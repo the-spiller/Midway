@@ -1,0 +1,46 @@
+﻿body {
+	margin: 0;
+	padding: 0;
+}
+
+ul {
+	list-style-type: none;
+}
+#head {
+	overflow: hidden;
+	width: 1387px;
+	height: 275px;
+}
+
+#nav1 {
+	position: absolute;
+	overflow: hidden;
+	padding: 15px;
+	text-align: left;
+	background-color: darkblue;
+	top: 275px;
+	width: 120px;
+	height: 650px;
+	font: bold 1.4em Arial;
+}
+	#nav li {
+		color: lightgray;
+		padding: 5px;
+	}
+	#nav a:hover, a:active {
+		color: white;
+	}
+
+#content1 {
+	text-indent: 3%;
+	height: 630px;
+	margin-left: 142px;
+	margin-right: 20px;
+	padding: 20px;
+	padding-bottom: 30px;
+	background-color: skyblue;
+	color: black;
+	text-align: left;
+	font: 1.2em "Times New Roman";
+	overflow: auto;
+}
