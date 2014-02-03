@@ -58,16 +58,19 @@ input[type="text"], input[type="password"] {
     color: rgba(0, 0, 0, 1.0);
 }
 
-td {
+td, th {
+    text-align: left;
     padding: 5px;
 }
     td a, td input {
         vertical-align: middle;
     }
-    td.right {
+    td.right, th.right {
 	    text-align: right;
     }
-
+th {
+    border-bottom: 1px solid #fff;
+}
 
 .noselect {
     -webkit-user-select: none;
@@ -254,7 +257,7 @@ td {
 #homediv {
     font-size: 1em;
     top: 200px;
-    left: 143px;
+    left: 43px;
     width: 675px;
     height: 360px;
     display: block;    
@@ -282,4 +285,30 @@ td {
 
 #quitgame {
     display: none;
+}
+
+#recordtable {
+    margin: 20px;
+    width: 90%;
+    border-collapse: collapse;
+}
+    #recordtable td.name {
+        width: 46%;
+        border-right: 1px solid #fff;
+    }
+    #recordtable td.number {
+        width: 18%;
+        border-left: 1px solid #fff;
+        text-align: right;
+    }
+
+#oppselectdiv {
+    position: absolute;
+    display: none;
+    background-color: #808080;
+    color: #000;
+}
+
+#oppselect {
+    font: 1em Arial, sans-serif;
 }

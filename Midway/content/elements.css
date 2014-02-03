@@ -2,6 +2,7 @@
 
 .flatbutton {
 	padding: 4px 10px 4px 10px;
+    margin-right: 5px;
 	font: 600 14px Arial, sans-serif;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 	display: inline-block;
@@ -217,9 +218,10 @@
     cursor: pointer;
     overflow: hidden;
 }
-	.listitem.down {
-		padding: 6px 5px 4px 5px;
-		box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
-		color: #fff;
-		text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.4), -1px -1px 3px rgba(255, 255, 255, 0.4);
-	}
+    .listitem.down
+    {
+        padding: 6px 5px 4px 5px;
+        box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
+        color: #fff;
+        text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.4), -1px -1px 3px rgba(255, 255, 255, 0.4);
+    }

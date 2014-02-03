@@ -15,5 +15,6 @@ namespace MidwayApi.Models.DTOs
 		public int? OpponentId { get; set; }
 		public string OpponentNickname { get; set; }
 		public int? OpponentPoints { get; set; }
+        public string Draw { get; set; }
 	}
 }

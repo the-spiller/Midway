@@ -23,15 +23,26 @@
             <div id="optopponent">
                 Opponent Nickname (optional):
                 <input id="oppnickname" type="text" value="First available" />
+                <div id="oppselectdiv">
+                    <select id="oppselect"></select>
+                </div>
             </div>
             <div id="buttondiv">
                 <a id="playgame" class="flatbutton graybtn">Play</a>
                 <a id="quitgame" class="flatbutton graybtn">Retire</a>
             </div>
-            <div id="searchout"></div>
         </div>
         <div id="editreg" class="tabpanel">Registration</div>
-        <div id="record" class="tabpanel">Record</div>
+        <div id="record" class="tabpanel">
+            <table id="recordtable">
+                <tr>
+                    <th>Opponent</th>
+                    <th class="right">Wins</th>
+                    <th class="right">Losses</th>
+                    <th class="right">No Outcome</th>
+                </tr>
+            </table>
+        </div>
     </div>
 </div>
 

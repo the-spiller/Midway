@@ -13,6 +13,7 @@ namespace MidwayApi.Models.Data.Mappings
 			Property(g => g.GameId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			Property(g => g.CreateDTime).IsRequired();
 			Property(g => g.CompletedDTime).IsOptional();
+		    Property(g => g.Draw).IsOptional().HasMaxLength(1);
 
 			HasMany(g => g.PlayerGames).WithRequired(p => p.Game).HasForeignKey(p => p.GameId);
 		}

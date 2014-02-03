@@ -8,6 +8,7 @@ namespace MidwayApi.Models
 		public int GameId { get; set; }
 		public DateTime CreateDTime { get; set; }
 		public DateTime? CompletedDTime { get; set; }
+        public string Draw { get; set; }
 
 		public virtual IList<PlayerGame> PlayerGames { get; set; }
 	}

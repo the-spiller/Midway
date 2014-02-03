@@ -209,7 +209,7 @@ namespace MidwayApi.Models.Data
 			var dbGames = _context.PlayerGames
 				.Include(p => p.Side)
 				.Include(p => p.Game)
-				.Where(p => p.PlayerId == playerId && p.Game.CompletedDTime == null )
+				.Where(p => p.PlayerId == playerId)
 				.ToList();
 
 			var dtoGames = new List<DtoGame>();
@@ -223,6 +223,7 @@ namespace MidwayApi.Models.Data
 						TinyFlagUrl = dbGame.Side.TinyFlagUrl,
 						LastPlayed = dbGame.LastPlayed,
 						Points = dbGame.Points,
+                        Draw = dbGame.Game.Draw,
 						SelectedLocation = dbGame.SelectedLocation,
 						SideShortName = dbGame.Side.ShortName
 					};
