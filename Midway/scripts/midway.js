@@ -176,6 +176,13 @@ function showWait(title, message, color) {
     $("#dlgoverlay").css("display", "block");
 }
 
+function showAjaxError(xhr, status, errorThrown) {
+    if (!errorThrown)
+        showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "yellow");
+    else
+        showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "yellow");
+}
+
 function ajaxGetPlayer(playerId, successCallback) {
     $.ajax({
         url: "/api/player/" + playerId.toString(),
@@ -185,10 +192,7 @@ function ajaxGetPlayer(playerId, successCallback) {
             if (successCallback) successCallback();
         },
         error: function (xhr, status, errorThrown) {
-            if (!errorThrown)
-                showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "yellow");
-            else
-                showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "yellow");
+            showAjaxError(xhr, status, errorThrown);
         }
     });
 }
@@ -203,28 +207,24 @@ function ajaxUpdatePlayer(successCallback) {
             if (successCallback) successCallback();
         },
         error: function (xhr, status, errorThrown) {
-            if (!errorThrown)
-                showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "yellow");
-            else
-                showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "yellow");
+            showAjaxError(xhr, status, errorThrown);
         }
     });
 }
 
-function ajaxRegisterPlayer(successCallback) {
+function ajaxGetPlayers(successCallback) {
+    var playersList;
+
     $.ajax({
-        url: "/api/player",
-        type: "POST",
-        data: player,
-        success: function (data) {
-            player = JSON.parse(data);
-            if (successCallback) successCallback();
+        url: "api/player",
+        type: "GET",
+        accepts: "application/json",
+        success: function(data) {
+            playersList = JSON.parse(data);
+            if (successCallback) successCallback(playersList);
         },
-        error: function (xhr, status, errorThrown) {
-            if (!errorThrown)
-                showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "yellow");
-            else
-                showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "yellow");
+        error: function(xhr, status, errorThrown) {
+            showAjaxError(xhr, status, errorThrown);
         }
     });
 }
@@ -248,6 +248,10 @@ $(document).ready(function () {
                 $("#btnno").trigger("click");
         }
     });
+    
+    // Tooltips
+
+    $(document).tooltip({ tooltipClass: "mi-tooltip" });
 
     // Let's go....................................................................
     

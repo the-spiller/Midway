@@ -10,7 +10,7 @@
         $("#infolink").on("click", function () {
             showPhotoblurb();
         });
-
+        
         $(".closex").on("click", function () {
             $("#infolink").trigger("click");
         });
@@ -56,6 +56,26 @@
             }
         });
 
+        // Functions...........................................................
+        
+        function ajaxRegisterPlayer(successCallback) {
+            $.ajax({
+                url: "/api/player",
+                type: "POST",
+                data: player,
+                success: function (data) {
+                    player = JSON.parse(data);
+                    if (successCallback) successCallback();
+                },
+                error: function (xhr, status, errorThrown) {
+                    if (!errorThrown)
+                        showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "yellow");
+                    else
+                        showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "yellow");
+                }
+            });
+        }
+        
         // Init................................................................
 
         drawBackground("content/images/bg-register.jpg");

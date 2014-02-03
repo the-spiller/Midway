@@ -2,7 +2,7 @@
 
 .flatbutton {
 	padding: 4px 10px 4px 10px;
-	font: 14px Arial, sans-serif;
+	font: 600 14px Arial, sans-serif;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 	display: inline-block;
     min-width: 30px;
@@ -205,6 +205,7 @@
 
 .listitem {
     display: inline-block;
+    font: 600 1em Arial, sans-serif;
     text-align: left;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 	padding: 5px;

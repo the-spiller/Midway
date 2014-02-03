@@ -1,7 +1,7 @@
 ﻿<div id="pagetitle" class="orange">MIDWAY HOME</div>
 
 <a id="logofflink" href="#">Log Off</a>
-<div id="infolink"><img id="photoInfo" src="content/images/camera.png" /></div>
+<div id="infolink" title="Click for photo info"><img id="photoInfo" src="content/images/camera.png" /></div>
 
 <div id="welcome" class="orange"></div>
 
@@ -23,12 +23,12 @@
             <div id="optopponent">
                 Opponent Nickname (optional):
                 <input id="oppnickname" type="text" value="First available" />
-                <a id="checkname" class="flatbutton graybtn">Check</a>
             </div>
             <div id="buttondiv">
                 <a id="playgame" class="flatbutton graybtn">Play</a>
                 <a id="quitgame" class="flatbutton graybtn">Retire</a>
             </div>
+            <div id="searchout"></div>
         </div>
         <div id="editreg" class="tabpanel">Registration</div>
         <div id="record" class="tabpanel">Record</div>
@@ -51,7 +51,8 @@
         have been lashed to the island to provide extra protection from enemy attack.
     </p>
     <p class="photocredit">
-        Kure Maritime Museum
+        Kure Maritime Museum, Hiroshima
     </p>
 </div>
 <script src="scripts/scenes/home.js"></script>
+<script src="scripts/vendor/fuzzyset.js"></script>

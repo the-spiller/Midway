@@ -97,6 +97,8 @@
     <Content Include="scripts\scenes\home.js" />
     <Content Include="scripts\scenes\logon.js" />
     <Content Include="scripts\scenes\register.js" />
+    <Content Include="scripts\vendor\fuse.js" />
+    <Content Include="scripts\vendor\fuzzyset.js" />
     <Content Include="Test.html" />
     <Content Include="_about.html" />
     <Content Include="errorpages\404.html" />

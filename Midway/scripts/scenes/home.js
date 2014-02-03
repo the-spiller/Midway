@@ -1,7 +1,8 @@
 ﻿var homePage = {
     show: function () {
         var oppCleared = false,
-            abandonables = [];
+            abandonables = [],
+            nicknames = FuzzySet();
         
         // Event handlers......................................................
 
@@ -18,7 +19,7 @@
             scenes["logon"]();
         });
 
-        $(".tablistitem").on("click", function(e) {
+        $(".tablistitem").on("click", function (e) {
             $(".tablistitem, .tabpanel").removeClass("tabshown");
             var clickedId = e.target.id;
             $("#" + clickedId).addClass("tabshown");
@@ -35,17 +36,31 @@
                 $("#oppnickname").val("First available");
                 oppCleared = false;
             }
-        });
-
-        $("#checkname").on("click", function() {
-
+        }).on("keyup", function() {
+            if ($("#oppnickname").val()) {
+                var results = nicknames.get($("#oppnickname").val());
+                if (results == null) {
+                    $("#searchout").html("");
+                } else {
+                    var html = "<ul>";
+                    for (var i = 0; i < results.length; i++) {
+                        html += "<li id='name" + i + "'>" + results[i][1] + "</li>";
+                    }
+                    $("#searchout").html(html + "</ul>");
+                }
+            } else {
+                $("#searchout").html("");
+            }
+        }).on("onchange", function() {
+            if (!$("#oppnickname").val()) {
+                $("#searchout").html("");
+            }
         });
         
         // Functions...........................................................
 
-        function getGameListItem(loopIndex) {
-            var game = player.Games[loopIndex],
-                item = '<li id="game' + game.GameId + '" class="listitem"><img src="' +
+        function getGameListItem(game) {
+                var item = '<li id="game' + game.GameId + '" class="listitem"><img src="' +
                     game.TinyFlagUrl + '" /> ' + game.SideShortName,
                 twoWeeks = 1000 * 60 * 60 * 24 * 14;
 
@@ -53,20 +68,22 @@
                 item += ' vs. ' + game.OpponentNickname;
                 if (game.LastPlayed) {
                     var lastPlayed = new Date(game.LastPlayed);
+                    // build last-played date string - only show year if it's other than this year
                     var dateStr = dateTimeString(lastPlayed, !thisYear(lastPlayed));
-                    item += ' (last updated ' + dateStr + ')</li>';
+                    item += ' (last played ' + dateStr + ')</li>';
 
                     // Games more than two weeks old can be abandoned; 
                     // if less, and one must retire and take a loss
-                    abandonables[loopIndex] =
-                        (new Date().getMilliseconds() - lastPlayed.getMilliseconds() > twoWeeks);
+                    var dateNow = new Date();
+                    abandonables[game.GameId] =
+                        (dateNow.getTime() - lastPlayed.getTime() > twoWeeks);
                 } else {
                     item += ' not started</li>';
-                    abandonables[loopIndex] = false;
+                    abandonables[game.GameId] = false;
                 }
             } else {
                 item += ' waiting for opponent</li>';
-                abandonables[loopIndex] = true;
+                abandonables[game.GameId] = true;
             }
 
             return item;
@@ -76,7 +93,7 @@
             var listHtml = "";
             if (player.Games) {
                 for (var i = 0; i < player.Games.length; i++) {
-                    listHtml += getGameListItem(i);
+                    listHtml += getGameListItem(player.Games[i]);
                 }
                 $("#gamelist ul").prepend(listHtml);
             }
@@ -85,20 +102,38 @@
             $(".listitem").on("mousedown", function (e) {
                 $(".listitem").removeClass("down");
                 $(e.target).addClass("down");
-                if (getGameIdFromListItem($(e.target).attr(("id"))) < 0) {
+                var gameId = getGameIdFromListItem($(e.target));
+                if (gameId < 0) {
                     $("#optopponent").slideDown();
+                    $("#quitgame").css("display", "none");
+                    $("#playgame").text("Create");
+                    $("#quitgame").css("display", "none");
                 } else {
                     $("#optopponent").slideUp();
+                    $("#playgame").text("Play");
+                    $("#quitgame").css("display", "inline-block")
+                        .text(abandonables[gameId] ? "Abandon": "Retire");
                 }
             });
         }
         
-        function getGameIdFromListItem(listItemId) {
-            return Number(listItemId.replace("game", ""));
+        function getGameIdFromListItem(listItem) {
+            return Number($(listItem).attr("id").replace("game", ""));
         }
-        
-        // Init................................................................
 
+        function getPlayers() {
+            ajaxGetPlayers(gotPlayers);
+
+            function gotPlayers(list) {
+                for (var i = 0; i < list.length; i++) {
+                    nicknames.add(list[i].Nickname);
+                }
+            }
+        }
+
+        // Init................................................................
+        
+        getPlayers();
         drawBackground("content/images/bg-home.jpg");
 
         $("#welcome").html("Welcome back, " + player.Nickname +

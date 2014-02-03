@@ -75,6 +75,12 @@ td {
     -ms-user-select: none;
 }
 
+.mi-tooltip {
+    font: 500 .85em Arial, sans-serif !important;
+    padding: 3px 5px !important;
+    box-shadow: rgba(0, 0, 0, 0.8) 2px 2px 4px !important;
+}
+
 .floatingdiv {
     text-align: left;
     position: absolute;
@@ -248,7 +254,7 @@ td {
 #homediv {
     font-size: 1em;
     top: 200px;
-    left: 43px;
+    left: 143px;
     width: 675px;
     height: 360px;
     display: block;    
@@ -271,5 +277,9 @@ td {
     }
 
 #quitgame, #playgame {
-    width: 50px;
+    width: 70px;
+}
+
+#quitgame {
+    display: none;
 }
