@@ -32,7 +32,8 @@ a img { border: none; vertical-align: middle; }
 body, html { height: 100%; font: normal 14px Arial, san-serif; }
 
 p {
-    margin-bottom: 1em;
+    line-height: normal;
+    padding-bottom: 1em;
 }
 	p.heading {
 		color: #004a7f;
@@ -90,6 +91,7 @@ th {
 	background-color: black;
     opacity: 0.8;
     color: rgba(255, 255, 255, 1.0);
+    padding: 5px;
 	font: 1em Arial, sans-serif;
     box-shadow: rgba(0, 0, 0, 0.8) 4px 4px 8px;
 }
@@ -100,10 +102,10 @@ th {
 }
 
 .floathead {
-    margin: 5px;
     cursor: move;
     background: linear-gradient(to right, #202020, #202020, #000);
     height: 25px;
+    margin-bottom: 5px;
 }
 
 .floatright {
@@ -241,7 +243,7 @@ th {
 	padding: 0 30px 20px 20px;
 	text-justify: auto;
 	text-align: justify;
-	font: 1.2em "Times New Roman", serif;
+	font: 1.2em Georgia, serif;
 	background-color: #ffe7c4;
 	color: #000;
 	overflow: auto;
@@ -259,8 +261,12 @@ th {
     top: 200px;
     left: 43px;
     width: 675px;
-    height: 360px;
-    display: block;    
+    min-height: 360px;
+    display: block;
+}
+
+#hometabs {
+    margin-bottom: -5px;
 }
 
 #optopponent {
@@ -279,11 +285,12 @@ th {
         width: 50px;
     }
 
-#quitgame, #playgame {
+.homebutton {
     width: 70px;
+    margin-top: 10px;
 }
 
-#quitgame {
+#quitgame, #btncancel {
     display: none;
 }
 
@@ -293,12 +300,11 @@ th {
     border-collapse: collapse;
 }
     #recordtable td.name {
-        width: 46%;
-        border-right: 1px solid #fff;
+        width: 33%;
     }
     #recordtable td.number {
-        width: 18%;
-        border-left: 1px solid #fff;
+        width: 19%;
+        border-right: 1px solid #fff;
         text-align: right;
     }
 
@@ -311,4 +317,8 @@ th {
 
 #oppselect {
     font: 1em Arial, sans-serif;
+}
+
+#editreg input[type="text"], #editreg input[type="password"] {
+    width: 300px;
 }

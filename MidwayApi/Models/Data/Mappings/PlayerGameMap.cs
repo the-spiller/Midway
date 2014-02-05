@@ -14,7 +14,7 @@ namespace MidwayApi.Models.Data.Mappings
 			Property(p => p.SideId).IsRequired();
 			Property(p => p.PhaseId).IsRequired();
 			Property(p => p.LastPlayed).IsOptional();
-			Property(p => p.Points).IsOptional();
+			Property(p => p.Points).IsRequired();
 			Property(p => p.SelectedLocation).IsOptional().HasMaxLength(3);
 			Property(p => p.SurfaceCombatRound).IsRequired();
 			Property(p => p.PhaseIndeterminate).IsRequired().HasMaxLength(1);

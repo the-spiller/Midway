@@ -4,7 +4,6 @@
 	padding: 4px 10px 4px 10px;
     margin-right: 5px;
 	font: 600 14px Arial, sans-serif;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 	display: inline-block;
     min-width: 30px;
 	text-align: center;
@@ -84,15 +83,15 @@
     -ms-user-select: none;
 }
     #dlghead.plaindlghead {
-        background-color: #808080;
+        background: linear-gradient(to right, #808080, #808080, #808080, #fff);
         color: #fff;
     }
     #dlghead.bluedlghead {
-        background-color: #6babba;
+        background: linear-gradient(to right, #6babba, #6babba, #6babba, #bcd0ca);
         color: #fffbdf;
     }
     #dlghead.yellowdlghead {
-        background-color: #884455;
+        background: linear-gradient(to right, #884455, #884455, #884455, #ffcc66);
         color: #ff9966;
     }
 #dlgbody {
@@ -102,22 +101,24 @@
     display: inline-block;
 }
 #dlgbuttons {
-	text-align: right;
 	padding: 5px;
-    margin: 5px 0 5px 0;
+    margin-top: 8px;
 }
+    #dlgbuttons a {
+        min-width: 40px;
+    }
 
 /* Photo info popup..........................................................*/
 
 .photoblurb {
     display: none;
 	position: absolute;
-    line-height: 1em;
+    line-height: normal;
     text-justify: auto;
     text-align: justify;
     width: 400px;
     padding: 30px 22px 5px 20px;
-    font: 1em Times New Roman, serif;
+    font: 1em Georgia, serif;
 	background-color: rgba(255, 231, 196, 0.7);
     color: #000;
     border-radius: 15px;
@@ -181,22 +182,23 @@
 
 .tablistitem {
     font: bold 1.2em Arial, sans-serif;
-    padding: 10px;
-    display: inline;
+    display: inline-block;
     color: #707070;
     cursor: pointer;
+    padding: 5px 15px 8px 15px;
 }
     .tablistitem:hover {
         color: #909090;
     }
     .tablistitem.tabshown {
         color: #fff;
+        background-color: #202020;
     }
 .tabpanel {
     color: #fff;
     padding: 20px;
     display: none;
-    overflow: auto;
+    background: linear-gradient(to right, #202020, #202020, #000);
 }
     .tabpanel.tabshown {
         display: block;
@@ -208,13 +210,12 @@
     display: inline-block;
     font: 600 1em Arial, sans-serif;
     text-align: left;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 	padding: 5px;
     width: 98%;
 	border-radius: 3px;
     background-color: #808080;
     color: #000;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
     cursor: pointer;
     overflow: hidden;
 }

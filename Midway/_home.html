@@ -1,7 +1,7 @@
 ﻿<div id="pagetitle" class="orange">MIDWAY HOME</div>
 
 <a id="logofflink" href="#">Log Off</a>
-<div id="infolink" title="Click for photo info"><img id="photoInfo" src="content/images/camera.png" /></div>
+<div id="infolink" title="Photo info"><img id="photoInfo" src="content/images/camera.png" /></div>
 
 <div id="welcome" class="orange"></div>
 
@@ -13,36 +13,58 @@
             <li id="editregtab" class="tablistitem">Your Registration</li>
             <li id="recordtab" class="tablistitem">Your Record</li>
         </ul>
-        <div id="gameselect" class="tabpanel tabshown">
-            <div id="gamelist">
-                <ul>
-                    <li id="game-1" class="listitem"><img src="content/images/usn.gif" /> USN New Game</li>
-                    <li id="game-2" class="listitem"><img src="content/images/ijn.gif" /> IJN New Game</li>
-                </ul>
-            </div>
-            <div id="optopponent">
-                Opponent Nickname (optional):
-                <input id="oppnickname" type="text" value="First available" />
-                <div id="oppselectdiv">
-                    <select id="oppselect"></select>
-                </div>
-            </div>
-            <div id="buttondiv">
-                <a id="playgame" class="flatbutton graybtn">Play</a>
-                <a id="quitgame" class="flatbutton graybtn">Retire</a>
+    </div>
+    <div id="gameselect" class="tabpanel tabshown">
+        <div id="gamelist">
+            <ul>
+                <li id="game-1" class="listitem"><img src="content/images/usn.gif" /> USN New Game</li>
+                <li id="game-2" class="listitem"><img src="content/images/ijn.gif" /> IJN New Game</li>
+            </ul>
+        </div>
+        <div id="optopponent">
+            Opponent Nickname (optional):
+            <input id="oppnickname" type="text" value="First available" />
+            <div id="oppselectdiv">
+                <select id="oppselect"></select>
             </div>
         </div>
-        <div id="editreg" class="tabpanel">Registration</div>
-        <div id="record" class="tabpanel">
-            <table id="recordtable">
-                <tr>
-                    <th>Opponent</th>
-                    <th class="right">Wins</th>
-                    <th class="right">Losses</th>
-                    <th class="right">No Outcome</th>
-                </tr>
-            </table>
+        <div id="buttondiv">
+            <a id="playgame" class="homebutton flatbutton graybtn">Play</a>
+            <a id="quitgame" class="homebutton flatbutton graybtn">Retire</a>
         </div>
+    </div>
+    <div id="editreg" class="tabpanel">
+        <table style="margin-left: 60px;">
+            <tr>
+                <td class="right">Email</td>
+                <td><input id="email" type="text" /></td>
+            </tr>
+            <tr>
+                <td class="right">Password</td>
+                <td><input id="pwd" type="password" /></td>
+            </tr>
+            <tr>
+                <td class="right">Nickname</td>
+                <td><input id="nickname" type="text" /></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <a id="savereg" class="homebutton flatbutton graybtn">Save</a>
+                    <a id="cancelreg" class="homebutton flatbutton graybtn">Cancel</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="record" class="tabpanel">
+        <table id="recordtable">
+            <tr>
+                <th>Opponent</th>
+                <th class="right">Wins</th>
+                <th class="right">Losses</th>
+                <th class="right">No Decision</th>
+            </tr>
+        </table>
     </div>
 </div>
 

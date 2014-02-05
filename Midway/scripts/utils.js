@@ -39,13 +39,13 @@ function validEmail(textElementId) {
 }
 
 function hasText(textElementId) {
-    if ($("#" + textElementId).val().length == 0) {
+    if ($("#" + textElementId).length == 0 || $("#" + textElementId).val().length == 0) {
         return false;
     }
     return true;
 }
 
-function in_array(needle, haystack) {
+function inArray(needle, haystack) {
     for (var x = 0; x < haystack.length; x++) {
         if (haystack[x] === needle) {
             return true;
@@ -56,17 +56,54 @@ function in_array(needle, haystack) {
 
 // DateTime stuff
 
-function dateTimeString(date, includeYear) {
-    if (includeYear)
-        return date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear() + " " +
-            date.getHours() + ":" + date.getMinutes();
-    else
-        return date.getMonth() + "/" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes();
+function parseIso8601(str) {
+    // we assume str is a UTC date ending in 'Z'
+    var parts = str.split('T'),
+    dateParts = parts[0].split('-'),
+    timeParts = parts[1].split('Z'),
+    timeSubParts = timeParts[0].split(':'),
+    timeSecParts = timeSubParts[2].split('.'),
+    timeHours = Number(timeSubParts[0]),
+    date = new Date;
+
+    date.setUTCFullYear(Number(dateParts[0]));
+    date.setUTCMonth(Number(dateParts[1]) - 1);
+    date.setUTCDate(Number(dateParts[2]));
+    date.setUTCHours(Number(timeHours));
+    date.setUTCMinutes(Number(timeSubParts[1]));
+    date.setUTCSeconds(Number(timeSecParts[0]));
+    if (timeSecParts[1]) date.setUTCMilliseconds(Number(timeSecParts[1]));
+
+    // by using setUTC methods the date has already been converted to local time(?)
+    return date;
 }
 
-function thisYear(dateToTest) {
-    var date = new Date();
-    return (date.getYear() == dateToTest.getYear());
+function prettyTimeAgo(date) {
+    var diff = (new Date().getTime() - date.getTime()) / 1000,  //seconds
+        dayDiff = Math.floor(diff / 86400); //days
+
+    if (isNaN(dayDiff) || dayDiff < 0)
+        return undefined;
+
+    switch (true) {
+        case(diff < 60):
+            return "just now";
+        case (diff < 120):
+            return "a minute ago";
+        case (diff < 3600):
+            return diff / 60 + " minutes ago";
+        case (diff < 7200):
+            return "an hour ago";
+        case (diff < 86400):
+            return diff / 3600 + " hours ago";
+        case (dayDiff == 1):
+            return "yesterday";
+        case (dayDiff < 14):
+            return dayDiff + " days ago";
+        default:
+            console.log("days: " + dayDiff + ", weeks: " + dayDiff / 7);
+            return Math.round(dayDiff / 7) + " weeks ago"; 
+    }
 }
 
 // Read/write localStorage and/or cookies

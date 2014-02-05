@@ -10,7 +10,7 @@ var canvas = document.getElementById("maincanvas"),
     DLG_WIDTH = 460,
     DLG_OK = 1,
     DLG_OKCANCEL = 2,
-    DLG_YESNO = 3,
+    DLG_YESCANCEL = 3,
     showingInfo = false,
     IMG_WIDTH = 1387,
     IMG_HEIGHT = 275;
@@ -118,7 +118,7 @@ function showAlert(title, message, buttons, color, callback) {
     var topLeft = getAlertPosition();
     
     function getAlertButtonHtml(text) {
-        return "<a id='btn" + text.toLowerCase() + "' class='flatbutton " + color + "btn'>" + text + "</a>";
+        return "<a id='dlgbtn" + text.toLowerCase() + "' class='flatbutton " + color + "btn'>" + text + "</a>";
     }
 
     $("#dlghead").removeClass()
@@ -135,8 +135,8 @@ function showAlert(title, message, buttons, color, callback) {
         case (DLG_OKCANCEL):
             $("#dlgbuttons").html(getAlertButtonHtml("OK") + getAlertButtonHtml("Cancel"));
             break;
-        case (DLG_YESNO):
-            $("#dlgbuttons").html(getAlertButtonHtml("Yes") + getAlertButtonHtml("No"));
+        case (DLG_YESCANCEL):
+            $("#dlgbuttons").html(getAlertButtonHtml("Yes") + getAlertButtonHtml("Cancel"));
             break;
     }
 
@@ -203,7 +203,8 @@ function ajaxUpdatePlayer(successCallback) {
         type: "PUT",
         accepts: "application/json",
         data: player,
-        success: function () {
+        success: function (data) {
+            player = JSON.parse(data);
             if (successCallback) successCallback();
         },
         error: function (xhr, status, errorThrown) {
@@ -237,15 +238,15 @@ $(document).ready(function () {
     
     $("#dlgoverlay").on("keyup", function(e) {
         if (e.keyCode == 13) {
-            if ($("#btnok").length)
-                $("#btnok").trigger("click");
-            else if ($("#btnyes").length)
-                $("#btnyes").trigger("click");
+            if ($("#dlgbtnok").length)
+                $("#dlgbtnok").trigger("click");
+            else if ($("#dlgbtnyes").length)
+                $("#dlgbtnyes").trigger("click");
         } else if (e.keyCode == 27) {
-            if ($("#btncancel").length)
-                $("#btncancel").trigger("click");
-            else if ($("#btnno").length)
-                $("#btnno").trigger("click");
+            if ($("#dlgbtncancel").length)
+                $("#dlgbtncancel").trigger("click");
+            else if ($("#dlgbtnno").length)
+                $("#dlgbtnno").trigger("click");
         }
     });
     

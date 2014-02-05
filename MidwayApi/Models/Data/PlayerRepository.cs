@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using MidwayApi.Models.DTOs;
-using MidwayApi.Models.Data;
 using System.Linq;
-using System.Net;
-using System.Web;
 using System.Web.Security;
+using MidwayApi.Models.Services;
+using MidwayApi.Models.DTOs;
 
 namespace MidwayApi.Models.Data
 {
@@ -27,7 +25,7 @@ namespace MidwayApi.Models.Data
             _context = context as MidwayContext;
         }
 
-        public IEnumerable<DtoPlayer> GetPlayers()
+        public IList<DtoPlayer> GetPlayers()
         {
 	        return _context.Players.Select(p => new DtoPlayer
 		        {
@@ -46,11 +44,11 @@ namespace MidwayApi.Models.Data
 			    {
 					PlayerId = p.PlayerId,
 					Email = p.Email,
-					Password =p.Password,
+					Password = p.Password,
 					Nickname  = p.Nickname,
 					Admin = p.Admin,
 					Lockout = p.Lockout
-				}).FirstOrDefault(p => p.Email == email);
+				}).FirstOrDefault(p => p.Email.ToLower() == email.ToLower());
 
 			if (dtoPlayer == null) return null;
 
@@ -90,23 +88,10 @@ namespace MidwayApi.Models.Data
 				throw new Exception("Player not found");
 			}
 
-            if (player.Password == null)
+            if (player.Password == null)  //Send new password to player's email addr.
             {
                 var newPass = Membership.GeneratePassword(new Random().Next(8, 11), 1);
-                var recips = new List<string> { player.Email };
-
-                new Mailer().Send(new Message
-                    {
-                        FromAddress = "admin@midwaygame.org",
-                        RecipientAddresses = recips,
-                        Subject = "New MIDWAY Password",
-                        Body = "Hello!\r\n\r\n" +
-                               "Here is your temporary password for the MIDWAY game site. Use it " +
-                               "the next time you log in:\r\n\t" + newPass +
-                               "\r\n\r\nThanks, and we hope you enjoy our game.\r\n" +
-                               "MIDWAY Site Admins"
-                    }
-                );
+                new Mailer().SendNewPwdMessage(player.Email, newPass);
                 player.Password = newPass;
             }
             
@@ -115,18 +100,32 @@ namespace MidwayApi.Models.Data
             dbPlayer.Nickname = player.Nickname;
             dbPlayer.Lockout = player.Lockout;
 
-			// No updates of games -- only newly-created ones are handled here.
-			// Existing game updates are handled in the GamesController.
+			// The only game data updated here is retire/abandonment or the addition of new games.
+            // Anything else is handled in the game controller.
 			foreach (var dtoGame in player.Games)
 			{
-				var dbGame = _context.Games.FirstOrDefault(g => g.GameId == dtoGame.GameId);
-				if (dbGame == null)
+				var dbGame = _context.Games
+                    .Include(g => g.PlayerGames)
+                    .FirstOrDefault(g => g.GameId == dtoGame.GameId);
+
+				if (dbGame != null && !string.IsNullOrEmpty(dtoGame.CompletedDTime)) // update fields affected by retire/abandonment
+				{
+				    dbGame.CompletedDTime = DateTime.Parse(dtoGame.CompletedDTime);
+
+				    var oppPg = dbGame.PlayerGames.FirstOrDefault(p => p.PlayerId == dtoGame.OpponentId);
+                    if (oppPg != null) oppPg.Points = dtoGame.OpponentPoints;
+
+				    var pg = dbGame.PlayerGames.First(p => p.SideId == dtoGame.SideId);
+                    pg.Points = dtoGame.Points;
+                    dbGame.Draw = dtoGame.Draw;
+				}
+				else if (dbGame == null) // new game
 				{
 					dbGame = new Game { CreateDTime = DateTime.Now, PlayerGames = new List<PlayerGame>() };
-					var pg = new PlayerGame
+					var dbPg = new PlayerGame
 						{
 							PlayerId = player.PlayerId,
-							LastPlayed = dtoGame.LastPlayed,
+							LastPlayed = null,
 							Points = 0,
 							SelectedLocation = "",
 							SurfaceCombatRound = 0,
@@ -136,13 +135,13 @@ namespace MidwayApi.Models.Data
 							SideId = dtoGame.SideId,
 							MidwayInvadedTurn = 0
 						};
-					dbGame.PlayerGames.Add(pg);
+					dbGame.PlayerGames.Add(dbPg);
 
-					if (dtoGame.OpponentId != null)
+					if (dtoGame.OpponentId > 0)
 					{
 						var oppPg = new PlayerGame
 							{
-								PlayerId = dtoGame.OpponentId.Value,
+								PlayerId = dtoGame.OpponentId,
 								Points = 0,
 								SurfaceCombatRound = 0,
 								Turn = 1,
@@ -152,9 +151,9 @@ namespace MidwayApi.Models.Data
 							};
 						dbGame.PlayerGames.Add(oppPg);
 					}
-					_context.Save();
-					dtoGame.GameId = dbGame.GameId;
 				}
+                _context.Save();
+                dtoGame.GameId = dbGame.GameId;
 			}
 			return player;
         }
@@ -164,7 +163,7 @@ namespace MidwayApi.Models.Data
             var newPass = Membership.GeneratePassword(new Random().Next(8, 11), 1);
             var recips = new List<string> { player.Email };
 
-            new Mailer().Send(new Message()
+            new Mailer().Send(new Message
                 {
                     FromAddress = "admin@midwaygame.org",
                     RecipientAddresses = recips,
@@ -179,8 +178,8 @@ namespace MidwayApi.Models.Data
 			player.Password = newPass;
 	        player.Admin = "N";
 	        player.Lockout = 0;
-	        var newPlayer = new Player()
-		        {
+	        var newPlayer = new Player
+	            {
 			        Email = player.Email,
 			        Password = player.Password,
 			        Nickname = player.Nickname,
@@ -216,12 +215,13 @@ namespace MidwayApi.Models.Data
 
 			foreach (var dbGame in dbGames)
 			{
-				var dtoGame = new DtoGame()
-					{
+				var dtoGame = new DtoGame
+				    {
 						GameId = dbGame.GameId,
 						SideId = dbGame.Side.SideId,
 						TinyFlagUrl = dbGame.Side.TinyFlagUrl,
-						LastPlayed = dbGame.LastPlayed,
+                        LastPlayed = dbGame.LastPlayed == null ? "" :
+                            dbGame.LastPlayed.Value.ToUniversalTime().ToString("o"),
 						Points = dbGame.Points,
                         Draw = dbGame.Game.Draw,
 						SelectedLocation = dbGame.SelectedLocation,
@@ -229,17 +229,26 @@ namespace MidwayApi.Models.Data
 					};
 
 				// Opponent
-				var opp = _context.PlayerGames
+				var dbOpp = _context.PlayerGames
 					.Include(p => p.Player)
 					.FirstOrDefault(p => p.GameId == dtoGame.GameId && p.PlayerId != playerId);
 
-				if (opp != null)
+				if (dbOpp != null)
 				{
-					dtoGame.OpponentId = opp.PlayerId;
-					dtoGame.OpponentNickname = opp.Player.Nickname;
-					dtoGame.OpponentPoints = opp.Points;
+				    dtoGame.OpponentId = dbOpp.PlayerId;
+				    dtoGame.OpponentNickname = dbOpp.Player.Nickname;
+				    dtoGame.OpponentPoints = dbOpp.Points;
 
-					if (opp.LastPlayed > dtoGame.LastPlayed) dtoGame.LastPlayed = opp.LastPlayed;
+				    if (dbOpp.LastPlayed != null && dbGame.LastPlayed != null)
+				    {
+                        if (dbOpp.LastPlayed.Value > dbGame.LastPlayed)
+				            dtoGame.LastPlayed = dbOpp.LastPlayed.Value.ToUniversalTime().ToString("o");
+				    }
+				}
+				else
+				{
+				    dtoGame.OpponentId = 0;
+				    dtoGame.OpponentPoints = 0;
 				}
 				dtoGames.Add(dtoGame);
 			}

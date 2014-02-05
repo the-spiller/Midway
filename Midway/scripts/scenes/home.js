@@ -2,6 +2,8 @@
     show: function () {
         var oppCleared = false,
             oppMatched = false,
+            gamesPrepend,
+            recordAppend,
             selGameId = 0,
             abandonables = [],
             nicknames = FuzzySet();
@@ -36,20 +38,34 @@
                     " It will go into your record as a draw.";
             } else {
                 caption = "Retire";
-                msg = "Are you sure you want to retire?" +
+                msg = "Are you sure you want to retire from this game?" +
                     " It will go into your record as a loss (and a free win for your opponent).";
             }
-            showAlert(caption, msg, DLG_YESNO, "blue", btnPressed);
+            showAlert(caption, msg, DLG_YESCANCEL, "blue", btnPressed);
             
             function btnPressed(button) {
                 if (button == "Yes") {
-                    alert("Abandon/retire logic goes here.");
+                    var game = findGameById();
+                    game.CompletedDTime = new Date().toISOString();
+                    if (abandonables[selGameId]) {
+                        game.Draw = "Y";
+                    } else {
+                        game.OpponentPoints = game.Points + 1;
+                        game.Draw = "N";
+                    }
+                    ajaxUpdatePlayer(updateSuccess);    // will update game data for this page only
+                    
+                    function updateSuccess() {
+                        selGameId = 0;
+                        buildRecord();
+                        buildGameList();
+                        $("#quitgame").css("display", "none");
+                    }
                 }
             }
         });
 
         $("#playgame").on("click", function () {
-            console.log("game " + selGameId);
             if (selGameId == 0) return;
 
             var game = {};
@@ -58,18 +74,11 @@
                 alert("Create and save new game goes here.");
             } else {
                 // find the selected game
-                for (var i = 0; i < player.Games.length; i++) {
-                    if (player.Games[i].GameId == selGameId) {
-                        console.log(player.Games[i].GameId + ", " + player.Games[i].SideShortName + ", " + player.Games[i].OpponentNickname);
-                        game = player.Games[i];
-                        break;
-                    }
-                }
+                game = findGameById();
             }
             // Make this game the only one
             player.Games = [];
             player.Games.push(game);
-            console.log(game.GameId + ", " + game.SideShortName + ", " + game.OpponentNickname);
             
             //scenes["search"]();
             alert("Load of search scene goes here.");
@@ -140,8 +149,29 @@
                 oppMatched = true;
             }
         });
+
+        $("#btnsave").on("click", function() {
+
+        });
         
         // Functions...........................................................
+        
+        function findGameById() {
+            var game = {};
+            for (var i = 0; i < player.Games.length; i++) {
+                if (player.Games[i].GameId == selGameId) {
+                    game = player.Games[i];
+                    break;
+                }
+            }
+            return game;
+        }
+        
+        function loadRegFields() {
+            $("#email").val(player.Email);
+            $("#pwd").val(player.Password);
+            $("#nickname").val(player.Nickname);
+        }
         
         function getGameListItem(game) {
         /*-------------------------------------------------------*/
@@ -154,16 +184,15 @@
             if (game.OpponentNickname) {
                 item += ' vs. ' + game.OpponentNickname;
                 if (game.LastPlayed) {
-                    var lastPlayed = new Date(game.LastPlayed);
-                    // build last-played date string - only show year if it's other than this year
-                    var dateStr = dateTimeString(lastPlayed, !thisYear(lastPlayed));
-                    item += ' (last played ' + dateStr + ')</li>';
+                    console.log(game.LastPlayed);
+                    var lp = parseIso8601(game.LastPlayed);
+                    item += ' (last played ' + prettyTimeAgo(lp) + ')</li>';
 
                     // Games more than two weeks old can be abandoned; 
                     // if less, to quit one must retire and take a loss.
                     var dateNow = new Date();
                     abandonables[game.GameId] =
-                        (dateNow.getTime() - lastPlayed.getTime() > twoWeeks);
+                        (dateNow.getTime() - lp.getTime() > twoWeeks);
                 } else {
                     item += ' not started</li>';
                     abandonables[game.GameId] = true;
@@ -181,13 +210,15 @@
         /* for the 'Your Games' list, and display it.         */
         /*----------------------------------------------------*/
             var listHtml = "";
+            if (gamesPrepend) gamesPrepend.remove();
+            
             if (player.Games) {
                 for (var i = 0; i < player.Games.length; i++) {
                     if (player.Games[i].CompletedDTime == null) {
                         listHtml += getGameListItem(player.Games[i]);
                     }
                 }
-                $("#gamelist ul").prepend(listHtml);
+                gamesPrepend = $(listHtml).prependTo("#gamelist ul");
             }
 
             // affected event handler needs to follow the prepend
@@ -198,12 +229,9 @@
                 if (selGameId < 0) {
                     $("#optopponent").slideDown();
                     $("#quitgame").css("display", "none");
-                    $("#playgame").text("Create");
-                    $("#quitgame").css("display", "none");
                     setOppselectPos();
                 } else {
                     $("#optopponent").slideUp();
-                    $("#playgame").text("Play");
                     $("#quitgame").css("display", "inline-block")
                         .text(abandonables[selGameId] ? "Abandon": "Retire");
                 }
@@ -256,25 +284,28 @@
                 html = "";
             
             // build table of game outcomes
+            if (recordAppend) recordAppend.remove();
             for (var i = 0; i < player.Games.length; i++) {
                 var game = player.Games[i];
-
-                recIndex = -1;
-                for (var j = 0; j < record.length; j++) {
-                    if (game.OpponentNickname == record[i][0]) {
-                        recIndex = j;
-                        break;
+                
+                if (game.OpponentNickname != null) {
+                    recIndex = -1;
+                    for (var j = 0; j < record.length; j++) {
+                        if (game.OpponentNickname == record[i][0]) {
+                            recIndex = j;
+                            break;
+                        }
                     }
-                }
-                if (recIndex == -1) {
-                    recIndex = record.push([game.OpponentNickname, 0, 0, 0]) - 1;
-                }
-                if (game.Draw == "Y") { // all incomplete games; some complete games (abandoned)
-                    record[recIndex][3]++;
-                } else if (game.Points < game.OpponentPoints) {
-                    record[recIndex][2]++;
-                } else {
-                    record[recIndex][1]++;
+                    if (recIndex == -1) {
+                        recIndex = record.push([game.OpponentNickname, 0, 0, 0]) - 1;
+                    }
+                    if (game.Draw == "Y") { // all incomplete games; some complete games (abandoned)
+                        record[recIndex][3]++;
+                    } else if (game.Points < game.OpponentPoints) {
+                        record[recIndex][2]++;
+                    } else {
+                        record[recIndex][1]++;
+                    }
                 }
             }
             
@@ -284,7 +315,7 @@
                     "</td><td class='number'>" + record[i][2] + "</td><td class='number'>" + record[i][3] +
                     "</td></tr>";
             }
-            $("#recordtable").append(html);
+            recordAppend = $(html).appendTo("#recordtable");
         }
         
         // Init................................................................
@@ -307,6 +338,7 @@
             containment: "#pagediv",
             scroll: false
         });
+        loadRegFields();
         getPlayers();
         buildRecord();
         buildGameList();
