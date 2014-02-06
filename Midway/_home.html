@@ -3,7 +3,9 @@
 <a id="logofflink" href="#">Log Off</a>
 <div id="infolink" title="Photo info"><img id="photoInfo" src="content/images/camera.png" /></div>
 
-<div id="welcome" class="orange"></div>
+<div id="welcome" class="orange">
+    Welcome back, <span id="namespan"></span>! Go to a game, edit your registration info or peruse your record.
+</div>
 
 <div id="homediv" class="floatingdiv">
     <div class="floathead"></div>
@@ -17,8 +19,8 @@
     <div id="gameselect" class="tabpanel tabshown">
         <div id="gamelist">
             <ul>
-                <li id="game-1" class="listitem"><img src="content/images/usn.gif" /> USN New Game</li>
-                <li id="game-2" class="listitem"><img src="content/images/ijn.gif" /> IJN New Game</li>
+                <li id="game-1" class="listitem"><img src="content/images/usn.gif" />&nbsp;USN New Game</li>
+                <li id="game-2" class="listitem"><img src="content/images/ijn.gif" />&nbsp;IJN New Game</li>
             </ul>
         </div>
         <div id="optopponent">
@@ -29,29 +31,33 @@
             </div>
         </div>
         <div id="buttondiv">
-            <a id="playgame" class="homebutton flatbutton graybtn">Play</a>
-            <a id="quitgame" class="homebutton flatbutton graybtn">Retire</a>
+            <a id="playgame" class="longbutton flatbutton graybtn">Play</a>
+            <a id="quitgame" class="longbutton flatbutton graybtn">Retire</a>
         </div>
     </div>
     <div id="editreg" class="tabpanel">
         <table style="margin-left: 60px;">
             <tr>
                 <td class="right">Email</td>
-                <td><input id="email" type="text" /></td>
+                <td><input id="email" type="text" class="regdata" /></td>
             </tr>
             <tr>
                 <td class="right">Password</td>
-                <td><input id="pwd" type="password" /></td>
+                <td><input id="pwd" type="password" class="regdata" /></td>
+            </tr>
+            <tr>
+                <td class="right">Reenter password</td>
+                <td><input id="pwd2" type="password" /></td>
             </tr>
             <tr>
                 <td class="right">Nickname</td>
-                <td><input id="nickname" type="text" /></td>
+                <td><input id="nickname" type="text" class="regdata" /></td>
             </tr>
             <tr>
                 <td></td>
                 <td>
-                    <a id="savereg" class="homebutton flatbutton graybtn">Save</a>
-                    <a id="cancelreg" class="homebutton flatbutton graybtn">Cancel</a>
+                    <a id="savereg" class="longbutton flatbutton graybtn">Save</a>
+                    <a id="cancelreg" class="longbutton flatbutton graybtn">Cancel</a>
                 </td>
             </tr>
         </table>

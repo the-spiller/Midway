@@ -29,7 +29,7 @@ a:link, a:visited { text-decoration: none; border: none; }
 a:hover, a:active { text-decoration: none; border: none; }
 a img { border: none; vertical-align: middle; }
 
-body, html { height: 100%; font: normal 14px Arial, san-serif; }
+body, html { height: 100%; font: normal 14px Arial, sans-serif; }
 
 p {
     line-height: normal;
@@ -37,13 +37,13 @@ p {
 }
 	p.heading {
 		color: #004a7f;
-		font: bold 1.2em Arial, Helvetica, sans-serif;
+		font: bold 1.2em Arial, sans-serif;
 		padding-top: 20px;
 	}
 
 	p.subheading {
 		color: #004a7f;
-		font: bold 1em Arial, Helvetica, sans-serif;
+		font: bold 1em Arial, sans-serif;
 	}
 
 input[type="text"], input[type="password"] {
@@ -93,7 +93,7 @@ th {
     color: rgba(255, 255, 255, 1.0);
     padding: 5px;
 	font: 1em Arial, sans-serif;
-    box-shadow: rgba(0, 0, 0, 0.8) 4px 4px 8px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
 
 .floattable {
@@ -103,7 +103,7 @@ th {
 
 .floathead {
     cursor: move;
-    background: linear-gradient(to right, #202020, #202020, #000);
+    background: linear-gradient(to right, #202020, #202020, #202020, #000);
     height: 25px;
     margin-bottom: 5px;
 }
@@ -151,6 +151,13 @@ th {
 .rtextwrap {
     float: right;
     margin: 0 0 0 1em;
+}
+
+.longbutton {
+    width: 70px;
+    margin-top: 10px;
+    border-bottom: 1px solid #202020;
+    border-right: 1px solid #202020;
 }
 
 #pagediv {
@@ -209,7 +216,6 @@ th {
     top: 380px;
     left: 700px;
 	width: 400px;
-	display: block;
 }
 
 #logofflink {
@@ -236,14 +242,13 @@ th {
     top: 200px;
     left: 400px;
 	width: 400px;
-	display: block;
 }
 
 #words {
 	padding: 0 30px 20px 20px;
 	text-justify: auto;
 	text-align: justify;
-	font: 1.2em Georgia, serif;
+	font: 1.2em "Times New Roman", serif;
 	background-color: #ffe7c4;
 	color: #000;
 	overflow: auto;
@@ -258,11 +263,8 @@ th {
 
 #homediv {
     font-size: 1em;
-    top: 200px;
     left: 43px;
     width: 675px;
-    min-height: 360px;
-    display: block;
 }
 
 #hometabs {
@@ -285,12 +287,11 @@ th {
         width: 50px;
     }
 
-.homebutton {
-    width: 70px;
-    margin-top: 10px;
+#quitgame, #btncancel {
+    display: none;
 }
 
-#quitgame, #btncancel {
+#cancelreg {
     display: none;
 }
 
@@ -316,7 +317,7 @@ th {
 }
 
 #oppselect {
-    font: 1em Arial, sans-serif;
+    font: 500 1em Arial, sans-serif;
 }
 
 #editreg input[type="text"], #editreg input[type="password"] {

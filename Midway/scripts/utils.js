@@ -101,7 +101,6 @@ function prettyTimeAgo(date) {
         case (dayDiff < 14):
             return dayDiff + " days ago";
         default:
-            console.log("days: " + dayDiff + ", weeks: " + dayDiff / 7);
             return Math.round(dayDiff / 7) + " weeks ago"; 
     }
 }

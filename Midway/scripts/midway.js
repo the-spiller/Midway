@@ -209,6 +209,7 @@ function ajaxUpdatePlayer(successCallback) {
         },
         error: function (xhr, status, errorThrown) {
             showAjaxError(xhr, status, errorThrown);
+            if (failureCallback) failureCallback(xhr.status + " " + errorThrown);
         }
     });
 }

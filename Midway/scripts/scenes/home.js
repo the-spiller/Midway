@@ -18,7 +18,8 @@
             $("#infolink").trigger("click");
         });
 
-        $("#logofflink").on("click", function() {
+        $("#logofflink").on("click", function () {
+            if (unsavedRegChanges()) return;
             removeLocal("player");
             scenes["logon"]();
         });
@@ -35,7 +36,7 @@
             if (abandonables[selGameId]) {
                 caption = "Abandon Game";
                 msg = "Are you sure you want to abandon this game?" +
-                    " It will go into your record as a draw.";
+                    " It will remain on your record and your opponent&rsquo;s record as &ldquo;No Decision.&rdquo;";
             } else {
                 caption = "Retire";
                 msg = "Are you sure you want to retire from this game?" +
@@ -67,7 +68,8 @@
 
         $("#playgame").on("click", function () {
             if (selGameId == 0) return;
-
+            if (unsavedRegChanges()) return;
+            
             var game = {};
             if (selGameId < 0) {
                 // create and save a new game
@@ -150,11 +152,86 @@
             }
         });
 
-        $("#btnsave").on("click", function() {
+        $(".regdata").on("input", function () {
+            if (anyRegDataChanged()) {
+                $("#cancelreg").css("display", "inline-block");
+            } else {
+                $("#cancelreg").css("display", "none");
+            }
+        });
 
+        $("#cancelreg").on("click", function() {
+            loadRegFields();
+            $(this).css("display", "none");
+        });
+        
+        $("#savereg").on("click", function () {
+            saveRegData();
         });
         
         // Functions...........................................................
+        
+        function unsavedRegChanges() {
+            if ($("#cancelreg").css("display") == "inline-block") {
+                showAlert("Unsaved Changes", "You've made changes to your registration info that haven't been " +
+                    "saved. Please save or cancel them.", DLG_OK, "blue");
+                $(".tablistitem, .tabpanel").removeClass("tabshown");
+                $("#editregtab, #editreg").addClass("tabshown");
+                return true;
+            }
+            return false;
+        }
+        
+        function saveRegData() {
+            var caption = "", msg = "";
+
+            if (anyRegDataChanged()) {
+                if (!validEmail("email")) {
+                    caption = "Invalid Email";
+                    msg = "The email address you've entered isn't actually an email address.";
+                } else if ($("#pwd").val() == "") {
+                    caption = "Invalid Password";
+                    msg = "You apparently don't care about your security, but we do. You must provide a password!";     
+                } else if ($("#pwd").val() != player.Password && $("#pwd").val() != $("#pwd2").val()) {
+                    caption = "Passwords Don't Match";
+                    msg = "The password you've entered does not match the password you've supposedly reentered.";
+                } else if ($("#nickname").val() != player.Nickname) {
+                    if ($("#nickname").val() == "") {
+                        caption = "Missing Nickname";
+                        msg = "We don't share email addresses, so you must provide a nickname. Otherwise, we " +
+                            " won't know what to call you!";
+                    } else if ($("#nickname").val().toLowerCase() == "first available") {
+                        caption = "Invalid Nickname";
+                        msg = "You trying to be funny? That'll screw up the way the nickname search works.";
+                    }
+                }
+                if (msg) {
+                    showAlert(caption, msg, DLG_OK, "blue");
+                } else {
+                    player.Email = $("#email").val();
+                    player.Password = $("#pwd").val();
+                    player.Nickname = $("#nickname").val();
+                    ajaxUpdatePlayer(updatedReg);
+                }
+                
+                function updatedReg() {
+                    loadRegFields();
+                    $("#cancelreg").css("display", "none");
+                    $("#namespan").text(player.Nickname);
+                }
+            }
+        }
+        
+        function anyRegDataChanged() {
+            if ($("#email").val().toLowerCase() != player.Email.toLowerCase())
+                return true;
+            if ($("#pwd").val() != player.Password)
+                return true;
+            if ($("#nickname").val() != player.Nickname)
+                return true;
+
+            return false;
+        }
         
         function findGameById() {
             var game = {};
@@ -170,6 +247,7 @@
         function loadRegFields() {
             $("#email").val(player.Email);
             $("#pwd").val(player.Password);
+            $("#pwd2").val(player.Password);
             $("#nickname").val(player.Nickname);
         }
         
@@ -178,7 +256,7 @@
         /* Build up html for one game for the 'Your Games' list. */
         /*-------------------------------------------------------*/
             var item = '<li id="game' + game.GameId + '" class="listitem"><img src="' +
-                game.TinyFlagUrl + '" /> ' + game.SideShortName,
+                game.TinyFlagUrl + '" />&nbsp;' + game.SideShortName,
             twoWeeks = 1000 * 60 * 60 * 24 * 14;
 
             if (game.OpponentNickname) {
@@ -214,6 +292,8 @@
             
             if (player.Games) {
                 for (var i = 0; i < player.Games.length; i++) {
+                    console.log("what? " + player.Games[i].CompletedDTime);
+                    console.log("null? " + (player.Games[i].CompletedDTime == null));
                     if (player.Games[i].CompletedDTime == null) {
                         listHtml += getGameListItem(player.Games[i]);
                     }
@@ -269,7 +349,9 @@
 
             function gotPlayers(list) {
                 for (var i = 0; i < list.length; i++) {
-                    nicknames.add(list[i].Nickname);
+                    if (list[i].Nickname != player.Nickname) {
+                        nicknames.add(list[i].Nickname);
+                    }
                 }
             }
         }
@@ -322,8 +404,7 @@
         
         drawBackground("content/images/bg-home.jpg");
 
-        $("#welcome").html("Welcome back, " + player.Nickname +
-            "! Go to a game, edit your registration info, or peruse your record.");
+        $("#namespan").text(player.Nickname);
 
         var left = setInfolinkPos();
         $("#logofflink").css("left", left - 85 + "px");
@@ -331,7 +412,7 @@
         setLeft(["pagetitle", "welcome", "homediv"]);
 
         var welcome = document.getElementById("welcome");
-        var top = welcome.offsetTop + welcome.offsetHeight + 30;
+        var top = welcome.offsetTop + welcome.offsetHeight + 20;
         
         $("#homediv").css("top", top + "px").draggable({
             handle: ".floathead",
