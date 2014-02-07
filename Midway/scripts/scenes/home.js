@@ -32,29 +32,36 @@
         });
 
         $("#quitgame").on("click", function() {
-            var msg, caption;
+            var caption,
+                msg = "Are you sure you want to abandon this game?",
+                selGame = findGameById(selGameId);
+            
             if (abandonables[selGameId]) {
                 caption = "Abandon Game";
-                msg = "Are you sure you want to abandon this game?" +
-                    " It will appear in the record as &ldquo;No Decision.&rdquo;";
+                if (selGame.OpponentId && selGame.OpponentId.length)
+                    msg += " It will appear in the record as &ldquo;No Decision.&rdquo;";
+                else
+                    msg += " It will not appear in the record.";
             } else {
                 caption = "Retire";
-                msg = "Are you sure you want to retire from this game?" +
+                msg = msg.replace("abandon", "retire from") +
                     " It will go into your record as a loss (and a free win for your opponent).";
             }
-            showAlert(caption, msg, DLG_YESCANCEL, "blue", btnPressed);
+            showAlert(caption, msg, DLG_YESCANCEL, "blue", quitResponse);
             
-            function btnPressed(button) {
+            function quitResponse(button) {
                 if (button == "Yes") {
-                    var game = findGameById();
-                    game.CompletedDTime = new Date().toISOString();
+                    var shallowPlayer = shallowCopyPlayer();
+                    shallowPlayer.Games.push(shallowCopyGame(selGame));
+                    
+                    shallowPlayer.Games[0].CompletedDTime = new Date().toISOString();
                     if (abandonables[selGameId]) {
-                        game.Draw = "Y";
+                        shallowPlayer.Games[0].Draw = "Y";
                     } else {
-                        game.OpponentPoints = game.Points + 1;
-                        game.Draw = "N";
+                        shallowPlayer.Games[0].OpponentPoints = shallowPlayer.Games[0].Points + 1;
+                        shallowPlayer.Games[0].Draw = "N";
                     }
-                    ajaxUpdatePlayer(player, updateSuccess);    // will update game data for this page only
+                    ajaxUpdatePlayer(shallowPlayer, updateSuccess);    // will update game data for this page only
                     
                     function updateSuccess() {
                         selGameId = 0;
@@ -170,6 +177,35 @@
         
         // Functions...........................................................
         
+        function shallowCopyPlayer() {
+            return {
+                playerId: player.PlayerId,
+                Email: player.Email,
+                Nickname: player.Nickname,
+                Password: player.Password,
+                Lockout: player.Lockout,
+                Admin: player.Admin,
+                Games: []
+            };
+        }
+        
+        function shallowCopyGame(game) {
+            return {
+                gameId: game.GameId,
+                SideId: game.SideId,
+                SideShortName: game.SideShortName,
+                TinyFlagUrl: game.TinyFlagUrl,
+                LastPlayed: game.LastPlayed,
+                CompletedDTime: game.CompletedDTime,
+                Points: game.Points,
+                SelectedLocation: game.SelectedLocation,
+                OpponentId: game.OpponentId,
+                OpponentNickname: game.OpponentNickname,
+                OpponentPoints: game.OpponentPoints,
+                Draw: game.Draw
+            };
+        }
+        
         function getNewestGame() {
             var maxId = 0, retIndex = 0;
             
@@ -188,15 +224,7 @@
             if ($("#oppnickname").val() && $("#oppnickname").val() != "First available")
                 nickname = $("#oppnickname").val();
 
-            var shallowPlayer = {
-                playerId: player.PlayerId,
-                Email: player.Email,
-                Nickname: player.Nickname,
-                Password: player.Password,
-                Lockout: player.Lockout,
-                Admin: player.Admin,
-                Games: []
-            };
+            var shallowPlayer = shallowCopyPlayer();
 
             var game = {
                 gameId: 0,
