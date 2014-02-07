@@ -122,9 +122,15 @@ namespace MidwayApi.Controllers
             catch (Exception ex)
             {
 				if (ex.Message == "Player not found")
-				{
 					return NotFoundResponse(player.PlayerId);
-				}
+
+	            if (ex.Message == "Opponent not found")
+		            return new HttpResponseMessage(HttpStatusCode.NotFound)
+			            {
+							Content = new StringContent("Unable to find opponent that has submitted nickname."),
+							ReasonPhrase = "Opponent Not Found"
+			            };
+
                 return ControllerHelper.GenericErrorResponse(ex);
             }
         }
@@ -139,7 +145,7 @@ namespace MidwayApi.Controllers
 			return new HttpResponseMessage(HttpStatusCode.NotFound)
 			{
 				Content = new StringContent("Player with PlayerId value " + playerId + " does not exist."),
-				ReasonPhrase = "Player not found."
+				ReasonPhrase = "Player Not Found"
 			};
 		}
 

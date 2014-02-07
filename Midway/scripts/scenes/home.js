@@ -36,7 +36,7 @@
             if (abandonables[selGameId]) {
                 caption = "Abandon Game";
                 msg = "Are you sure you want to abandon this game?" +
-                    " It will remain on your record and your opponent&rsquo;s record as &ldquo;No Decision.&rdquo;";
+                    " It will appear in the record as &ldquo;No Decision.&rdquo;";
             } else {
                 caption = "Retire";
                 msg = "Are you sure you want to retire from this game?" +
@@ -54,7 +54,7 @@
                         game.OpponentPoints = game.Points + 1;
                         game.Draw = "N";
                     }
-                    ajaxUpdatePlayer(updateSuccess);    // will update game data for this page only
+                    ajaxUpdatePlayer(player, updateSuccess);    // will update game data for this page only
                     
                     function updateSuccess() {
                         selGameId = 0;
@@ -69,21 +69,20 @@
         $("#playgame").on("click", function () {
             if (selGameId == 0) return;
             if (unsavedRegChanges()) return;
-            
-            var game = {};
+
             if (selGameId < 0) {
-                // create and save a new game
-                alert("Create and save new game goes here.");
+                createGameThenPlay();
             } else {
                 // find the selected game
-                game = findGameById();
+                var game = findGameById();
+
+                // Make this game the only one
+                player.Games = [];
+                player.Games.push(game);
+
+                alert("Game ID: " + player.Games[0].GameId + ". Load of search scene goes here.");
+                //scenes["search"]();
             }
-            // Make this game the only one
-            player.Games = [];
-            player.Games.push(game);
-            
-            //scenes["search"]();
-            alert("Load of search scene goes here.");
         });
         
         $("#oppnickname").on("focus", function () {
@@ -171,6 +170,64 @@
         
         // Functions...........................................................
         
+        function getNewestGame() {
+            var maxId = 0, retIndex = 0;
+            
+            for (var i = 0; i < player.Games.length; i++) {
+                if (player.Games[i].GameId > maxId) {
+                    maxId = player.Games[i].GameId;
+                    retIndex = i;
+                }
+            }
+            return player.Games[retIndex];
+        }
+        
+        function createGameThenPlay() {
+            // create a new game
+            var nickname = "";
+            if ($("#oppnickname").val() && $("#oppnickname").val() != "First available")
+                nickname = $("#oppnickname").val();
+
+            var shallowPlayer = {
+                playerId: player.PlayerId,
+                Email: player.Email,
+                Nickname: player.Nickname,
+                Password: player.Password,
+                Lockout: player.Lockout,
+                Admin: player.Admin,
+                Games: []
+            };
+
+            var game = {
+                gameId: 0,
+                SideId: Math.abs(selGameId),
+                SideShortName: "",
+                TinyFlagUrl: "",
+                LastPlayed: "",
+                CompletedDTime: "",
+                Points: 0,
+                SelectedLocation: "",
+                OpponentId: 0,
+                OpponentNickname: nickname,
+                OpponentPoints: 0,
+                Draw: "Y"
+            };
+            shallowPlayer.Games.push(game);
+
+            // do an update to create it
+            ajaxUpdatePlayer(shallowPlayer, newGameUpdated);
+
+            function newGameUpdated() {
+                // strip down to just the newly created game
+                var newGame = getNewestGame(); //highest game Id
+                player.Games = [];
+                player.Games.push(newGame);
+                
+                alert("Game ID: " + player.Games[0].GameId + ". Load of search scene goes here.");
+                //scenes["search"]();
+            }
+        }
+        
         function unsavedRegChanges() {
             if ($("#cancelreg").css("display") == "inline-block") {
                 showAlert("Unsaved Changes", "You've made changes to your registration info that haven't been " +
@@ -208,10 +265,16 @@
                 if (msg) {
                     showAlert(caption, msg, DLG_OK, "blue");
                 } else {
-                    player.Email = $("#email").val();
-                    player.Password = $("#pwd").val();
-                    player.Nickname = $("#nickname").val();
-                    ajaxUpdatePlayer(updatedReg);
+                    var shallowPlayer = {
+                        playerId: player.PlayerId,
+                        Email: $("#email").val(),
+                        Nickname: $("#nickname").val(),
+                        Password: $("#pwd").val(),
+                        Lockout: player.Lockout,
+                        Admin: player.Admin,
+                        Games: []
+                    };
+                    ajaxUpdatePlayer(shallowPlayer, updatedReg);
                 }
                 
                 function updatedReg() {
@@ -262,7 +325,6 @@
             if (game.OpponentNickname) {
                 item += ' vs. ' + game.OpponentNickname;
                 if (game.LastPlayed) {
-                    console.log(game.LastPlayed);
                     var lp = parseIso8601(game.LastPlayed);
                     item += ' (last played ' + prettyTimeAgo(lp) + ')</li>';
 
@@ -292,9 +354,7 @@
             
             if (player.Games) {
                 for (var i = 0; i < player.Games.length; i++) {
-                    console.log("what? " + player.Games[i].CompletedDTime);
-                    console.log("null? " + (player.Games[i].CompletedDTime == null));
-                    if (player.Games[i].CompletedDTime == null) {
+                    if (player.Games[i].CompletedDTime == null || player.Games[i].CompletedDTime == "") {
                         listHtml += getGameListItem(player.Games[i]);
                     }
                 }
@@ -332,9 +392,9 @@
         }
         
         function closeOppSelect() {
-            /*------------------------------------------------*/
-            /* Clear out and hide the nickname search select. */
-            /*------------------------------------------------*/
+        /*------------------------------------------------*/
+        /* Clear out and hide the nickname search select. */
+        /*------------------------------------------------*/
             $("#oppselect").html("");
             $("#oppselectdiv").css("display", "none");
             $("#oppnickname").focus();
@@ -373,7 +433,7 @@
                 if (game.OpponentNickname != null) {
                     recIndex = -1;
                     for (var j = 0; j < record.length; j++) {
-                        if (game.OpponentNickname == record[i][0]) {
+                        if (game.OpponentNickname == record[j][0]) {
                             recIndex = j;
                             break;
                         }
@@ -381,7 +441,7 @@
                     if (recIndex == -1) {
                         recIndex = record.push([game.OpponentNickname, 0, 0, 0]) - 1;
                     }
-                    if (game.Draw == "Y") { // all incomplete games; some complete games (abandoned)
+                    if (game.Draw == "Y") {     //incomplete, abandoned or retired from
                         record[recIndex][3]++;
                     } else if (game.Points < game.OpponentPoints) {
                         record[recIndex][2]++;

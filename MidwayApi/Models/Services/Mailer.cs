@@ -17,7 +17,7 @@ namespace MidwayApi.Models.Services
     {
         public void Send(Message message)
         {
-            // TODO: once we've got a site and email address,
+            // TODO: once we've got a site and SMTP server,
             // we'll actually send out email.
         }
 
@@ -37,5 +37,24 @@ namespace MidwayApi.Models.Services
                 };
             Send(msg);
         }
+
+	    public void SendNewRegMessage(string addr, string pwd)
+	    {
+		    var recips = new List<string>();
+		    recips.Add(addr);
+
+		    var msg = new Message
+			    {
+				    FromAddress = "admin@midwaygame.net",
+				    RecipientAddresses = recips,
+				    Subject = "Midway Administrators Message",
+				    Body = "Hello!\r\n\r\n" +
+				           "Welcome! Here is your first-time password for the Midway game site. Use it " +
+				           "the next time you log in:\r\n\t" + pwd +
+				           "\r\n\r\nYou can change it on the home page \"Your Registration\" tab. " +
+						   "Thanks, and we hope you enjoy our game.\r\nMIDWAY Site Admins"
+			    };
+		    Send(msg);
+	    }
     }
 }

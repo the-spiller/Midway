@@ -197,19 +197,18 @@ function ajaxGetPlayer(playerId, successCallback) {
     });
 }
 
-function ajaxUpdatePlayer(successCallback) {
+function ajaxUpdatePlayer(shallowPlayer, successCallback) {
     $.ajax({
         url: "/api/player",
         type: "PUT",
         accepts: "application/json",
-        data: player,
+        data: shallowPlayer,
         success: function (data) {
             player = JSON.parse(data);
             if (successCallback) successCallback();
         },
         error: function (xhr, status, errorThrown) {
             showAjaxError(xhr, status, errorThrown);
-            if (failureCallback) failureCallback(xhr.status + " " + errorThrown);
         }
     });
 }

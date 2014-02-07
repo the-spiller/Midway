@@ -42,7 +42,7 @@
             if (!validEmail("email")) {
                 showAlert(
                     "Missing or Bogus Email Address",
-                    "Is that really supposed to be an email address?",
+                    "C'mon. You don't mean that this is supposed to be an email address.",
                     DLG_OK,
                     "blue",
                     function() {
@@ -52,7 +52,7 @@
             } else if (!hasText("pwd")) {
                 showAlert(
                     "That Won't Work",
-                    "You've got a password, right? Well use it.",
+                    "You've got a password, right? Well, use it!",
                     DLG_OK,
                     "blue",
                     function() {

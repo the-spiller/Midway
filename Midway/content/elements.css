@@ -35,16 +35,17 @@
 		background-color: #516580;
 	}
 .yellowbtn {
-    background-color: #ff9966;
+	background-color: #5D582F;
+	color: #fff;
 }
     .yellowbtn:hover, .yellowbtn:active {
-        background-color: #cc7851;
+        background-color: #726E37;
     }
 .redbtn {
     background-color: #802631;
     color: #fcd2ca;
 }
-    .redbtn:hover, redbtn:active {
+    .redbtn:hover, .redbtn:active {
         background-color: #d14a43;
     }
 /* Dialog box................................................................*/
@@ -74,8 +75,8 @@
         color: #202c38;
     }
     #dlgcontent.yellowdlg {
-        background-color: #ffcc66;
-        color: #884455;
+        background-color: #CACA59;
+        color: #4B4529;
     }
     #dlgcontent.reddlg {
         background-color: #b2d9d9;
@@ -100,8 +101,8 @@
         color: #c6c6c6;
     }
     #dlghead.yellowdlghead {
-        background: linear-gradient(to right, #884455, #884455, #884455, #ffcc66);
-        color: #ff9966;
+        background: linear-gradient(to right, #5D582F, #5D582F, #5D582F, #CACA59);
+        color: #fff;
     }
     #dlghead.reddlghead {
         background: linear-gradient(to right, #802631, #802631, #802631, #b2d9d9);
