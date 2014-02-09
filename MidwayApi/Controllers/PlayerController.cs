@@ -18,7 +18,7 @@ namespace MidwayApi.Controllers
             _repo = new PlayerRepository(uow);
         }
         
-        // GET api/player
+        // GET api/player......................................................
         public HttpResponseMessage GetPlayers()
         {
             try
@@ -34,7 +34,7 @@ namespace MidwayApi.Controllers
             }
         }
 
-        // GET api/player/5
+        // GET api/player/5....................................................
         public HttpResponseMessage GetPlayer(int id)
         {
             try
@@ -75,7 +75,7 @@ namespace MidwayApi.Controllers
             }
         }
 
-        // POST api/player (INSERT)
+        // POST api/player (INSERT)............................................
         public HttpResponseMessage PostPlayer(DtoPlayer player)
         {
             try
@@ -108,7 +108,7 @@ namespace MidwayApi.Controllers
             }
         }
 
-        // PUT api/player (UPDATE)
+        // PUT api/player (UPDATE).............................................
         public HttpResponseMessage PutPlayer(DtoPlayer player)
         {
             try
@@ -135,11 +135,12 @@ namespace MidwayApi.Controllers
             }
         }
 
-        //// DELETE api/player/id
+        //// DELETE api/player/id..............................................
         //public void Delete(int id)
         //{
         //}
-
+        
+        // Private methods.....................................................
 		private HttpResponseMessage NotFoundResponse(int playerId)
 		{
 			return new HttpResponseMessage(HttpStatusCode.NotFound)

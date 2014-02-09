@@ -53,6 +53,15 @@ var about = function() {
 };
 scenes["about"] = about;
 
+// Search Board scene..........................................................
+
+var search = function() {
+    $("#content").load("_search.html", function() {
+        currentScene = searchPage.show();
+    });
+};
+scenes["search"] = search;
+
 // Functions...................................................................
 
 function drawBackground(url) {
@@ -62,6 +71,14 @@ function drawBackground(url) {
         $(canvas).attr("width", img.width);
         $(canvas).attr("height", img.height);
         context.drawImage(img, 0, 0);
+    };
+}
+
+function drawImage(url, x, y) {
+    var img = new Image();
+    img.src = url;
+    img.onload = function() {
+        context.drawImage(img, x, y);
     };
 }
 

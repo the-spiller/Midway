@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Validation;
 using System.Linq;
 using System.Web.Security;
 using MidwayApi.Models.Services;
@@ -105,7 +104,7 @@ namespace MidwayApi.Models.Data
             dbPlayer.Lockout = dtoPlayer.Lockout;
 			dbPlayer.Admin = dtoPlayer.Admin;
 
-			// The only game data updated here is retire/abandonment or the addition of new games.
+			// The only game data updated here is retirement/abandonment or the addition of new games.
             // Anything else is handled in the game controller.
 	        if (dtoPlayer.Games != null)
 	        {
@@ -134,12 +133,13 @@ namespace MidwayApi.Models.Data
 					    {
 						    // anyone out there looking to be the opposition?
 						    var matches = _context.Games
-						                          .Include(g => g.PlayerGames)
-						                          .Where(g => g.CompletedDTime == null &&
-						                                      g.PlayerGames.Count == 1 &&
-						                                      g.PlayerGames.Any(p => p.SideId != dtoGame.SideId))
-						                          .OrderBy(g => g.CreateDTime)
-						                          .ToList();
+						        .Include(g => g.PlayerGames)
+						        .Where(g => g.CompletedDTime == null &&
+						                    g.PlayerGames.Count == 1 &&
+						                    g.PlayerGames.Any(p => p.SideId != dtoGame.SideId &&
+                                                p.PlayerId != dtoPlayer.PlayerId))
+						        .OrderBy(g => g.CreateDTime)
+						        .ToList();
 
 						    if (matches.Any())
 						    {
@@ -202,7 +202,7 @@ namespace MidwayApi.Models.Data
 						    if (!string.IsNullOrEmpty(dtoGame.OpponentNickname))
 						    {
 							    var dbOpponent = _context.Players
-							                             .FirstOrDefault(p => p.Nickname.ToLower() == dtoGame.OpponentNickname.ToLower());
+							        .FirstOrDefault(p => p.Nickname.ToLower() == dtoGame.OpponentNickname.ToLower());
 
 							    if (dbOpponent == null)
 							    {

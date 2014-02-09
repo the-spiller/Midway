@@ -87,8 +87,7 @@
                 player.Games = [];
                 player.Games.push(game);
 
-                alert("Game ID: " + player.Games[0].GameId + ". Load of search scene goes here.");
-                //scenes["search"]();
+                scenes["search"]();
             }
         });
         
@@ -206,6 +205,7 @@
             };
         }
         
+        // Return the game with the highest ID value -- it's the newest
         function getNewestGame() {
             var maxId = 0, retIndex = 0;
             
@@ -251,8 +251,7 @@
                 player.Games = [];
                 player.Games.push(newGame);
                 
-                alert("Game ID: " + player.Games[0].GameId + ". Load of search scene goes here.");
-                //scenes["search"]();
+                scenes["search"]();
             }
         }
         

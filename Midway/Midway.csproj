@@ -73,6 +73,7 @@
     <Content Include="content\images\IJN.gif" />
     <Content Include="content\images\midway_atoll.jpg" />
     <Content Include="content\images\return.png" />
+    <Content Include="content\images\searchboard.png" />
     <Content Include="content\images\usn-bigger.png" />
     <Content Include="content\images\USN.gif" />
     <Content Include="content\midway.css" />
@@ -93,7 +94,9 @@
     <Content Include="content\themes\images\ui-icons_ffffff_256x240.png" />
     <Content Include="content\themes\jquery-ui-1.10.3.css" />
     <Content Include="content\Test.css" />
+    <Content Include="_search.html" />
     <Content Include="scripts\scenes\about.js" />
+    <Content Include="scripts\scenes\search.js" />
     <Content Include="scripts\scenes\home.js" />
     <Content Include="scripts\scenes\logon.js" />
     <Content Include="scripts\scenes\register.js" />
