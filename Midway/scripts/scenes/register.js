@@ -69,9 +69,9 @@
                 },
                 error: function (xhr, status, errorThrown) {
                     if (!errorThrown)
-                        showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "yellow");
+                        showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "red");
                     else
-                        showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "yellow");
+                        showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "red");
                 }
             });
         }

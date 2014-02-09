@@ -76,7 +76,7 @@
                                 "No way, pal. The password you've entered is a no-go.<br /><br />" +
                                     "Try again without fat-fingering it this time!",
                                 DLG_OK,
-                                "yellow",
+                                "red",
                                 function() {
                                     $("#pwd").select().focus();
                                 }
@@ -99,7 +99,7 @@
                 "You've exceeded the maximum number of attempts to log on with an incorrect " +
                     "password, so you are temporarily locked out.<br /><br />Please try again later.",
                 DLG_OK,
-                "yellow"
+                "red"
             );
         }
         // end function showLockoutAlert()
@@ -139,14 +139,14 @@
                 },
                 error: function(xhr, status, errorThrown) {
                     if (!errorThrown) {
-                        showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "yellow");
+                        showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "red");
                     } else if (errorThrown.indexOf("Player") == 0) {
                         showAlert(errorThrown,
                             "We looked <span class='i'>everywhere</span> for your email address and just " +
-                                "couldn't find it.<br /><br />Try again, without fat-fingering it this time!",
-                            DLG_OK, "yellow", hilightEmail);
+                                "couldn't find it.<br /><br />I'd suggest that perhaps you mistyped it.",
+                            DLG_OK, "red", hilightEmail);
                     } else {
-                        showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "yellow", hilightEmail);
+                        showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "red", hilightEmail);
                     }
                 }
             });
@@ -165,7 +165,8 @@
         // end function ajaxSendPassword()
 
         function ajaxSetLockout(successCallback) {
-            player.Lockout = new Date().getTime() + 1200000; // 20 min.
+            var twentyMin = 1000 * 60 * 20;
+            player.Lockout = new Date().getTime() + twentyMin;
             ajaxUpdatePlayer(successCallback);
         }
         // end function ajaxSetLockout()

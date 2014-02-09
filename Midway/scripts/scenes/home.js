@@ -38,7 +38,7 @@
             
             if (abandonables[selGameId]) {
                 caption = "Abandon Game";
-                if (selGame.OpponentId && selGame.OpponentId.length)
+                if (selGame.OpponentNickname && selGame.OpponentNickname.length)
                     msg += " It will appear in the record as &ldquo;No Decision.&rdquo;";
                 else
                     msg += " It will not appear in the record.";
