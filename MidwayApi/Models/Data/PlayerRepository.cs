@@ -287,6 +287,8 @@ namespace MidwayApi.Models.Data
 				    {
 						GameId = dbGame.GameId,
 						SideId = dbGame.Side.SideId,
+                        PhaseId = dbGame.PhaseId,
+                        Turn = dbGame.Turn,
                         CompletedDTime = dbGame.Game.CompletedDTime == null ? "" :
                             dbGame.Game.CompletedDTime.Value.ToUniversalTime().ToString("o"),
 						TinyFlagUrl = dbGame.Side.TinyFlagUrl,

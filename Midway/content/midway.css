@@ -93,7 +93,6 @@ th {
     color: rgba(255, 255, 255, 1.0);
     padding: 5px;
 	font: 1em Arial, sans-serif;
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
 
 .floattable {
@@ -125,6 +124,29 @@ th {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+}
+
+.pagecaption {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 2em;
+    font-weight: 800;
+}
+    .pagecaption img {
+        margin-right: 7px;
+    }
+    .pagecaption .shrinkit {
+        font-size: .65em;
+        font-weight: 600;
+    }
+
+.ijnred {
+    color: #a01000;
+}
+
+.usnblue {
+    color: #004a7f;
 }
 
 .i {
@@ -216,6 +238,7 @@ th {
     top: 380px;
     left: 700px;
 	width: 400px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
 
 #logofflink {
@@ -242,6 +265,7 @@ th {
     top: 180px;
     left: 400px;
 	width: 400px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
 
 #words {
@@ -265,9 +289,10 @@ th {
     font-size: 1em;
     left: 43px;
     width: 675px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
 
-#hometabs {
+.tablist {
     margin-bottom: -5px;
 }
 
@@ -323,3 +348,12 @@ th {
 #editreg input[type="text"], #editreg input[type="password"] {
     width: 300px;
 }
+
+#searchdiv {
+    top: 50px;
+    width: 400px;
+    height: 737px;
+}
+    #searchdiv .tabpanel {
+        height: 635px;
+    }

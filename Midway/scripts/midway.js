@@ -13,72 +13,67 @@ var canvas = document.getElementById("maincanvas"),
     DLG_YESCANCEL = 3,
     showingInfo = false,
     IMG_WIDTH = 1387,
-    IMG_HEIGHT = 275;
+    IMG_HEIGHT = 857,
+    SHORT_IMG_HEIGHT = 275;
 
 // Scenes......................................................................
 
-// Logon scene.................................................................
-
 var logon = function() {
     $("#content").load("_logon.html", function () {
-        currentScene = logonPage.show();
+        currentScene = logonPage.run();
     });
 };
 scenes["logon"] = logon;
 
-// Home scene..................................................................
-
 var home = function() {
     $("#content").load("_home.html", function() {
-        currentScene = homePage.show();
+        currentScene = homePage.run();
     });
 };
 scenes["home"] = home;
 
-// Registration scene..........................................................
-
 var register = function() {
     $("#content").load("_register.html", function() {
-        currentScene = registerPage.show();
+        currentScene = registerPage.run();
     });
 };
 scenes["register"] = register;
 
-// About scene.................................................................
-
 var about = function() {
     $("#content").load("_about.html", function () {
-        currentScene = aboutPage.show();
+        currentScene = aboutPage.run();
     });
 };
 scenes["about"] = about;
 
-// Search Board scene..........................................................
-
 var search = function() {
     $("#content").load("_search.html", function() {
-        currentScene = searchPage.show();
+        currentScene = searchPage.run();
     });
 };
 scenes["search"] = search;
 
 // Functions...................................................................
 
-function drawBackground(url) {
+function drawBackground(url, callback) {
+    context.globalAlpha = 1.0;
     var img = new Image();
     img.src = url;
     img.onload = function () {
         $(canvas).attr("width", img.width);
         $(canvas).attr("height", img.height);
         context.drawImage(img, 0, 0);
+        if (callback) callback();
     };
 }
 
-function drawImage(url, x, y) {
+function drawImage(url, x, y, opacity, callback) {
+    context.globalAlpha = opacity;
     var img = new Image();
     img.src = url;
     img.onload = function() {
         context.drawImage(img, x, y);
+        if (callback) callback();
     };
 }
 
@@ -247,31 +242,78 @@ function ajaxGetPlayers(successCallback) {
     });
 }
 
+function workTabs(clickEvent) {
+    $(".tablistitem, .tabpanel").removeClass("tabshown");
+    var clickedId = clickEvent.target.id;
+    $("#" + clickedId).addClass("tabshown");
+    $("#" + clickedId.replace("tab", "")).addClass("tabshown");
+}
+
+function gameTimeFromTurn(turn) {
+    var year = 1942,
+        month = 6,
+        day = 3,
+        hour = 5;
+
+    switch (true) {
+        case (turn > 1 && turn < 9):
+            hour += (turn - 1) * 2;
+            break;
+        case (turn == 9):
+            day = 4;
+            hour = 0;
+            break;
+        case (turn > 9 && turn < 18):
+            day = 4;
+            hour = 5 + ((turn - 10) * 2);
+            break;
+        case (turn == 18):
+            day = 5;
+            hour = 0;
+            break;
+        case (turn > 18 && turn < 27):
+            day = 5;
+            hour = 5 + ((turn - 19) * 2);
+            break;
+        case (turn == 27):
+            day = 6;
+            hour = 0;
+            break;
+        case (turn > 27):
+            day = 6;
+            hour = 5 + ((turn - 28) * 2);
+            break;
+        default:
+            break;
+    }
+    return new Date(year, month, day, hour);
+} 
+
+// Global event handlers..............................................................
+
+$("#dlgoverlay").on("keyup", function (e) {
+    if (e.keyCode == 13) {
+        if ($("#dlgbtnok").length)
+            $("#dlgbtnok").trigger("click");
+        else if ($("#dlgbtnyes").length)
+            $("#dlgbtnyes").trigger("click");
+    } else if (e.keyCode == 27) {
+        if ($("#dlgbtncancel").length)
+            $("#dlgbtncancel").trigger("click");
+        else if ($("#dlgbtnno").length)
+            $("#dlgbtnno").trigger("click");
+    }
+});
+
 // Init........................................................................
 
 $(document).ready(function () {
-    
-    // Event handlers..............................................................
-    
-    $("#dlgoverlay").on("keyup", function(e) {
-        if (e.keyCode == 13) {
-            if ($("#dlgbtnok").length)
-                $("#dlgbtnok").trigger("click");
-            else if ($("#dlgbtnyes").length)
-                $("#dlgbtnyes").trigger("click");
-        } else if (e.keyCode == 27) {
-            if ($("#dlgbtncancel").length)
-                $("#dlgbtncancel").trigger("click");
-            else if ($("#dlgbtnno").length)
-                $("#dlgbtnno").trigger("click");
-        }
-    });
-    
-    // Tooltips
+
+    // Tooltips................................................................
 
     $(document).tooltip({ tooltipClass: "mi-tooltip" });
 
-    // Let's go....................................................................
+    // Let's go................................................................
     
     //sounds["teletype"] = new buzz.sound("/midway/content/audio/teletype", { formats: ["ogg", "mp3"] });
     showingInfo = false;

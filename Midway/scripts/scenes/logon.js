@@ -1,5 +1,5 @@
 ﻿var logonPage = {
-    show: function() {
+    run: function() {
         var badPwdCount = 0,
             badPwdTries = 5;
 

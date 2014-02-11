@@ -39,7 +39,7 @@ namespace MidwayApi.Controllers
         {
             try
             {
-                var player = _repo.GetPlayer(id);
+                var player = _repo.GetPlayer(id, true);
                 if (player == null)
                 {
 	                return NotFoundResponse(id);

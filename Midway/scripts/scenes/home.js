@@ -1,5 +1,5 @@
 ﻿var homePage = {
-    show: function () {
+    run: function () {
         var oppCleared = false,
             oppMatched = false,
             gamesPrepend,
@@ -25,10 +25,7 @@
         });
 
         $(".tablistitem").on("click", function (e) {
-            $(".tablistitem, .tabpanel").removeClass("tabshown");
-            var clickedId = e.target.id;
-            $("#" + clickedId).addClass("tabshown");
-            $("#" + clickedId.replace("tab", "")).addClass("tabshown");
+            workTabs(e);
         });
 
         $("#quitgame").on("click", function() {
@@ -86,7 +83,6 @@
                 // Make this game the only one
                 player.Games = [];
                 player.Games.push(game);
-
                 scenes["search"]();
             }
         });
@@ -227,7 +223,9 @@
             var shallowPlayer = shallowCopyPlayer();
 
             var game = {
-                gameId: 0,
+                GameId: 0,
+                Turn: 1,
+                PhaseId: 1,
                 SideId: Math.abs(selGameId),
                 SideShortName: "",
                 TinyFlagUrl: "",

@@ -54,7 +54,50 @@ function inArray(needle, haystack) {
     return false;
 }
 
-// DateTime stuff
+// DateTime stuff..............................................................
+
+function militaryDateTimeStr(date, includeYear) {
+    var hourStr = date.getHours() < 10 ? "0" + date.getHours() + "00" : date.getHours() + "00",
+        dayStr = date.getDate() < 10 ? "0" + date.getDate() : date.getDate(),
+        monthStr = getMonthName(date.getMonth()),
+        retStr = hourStr + " " + dayStr + " " + monthStr;
+    
+    if (includeYear) {
+        return retStr + " " + date.getFullYear();
+    }
+    return retStr;
+}
+
+function getMonthName(monthNum) {
+    switch (monthNum) {
+        case 1:
+            return "January";
+        case 2:
+            return "February";
+        case 3:
+            return "March";
+        case 4:
+            return "April";
+        case 5:
+            return "May";
+        case 6:
+            return "June";
+        case 7:
+            return "July";
+        case 8:
+            return "August";
+        case 9:
+            return "September";
+        case 10:
+            return "October";
+        case 11:
+            return "November";
+        case 12:
+            return "December";
+        default:
+            return "";
+    }  
+}
 
 function parseIso8601(str) {
     // we assume str is a UTC date ending in 'Z'
@@ -105,7 +148,7 @@ function prettyTimeAgo(date) {
     }
 }
 
-// Read/write localStorage and/or cookies
+// Read/write localStorage and/or cookies......................................
 
 function saveLocal(key, value) {
     if (localStorageSupported()) {
@@ -180,7 +223,7 @@ function eraseCookie(name) {
 }
 // END Local Storage
 
-// Element location
+// Element location............................................................
 
 function findPos(obj) {
     var curleft = 0, curtop = 0;

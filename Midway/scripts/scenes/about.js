@@ -1,5 +1,5 @@
 ﻿var aboutPage = {
-    show: function () {
+    run: function () {
         // Event Handlers......................................................
 
         $("#return").on("click", function () {
@@ -36,7 +36,7 @@
         $("#return").css("left", left - 40 + "px");
         setLeft(["pagetitle", "welcome"]);
 
-        var availHeight = $(window).height() - IMG_HEIGHT - 40;
+        var availHeight = $(window).height() - SHORT_IMG_HEIGHT - 40;
         var realLeft = Math.floor(($(window).width() - IMG_WIDTH) / 2);
         if (realLeft < 0) realLeft = 0;
         $("#nav").css({ "height": availHeight + "px", "left": realLeft + "px" });

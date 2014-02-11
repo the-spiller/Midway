@@ -1,5 +1,5 @@
 ﻿var registerPage = {
-    show: function () {
+    run: function () {
 
         // Event handlers......................................................
 
