@@ -13,8 +13,7 @@ var canvas = document.getElementById("maincanvas"),
     DLG_YESCANCEL = 3,
     showingInfo = false,
     IMG_WIDTH = 1387,
-    IMG_HEIGHT = 857,
-    SHORT_IMG_HEIGHT = 275;
+    IMG_HEIGHT = 857;
 
 // Scenes......................................................................
 
@@ -55,18 +54,6 @@ scenes["search"] = search;
 
 // Functions...................................................................
 
-function drawBackground(url, callback) {
-    context.globalAlpha = 1.0;
-    var img = new Image();
-    img.src = url;
-    img.onload = function () {
-        $(canvas).attr("width", img.width);
-        $(canvas).attr("height", img.height);
-        context.drawImage(img, 0, 0);
-        if (callback) callback();
-    };
-}
-
 function drawImage(url, x, y, opacity, callback) {
     context.globalAlpha = opacity;
     var img = new Image();
@@ -75,30 +62,6 @@ function drawImage(url, x, y, opacity, callback) {
         context.drawImage(img, x, y);
         if (callback) callback();
     };
-}
-
-function setLeft(elementIds) {
-    var elem, realLeft;
-    
-    for (var i = 0; i < elementIds.length; i++) {
-        elem = "#" + elementIds[i];
-        realLeft = Math.floor(($(window).width() - IMG_WIDTH) / 2);
-        if (realLeft < 0) realLeft = 0;
-        if ($(elem).length) {
-            var left = document.getElementById(elementIds[i]).offsetLeft + realLeft;
-            $(elem).css("left", left + "px");
-        }
-    }
-}
-
-function setInfolinkPos() {
-    var width = IMG_WIDTH;
-    if ($(window).width() < IMG_WIDTH) width = $(window).width();
-    
-    var left = Math.floor(($(window).width() - width) / 2) + width - 65;
-    $("#infolink").css({ "top": "10px", "left": left + "px" });
-    showingInfo = false;
-    return left;
 }
 
 function showPhotoblurb() {

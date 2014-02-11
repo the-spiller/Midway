@@ -173,12 +173,9 @@
 
         // Init................................................................
 
-        drawBackground("content/images/bg-logon.jpg");
-
-        $("#infolink").css({ "top": "365px", "left": "42px" });
+        $("#pagediv").css("background-image", "url(\"content/images/bg-logon.jpg\")");
+        $("#infolink").css({ top: "365px", left: "42px" });
         window.showingInfo = false;
-
-        setLeft(["fronttitle", "fronttiny", "frontdate", "infolink"]);
 
         if (!localStorageSupported()) {
             $("#staytd").css("display", "none");

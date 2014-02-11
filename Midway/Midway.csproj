@@ -96,6 +96,7 @@
     <Content Include="content\themes\images\ui-icons_ffffff_256x240.png" />
     <Content Include="content\themes\jquery-ui-1.10.3.css" />
     <Content Include="content\Test.css" />
+    <Content Include="favicon.ico" />
     <Content Include="_search.html" />
     <Content Include="scripts\scenes\about.js" />
     <Content Include="scripts\scenes\search.js" />

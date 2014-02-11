@@ -486,15 +486,11 @@
         }
         
         // Init................................................................
-        
-        drawBackground("content/images/bg-home.jpg");
 
+        $("#pagediv").css("background-image", "url(\"content/images/bg-home.jpg\")");
         $("#namespan").text(player.Nickname);
 
-        var left = setInfolinkPos();
-        $("#logofflink").css("left", left - 85 + "px");
-
-        setLeft(["pagetitle", "welcome", "homediv"]);
+        $("#logofflink").css("left", "1240px");
 
         var welcome = document.getElementById("welcome");
         var top = welcome.offsetTop + welcome.offsetHeight + 20;

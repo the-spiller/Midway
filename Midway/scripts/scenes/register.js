@@ -78,7 +78,7 @@
         
         // Init................................................................
 
-        drawBackground("content/images/bg-register.jpg");
+        $("#pagediv").css("background-image", "url(\"content/images/bg-register.jpg\")");
         $("#welcome").css("width", "1125");
 
         $("#registerdiv").draggable({
@@ -86,10 +86,6 @@
             containment: "#pagediv",
             scroll: false
         });
-
-        var left = setInfolinkPos();
-        $("#return").css("left", left - 40 + "px");
-        setLeft(["pagetitle", "welcome"]);
 
         $("#email").focus();
         return "register";

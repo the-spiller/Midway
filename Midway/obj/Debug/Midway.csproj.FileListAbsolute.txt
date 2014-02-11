@@ -13,3 +13,8 @@ C:\Users\JeffC\Documents\GitHub\Midway\Midway\bin\Midway.pdb
 C:\Users\JeffC\Documents\GitHub\Midway\Midway\obj\Debug\Midway.dll
 C:\Users\JeffC\Documents\GitHub\Midway\Midway\obj\Debug\Midway.pdb
 C:\Users\JeffC\Documents\GitHub\Midway\Midway\obj\Debug\Midway.csprojResolveAssemblyReference.cache
+D:\GitHub\Midway\Midway\Midway\bin\Midway.dll
+D:\GitHub\Midway\Midway\Midway\bin\Midway.pdb
+D:\GitHub\Midway\Midway\Midway\obj\Debug\Midway.csprojResolveAssemblyReference.cache
+D:\GitHub\Midway\Midway\Midway\obj\Debug\Midway.dll
+D:\GitHub\Midway\Midway\Midway\obj\Debug\Midway.pdb

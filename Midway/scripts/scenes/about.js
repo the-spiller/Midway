@@ -1,5 +1,7 @@
 ﻿var aboutPage = {
     run: function () {
+        var ABOUT_IMG_HEIGHT = 275;
+        
         // Event Handlers......................................................
 
         $("#return").on("click", function () {
@@ -27,33 +29,10 @@
 
         // Init................................................................
 
-        drawBackground("content/images/head-about.jpg");
+        $("#pagediv").css("background-image", "url(\"content/images/head-about.jpg\")");
 
-        $("#pagetitle").css("top", "90px");
-        $("#welcome").css("top", "205px");
-
-        var left = setInfolinkPos();
-        $("#return").css("left", left - 40 + "px");
-        setLeft(["pagetitle", "welcome"]);
-
-        var availHeight = $(window).height() - SHORT_IMG_HEIGHT - 40;
-        var realLeft = Math.floor(($(window).width() - IMG_WIDTH) / 2);
-        if (realLeft < 0) realLeft = 0;
-        $("#nav").css({ "height": availHeight + "px", "left": realLeft + "px" });
-
-        var navWidth = document.getElementById("nav").offsetWidth;
-        var leftMargin = realLeft + navWidth + 4;
-        var fudge = 55;
-        var availWidth = IMG_WIDTH - navWidth - fudge;
-        if ($(window).width() < IMG_WIDTH && $(window).width() > navWidth)
-            availWidth = $(window).width() - navWidth - fudge;
-
-        availHeight = availHeight + 8;
-        $("#words").css({
-            "height": availHeight + "px",
-            "margin-left": leftMargin + "px",
-            "width": availWidth + "px"
-        });
+        $("#pagetitle").css("top", "85px");
+        $("#welcome").css("top", "195px");
 
         return "about";
     }
