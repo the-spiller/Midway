@@ -1,9 +1,7 @@
 ﻿/*---------------------------------------------------------------------------*/
 /* Midway game: HTML5 and JQuery                                             */
 /*---------------------------------------------------------------------------*/
-var canvas = document.getElementById("maincanvas"),
-    context = canvas.getContext("2d"),
-    player = undefined,
+var player = undefined,
     currentScene = "",
     scenes = {},
     sounds = {},
@@ -53,16 +51,6 @@ var search = function() {
 scenes["search"] = search;
 
 // Functions...................................................................
-
-function drawImage(url, x, y, opacity, callback) {
-    context.globalAlpha = opacity;
-    var img = new Image();
-    img.src = url;
-    img.onload = function() {
-        context.drawImage(img, x, y);
-        if (callback) callback();
-    };
-}
 
 function showPhotoblurb() {
     showingInfo = !showingInfo;

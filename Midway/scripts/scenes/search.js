@@ -1,6 +1,7 @@
 ﻿var searchPage = {
     run: function () {
-        var mapTop = 50,
+        var canvas = document.getElementById("searchcanvas"),
+            context = canvas.getContext("2d"),
             mapLeft = 5,
             divLeft = 974,
             bgImg = "content/images/search/bg-usn-search.jpg",
@@ -8,8 +9,6 @@
             captionColor = "usnblue",
             game = player.Games[0],
             side = game.SideShortName,
-            canvas = window.canvas,
-            context = window.context,
             mousebuttonDown = false;
         
         // Event handlers......................................................
@@ -27,20 +26,20 @@
             workTabs(e);
         });
 
-        $("#maincanvas").on("mousedown", function(e) {
+        $(canvas).on("mousedown", function(e) {
             var loc = windowToCanvas(canvas, e.clientX, e.clientY);
             console.log("mousedown x: " + loc.x + " y: " + loc.y);
             mousebuttonDown = true;
         });
 
-        $("#maincanvas").on("mousemove", function(e) {
+        $(canvas).on("mousemove", function(e) {
             if (mousebuttonDown) {
                 var loc = windowToCanvas(canvas, e.clientX, e.clientY);
                 console.log("mousemove x: " + loc.x + " y: " + loc.y);
             }
         });
         
-        $("#maincanvas").on("mouseup", function(e) {
+        $(canvas).on("mouseup", function(e) {
             if (mousebuttonDown) {
                 var loc = windowToCanvas(canvas, e.clientX, e.clientY);
                 console.log("mouseup x: " + loc.x + " y: " + loc.y);
@@ -49,7 +48,18 @@
         })
         // Functions...........................................................
         
-        
+        function drawMap(callback) {
+            var img = new Image();
+            img.src = "content/images/search/searchboard.png";
+            img.onload = function () {
+                canvas.height = img.height;
+                canvas.width = img.width;
+                context.globalAlpha = 0.8;
+                context.drawImage(img, 0, 0);
+                if (callback) callback();
+            };
+        }
+
         // Init................................................................ 
 
         if (side == "IJN") {
@@ -60,7 +70,7 @@
             captionColor = "ijnred";
         }
 
-        $("#maincanvas").css("left", mapLeft + "px");
+        $("#searchcanvas").css("left", mapLeft + "px");
         
         $("#searchdiv").css("left", divLeft + "px").draggable({
             handle: ".floathead",
@@ -77,6 +87,6 @@
 
         $("#pagediv").css("background-image", "url(\"" + bgImg + "\")");
         
-        drawImage("content/images/search/searchboard.png", 0, 0, 0.8);
+        drawMap();
     }
 };
