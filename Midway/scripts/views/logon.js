@@ -29,11 +29,11 @@
         });
 
         $("#register").on("click", function() {
-            scenes["register"]();
+            views["register"]();
         });
 
         $("#wat").on("click", function() {
-            scenes["about"]();
+            views["about"]();
         });
 
         // Functions...........................................................
@@ -61,9 +61,9 @@
                 );
             } else {
                 ajaxGetPlayerByEmail(function() {
-                    if (player.Lockout > new Date().getTime()) {
+                    if (window.player.Lockout > new Date().getTime()) {
                         showLockoutAlert();
-                    } else if (player.Password != $("#pwd").val()) {
+                    } else if (window.player.Password != $("#pwd").val()) {
                         badPwdCount++;
                         if (badPwdCount > badPwdTries) {
                             ajaxSetLockout(function() {
@@ -84,9 +84,9 @@
                         }
                     } else {
                         if ($("#stay").prop("checked"))
-                            saveLocal("player", player.PlayerId.toString());
+                            saveLocal("player", window.player.PlayerId.toString());
 
-                        scenes["home"]();
+                        views["home"]();
                     }
                 });
             }
@@ -159,14 +159,14 @@
         }
         
         function ajaxSendPassword(successCallback) {
-            player.Password = null;
+            window.player.Password = null;
             ajaxUpdatePlayer(successCallback);
         }
         // end function ajaxSendPassword()
 
         function ajaxSetLockout(successCallback) {
             var twentyMin = 1000 * 60 * 20;
-            player.Lockout = new Date().getTime() + twentyMin;
+            window.player.Lockout = new Date().getTime() + twentyMin;
             ajaxUpdatePlayer(successCallback);
         }
         // end function ajaxSetLockout()
@@ -187,8 +187,8 @@
             scroll: false
         });
 
-        if (player) {
-            $("#email").val(player.Email);
+        if (window.player) {
+            $("#email").val(window.player.Email);
             $("#pwd").focus();
         } else {
             $("#email").focus();

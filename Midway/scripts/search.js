@@ -18,7 +18,7 @@
 
             function gotPlayer() {
                 context.clearRect(0, 0, canvas.width, canvas.height);
-                scenes["home"]();
+                views["home"]();
             }
         });
 

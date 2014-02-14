@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Midway</title>
+        <link rel="stylesheet" href="content/midway.css" />
+        <link rel="stylesheet" href="content/elements.css" />
+        <link rel="stylesheet" href="content/themes/jquery-ui-1.10.3.css" />
+    </head>
+    <body>
+        <div id="pagediv">
+            <div id="gamedesc" class="pagecaption"></div>
+            <a id="return" href="#" title="Return to home page"><img src="content/images/return.png" /></a>
+
+            <canvas id="searchcanvas">
+                Canvas not supported!
+            </canvas>
+
+            <div id="searchdiv" class="floatingdiv">
+                <div class="floathead"></div>
+                <div id="searchtabs" class="tablist">
+                    <ul>
+                        <li id="arrivalstab" class="tablistitem tabshown">Arrivals</li>
+                        <li id="shipstab" class="tablistitem">Ships</li>
+                    </ul>
+                </div> 
+                <div id="arrivals" class="tabpanel tabshown"></div>
+                <div id="ships" class="tabpanel"></div>
+
+            </div>
+            <div id="dlgoverlay">
+                <div id="dlgcontent">
+                    <div id="dlghead"></div>
+                    <div id="dlgbody"></div>
+                    <div id="dlgbuttons"></div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="scripts/vendor/buzz.js"></script>
+        <script type="text/javascript" src="scripts/vendor/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="scripts/vendor/jquery-ui-1.10.3.js"></script>
+        <script type="text/javascript" src="scripts/utils.js"></script>
+        <script type="text/javascript" src="scripts/midway.js"></script>
+        <script type="text/javascript" src="scripts/search.js"></script>
+    </body>
+</html>

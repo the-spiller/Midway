@@ -1,11 +1,10 @@
 ﻿var aboutPage = {
     run: function () {
-        var ABOUT_IMG_HEIGHT = 275;
         
         // Event Handlers......................................................
 
         $("#return").on("click", function () {
-            scenes["logon"]();
+            views["logon"]();
         });
 
         $("#infolink").on("click", function () {

@@ -4,7 +4,7 @@
         // Event handlers......................................................
 
         $("#return").on("click", function () {
-            scenes["logon"]();
+            views["logon"]();
         });
 
         $("#infolink").on("click", function () {
@@ -36,15 +36,15 @@
                 );
             } else {
                 window.player = new Object();
-                player.Email = $("#email").val();
-                player.Nickname = $("#nickname").val();
+                window.player.Email = $("#email").val();
+                window.player.Nickname = $("#nickname").val();
 
                 ajaxRegisterPlayer(function () {
                     showAlert("Registration Successful",
                         "You are now registered. Expect to receive a password in email that will allow you to " +
                             "log in the first time.<br /><br />We hope you enjoy our game!",
                         DLG_OK, "blue", function () {
-                            scenes["logon"]();
+                            views["logon"]();
                         });
                 });
             }
@@ -62,9 +62,9 @@
             $.ajax({
                 url: "/api/player",
                 type: "POST",
-                data: player,
+                data: window.player,
                 success: function (data) {
-                    player = JSON.parse(data);
+                    window.player = JSON.parse(data);
                     if (successCallback) successCallback();
                 },
                 error: function (xhr, status, errorThrown) {

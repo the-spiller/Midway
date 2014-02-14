@@ -21,7 +21,7 @@
         $("#logofflink").on("click", function () {
             if (unsavedRegChanges()) return;
             removeLocal("player");
-            scenes["logon"]();
+            views["logon"]();
         });
 
         $(".tablistitem").on("click", function (e) {
@@ -79,11 +79,7 @@
             } else {
                 // find the selected game
                 var game = findGameById();
-
-                // Make this game the only one
-                player.Games = [];
-                player.Games.push(game);
-                scenes["search"]();
+                document.location.href = "search.html?pid=" + window.player.PlayerId + "&gid=" + game.GameId;
             }
         });
         
@@ -174,12 +170,12 @@
         
         function shallowCopyPlayer() {
             return {
-                playerId: player.PlayerId,
-                Email: player.Email,
-                Nickname: player.Nickname,
-                Password: player.Password,
-                Lockout: player.Lockout,
-                Admin: player.Admin,
+                playerId: window.player.PlayerId,
+                Email: window.player.Email,
+                Nickname: window.player.Nickname,
+                Password: window.player.Password,
+                Lockout: window.player.Lockout,
+                Admin: window.player.Admin,
                 Games: []
             };
         }
@@ -205,13 +201,13 @@
         function getNewestGame() {
             var maxId = 0, retIndex = 0;
             
-            for (var i = 0; i < player.Games.length; i++) {
-                if (player.Games[i].GameId > maxId) {
-                    maxId = player.Games[i].GameId;
+            for (var i = 0; i < window.player.Games.length; i++) {
+                if (window.player.Games[i].GameId > maxId) {
+                    maxId = window.player.Games[i].GameId;
                     retIndex = i;
                 }
             }
-            return player.Games[retIndex];
+            return window.player.Games[retIndex];
         }
         
         function createGameThenPlay() {
@@ -246,10 +242,7 @@
             function newGameUpdated() {
                 // strip down to just the newly created game
                 var newGame = getNewestGame(); //highest game Id
-                player.Games = [];
-                player.Games.push(newGame);
-                
-                scenes["search"]();
+                document.location.href = "search.html?pid=" + window.player.PlayerId + "&gid=" + newGame.GameId;
             }
         }
         
@@ -274,10 +267,10 @@
                 } else if ($("#pwd").val() == "") {
                     caption = "Invalid Password";
                     msg = "You apparently don't care about your security, but we do. You must provide a password!";     
-                } else if ($("#pwd").val() != player.Password && $("#pwd").val() != $("#pwd2").val()) {
+                } else if ($("#pwd").val() != window.player.Password && $("#pwd").val() != $("#pwd2").val()) {
                     caption = "Passwords Don't Match";
                     msg = "The password you've entered does not match the password you've supposedly reentered.";
-                } else if ($("#nickname").val() != player.Nickname) {
+                } else if ($("#nickname").val() != window.player.Nickname) {
                     if ($("#nickname").val() == "") {
                         caption = "Missing Nickname";
                         msg = "We don't share email addresses, so you must provide a nickname. Otherwise, we " +
@@ -291,12 +284,12 @@
                     showAlert(caption, msg, DLG_OK, "blue");
                 } else {
                     var shallowPlayer = {
-                        playerId: player.PlayerId,
+                        playerId: window.player.PlayerId,
                         Email: $("#email").val(),
                         Nickname: $("#nickname").val(),
                         Password: $("#pwd").val(),
-                        Lockout: player.Lockout,
-                        Admin: player.Admin,
+                        Lockout: window.player.Lockout,
+                        Admin: window.player.Admin,
                         Games: []
                     };
                     ajaxUpdatePlayer(shallowPlayer, updatedReg);
@@ -305,17 +298,17 @@
                 function updatedReg() {
                     loadRegFields();
                     $("#cancelreg").css("display", "none");
-                    $("#namespan").text(player.Nickname);
+                    $("#namespan").text(window.player.Nickname);
                 }
             }
         }
         
         function anyRegDataChanged() {
-            if ($("#email").val().toLowerCase() != player.Email.toLowerCase())
+            if ($("#email").val().toLowerCase() != window.player.Email.toLowerCase())
                 return true;
-            if ($("#pwd").val() != player.Password)
+            if ($("#pwd").val() != window.player.Password)
                 return true;
-            if ($("#nickname").val() != player.Nickname)
+            if ($("#nickname").val() != window.player.Nickname)
                 return true;
 
             return false;
@@ -323,9 +316,9 @@
         
         function findGameById() {
             var game = {};
-            for (var i = 0; i < player.Games.length; i++) {
-                if (player.Games[i].GameId == selGameId) {
-                    game = player.Games[i];
+            for (var i = 0; i < window.player.Games.length; i++) {
+                if (window.player.Games[i].GameId == selGameId) {
+                    game = window.player.Games[i];
                     break;
                 }
             }
@@ -333,10 +326,10 @@
         }
         
         function loadRegFields() {
-            $("#email").val(player.Email);
-            $("#pwd").val(player.Password);
-            $("#pwd2").val(player.Password);
-            $("#nickname").val(player.Nickname);
+            $("#email").val(window.player.Email);
+            $("#pwd").val(window.player.Password);
+            $("#pwd2").val(window.player.Password);
+            $("#nickname").val(window.player.Nickname);
         }
         
         function getGameListItem(game) {
@@ -377,10 +370,10 @@
             var listHtml = "";
             if (gamesPrepend) gamesPrepend.remove();
             
-            if (player.Games) {
-                for (var i = 0; i < player.Games.length; i++) {
-                    if (player.Games[i].CompletedDTime == null || player.Games[i].CompletedDTime == "") {
-                        listHtml += getGameListItem(player.Games[i]);
+            if (window.player.Games) {
+                for (var i = 0; i < window.player.Games.length; i++) {
+                    if (window.player.Games[i].CompletedDTime == null || window.player.Games[i].CompletedDTime == "") {
+                        listHtml += getGameListItem(window.player.Games[i]);
                     }
                 }
                 gamesPrepend = $(listHtml).prependTo("#gamelist ul");
@@ -434,7 +427,7 @@
 
             function gotPlayers(list) {
                 for (var i = 0; i < list.length; i++) {
-                    if (list[i].Nickname != player.Nickname) {
+                    if (list[i].Nickname != window.player.Nickname) {
                         nicknames.add(list[i].Nickname);
                     }
                 }
@@ -452,8 +445,8 @@
             
             // build table of game outcomes
             if (recordAppend) recordAppend.remove();
-            for (var i = 0; i < player.Games.length; i++) {
-                var game = player.Games[i];
+            for (var i = 0; i < window.player.Games.length; i++) {
+                var game = window.player.Games[i];
                 
                 if (game.OpponentNickname != null) {
                     recIndex = -1;
@@ -488,7 +481,7 @@
         // Init................................................................
 
         $("#pagediv").css("background-image", "url(\"content/images/bg-home.jpg\")");
-        $("#namespan").text(player.Nickname);
+        $("#namespan").text(window.player.Nickname);
 
         $("#logofflink").css("left", "1240px");
 
