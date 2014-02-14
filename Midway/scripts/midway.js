@@ -2,8 +2,8 @@
 /* Midway game: HTML5 and JQuery                                             */
 /*---------------------------------------------------------------------------*/
 var player = undefined,
-    currentView = "",
-    views = {},
+    currentScene = "",
+    scenes = {},
     sounds = {},
     DLG_WIDTH = 460,
     DLG_OK = 1,
@@ -13,35 +13,42 @@ var player = undefined,
     IMG_WIDTH = 1387,
     IMG_HEIGHT = 857;
 
-// Views.......................................................................
+// Scenes......................................................................
 
 var logon = function() {
     $("#content").load("_logon.html", function () {
-        currentView = logonPage.run();
+        currentScene = logonPage.run();
     });
 };
-views["logon"] = logon;
+scenes["logon"] = logon;
 
 var home = function() {
-    $("#content").load("_home.html", function () {
-        currentView = homePage.run();
+    $("#content").load("_home.html", function() {
+        currentScene = homePage.run();
     });
 };
-views["home"] = home;
+scenes["home"] = home;
 
 var register = function() {
-    $("#content").load("_register.html", function () {
-        currentView = registerPage.run();
+    $("#content").load("_register.html", function() {
+        currentScene = registerPage.run();
     });
 };
-views["register"] = register;
+scenes["register"] = register;
 
 var about = function() {
     $("#content").load("_about.html", function () {
-        currentView = aboutPage.run();
+        currentScene = aboutPage.run();
     });
 };
-views["about"] = about;
+scenes["about"] = about;
+
+var search = function() {
+    $("#content").load("_search.html", function() {
+        currentScene = searchPage.run();
+    });
+};
+scenes["search"] = search;
 
 // Functions...................................................................
 
@@ -49,7 +56,7 @@ function showPhotoblurb() {
     showingInfo = !showingInfo;
 
     if (showingInfo) {
-        if (currentView == "logon") {
+        if (currentScene == "logon") {
             $(".photoblurb").css({ "display": "block", "top": "394px", "left": $("#infolink").css("left") });
         } else {
             $(".photoblurb").css({ "display": "block", "top": "40px", "left": getPhotoBlurbLeft() + "px" });
@@ -270,9 +277,9 @@ $(document).ready(function () {
         
         player = ajaxGetPlayer(playerId, function () {
             $("#dlgoverlay").css("display", "none");
-            views["home"]();
+            scenes["home"]();
             return;
         });
     }
-    views["logon"]();
+    scenes["logon"]();
 });
