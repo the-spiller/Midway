@@ -1,6 +1,5 @@
 ﻿var aboutPage = {
     run: function () {
-        var ABOUT_IMG_HEIGHT = 275;
         
         // Event Handlers......................................................
 

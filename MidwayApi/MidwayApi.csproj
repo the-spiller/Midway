@@ -163,7 +163,7 @@
     <Compile Include="Models\Data\Mappings\SideMap.cs" />
     <Compile Include="Models\Data\MidwayContext.cs" />
     <Compile Include="Models\Data\PlayerRepository.cs" />
-    <Compile Include="Models\DTOs\DtoGame.cs" />
+    <Compile Include="Models\DTOs\DtoPlayerGame.cs" />
     <Compile Include="Models\DTOs\DtoPlayer.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Phase.cs" />

@@ -54,7 +54,7 @@ namespace MidwayApi.Models.Data
 
 			if (includeGames)
 			{
-				dtoPlayer.Games = GetDtoGames(dtoPlayer.PlayerId);
+				dtoPlayer.Games = GetDtoPlayerGames(dtoPlayer.PlayerId);
 			}
 			return dtoPlayer;
         }
@@ -75,7 +75,7 @@ namespace MidwayApi.Models.Data
 
 	        if (includeGames)
 	        {
-		        dtoPlayer.Games = GetDtoGames(dtoPlayer.PlayerId);
+		        dtoPlayer.Games = GetDtoPlayerGames(dtoPlayer.PlayerId);
 	        }
 			return dtoPlayer;
         }
@@ -108,35 +108,35 @@ namespace MidwayApi.Models.Data
             // Anything else is handled in the game controller.
 	        if (dtoPlayer.Games != null)
 	        {
-			    foreach (var dtoGame in dtoPlayer.Games)
+			    foreach (var dtoPlayerGame in dtoPlayer.Games)
 			    {
 				    var dbGame = _context.Games
 				                            .Include(g => g.PlayerGames)
-				                            .FirstOrDefault(g => g.GameId == dtoGame.GameId);
+				                            .FirstOrDefault(g => g.GameId == dtoPlayerGame.GameId);
 
-				    if (dbGame != null && !string.IsNullOrEmpty(dtoGame.CompletedDTime))
+				    if (dbGame != null && !string.IsNullOrEmpty(dtoPlayerGame.CompletedDTime))
 					{
 					    // game exists and is now marked complete: update fields affected by retire/abandonment
-					    dbGame.CompletedDTime = DateTime.Parse(dtoGame.CompletedDTime);
+					    dbGame.CompletedDTime = DateTime.Parse(dtoPlayerGame.CompletedDTime);
 
-					    var oppPg = dbGame.PlayerGames.FirstOrDefault(p => p.PlayerId == dtoGame.OpponentId);
-					    if (oppPg != null) oppPg.Points = dtoGame.OpponentPoints;
+					    var oppPg = dbGame.PlayerGames.FirstOrDefault(p => p.PlayerId == dtoPlayerGame.OpponentId);
+					    if (oppPg != null) oppPg.Points = dtoPlayerGame.OpponentPoints;
 
-					    var pg = dbGame.PlayerGames.First(p => p.SideId == dtoGame.SideId);
-					    pg.Points = dtoGame.Points;
-					    dbGame.Draw = dtoGame.Draw;
+					    var pg = dbGame.PlayerGames.First(p => p.SideId == dtoPlayerGame.SideId);
+					    pg.Points = dtoPlayerGame.Points;
+					    dbGame.Draw = dtoPlayerGame.Draw;
 				    }
 				    else if (dbGame == null)
 				    {
 						// new game -- see if we can match it up to an existing one
-					    if (string.IsNullOrEmpty(dtoGame.OpponentNickname))
+					    if (string.IsNullOrEmpty(dtoPlayerGame.OpponentNickname))
 					    {
 						    // anyone out there looking to be the opposition?
 						    var matches = _context.Games
 						        .Include(g => g.PlayerGames)
 						        .Where(g => g.CompletedDTime == null &&
 						                    g.PlayerGames.Count == 1 &&
-						                    g.PlayerGames.Any(p => p.SideId != dtoGame.SideId &&
+						                    g.PlayerGames.Any(p => p.SideId != dtoPlayerGame.SideId &&
                                                 p.PlayerId != dtoPlayer.PlayerId))
 						        .OrderBy(g => g.CreateDTime)
 						        .ToList();
@@ -157,7 +157,7 @@ namespace MidwayApi.Models.Data
 										    PhaseIndeterminate = "N",
 										    Turn = 1,
 										    PhaseId = 1,
-										    SideId = dtoGame.SideId,
+										    SideId = dtoPlayerGame.SideId,
 										    MidwayInvadedTurn = 0
 									    };
 								    game.PlayerGames.Add(dbPg);
@@ -194,15 +194,15 @@ namespace MidwayApi.Models.Data
 								    PhaseIndeterminate = "N",
 								    Turn = 1,
 								    PhaseId = 1,
-								    SideId = dtoGame.SideId,
+								    SideId = dtoPlayerGame.SideId,
 								    MidwayInvadedTurn = 0
 							    };
 						    dbGame.PlayerGames.Add(dbPg);
 
-						    if (!string.IsNullOrEmpty(dtoGame.OpponentNickname))
+						    if (!string.IsNullOrEmpty(dtoPlayerGame.OpponentNickname))
 						    {
 							    var dbOpponent = _context.Players
-							        .FirstOrDefault(p => p.Nickname.ToLower() == dtoGame.OpponentNickname.ToLower());
+							        .FirstOrDefault(p => p.Nickname.ToLower() == dtoPlayerGame.OpponentNickname.ToLower());
 
 							    if (dbOpponent == null)
 							    {
@@ -219,7 +219,7 @@ namespace MidwayApi.Models.Data
 									    PhaseIndeterminate = "N",
 									    Turn = 1,
 									    PhaseId = 1,
-									    SideId = (dtoGame.SideId == 1) ? 2 : 1, //opposite
+									    SideId = (dtoPlayerGame.SideId == 1) ? 2 : 1, //opposite
 									    MidwayInvadedTurn = 0
 								    };
 							    dbGame.PlayerGames.Add(oppDbPg);
@@ -271,7 +271,7 @@ namespace MidwayApi.Models.Data
 			return InsertStatus.Ok;
 		}
 
-		private IEnumerable<DtoGame> GetDtoGames(int playerId)
+		private IEnumerable<DtoPlayerGame> GetDtoPlayerGames(int playerId)
 		{
 			var dbGames = _context.PlayerGames
 				.Include(p => p.Side)
@@ -279,11 +279,11 @@ namespace MidwayApi.Models.Data
 				.Where(p => p.PlayerId == playerId)
 				.ToList();
 
-			var dtoGames = new List<DtoGame>();
+			var dtoPlayerGames = new List<DtoPlayerGame>();
 
 			foreach (var dbGame in dbGames)
 			{
-				var dtoGame = new DtoGame
+				var dtoPlayerGame = new DtoPlayerGame
 				    {
 						GameId = dbGame.GameId,
 						SideId = dbGame.Side.SideId,
@@ -303,28 +303,28 @@ namespace MidwayApi.Models.Data
 				// Opponent
 				var dbOpp = _context.PlayerGames
 					.Include(p => p.Player)
-					.FirstOrDefault(p => p.GameId == dtoGame.GameId && p.PlayerId != playerId);
+					.FirstOrDefault(p => p.GameId == dtoPlayerGame.GameId && p.PlayerId != playerId);
 
 				if (dbOpp != null)
 				{
-				    dtoGame.OpponentId = dbOpp.PlayerId;
-				    dtoGame.OpponentNickname = dbOpp.Player.Nickname;
-				    dtoGame.OpponentPoints = dbOpp.Points;
+				    dtoPlayerGame.OpponentId = dbOpp.PlayerId;
+				    dtoPlayerGame.OpponentNickname = dbOpp.Player.Nickname;
+				    dtoPlayerGame.OpponentPoints = dbOpp.Points;
 
 				    if (dbOpp.LastPlayed != null && dbGame.LastPlayed != null)
 				    {
                         if (dbOpp.LastPlayed.Value > dbGame.LastPlayed)
-				            dtoGame.LastPlayed = dbOpp.LastPlayed.Value.ToUniversalTime().ToString("o");
+				            dtoPlayerGame.LastPlayed = dbOpp.LastPlayed.Value.ToUniversalTime().ToString("o");
 				    }
 				}
 				else
 				{
-				    dtoGame.OpponentId = 0;
-				    dtoGame.OpponentPoints = 0;
+				    dtoPlayerGame.OpponentId = 0;
+				    dtoPlayerGame.OpponentPoints = 0;
 				}
-				dtoGames.Add(dtoGame);
+				dtoPlayerGames.Add(dtoPlayerGame);
 			}
-			return dtoGames;
+			return dtoPlayerGames;
 		}
     }
 }

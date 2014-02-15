@@ -11,6 +11,6 @@ namespace MidwayApi.Models.DTOs
 		public string Admin { get; set; }
 		public long Lockout { get; set; }
 
-		public IEnumerable<DtoGame> Games { get; set; }
+		public IEnumerable<DtoPlayerGame> Games { get; set; }
 	}
 }

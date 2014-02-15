@@ -2,7 +2,7 @@
 
 namespace MidwayApi.Models.DTOs
 {
-	public class DtoGame
+	public class DtoPlayerGame
 	{
 		public int GameId { get; set; }
 		public int SideId { get; set; }
@@ -18,5 +18,7 @@ namespace MidwayApi.Models.DTOs
 		public string OpponentNickname { get; set; }
 		public int OpponentPoints { get; set; }
         public string Draw { get; set; }
+
+        
 	}
 }

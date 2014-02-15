@@ -17,7 +17,7 @@ namespace MidwayApi.Models
 		public int MidwayInvadedTurn { get; set; }
 
 		public virtual Game Game { get; set; }
-		public virtual Player Player { get; set; }
+		public Player Player { get; set; }
 		public Side Side { get; set; }
 		public Phase Phase { get; set; }
 	}
