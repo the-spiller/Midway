@@ -19,7 +19,5 @@ namespace MidwayApi.Controllers
             IUnitOfWork uow = new MidwayContext();
             _repo = new GameRepository(uow);
         }
-
-        
     }
 }

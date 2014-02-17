@@ -3,19 +3,20 @@ using System.Data.Entity.ModelConfiguration;
 
 namespace MidwayApi.Models.Data.Mappings
 {
-	public class GameMap : EntityTypeConfiguration<Game>
-	{
-		public GameMap()
-		{
-			ToTable("Game");
-			HasKey(g => g.GameId);
+    public class GameMap : EntityTypeConfiguration<Game>
+    {
+        public GameMap()
+        {
+            ToTable("Game");
 
-			Property(g => g.GameId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-			Property(g => g.CreateDTime).IsRequired();
-			Property(g => g.CompletedDTime).IsOptional();
-		    Property(g => g.Draw).IsOptional().HasMaxLength(1);
+            HasKey(g => g.GameId);
+            Property(g => g.GameId).IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 
-			HasMany(g => g.PlayerGames).WithRequired(p => p.Game).HasForeignKey(p => p.GameId);
-		}
-	}
+            Property(g => g.CreateDTime).IsRequired();
+            Property(g => g.CompletedDTime);
+            Property(g => g.Draw).HasMaxLength(1).IsRequired();
+
+            HasMany(g => g.PlayerGames).WithRequired(p => p.Game).HasForeignKey(p => p.GameId);
+        }
+    }
 }

@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MidwayApi.Models
+namespace ClassicMidway.Models.ViewModels
 {
-    public class Player
+    public class VmAuth
     {
-        public int PlayerId { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string Nickname { get; set; }
         public string Admin { get; set; }
-        public long Lockout { get; set; }
+        public string ResendPwd { get; set; }
 
-        public virtual IList<PlayerGame> PlayerGames { get; set; }
+        public VmAuth()
+        {
+            Admin = "N";
+            ResendPwd = "N";
+        }
     }
 }

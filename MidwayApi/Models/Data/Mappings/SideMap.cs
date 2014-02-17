@@ -1,22 +1,25 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration;
 
 namespace MidwayApi.Models.Data.Mappings
 {
-	public class SideMap : EntityTypeConfiguration<Side>
-	{
-		public SideMap()
-		{
-			ToTable("Side");
-			HasKey(s => s.SideId);
+    public class SideMap : EntityTypeConfiguration<Side>
+    {
+        public SideMap()
+        {
+            this.ToTable("Side");
 
-			Property(s => s.SideId).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-			Property(s => s.ShortName).IsRequired().HasMaxLength(4);
-			Property(s => s.LongName).IsRequired().HasMaxLength(60);
-			Property(s => s.FlagUrl).IsOptional().HasMaxLength(256);
-			Property(s => s.TinyFlagUrl).IsOptional().HasMaxLength(256);
+            this.HasKey(s => s.SideId);
+            this.Property(s => s.SideId).IsRequired();
 
-			HasMany(s => s.PlayerGames).WithRequired(p => p.Side).HasForeignKey(p => p.SideId);
-		}
-	}
+            this.Property(s => s.ShortName).IsRequired().HasMaxLength(3);
+            this.Property(s => s.LongName).HasMaxLength(60);
+			this.Property(s => s.FlagUrl).HasMaxLength(256);
+			this.Property(s => s.TinyFlagUrl).HasMaxLength(256);
+
+            this.HasMany(s => s.PlayerGames).WithRequired(p => p.Side).HasForeignKey(p => p.SideId);
+            this.HasMany(s => s.Airbases).WithRequired(i => i.Side).Map(s => s.MapKey("SideId"));
+			this.HasMany(s => s.Ships).WithRequired(sh => sh.Side).Map(s => s.MapKey("SideId"));
+        }
+    }
 }
