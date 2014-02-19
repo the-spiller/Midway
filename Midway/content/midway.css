@@ -184,14 +184,17 @@ th {
 .shipitem {
     position: relative;
     cursor: pointer;
-    padding: 4px;
+	padding: 4px;
     margin-bottom: 4px;
 }
     .shipitem:hover {
-        background-color: #354b68;
+        background-color: #253549;
     }
     .shipitem.selected {
-        background-color: #415c7f;
+        background-color: #1f2c3d;
+	    padding: 5px 3px 3px 5px;
+		box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
+
     }
 .numplanes {
 	position: absolute;

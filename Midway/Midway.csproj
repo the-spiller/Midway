@@ -60,6 +60,9 @@
     <Content Include="content\elements.css" />
     <Content Include="content\fonts\teletype1945-1985-webfont.svg" />
     <Content Include="content\images\search\addicon.png" />
+    <Content Include="content\images\search\ijnmarker.png" />
+    <Content Include="content\images\search\ijnsighting.png" />
+    <Content Include="content\images\search\selectedZone.png" />
     <Content Include="content\images\search\Ships\akagi.png" />
     <Content Include="content\images\search\Ships\astoria.png" />
     <Content Include="content\images\search\Ships\atago.png" />
@@ -131,6 +134,8 @@
     <Content Include="content\images\search\Ships\yorktown.png" />
     <Content Include="content\images\search\Ships\yura.png" />
     <Content Include="content\images\search\Ships\zuiho.png" />
+    <Content Include="content\images\search\usnmarker.png" />
+    <Content Include="content\images\search\usnsighting.png" />
     <Content Include="content\images\usn-med.png" />
     <Content Include="content\images\USN.gif" />
     <Content Include="content\midway.css" />
