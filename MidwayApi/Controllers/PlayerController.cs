@@ -127,18 +127,13 @@ namespace MidwayApi.Controllers
 	            if (ex.Message == "Opponent not found")
 		            return new HttpResponseMessage(HttpStatusCode.NotFound)
 			            {
-							Content = new StringContent("Unable to find opponent that has submitted nickname."),
+							Content = new StringContent("Unable to find a player that has the submitted nickname."),
 							ReasonPhrase = "Opponent Not Found"
 			            };
 
                 return ControllerHelper.GenericErrorResponse(ex);
             }
         }
-
-        //// DELETE api/player/id..............................................
-        //public void Delete(int id)
-        //{
-        //}
         
         // Private methods.....................................................
 		private HttpResponseMessage NotFoundResponse(int playerId)

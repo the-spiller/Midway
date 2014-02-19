@@ -54,7 +54,7 @@ input[type="text"], input[type="password"] {
     border-right: 1px solid #fff;
     border-bottom: 1px solid #fff;
 	border-left: 1px solid #202020;
-    background-color: #808080;
+    background-color: rgba(128, 128, 128, 1.0);
     color: #000;
 }
 
@@ -87,7 +87,7 @@ th {
 .floatingdiv {
     text-align: left;
     position: absolute;
-	background-color: black;
+	background-color: #000;
     opacity: 0.8;
     color: rgba(255, 255, 255, 1.0);
     padding: 5px;
@@ -180,6 +180,48 @@ th {
     border-bottom: 1px solid #202020;
     border-right: 1px solid #202020;
 }
+
+.shipitem {
+    position: relative;
+    cursor: pointer;
+    padding: 4px;
+    margin-bottom: 4px;
+}
+    .shipitem:hover {
+        background-color: #354b68;
+    }
+    .shipitem.selected {
+        background-color: #415c7f;
+    }
+.numplanes {
+	position: absolute;
+	top: 29px;
+	font-weight: 500;
+	color: #fff;
+	z-index: 5;
+    font-size: .85em;
+}
+	.numplanes.torpedo {
+		left: 186px;
+	}
+	.numplanes.fighter {
+		left: 237px;
+	}
+	.numplanes.divebomber {
+		left: 292px;
+	}
+
+.shiphits {
+    position: absolute;
+    left: 8px;
+    top: 34px;
+}
+    .shiphits.green {
+        z-index: 2;
+    }
+    .shiphits.red {
+        z-index: 3;
+    }
 
 #pagediv {
 	width: 100%;
@@ -300,10 +342,6 @@ th {
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
 
-.tablist {
-    margin-bottom: -5px;
-}
-
 #optopponent {
 	margin: 10px 0 10px 0;
 	display: none;
@@ -326,6 +364,10 @@ th {
 
 #cancelreg {
     display: none;
+}
+
+#gameselect {
+    padding: 20px;
 }
 
 #recordtable {
@@ -361,9 +403,12 @@ th {
     top: 50px;
     width: 400px;
     height: 737px;
+    opacity: 1.0;
 }
     #searchdiv .tabpanel {
-        height: 635px;
+        height: 670px;
+        background: none;
+        background-color: #2b3d55;
     }
 
 #searchcanvas {

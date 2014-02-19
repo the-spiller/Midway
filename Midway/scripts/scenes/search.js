@@ -26,7 +26,7 @@
         $(".tablistitem").on("click", function(e) {
             workTabs(e);
         });
-
+        
         $(canvas).on("mousedown", function(e) {
             var loc = windowToCanvas(canvas, e.clientX, e.clientY);
             console.log("mousedown x: " + loc.x + " y: " + loc.y);
@@ -46,7 +46,8 @@
                 console.log("mouseup x: " + loc.x + " y: " + loc.y);
                 mousebuttonDown = false;
             }
-        })
+        });
+        
         // Functions...........................................................
 
         function drawMap(callback) {
@@ -93,8 +94,58 @@
             $("#pagediv").css("background-image", "url(\"" + bgImg + "\")");
             
             drawMap();
+            
+            if (game.PhaseId == 1) {
+                showArrivingShips();
+            }
         }
 
+        function getShipListHtml(ship) {
+            var hitsDir = "content/images/search/ships/hits/",
+                html = "<li class=\"shipitem\"><div id=\"ship" + ship.Id + "\"><img src=\"" +
+                    ship.SearchImgPath + "\" />";
+
+            if (ship.ShipType == "CV" || ship.ShipType == "CVL") {
+                html += "<div class=\"numplanes torpedo\">" + ship.TSquadrons +
+                    "</div><div class=\"numplanes fighter\">" + ship.FSquadrons +
+                    "</div><div class=\"numplanes divebomber\">" + ship.DSquadrons + "</div>";
+            }
+            html += "<div class=\"shiphits green\"><img src=\"" + hitsDir + ship.HitsToSink +
+                "-hitsgreen.png\"></div>";
+            
+            if (ship.Hits > 0) {
+                html += "<div class=\"shiphits red\"><img src=\"" + hitsDir + ship.Hits +
+                    "-hitsred.png\"></div></div></li>";
+            }
+            return html;
+        }
+        
+        function showArrivingShips() {
+            var html = "<ul>";
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == "ARR") {
+                    html += getShipListHtml(ships[i]);
+                }
+            }
+            html += "</ul>";
+            $("#arrivals").html(html);
+            
+            // Event handler for ship items
+            $(".shipitem").on("click", function (e) {
+                if (e.shiftKey) {
+                    for (var j = 0; i < $(".shipitem").length; i++) {
+                    
+                    }
+                }
+                
+                if ($(this).hasClass("selected"))
+                    $(this).removeClass("selected");
+                else
+                    $(this).addClass("selected");
+                
+            });
+        }
+        
         // Init................................................................ 
         
         if (side == "IJN") {

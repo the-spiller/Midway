@@ -190,15 +190,18 @@
     }
 .tabpanel {
     color: #fff;
-    padding: 20px;
+    padding: 5px;
     display: none;
     background: linear-gradient(to right, #2b3d55, #2b3d55, #2b3d55, #000);
-    background-color: #2b3d55;
     min-height: 270px;
 }
     .tabpanel.tabshown {
         display: block;
     }
+
+.tablist {
+    margin-bottom: -5px;
+}
 
 /* List item state buttons...................................................*/
 
@@ -221,5 +224,4 @@
         box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
         color: #fff;
         border-bottom: none;
-        border-right: none;
     }

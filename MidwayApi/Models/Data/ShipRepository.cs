@@ -83,15 +83,15 @@ namespace MidwayApi.Models.Data
             if (pg.PhaseId == 1)
             {
                 var arrivals = _context.Ships
-                    .Where(s => s.Side.SideId == pg.SideId && s.ArrivalTurn == pg.Turn ||
-                        s.ShipType.Substring(0, 2) == "CV" && s.ArrivalTurn > pg.Turn)
+                    .Where(s => s.Side.SideId == pg.SideId && (s.ArrivalTurn == pg.Turn ||
+                        s.ShipType.Substring(0, 2) == "CV" && s.ArrivalTurn > pg.Turn))
                     .ToList();
 
                 dtoShips.AddRange(arrivals.Select(s => new DtoShip
                     {
                         Id = s.ShipId,
                         OwningSide = pg.Side.ShortName,
-                        Location = "ARR",
+                        Location = s.ArrivalTurn > pg.Turn ? "DUE" : "ARR",
                         Name = s.Name,
                         ShipType = s.ShipType,
                         SearchImgPath = s.SearchImgPath,
