@@ -14,7 +14,8 @@
             zoneSize = 36,
             mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
             selectedZone = "",
-            selectionImage = null;
+            selImg,
+            dragThang = { dragging: false, origin: "", dragData: null };
 
         // Event handlers......................................................
 
@@ -33,11 +34,17 @@
 
         $(canvas).on("click", function (e) {
             selectZone(windowToCanvas(canvas, e.clientX, e.clientY));
-            showShipsInZone(selectedZone);
+            showShipsInZone();
+        }).on("mousedown", function (e) {
+            canvasMouseDown(e);
         });
         
         // Functions...........................................................
 
+        /*-------------------------------------------------------------------*/
+        /* Draw the search map semi-transparently and size the canvas to     */
+        /* match its dimensions.                                             */
+        /*-------------------------------------------------------------------*/
         function drawMap(callback) {
             var img = new Image();
             img.src = "content/images/search/searchboard.png";
@@ -50,6 +57,9 @@
             };
         }
 
+        /*-------------------------------------------------------------------*/
+        /* Make ajax call to load player's ships in this game.               */
+        /*-------------------------------------------------------------------*/
         function ajaxLoadShips(successCallback) {
             $.ajax({
                 url: "api/ship",
@@ -66,9 +76,53 @@
             });
         }
 
-        function getShipListHtml(ship) {
+        /*-------------------------------------------------------------------*/
+        /* Callback for ajaxLoadShips call above. Set up the various display */
+        /* elements, draw the search map and add event handlers for dynamic  */
+        /* elements (not in the html).                                       */
+        /*-------------------------------------------------------------------*/
+        function gotShips() {
+            $("#searchcanvas").css("left", mapLeft + "px");
+            $("#searchdiv").css("left", divLeft + "px").draggable({
+                handle: ".floathead",
+                containment: "#pagediv",
+                scroll: false
+            });
+            $("#return").css("left", "1330px");
+
+            var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
+                " " + game.PhaseName + " Phase vs. " + game.OpponentNickname + "</span>";
+            $("#gamedesc").addClass(captionColor).html("MIDWAY SEARCH <img src=\"" + flagImg + "\" />" + gameStatus);
+
+            $("#pagediv").css("background-image", "url(\"" + bgImg + "\")");
+
+            drawMap();
+
+            if (game.PhaseId == 1) {
+                $("#arrivalstab").css("display", "inline-block").addClass("tabshown");
+                $("#arrivals").addClass("tabshown");
+                showArrivingShips();
+            } else {
+                $("#arrivalstab").css("display", "none");
+                $("#zone, #zonetab").addClass("tabshown");
+            }
+
+            // Event handlers for ship lists
+            $(".shipitem").on("click", function (e) {
+                doShipSelection(e, $(this));
+            }).on("mousedown", function(e) {
+                shipitemMouseDown(e);
+            }).on("mouseup", function() {
+                shipitemMouseUp();
+            });
+        }
+        
+        /*-------------------------------------------------------------------*/
+        /* Build up and return the HTML for a single ship list item.         */
+        /*-------------------------------------------------------------------*/
+        function getShipListItemHtml(ship) {
             var hitsDir = "content/images/search/ships/hits/",
-                shipId = (ship.Location == "ARR" ? "arrship" : "ship") + ship.Id,
+                shipId = (ship.Location == "ARR" ? "arrship-" : "ship-") + ship.Id,
                 html = "<li><div id=\"" + shipId + "\" class=\"noselect shipitem\"><img src=\"" +
                     ship.SearchImgPath + "\"  draggable=\"false\"/>";
 
@@ -87,7 +141,10 @@
             return html;
         }
         
-        function showShipsInZone(zone) {
+        /*-------------------------------------------------------------------*/
+        /* Display on the Zone tab any ships in the currently selected zone. */
+        /*-------------------------------------------------------------------*/
+        function showShipsInZone() {
             var i, html;
 
             if (selectedZone == "H5G")
@@ -96,36 +153,31 @@
                 html = "Zone " + selectedZone + "<ul>";
             
             for (i = 0; i < ships.length; i++) {
-                if (ships[i].Location == zone) {
-                    html += getShipListHtml(ships[i]);
+                if (ships[i].Location == selectedZone) {
+                    html += getShipListItemHtml(ships[i]);
                 }
             }
             $("#zone").html(html + "<ul>");
-            
-            // Event handler for ships in a zone (might be set by arrivals)
-            if (game.PhaseId != 1) {
-                $(".shipitem").on("click", function(e) {
-                    doShipSelection(e, $(this));
-                });
-            }
         }
         
+        /*-------------------------------------------------------------------*/
+        /* Display on the Arrived tab any ships that arrived this turn.      */
+        /*-------------------------------------------------------------------*/
         function showArrivingShips() {
             var i, html = "<ul>";
             
             for (i = 0; i < ships.length; i++) {
                 if (ships[i].Location == "ARR") {
-                    html += getShipListHtml(ships[i]);
+                    html += getShipListItemHtml(ships[i]);
                 }
             }
             $("#arrivals").html(html + "<ul>");
-
-            // Event handler for arrivals
-            $(".shipitem").on("click", function (e) {
-                doShipSelection(e, $(this));
-            });
         }
         
+        /*-------------------------------------------------------------------*/
+        /* Respond to a click or Shift-click on a ship list item. Click      */
+        /* toggles selected state; Shift-click selects or deselects a range. */
+        /*-------------------------------------------------------------------*/
         function doShipSelection(e, $this) {
             if (!lastShipSelected) {
                 $this.addClass("selected");
@@ -150,6 +202,10 @@
             lastShipSelected = $this;
         }
         
+        /*-------------------------------------------------------------------*/
+        /* Convert input canvas coordinates to the name of the zone that     */
+        /* contains them.                                                    */
+        /*-------------------------------------------------------------------*/
         function coordsToZone(coords) {
             var x = coords.x;
             var y = coords.y;
@@ -188,6 +244,9 @@
             }
         }
         
+        /*-------------------------------------------------------------------*/
+        /* Convert a zone name to its top left canvas coordinates.           */
+        /*-------------------------------------------------------------------*/
         function zoneToTopLeftCoords(zone) {
             var col = 0;
             var areaSize = zoneSize * 3;
@@ -232,6 +291,10 @@
             return { x: col, y: row };
         }
         
+        /*-------------------------------------------------------------------*/
+        /* Convert input canvas coordinates to those of the top left of the  */
+        /* zone that contains them.                                          */
+        /*-------------------------------------------------------------------*/
         function coordsToTopLeftCoords(coords) {
             var zonesX = Math.floor((coords.x - 27) / 36),
                 zonesY = Math.floor((coords.y - 27) / 36);
@@ -239,6 +302,9 @@
             return { x: zonesX * 36 + 27, y: zonesY * 36 + 27 };
         }
 
+        /*-------------------------------------------------------------------*/
+        /* 
+        /*-------------------------------------------------------------------*/
         function selectZone(point) {
             var topLeft = coordsToTopLeftCoords(point),
                 top = topLeft.y - 3,
@@ -248,37 +314,138 @@
                 var oldTopLeft = zoneToTopLeftCoords(selectedZone),
                     oldTop = oldTopLeft.y - 3,
                     oldLeft = oldTopLeft.x - 3;
-                context.putImageData(selectionImage, oldLeft, oldTop);
+                context.putImageData(selImg, oldLeft, oldTop);
             }
             
-            selectionImage = context.getImageData(left, top, 43, 43);
-            context.drawImage(document.getElementById("selectedZone"), left, top);
+            var newImg = document.getElementById("selectedZone");
+            selImg = context.getImageData(left, top, newImg.width, newImg.height);
+            context.drawImage(newImg, left, top);
             selectedZone = coordsToZone(point);
         }
         
-        function gotShips() {
-            $("#searchcanvas").css("left", mapLeft + "px");
-            $("#searchdiv").css("left", divLeft + "px").draggable({
-                handle: ".floathead",
-                containment: "#pagediv",
-                scroll: false
-            });
-            $("#return").css("left", "1330px");
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function getShipsInZone(zone) {
+            var zoneShips = [];
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == zone) {
+                    zoneShips.push(ships[i]);
+                }
+            }
+            return zoneShips;
+        }
+        
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function getSelectedArrivals() {
+            var selShips = [];
+            if ($("#arrivals").hasClass("tabshown")) {
+                var list = $("#arrivals").find("div.shipitem"), id;
 
-            var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
-                " " + game.PhaseName + " Phase vs. " + game.OpponentNickname + "</span>";
-            $("#gamedesc").addClass(captionColor).html("MIDWAY SEARCH <img src=\"" + flagImg + "\" />" + gameStatus);
-
-            $("#pagediv").css("background-image", "url(\"" + bgImg + "\")");
-
-            drawMap();
-
-            if (game.PhaseId == 1) {
-                showArrivingShips();
+                for (var i = 0; i < list.length; i++) {
+                    if ($(list[i]).hasClass("selected")) {
+                        id = list[i].id.substr(list[i].id.indexOf("-") + 1);
+                        selShips.push(getShipById(id));
+                    }
+                }
+            }
+            return selShips;
+        }
+        
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function getShipById(id) {
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Id == id) {
+                    return ships[i];
+                }
+            }
+            return null;
+        }
+        
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function relocateShips(zone, movedShips) {
+            for (var i = 0; i < movedShips.length; i++) {
+                movedShips[i].Location = zone;
             }
         }
         
-        // Init................................................................ 
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function shipitemMouseDown(e) {
+            var selShips = getSelectedArrivals();
+            if (selShips.length > 0) {
+                dragThang.dragging = true;
+                dragThang.origin = "arrivals";
+                dragThang.dragData = selShips;
+
+                canvas.addEventListener("mousemove", canvasMouseMove, false);
+            }
+            canvas.removeEventListener("mousedown", canvasMouseDown, false);
+            canvas.addEventListener("mouseup", canvasMouseUp, false);
+            e.preventDefault();
+            
+            console.log("mousedown with " + selShips.length + " ships");
+        }
+        
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function shipitemMouseUp() {
+            canvas.addEventListener("mousedown", canvasMouseDown, false);
+            canvas.removeEventListener("mouseup", canvasMouseUp, false);
+            if (dragThang.dragging) {
+                dragThang.dragging = false;
+                canvas.removeEventListener("mousemove", canvasMouseMove, false);
+            }
+            console.log("mouseup");
+        }
+        
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function canvasMouseDown(e) {
+            var zone = coordsToZone(windowToCanvas(canvas, e.ClientX, e.ClientY)),
+                shipsInZone = getShipsInZone(zone);
+            
+            if (shipsInZone.length > 0) {
+                dragThang.dragging = true;
+                dragThang.origin = zone;
+                dragThang.dragData = shipsInZone;
+                
+                canvas.addEventListener("mousemove", canvasMouseMove, false);
+            }
+            canvas.removeEventListener("mousedown", canvasMouseDown, false);
+            canvas.addEventListener("mouseup", canvasMouseUp, false);
+            e.preventDefault();
+
+            console.log("mousedown");
+        }
+        
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function canvasMouseMove(e) {
+            console.log("drag");
+        }
+        
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function canvasMouseUp(e) {
+            canvas.addEventListener("mousedown", canvasMouseDown, false);
+            canvas.removeEventListener("mouseup", canvasMouseUp, false);
+            if (dragThang.dragging) {
+                dragThang.dragging = false;
+                canvas.removeEventListener("mousemove", canvasMouseMove, false);
+
+                var zone = coordsToZone(windowToCanvas(canvas, e.clientX, e.clientY));
+                relocateShips(zone, dragThang.dragData);
+                
+                console.log("drop " + dragThang.origin + " on " + zone);
+            } else {
+                console.log("mouseup");
+            }
+        }
+        
+        // Initialize..........................................................
         
         if (side == "IJN") {
             mapLeft = 418;
