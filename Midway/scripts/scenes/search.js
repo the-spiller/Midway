@@ -11,8 +11,10 @@
             side = game.SideShortName,
             ships = [],
             lastShipSelected = null,
+            zoneSize = 36,
             mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
-            selectedZone = "";
+            selectedZone = "",
+            selectionImage = null;
 
         // Event handlers......................................................
 
@@ -30,7 +32,7 @@
         });
 
         $(canvas).on("click", function (e) {
-            showSelectedZone(e);
+            selectZone(windowToCanvas(canvas, e.clientX, e.clientY));
             showShipsInZone(selectedZone);
         });
         
@@ -67,8 +69,8 @@
         function getShipListHtml(ship) {
             var hitsDir = "content/images/search/ships/hits/",
                 shipId = (ship.Location == "ARR" ? "arrship" : "ship") + ship.Id,
-                html = "<li><div id=\"" + shipId + "\" class=\"noselect shipitem\" draggable=\"true\"><img src=\"" +
-                    ship.SearchImgPath + "\" />";
+                html = "<li><div id=\"" + shipId + "\" class=\"noselect shipitem\"><img src=\"" +
+                    ship.SearchImgPath + "\"  draggable=\"false\"/>";
 
             if (ship.ShipType == "CV" || ship.ShipType == "CVL") {
                 html += "<div class=\"numplanes torpedo\">" + ship.TSquadrons +
@@ -86,7 +88,12 @@
         }
         
         function showShipsInZone(zone) {
-            var i, html = "<ul>";
+            var i, html;
+
+            if (selectedZone == "H5G")
+                html = "Midway <ul>";
+            else
+                html = "Zone " + selectedZone + "<ul>";
             
             for (i = 0; i < ships.length; i++) {
                 if (ships[i].Location == zone) {
@@ -113,7 +120,7 @@
             }
             $("#arrivals").html(html + "<ul>");
 
-            // Event handlers for arrivals
+            // Event handler for arrivals
             $(".shipitem").on("click", function (e) {
                 doShipSelection(e, $(this));
             });
@@ -150,11 +157,11 @@
             if (x < 28 || x > 962 || y < 28 || y > 746)
                 return "";
 
-            var zoneRow = (y - 27) / 36;
+            var zoneRow = (y - 27) / zoneSize;
             var row = Math.floor(zoneRow / 3 + 1).toString();
             var areaRow = Math.floor(zoneRow % 3 + 1);
             
-            var zoneCol = (x - 27) / 36;
+            var zoneCol = (x - 27) / zoneSize;
             var colRow = mapCols[Math.floor(zoneCol / 3)] + row;
             var areaCol = Math.floor(zoneCol % 3 + 1);
             
@@ -181,67 +188,72 @@
             }
         }
         
-        function zoneToZoneTopLeft(zone) {
+        function zoneToTopLeftCoords(zone) {
             var col = 0;
+            var areaSize = zoneSize * 3;
             for (var i = 0; i < mapCols.length; i++) {
-                if (zone.indexOf(mapCols[i] == 0)) {
-                    col = i * 36 + 27;
+                if (zone.charAt(0) == mapCols[i]) {
+                    col = (i * areaSize) + 27;
                     break;
                 }
             }
-            var row = (Number(zone.substring(1, 1)) - 1) * 36 + 27;
+            var row = ((Number(zone.substr(1, 1)) - 1) * areaSize) + 27;
 
             switch(zone.substr(2, 1)) {
                 case "B":
-                    col += 36;
+                    col += zoneSize;
                     break;
                 case "C":
-                    col += 72;
+                    col += zoneSize * 2;
                     break;
                 case "D":
-                    row += 36;
+                    row += zoneSize;
                     break;
                 case "E":
-                    row += 36;
-                    col += 36;
+                    row += zoneSize;
+                    col += zoneSize;
                     break;
                 case "F":
-                    row += 36;
-                    col += 72;
+                    row += zoneSize;
+                    col += zoneSize * 2;
                     break;
                 case "G":
-                    row += 72;
+                    row += zoneSize * 2;
                     break;
                 case "H":
-                    row += 72;
-                    col += 36;
+                    row += zoneSize * 2;
+                    col += zoneSize;
                     break;
                 case "I":
-                    row += 72;
-                    col += 72;
+                    row += zoneSize * 2;
+                    col += zoneSize * 2;
                     break;
             }
             return { x: col, y: row };
         }
         
-        function coordsToZoneTopLeft(coords) {
+        function coordsToTopLeftCoords(coords) {
             var zonesX = Math.floor((coords.x - 27) / 36),
                 zonesY = Math.floor((coords.y - 27) / 36);
 
             return { x: zonesX * 36 + 27, y: zonesY * 36 + 27 };
         }
 
-        function showSelectedZone(e) {
-            var topLeft;
-            
-            if (selectedZone != "") {
-                topLeft = zoneToZoneTopLeft(selectedZone);
-                context.clearRect(topLeft.x - 3, topLeft.y - 3, topLeft.x + 40, topLeft.y + 40);
+        function selectZone(point) {
+            var topLeft = coordsToTopLeftCoords(point),
+                top = topLeft.y - 3,
+                left = topLeft.x - 3;
+
+            if (selectedZone) {
+                var oldTopLeft = zoneToTopLeftCoords(selectedZone),
+                    oldTop = oldTopLeft.y - 3,
+                    oldLeft = oldTopLeft.x - 3;
+                context.putImageData(selectionImage, oldLeft, oldTop);
             }
-            var canvasLoc = windowToCanvas(canvas, e.clientX, e.clientY);
-            topLeft = coordsToZoneTopLeft(canvasLoc);
-            context.drawImage(document.getElementById("selectedZone"), topLeft.x - 3, topLeft.y - 3);
-            selectedZone = coordsToZone(canvasLoc);
+            
+            selectionImage = context.getImageData(left, top, 43, 43);
+            context.drawImage(document.getElementById("selectedZone"), left, top);
+            selectedZone = coordsToZone(point);
         }
         
         function gotShips() {
@@ -254,8 +266,8 @@
             $("#return").css("left", "1330px");
 
             var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
-                " phase " + game.PhaseId + " vs. " + game.OpponentNickname + "</span>";
-            $("#gamedesc").addClass(captionColor).html("<img src=\"" + flagImg + "\" />MIDWAY SEARCH " + gameStatus);
+                " " + game.PhaseName + " Phase vs. " + game.OpponentNickname + "</span>";
+            $("#gamedesc").addClass(captionColor).html("MIDWAY SEARCH <img src=\"" + flagImg + "\" />" + gameStatus);
 
             $("#pagediv").css("background-image", "url(\"" + bgImg + "\")");
 

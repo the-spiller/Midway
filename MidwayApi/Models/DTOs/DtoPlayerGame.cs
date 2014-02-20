@@ -8,6 +8,7 @@ namespace MidwayApi.Models.DTOs
 		public int SideId { get; set; }
         public int Turn { get; set; }
         public int PhaseId { get; set; }
+        public string PhaseName { get; set; }
 		public string SideShortName { get; set; }	// My side
 		public string TinyFlagUrl { get; set; }
 		public string LastPlayed { get; set; }	// Max of last played for both players

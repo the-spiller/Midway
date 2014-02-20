@@ -54,7 +54,7 @@ namespace MidwayApi.Models.Data
 
 			if (includeGames)
 			{
-				dtoPlayer.Games = GetDtoPlayerGames(dtoPlayer.PlayerId);
+				dtoPlayer.Games = GetPlayerGames(dtoPlayer.PlayerId);
 			}
 			return dtoPlayer;
         }
@@ -75,7 +75,7 @@ namespace MidwayApi.Models.Data
 
 	        if (includeGames)
 	        {
-		        dtoPlayer.Games = GetDtoPlayerGames(dtoPlayer.PlayerId);
+		        dtoPlayer.Games = GetPlayerGames(dtoPlayer.PlayerId);
 	        }
 			return dtoPlayer;
         }
@@ -271,11 +271,12 @@ namespace MidwayApi.Models.Data
 			return InsertStatus.Ok;
 		}
 
-		private IEnumerable<DtoPlayerGame> GetDtoPlayerGames(int playerId)
+		private IEnumerable<DtoPlayerGame> GetPlayerGames(int playerId)
 		{
 			var dbGames = _context.PlayerGames
 				.Include(p => p.Side)
 				.Include(p => p.Game)
+                .Include(p => p.Phase)
 				.Where(p => p.PlayerId == playerId)
 				.ToList();
 
@@ -288,6 +289,7 @@ namespace MidwayApi.Models.Data
 						GameId = dbGame.GameId,
 						SideId = dbGame.Side.SideId,
                         PhaseId = dbGame.PhaseId,
+                        PhaseName = dbGame.Phase.Name,
                         Turn = dbGame.Turn,
                         CompletedDTime = dbGame.Game.CompletedDTime == null ? "" :
                             dbGame.Game.CompletedDTime.Value.ToUniversalTime().ToString("o"),

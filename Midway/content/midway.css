@@ -226,6 +226,11 @@ th {
         z-index: 3;
     }
 
+.searchmarker {
+    position: absolute;
+    z-index: 5;    
+}
+
 #pagediv {
 	width: 100%;
 	height: 100%;
