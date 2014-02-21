@@ -170,7 +170,6 @@
     <Content Include="scripts\midway.js" />
     <Content Include="scripts\utils.js" />
     <Content Include="scripts\vendor\buzz.js" />
-    <Content Include="scripts\vendor\jqplugins.js" />
     <Content Include="scripts\vendor\jquery-1.9.1.js" />
     <Content Include="scripts\vendor\jquery-ui-1.10.3.custom.min.js" />
     <Content Include="scripts\vendor\jquery-ui-1.10.3.js" />

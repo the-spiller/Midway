@@ -7,6 +7,10 @@ function windowToCanvas(canvas, x, y) {
     };
 }
 
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 function teletype(id, text, delay) {
     function typechar(chr) {
         if (chr == '◄' && document.getElementById(id).innerHTML >= 1) {
