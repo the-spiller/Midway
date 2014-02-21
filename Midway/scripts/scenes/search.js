@@ -15,7 +15,7 @@
             mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
             selectedZone = "",
             selImg,
-            dragThang = { dragging: false, origin: "", dragData: null };
+            dragThang = { dragging: false, origin: "", dragData: null, canvasImg: null };
 
         // Event handlers......................................................
 
@@ -203,8 +203,8 @@
         }
         
         /*-------------------------------------------------------------------*/
-        /* Convert input canvas coordinates to the name of the zone that     */
-        /* contains them.                                                    */
+        /* Convert input canvas coordinates to the name of the search map    */
+        /* zone that contains them.                                          */
         /*-------------------------------------------------------------------*/
         function coordsToZone(coords) {
             var x = coords.x;
@@ -296,8 +296,8 @@
         /* zone that contains them.                                          */
         /*-------------------------------------------------------------------*/
         function coordsToTopLeftCoords(coords) {
-            var zonesX = Math.floor((coords.x - 27) / 36),
-                zonesY = Math.floor((coords.y - 27) / 36);
+            var zonesX = Math.floor((coords.x - 27) / 36) < 0 ? 0 : Math.floor((coords.x - 27) / 36),
+                zonesY = Math.floor((coords.y - 27) / 36) < 0 ? 0 : Math.floor((coords.y - 27) / 36);
 
             return { x: zonesX * 36 + 27, y: zonesY * 36 + 27 };
         }
@@ -379,14 +379,13 @@
                 dragThang.dragging = true;
                 dragThang.origin = "arrivals";
                 dragThang.dragData = selShips;
-
+                dragThang.canvasImg = null;
+                
                 canvas.addEventListener("mousemove", canvasMouseMove, false);
             }
             canvas.removeEventListener("mousedown", canvasMouseDown, false);
             canvas.addEventListener("mouseup", canvasMouseUp, false);
             e.preventDefault();
-            
-            console.log("mousedown with " + selShips.length + " ships");
         }
         
         /*-------------------------------------------------------------------*/
@@ -398,7 +397,6 @@
                 dragThang.dragging = false;
                 canvas.removeEventListener("mousemove", canvasMouseMove, false);
             }
-            console.log("mouseup");
         }
         
         /*-------------------------------------------------------------------*/
@@ -417,14 +415,20 @@
             canvas.removeEventListener("mousedown", canvasMouseDown, false);
             canvas.addEventListener("mouseup", canvasMouseUp, false);
             e.preventDefault();
-
-            console.log("mousedown");
         }
         
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function canvasMouseMove(e) {
-            console.log("drag");
+            var topLeft = coordsToTopLeftCoords(windowToCanvas(canvas, e.clientX, e.clientY));
+            
+            if (!dragThang.canvasImg)
+                dragThang.canvasImg = context.getImageData(0, 0, canvas.width, canvas.height);
+            else
+                context.putImageData(dragThang.canvasImg, 0, 0);
+
+            if (isLegitDrop(coordsToZone(topLeft)))
+                context.drawImage(document.getElementById(side.toLowerCase() + "marker"), topLeft.x, topLeft.y);
         }
         
         /*-------------------------------------------------------------------*/
@@ -436,13 +440,30 @@
                 dragThang.dragging = false;
                 canvas.removeEventListener("mousemove", canvasMouseMove, false);
 
-                var zone = coordsToZone(windowToCanvas(canvas, e.clientX, e.clientY));
-                relocateShips(zone, dragThang.dragData);
-                
-                console.log("drop " + dragThang.origin + " on " + zone);
-            } else {
-                console.log("mouseup");
+                var coords = windowToCanvas(canvas, e.clientX, e.clientY);
+                if (isLegitDrop(coords)) {
+                    if (dragThang.origin == "arrivals") {
+                        $("#arrivals").find("li").remove(".selected");
+                    }
+                    relocateShips(coordsToZone(coords), dragThang.dragData);
+                }
             }
+        }
+        
+        function isLegitDrop(coords) {
+            var dropZone = coordsToZone(coords);
+            if (dragThang.origin == "arrivals") {
+                if (side == "USN") {
+                    if (dropZone.substr(0, 1) == "I" && "BEH".indexOf(dropZone.substr(2, 1)) > -1)
+                        return true;
+                } else {
+                    if (dropZone.substr(0, 1) == "A" && "ADG".indexOf(dropZone.substr(2, 1)) > -1)
+                        return true;
+                }
+            } else {    // a zone
+                    
+            }
+            return false;
         }
         
         // Initialize..........................................................
