@@ -193,9 +193,9 @@ function ajaxGetPlayers(successCallback) {
     });
 }
 
-function workTabs(clickEvent) {
+function workTabs(e) {
     $(".tablistitem, .tabpanel").removeClass("tabshown");
-    var clickedId = clickEvent.target.id;
+    var clickedId = e.target.id;
     $("#" + clickedId).addClass("tabshown");
     $("#" + clickedId.replace("tab", "")).addClass("tabshown");
 }

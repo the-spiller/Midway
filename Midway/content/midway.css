@@ -236,7 +236,6 @@ th {
 	height: 100%;
     text-align: center;
 	background-repeat: no-repeat;
-    background-color: #004a7f;
 }
 
 #pagetitle {
@@ -326,8 +325,8 @@ th {
 	position: absolute;
 	top: 277px;
     left: 229px;
-	height: 550px;
-	width: 1110px;
+	height: 559px;
+	width: 1108px;
 	padding: 0 30px 20px 20px;
 	text-justify: auto;
 	text-align: justify;

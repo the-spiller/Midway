@@ -17,6 +17,7 @@
             mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
             selectedZone = "",
             selImg,
+            mouseDown = false,
             dragThang = {
                 dragging: false,
                 origin: "",
@@ -46,11 +47,19 @@
             selectZone(windowToCanvas(canvas, e.clientX, e.clientY));
         }).on("mousedown", function (e) {
             canvasMouseDown(e);
+        }).on("dblclick", function (e) {
+            if (shipsInZone(windowToCanvas(canvas, e.clientX, e.clientY))) {
+                $("#zone").find("div.shipitem").addClass("selected");
+            }
+        });
+
+        $(document).on("mouseup", function(e) {
+            documentMouseUp(e);
         });
         
         // Event handlers for dynamically-loaded ship lists
         $(document).on("click", ".shipitem", function (e) {
-            doShipSelection(e, $(this));
+            doShipSelection(this, (e.shiftKey));
         }).on("mousedown", ".shipitem", function (e) {
             shipitemMouseDown(e);
         });
@@ -112,22 +121,35 @@
         
         function drawZoneSelector(top, left) {
             selImg = context.getImageData(left, top, 43, 43);
-            var newImg = document.getElementById("selectedZone");
-            context.drawImage(newImg, left, top);
+            context.globalAlpha = 0.6;
+            context.lineWidth = 4;
+            context.strokeStyle = "#ffd651";
+            context.beginPath();
+            context.moveTo(left + 2, top + 2);
+            context.lineTo(left + 40, top + 2);
+            context.lineTo(left + 40, top + 40);
+            context.lineTo(left + 2, top + 40);
+            context.closePath();
+            context.stroke();
         }
         
         function drawMoveBand(coords) {
-            var start = zoneToTopLeftCoords(dragThang.origin);
+            var start = zoneToTopLeftCoords(dragThang.origin),
+                topLeft = coordsToTopLeftCoords(coords);
             start.x += Math.floor(zoneSize / 2);
             start.y += Math.floor(zoneSize / 2);
-            //coords = coordsToTopLeftCoords(coords);
             
-            context.beginPath();
-            context.moveTo(start.x, start.y);
-            context.lineTo(coords.x, coords.y);
             context.lineWidth = 2;
             context.lineCap = "round";
             context.strokeStyle = "#ff0000";
+            context.beginPath();
+            context.moveTo(start.x, start.y);
+            context.lineTo(coords.x, coords.y);
+            context.moveTo(topLeft.x, topLeft.y);
+            context.lineTo(topLeft.x + zoneSize, topLeft.y);
+            context.lineTo(topLeft.x + zoneSize, topLeft.y + zoneSize);
+            context.lineTo(topLeft.x, topLeft.y + zoneSize);
+            context.closePath();
             context.stroke();
         }
         
@@ -184,6 +206,7 @@
                 $("#arrivalstab").css("display", "none");
                 $("#zone, #zonetab").addClass("tabshown");
             }
+            showOffMapShips();
         }
         
         /*-------------------------------------------------------------------*/
@@ -214,14 +237,10 @@
         /* Display on the Zone tab any ships in the currently selected zone. */
         /*-------------------------------------------------------------------*/
         function showShipsInZone() {
-            var i, html;
-
-            if (selectedZone == "H5G")
-                html = "Midway <ul>";
-            else
-                html = "Zone " + selectedZone + "<ul>";
+            var zonetext = selectedZone == "H5G" ? "Midway" : selectedZone,
+                html = "<div style=\"margin: 5px;\">" + zonetext + "</div><ul>";
             
-            for (i = 0; i < ships.length; i++) {
+            for (var i = 0; i < ships.length; i++) {
                 if (ships[i].Location == selectedZone) {
                     html += getShipListItemHtml(ships[i]);
                 }
@@ -233,42 +252,66 @@
         /* Display on the Arrived tab any ships that arrived this turn.      */
         /*-------------------------------------------------------------------*/
         function showArrivingShips() {
-            var i, html = "<ul>";
+            var html = "<ul>";
             
-            for (i = 0; i < ships.length; i++) {
+            for (var i = 0; i < ships.length; i++) {
                 if (ships[i].Location == "ARR") {
                     html += getShipListItemHtml(ships[i]);
                 }
             }
-            $("#arrivals").html(html + "<ul>");
+            $("#arrivals").html(html + "</ul>");
+        }
+        
+        function showOffMapShips() {
+            var html = "<ul>";
+            
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == "OFF" || ships[i].Location == "SNK") {
+                    html += getShipListItemHtml(ships[i]);
+                }
+            }
+            $("#off").html(html + "</ul>");
+        }
+        
+        /*-------------------------------------------------------------------*/
+        /* Return true if the zone containing the input coordinates also     */
+        /* constains ships; false if not.                                    */
+        /*-------------------------------------------------------------------*/
+        function shipsInZone(coords) {
+            var zone = coordsToZone(coords);
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == zone)
+                    return true;
+            }
+            return false;
         }
         
         /*-------------------------------------------------------------------*/
         /* Respond to a click or Shift-click on a ship list item. Click      */
         /* toggles selected state; Shift-click selects or deselects a range. */
         /*-------------------------------------------------------------------*/
-        function doShipSelection(e, $this) {
+        function doShipSelection(shipItem, shiftPressed) {
             if (!lastShipSelected) {
-                $this.addClass("selected");
-                lastShipSelected = $this;
+                $(shipItem).addClass("selected");
+                lastShipSelected = shipItem;
                 return;
             }
-            if (e.shiftKey) {
-                var start = $(".shipitem").index($this);
+            if (shiftPressed) {
+                var start = $(".shipitem").index(shipItem);
                 var end = $(".shipitem").index(lastShipSelected);
 
-                if (lastShipSelected.hasClass("selected")) {
+                if ($(lastShipSelected).hasClass("selected")) {
                     $(".shipitem").slice(Math.min(start, end), Math.max(start, end) + 1).addClass("selected");
                 } else {
                     $(".shipitem").slice(Math.min(start, end), Math.max(start, end) + 1).removeClass("selected");
                 }
             } else {
-                if ($this.hasClass("selected"))
-                    $this.removeClass("selected");
+                if ($(shipItem).hasClass("selected"))
+                    $(shipItem).removeClass("selected");
                 else
-                    $this.addClass("selected");
+                    $(shipItem).addClass("selected");
             }
-            lastShipSelected = $this;
+            lastShipSelected = shipItem;
         }
         
         /*-------------------------------------------------------------------*/
@@ -458,32 +501,32 @@
         /*-------------------------------------------------------------------*/
         function shipitemMouseDown(e) {
             if (!$("#arrivals").hasClass("tabshown")) return;
-            
+
+            mouseDown = true;
             var selShips = getSelectedShips("arrivals");
             if (selShips.length > 0) {
-                dragThang.dragging = true;
+                dragThang.dragging = false;
                 dragThang.origin = "arrivals";
                 dragThang.dragData = selShips;
                 dragThang.useSnapshot = true;
                 dragThang.snapshot = null;
                 dragThang.restoreFunction = null;
                 dragThang.drawFunction = drawShipsMarker;
-                
-                canvas.addEventListener("mousemove", canvasMouseMove, false);
+
+                setTimeout(beginShipsDrag, 150);
             }
-            canvas.removeEventListener("mousedown", canvasMouseDown, false);
-            document.addEventListener("mouseup", documentMouseUp, false);
             e.preventDefault();
         }
        
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function canvasMouseDown(e) {
+            mouseDown = true;
             var zone = coordsToZone(windowToCanvas(canvas, e.clientX, e.clientY)),
                 selShips = getSelectedShips("zone");
             
             if (selShips.length > 0) {
-                dragThang.dragging = true;
+                dragThang.dragging = false;
                 dragThang.origin = zone;
                 dragThang.dragData = selShips;
                 dragThang.useSnapshot = true;
@@ -491,11 +534,16 @@
                 dragThang.restoreFunction = null;
                 dragThang.drawFunction = drawMoveBand;
                 
+                setTimeout(beginShipsDrag, 150);
+            }
+            e.preventDefault();
+        }
+        
+        function beginShipsDrag() {
+            if (mouseDown) {
+                dragThang.dragging = true;
                 canvas.addEventListener("mousemove", canvasMouseMove, false);
             }
-            canvas.removeEventListener("mousedown", canvasMouseDown, false);
-            document.addEventListener("mouseup", documentMouseUp, false);
-            e.preventDefault();
         }
         
         /*-------------------------------------------------------------------*/
@@ -504,31 +552,33 @@
         /* start of drag. Draw element being dragged at new mouse coordinates.*/
         /*-------------------------------------------------------------------*/
         function canvasMouseMove(e) {
+            // see if we've gone off the reservation -- if so, cancel the drag
             if (e.clientX < canvas.left || e.clientX > canvas.left + canvas.width ||
                 e.clientY < canvas.top || e.clientY > canvas.top + canvas.height) {
-                
+
+                mouseDown = false;
                 if (dragThang.dragging) {
                     dragThang.dragging = false;
-                    canvas.addEventListener("mousedown", canvasMouseDown);
                     canvas.removeEventListener("mousemmove", canvasMouseMove);
-                    document.removeEventListener("mouseup", documentMouseUp);
                 }
-            }
-            var canvasCoords = windowToCanvas(canvas, e.clientX, e.clientY);
-            if (dragThang.useSnapshot) {
-                if (dragThang.snapshot) {
-                    context.putImageData(dragThang.snapshot, 0, 0);
-                } else {
-                    dragThang.snapshot = context.getImageData(0, 0, canvas.width, canvas.height);
-                }
-            } else if (dragThang.restoreFunction) {
-                dragThang.restoreFunction();
+                return;
             }
             
-            if (isLegitDrop(canvasCoords)) {
-                dragThang.drawFunction(canvasCoords);
-            } else {
-                console.log("not legit");
+            if (dragThang.dragging) {
+                var canvasCoords = windowToCanvas(canvas, e.clientX, e.clientY);
+                if (dragThang.useSnapshot) {
+                    if (dragThang.snapshot) {
+                        context.putImageData(dragThang.snapshot, 0, 0);
+                    } else {
+                        dragThang.snapshot = context.getImageData(0, 0, canvas.width, canvas.height);
+                    }
+                } else if (dragThang.restoreFunction) {
+                    dragThang.restoreFunction();
+                }
+
+                if (isLegitDrop(canvasCoords)) {
+                    dragThang.drawFunction(canvasCoords);
+                }
             }
         }
         
@@ -536,9 +586,7 @@
         /* 
         /*-------------------------------------------------------------------*/
         function documentMouseUp(e) {
-            canvas.addEventListener("mousedown", canvasMouseDown, false);
-            document.removeEventListener("mouseup", documentMouseUp, false);
-            
+            mouseDown = false;
             if (dragThang.dragging) {
                 dragThang.dragging = false;
                 canvas.removeEventListener("mousemove", canvasMouseMove, false);
@@ -581,9 +629,7 @@
             } else if (isNumber(dragThang.origin.substr(1, 1))) {
                 var zones = zoneDistance(dragThang.origin, dropZone),
                     moves = getShipsMinMovePoints(dragThang.origin);
-                
-                 if (zones <= moves)
-                        return true;
+                if (zones <= moves) return true;
             }
             return false;
         }
