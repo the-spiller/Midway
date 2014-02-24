@@ -11,6 +11,7 @@ namespace MidwayApi.Models
         public DateTime? LastPlayed { get; set; }
         public int SideId { get; set; }
         public int PhaseId { get; set; }
+        public int AircraftReadyState { get; set; }
         public int Points { get; set; }
         public string SelectedLocation { get; set; }
         public int SurfaceCombatRound { get; set; }

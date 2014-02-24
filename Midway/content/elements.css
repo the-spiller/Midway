@@ -194,6 +194,7 @@
     display: none;
     background: linear-gradient(to right, #2b3d55, #2b3d55, #2b3d55, #000);
     min-height: 270px;
+    overflow: auto;
 }
     .tabpanel.tabshown {
         display: block;

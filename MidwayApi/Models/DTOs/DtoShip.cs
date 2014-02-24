@@ -2,7 +2,8 @@
 {
     public class DtoShip
     {
-        public int Id { get; set; }
+        public int ShipId { get; set; }
+        public int AirbaseId { get; set; }
         public string OwningSide { get; set; }
         public string Location { get; set; }
         public string Name { get; set; }
@@ -18,7 +19,8 @@
         public int TSquadrons { get; set; }
         public int FSquadrons { get; set; }
         public int DSquadrons { get; set; }
-        public int AirReadyState { get; set; }
         public int ArrivalTurn { get; set; }
+        public int FortificationStrength { get; set; }
+        public int OriginalFortificationStrength { get; set; }
     }
 }

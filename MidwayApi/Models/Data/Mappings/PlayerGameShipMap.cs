@@ -18,7 +18,6 @@ namespace MidwayApi.Models.Data.Mappings
 			this.Property(p => p.TSquadrons);
 			this.Property(p => p.FSquadrons);
 			this.Property(p => p.DSquadrons);
-            this.Property(p => p.AircraftReadyState);
 		}
 	}
 }

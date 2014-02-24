@@ -155,6 +155,7 @@ namespace MidwayApi.Models.Data
 										    SelectedLocation = "",
 										    SurfaceCombatRound = 0,
 										    PhaseIndeterminate = "N",
+                                            AircraftReadyState = 0,
 										    Turn = 1,
 										    PhaseId = 1,
 										    SideId = dtoPlayerGame.SideId,
@@ -192,6 +193,7 @@ namespace MidwayApi.Models.Data
 								    SelectedLocation = "",
 								    SurfaceCombatRound = 0,
 								    PhaseIndeterminate = "N",
+                                    AircraftReadyState = 0,
 								    Turn = 1,
 								    PhaseId = 1,
 								    SideId = dtoPlayerGame.SideId,
@@ -217,6 +219,7 @@ namespace MidwayApi.Models.Data
 									    SelectedLocation = "",
 									    SurfaceCombatRound = 0,
 									    PhaseIndeterminate = "N",
+                                        AircraftReadyState = 0,
 									    Turn = 1,
 									    PhaseId = 1,
 									    SideId = (dtoPlayerGame.SideId == 1) ? 2 : 1, //opposite
@@ -291,6 +294,7 @@ namespace MidwayApi.Models.Data
                         PhaseId = dbGame.PhaseId,
                         PhaseName = dbGame.Phase.Name,
                         Turn = dbGame.Turn,
+                        AircraftReadyState = dbGame.AircraftReadyState,
                         CompletedDTime = dbGame.Game.CompletedDTime == null ? "" :
                             dbGame.Game.CompletedDTime.Value.ToUniversalTime().ToString("o"),
 						TinyFlagUrl = dbGame.Side.TinyFlagUrl,

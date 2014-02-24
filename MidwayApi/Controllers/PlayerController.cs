@@ -3,6 +3,7 @@ using System.Web.Http;
 using System.Net;
 using System.Net.Http;
 using Newtonsoft.Json;
+using MidwayApi.Helpers;
 using MidwayApi.Models.DTOs;
 using MidwayApi.Models.Data;
 

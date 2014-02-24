@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Http;
 
-namespace MidwayApi.Controllers
+namespace MidwayApi.Helpers
 {
 	public static class ControllerHelper
 	{

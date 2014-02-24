@@ -56,11 +56,13 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\index.htm" />
     <Content Include="content\audio\teletype.mp3" />
     <Content Include="content\elements.css" />
     <Content Include="content\fonts\teletype1945-1985-webfont.svg" />
+    <Content Include="content\images\done.png" />
     <Content Include="content\images\search\addicon.png" />
-    <Content Include="content\images\search\ijnmarker.png" />
+    <Content Include="content\images\search\ijnfleet.png" />
     <Content Include="content\images\search\ijnsighting.png" />
     <Content Include="content\images\search\selectedZone.png" />
     <Content Include="content\images\search\Ships\akagi.png" />
@@ -92,8 +94,19 @@
     <Content Include="content\images\search\Ships\Hits\1-hitred.png" />
     <Content Include="content\images\search\Ships\Hits\10-hitsgreen.png" />
     <Content Include="content\images\search\Ships\Hits\10-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\11-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\12-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\13-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\14-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\15-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\16-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\17-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\18-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\19-hitsred.png" />
     <Content Include="content\images\search\Ships\Hits\2-hitsgreen.png" />
     <Content Include="content\images\search\Ships\Hits\2-hitsred.png" />
+    <Content Include="content\images\search\Ships\Hits\20-hitsgreen.png" />
+    <Content Include="content\images\search\Ships\Hits\20-hitsred.png" />
     <Content Include="content\images\search\Ships\Hits\3-hitsgreen.png" />
     <Content Include="content\images\search\Ships\Hits\3-hitsred.png" />
     <Content Include="content\images\search\Ships\Hits\4-hitsgreen.png" />
@@ -134,7 +147,7 @@
     <Content Include="content\images\search\Ships\yorktown.png" />
     <Content Include="content\images\search\Ships\yura.png" />
     <Content Include="content\images\search\Ships\zuiho.png" />
-    <Content Include="content\images\search\usnmarker.png" />
+    <Content Include="content\images\search\usnfleet.png" />
     <Content Include="content\images\search\usnsighting.png" />
     <Content Include="content\images\usn-med.png" />
     <Content Include="content\images\USN.gif" />

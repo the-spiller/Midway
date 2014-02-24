@@ -306,13 +306,6 @@ th {
         text-decoration: underline;
     }
 
-#return {
-	position: absolute;
-	display: inline;
-	top: 10px;
-	left: 1285px;
-}
-
 #registerdiv {
     font-size: 1em;
     top: 195px;
@@ -408,7 +401,7 @@ th {
 }
 
 #searchdiv {
-    top: 50px;
+    top: 60px;
     width: 400px;
     height: 737px;
     opacity: 1.0;
@@ -421,5 +414,5 @@ th {
 
 #searchcanvas {
 	position: absolute;
-	top: 50px;
+	top: 60px;
 }

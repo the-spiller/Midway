@@ -78,7 +78,7 @@
             img.onload = function() {
                 canvas.height = img.height;
                 canvas.width = img.width;
-                context.globalAlpha = 0.8;
+                context.globalAlpha = 0.6;
                 context.drawImage(img, 0, 0);
                 
                 //stuff on the map
@@ -206,6 +206,11 @@
                 $("#arrivalstab").css("display", "none");
                 $("#zone, #zonetab").addClass("tabshown");
             }
+            if (side == "USN") {
+                $("#duetab").css("display", "none");
+            } else {
+                showShipsDue();
+            }
             showOffMapShips();
         }
         
@@ -214,7 +219,8 @@
         /*-------------------------------------------------------------------*/
         function getShipListItemHtml(ship) {
             var hitsDir = "content/images/search/ships/hits/",
-                shipId = (ship.Location == "ARR" ? "arrship-" : "ship-") + ship.Id,
+                idPrefix = ship.Location == "ARR" ? "arrship-" : (ship.Location == "DUE" ? "dueship-" : "ship-"),
+                shipId = idPrefix + ship.Id,
                 html = "<li><div id=\"" + shipId + "\" class=\"noselect shipitem\"><img src=\"" +
                     ship.SearchImgPath + "\"  draggable=\"false\"/>";
 
@@ -237,14 +243,29 @@
         /* Display on the Zone tab any ships in the currently selected zone. */
         /*-------------------------------------------------------------------*/
         function showShipsInZone() {
-            var zonetext = selectedZone == "H5G" ? "Midway" : selectedZone,
-                html = "<div style=\"margin: 5px;\">" + zonetext + "</div><ul>";
+            var html = "<div style=\"margin: 5px;\">" + selectedZone + "</div><ul>";
             
             for (var i = 0; i < ships.length; i++) {
                 if (ships[i].Location == selectedZone) {
                     html += getShipListItemHtml(ships[i]);
                 }
             }
+            //if (selectedZone == "H5G") {
+            //    var hitsDir = "content/images/search/ships/hits/";
+            //    html += "<li><div id=\"midway\" class=\"noselect shipitem\">" +
+            //        "<img src=\"/content/images/search/ships/midway.png\"  draggable=\"false\"/>";
+            //        + "<div class=\"numplanes torpedo\">" + island.TSquadrons +
+            //            "</div><div class=\"numplanes fighter\">" + island.FSquadrons +
+            //            "</div><div class=\"numplanes divebomber\">" + island.DSquadrons + "</div>";
+
+            //    html += "<div class=\"shiphits green\"><img src=\"" + hitsDir + island.FortificationStrength +
+            //        "-hitsgreen.png\"></div>";
+
+            //    if (island.Hits > 0) {
+            //        html += "<div class=\"shiphits red\"><img src=\"" + hitsDir + island.Hits +
+            //            "-hitsred.png\"></div></div></li>";
+            //    }
+            //}
             $("#zone").html(html + "<ul>");
         }
         
@@ -253,13 +274,30 @@
         /*-------------------------------------------------------------------*/
         function showArrivingShips() {
             var html = "<ul>";
-            
             for (var i = 0; i < ships.length; i++) {
                 if (ships[i].Location == "ARR") {
                     html += getShipListItemHtml(ships[i]);
                 }
             }
             $("#arrivals").html(html + "</ul>");
+        }
+        
+        function showShipsDue() {
+            var arrivalTurn = 0,
+                html = "<ul>";
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == "DUE") {
+                    if (ships[i].ArrivalTurn != arrivalTurn) {
+                        arrivalTurn = ships[i].ArrivalTurn;
+                        var dueDate = militaryDateTimeStr(gameTimeFromTurn(ships[i].ArrivalTurn), false);
+                        var turns = arrivalTurn - game.Turn;
+                        html += "</ul><div style=\"margin: 5px; background-color: #516580; padding: 4px;\">Due " +
+                            dueDate + " (" + turns + " turns)</div><ul>";
+                    }
+                    html += getShipListItemHtml(ships[i]);
+                }
+            }
+            $("#due").html(html + "</ul>");
         }
         
         function showOffMapShips() {

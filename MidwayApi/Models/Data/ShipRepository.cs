@@ -20,9 +20,10 @@ namespace MidwayApi.Models.Data
         //.....................................................................
         public IList<DtoShip> GetShips()
         {
-            return _context.Ships.Select(s => new DtoShip
+            var dbShips = _context.Ships.Select(s => new DtoShip
                 {
-                    Id = s.ShipId,
+                    ShipId = s.ShipId,
+                    AirbaseId = 0,
                     OwningSide = s.Side.ShortName,
                     Location = "",
                     Name = s.Name,
@@ -34,13 +35,40 @@ namespace MidwayApi.Models.Data
                     Hits = 0,
                     ScreenStrength = s.ScreenStrength,
                     SurfaceStrength = s.SurfaceStrength,
+                    OriginalFortificationStrength = 0,
+                    FortificationStrength = 0,
                     AircraftCapacity = s.AircraftCapacity,
                     TSquadrons = s.TSquadrons,
                     FSquadrons = s.FSquadrons,
                     DSquadrons = s.DSquadrons,
-                    AirReadyState = 0,
                     ArrivalTurn = s.ArrivalTurn
                 }).ToList();
+
+            dbShips.AddRange(_context.Airbases.Select(a => new DtoShip
+                {
+                    ShipId = 0,
+                    AirbaseId = a.AirbaseId,
+                    OwningSide = a.Side.ShortName,
+                    Location = a.Location,
+                    Name = a.AirbaseName,
+                    ShipType = "",
+                    SearchImgPath = a.SearchImgPath,
+                    BattleImgPath = a.BattleImgPath,
+                    MovePoints = 0,
+                    HitsToSink = 0,
+                    Hits = 0,
+                    ScreenStrength = 0,
+                    SurfaceStrength = 0,
+                    OriginalFortificationStrength = a.FortificationStrength,
+                    FortificationStrength = a.FortificationStrength,
+                    AircraftCapacity = a.AircraftCapacity,
+                    TSquadrons = a.TSquadrons,
+                    FSquadrons = a.FSquadrons,
+                    DSquadrons = a.DSquadrons,
+                    ArrivalTurn = 0
+                }).ToList());
+
+            return dbShips;
         }
 
         //.....................................................................
@@ -60,7 +88,7 @@ namespace MidwayApi.Models.Data
 
             var dtoShips = dbShips.Select(dbShip => new DtoShip
                 {
-                    Id = dbShip.ShipId, 
+                    ShipId = dbShip.ShipId, 
                     OwningSide = sideName, 
                     Location = dbShip.Location,
                     Name = dbShip.Ship.Name, 
@@ -71,44 +99,105 @@ namespace MidwayApi.Models.Data
                     HitsToSink = dbShip.Ship.HitsToSink, 
                     Hits = dbShip.Hits, 
                     ScreenStrength = dbShip.Ship.ScreenStrength, 
-                    SurfaceStrength = dbShip.Ship.SurfaceStrength, 
+                    SurfaceStrength = dbShip.Ship.SurfaceStrength,
+                    OriginalFortificationStrength = 0,
+                    FortificationStrength = 0,
                     AircraftCapacity = dbShip.Ship.AircraftCapacity, 
                     TSquadrons = dbShip.TSquadrons, 
                     FSquadrons = dbShip.FSquadrons, 
                     DSquadrons = dbShip.DSquadrons, 
-                    AirReadyState = dbShip.AircraftReadyState, 
                     ArrivalTurn = dbShip.Ship.ArrivalTurn
                 }).ToList();
 
-            if (pg.PhaseId == 1)
-            {
-                var arrivals = _context.Ships
-                    .Where(s => s.Side.SideId == pg.SideId && (s.ArrivalTurn == pg.Turn ||
-                        s.ShipType.Substring(0, 2) == "CV" && s.ArrivalTurn > pg.Turn))
-                    .ToList();
 
-                dtoShips.AddRange(arrivals.Select(s => new DtoShip
+            var arrivals = _context.Ships
+                                .Where(s => s.Side.SideId == pg.SideId && (s.ArrivalTurn >= pg.Turn))
+                                .ToList();
+            
+            dtoShips.AddRange(arrivals.Select(s => new DtoShip
+                {
+                    ShipId = s.ShipId,
+                    OwningSide = sideName,
+                    Location = s.ArrivalTurn > pg.Turn ? "DUE" : "ARR",
+                    Name = s.Name,
+                    ShipType = s.ShipType,
+                    SearchImgPath = s.SearchImgPath,
+                    BattleImgPath = s.BattleImgPath,
+                    MovePoints = movePts,
+                    HitsToSink = s.HitsToSink,
+                    Hits = 0,
+                    ScreenStrength = s.ScreenStrength,
+                    SurfaceStrength = s.SurfaceStrength,
+                    OriginalFortificationStrength = 0,
+                    FortificationStrength = 0,
+                    AircraftCapacity = s.AircraftCapacity,
+                    TSquadrons = s.TSquadrons,
+                    FSquadrons = s.FSquadrons,
+                    DSquadrons = s.DSquadrons,
+                    ArrivalTurn = s.ArrivalTurn
+                }).ToList());
+             
+            if (pg.Turn == 1 && pg.PhaseId == 1)
+            {
+                var airbases = _context.Airbases
+                                       .Include(a => a.Side)
+                                       .Where(a => a.Side.SideId == pg.SideId)
+                                       .ToList();
+                dtoShips.AddRange(airbases.Select(a => new DtoShip
                     {
-                        Id = s.ShipId,
-                        OwningSide = pg.Side.ShortName,
-                        Location = s.ArrivalTurn > pg.Turn ? "DUE" : "ARR",
-                        Name = s.Name,
-                        ShipType = s.ShipType,
-                        SearchImgPath = s.SearchImgPath,
-                        BattleImgPath = s.BattleImgPath,
-                        MovePoints = movePts,
-                        HitsToSink = s.HitsToSink,
+                        ShipId = 0,
+                        AirbaseId = a.AirbaseId,
+                        OwningSide = sideName,
+                        Location = a.Location,
+                        Name = a.AirbaseName,
+                        ShipType = "",
+                        SearchImgPath = a.SearchImgPath,
+                        BattleImgPath = a.BattleImgPath,
+                        MovePoints = 0,
+                        HitsToSink = 0,
                         Hits = 0,
-                        ScreenStrength = s.ScreenStrength,
-                        SurfaceStrength = s.SurfaceStrength,
-                        AircraftCapacity = s.AircraftCapacity,
-                        TSquadrons = s.TSquadrons,
-                        FSquadrons = s.FSquadrons,
-                        DSquadrons = s.DSquadrons,
-                        AirReadyState = 0,
-                        ArrivalTurn = s.ArrivalTurn
-                    }));
+                        ScreenStrength = 0,
+                        SurfaceStrength = 0,
+                        OriginalFortificationStrength = a.FortificationStrength,
+                        FortificationStrength = a.FortificationStrength,
+                        AircraftCapacity = a.AircraftCapacity,
+                        TSquadrons = a.TSquadrons,
+                        FSquadrons = a.FSquadrons,
+                        DSquadrons = a.DSquadrons,
+                        ArrivalTurn = 0
+                    }).ToList());
             }
+            else
+            {
+                var airbases = _context.PlayerGameAirbases
+                                       .Include(p => p.Airbase)
+                                       .Where(p => p.PlayerId == pg.PlayerId && p.GameId == pg.GameId)
+                                       .ToList();
+                dtoShips.AddRange(airbases.Select(a => new DtoShip
+                {
+                    ShipId = 0,
+                    AirbaseId = a.AirbaseId,
+                    OwningSide = pg.Side.ShortName,
+                    Location = a.Airbase.Location,
+                    Name = a.Airbase.AirbaseName,
+                    ShipType = "",
+                    SearchImgPath = a.Airbase.SearchImgPath,
+                    BattleImgPath = a.Airbase.BattleImgPath,
+                    MovePoints = 0,
+                    HitsToSink = 0,
+                    Hits = 0,
+                    ScreenStrength = 0,
+                    SurfaceStrength = 0,
+                    OriginalFortificationStrength = a.Airbase.FortificationStrength,
+                    FortificationStrength = a.FortificationStrength,
+                    AircraftCapacity = a.Airbase.AircraftCapacity,
+                    TSquadrons = a.TSquadrons,
+                    FSquadrons = a.FSquadrons,
+                    DSquadrons = a.DSquadrons,
+                    ArrivalTurn = 0
+                }).ToList());
+            }
+
             return dtoShips;
         }
 

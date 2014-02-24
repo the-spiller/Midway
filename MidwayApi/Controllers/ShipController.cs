@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Newtonsoft.Json;
+using MidwayApi.Helpers;
 using MidwayApi.Models.Data;
 
 namespace MidwayApi.Controllers
