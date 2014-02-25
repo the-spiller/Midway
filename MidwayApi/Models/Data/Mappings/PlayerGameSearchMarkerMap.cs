@@ -13,14 +13,8 @@ namespace MidwayApi.Models.Data.Mappings
 			Property(s => s.GameId).IsRequired();
 			Property(s => s.PlayerId).IsRequired();
 			Property(s => s.Zone).HasMaxLength(3).IsRequired();
-
+			Property(s => s.TypesFound).HasMaxLength(24).IsRequired();
 			Property(s => s.PlacedTurn).IsRequired();
-            Property(s => s.CVs);
-            Property(s => s.CVLs);
-            Property(s => s.BBs);
-            Property(s => s.CAs);
-            Property(s => s.CLs);
-            Property(s => s.DDs);
 		}
 	}
 }

@@ -150,7 +150,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Helpers\ControllerHelper.cs" />
-    <Compile Include="Controllers\GameController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Controllers\ShipController.cs" />
     <Compile Include="Global.asax.cs">
@@ -160,7 +160,7 @@
     <Compile Include="Models\Airbase.cs" />
     <Compile Include="Models\AirOp.cs" />
     <Compile Include="Models\AirOpAircraft.cs" />
-    <Compile Include="Models\Data\GameRepository.cs" />
+    <Compile Include="Models\Data\SearchRepository.cs" />
     <Compile Include="Models\Data\IUnitOfWork.cs" />
     <Compile Include="Models\Data\Mappings\ActionMap.cs" />
     <Compile Include="Models\Data\Mappings\AirbaseMap.cs" />
@@ -182,6 +182,7 @@
     <Compile Include="Models\Data\ShipRepository.cs" />
     <Compile Include="Models\DTOs\DtoPlayerGame.cs" />
     <Compile Include="Models\DTOs\DtoPlayer.cs" />
+    <Compile Include="Models\DTOs\DtoSearch.cs" />
     <Compile Include="Models\DTOs\DtoShip.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Phase.cs" />
