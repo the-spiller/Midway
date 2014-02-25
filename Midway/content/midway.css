@@ -216,8 +216,8 @@ th {
 
 .shiphits {
     position: absolute;
-    left: 8px;
-    top: 34px;
+    left: 4px;
+    top: 35px;
 }
     .shiphits.green {
         z-index: 2;

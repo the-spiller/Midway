@@ -13,6 +13,11 @@ namespace MidwayApi.Controllers
     {
         private readonly PlayerRepository _repo;
 
+		public PlayerController(IUnitOfWork uow)
+		{
+			_repo = new PlayerRepository(uow as MidwayContext);
+		}
+
         public PlayerController()
         {
             IUnitOfWork uow = new MidwayContext();

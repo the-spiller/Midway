@@ -56,11 +56,14 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\index.htm" />
     <Content Include="content\audio\teletype.mp3" />
     <Content Include="content\elements.css" />
     <Content Include="content\fonts\teletype1945-1985-webfont.svg" />
+    <Content Include="content\images\arnotready.png" />
+    <Content Include="content\images\arready.png" />
+    <Content Include="content\images\arreadying.png" />
     <Content Include="content\images\done.png" />
+    <Content Include="content\images\icon.png" />
     <Content Include="content\images\search\addicon.png" />
     <Content Include="content\images\search\ijnfleet.png" />
     <Content Include="content\images\search\ijnsighting.png" />
