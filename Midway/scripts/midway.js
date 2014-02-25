@@ -193,6 +193,10 @@ function ajaxGetPlayers(successCallback) {
     });
 }
 
+function ajaxPostPhase(successcallback) {
+    
+}
+
 function workTabs(e) {
     $(".tablistitem, .tabpanel").removeClass("tabshown");
     var clickedId = e.target.id;

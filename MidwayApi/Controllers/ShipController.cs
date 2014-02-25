@@ -12,6 +12,11 @@ namespace MidwayApi.Controllers
     {
         private readonly ShipRepository _repo;
 
+		public ShipController(IUnitOfWork uow)
+		{
+			_repo = new ShipRepository(uow as MidwayContext);
+		}
+
         public ShipController()
         {
             IUnitOfWork uow = new MidwayContext();
@@ -34,7 +39,7 @@ namespace MidwayApi.Controllers
             }
         }
 
-        // GET api/ship?pid=playerId&gid=gameId
+        // GET api/ship?playerId=x&gameId=y
         public HttpResponseMessage GetShipsForPlayerGame(int playerId, int gameId)
         {
              try
@@ -50,5 +55,6 @@ namespace MidwayApi.Controllers
             }
         }           
         
+		// PUT api/ship
     }
 }
