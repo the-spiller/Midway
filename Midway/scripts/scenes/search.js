@@ -84,11 +84,13 @@
                 //stuff on the map
                 context.globalAlpha = 1.0;
                 for (i = 0; i < ships.length; i++) {
-                    thisLoc = ships[i].Location;
-                    if (isNumber(thisLoc.substr(1, 1))) {
-                        if ($.inArray(shipZones, thisLoc) == -1) {
-                            drawShipsMarker(zoneToTopLeftCoords(thisLoc));
-                            shipZones.push(thisLoc);
+                    if (ships[i].ShipType != "BAS") {
+                        thisLoc = ships[i].Location;
+                        if (isNumber(thisLoc.substr(1, 1))) {
+                            if ($.inArray(shipZones, thisLoc) == -1) {
+                                drawShipsMarker(zoneToTopLeftCoords(thisLoc));
+                                shipZones.push(thisLoc);
+                            }
                         }
                     }
                 }
@@ -219,22 +221,32 @@
         /*-------------------------------------------------------------------*/
         function getShipListItemHtml(ship) {
             var hitsDir = "content/images/search/ships/hits/",
-                idPrefix = ship.Location == "ARR" ? "arrship-" : (ship.Location == "DUE" ? "dueship-" : "ship-"),
-                shipId = idPrefix + ship.Id,
-                html = "<li><div id=\"" + shipId + "\" class=\"noselect shipitem\"><img src=\"" +
-                    ship.SearchImgPath + "\"  draggable=\"false\"/>";
+                idPrefix, shipId, imgSuffix, availHits, hits;
+            
+            if (ship.ShipType == "BAS") {
+                shipId = "airbase-" + ship.AirbaseId;
+                imgSuffix = ".png";
+                availHits = ship.OriginalFortificationStrength;
+                hits = ship.OriginalFortificationStrength - ship.FortificationStrength;
+            } else {
+                idPrefix = ship.Location == "ARR" ? "arrship-" : (ship.Location == "DUE" ? "dueship-" : "ship-");
+                shipId = idPrefix + ship.ShipId;
+                imgSuffix = "";
+                availHits = ship.HitsToSink;
+                hits = ship.Hits;
+            }
+            var html = "<li><div id=\"" + shipId + "\" class=\"noselect shipitem\"><img src=\"" +
+                ship.SearchImgPath + imgSuffix + "\"  draggable=\"false\"/>";
 
-            if (ship.ShipType == "CV" || ship.ShipType == "CVL") {
+            if (ship.ShipType == "CV" || ship.ShipType == "CVL" || ship.ShipType == "BAS") {
                 html += "<div class=\"numplanes torpedo\">" + ship.TSquadrons +
                     "</div><div class=\"numplanes fighter\">" + ship.FSquadrons +
                     "</div><div class=\"numplanes divebomber\">" + ship.DSquadrons + "</div>";
             }
-            html += "<div class=\"shiphits green\"><img src=\"" + hitsDir + ship.HitsToSink +
-                "-hitsgreen.png\"></div>";
+            html += "<div class=\"shiphits green\"><img src=\"" + hitsDir + availHits + "-hitsgreen.png\"></div>";
             
-            if (ship.Hits > 0) {
-                html += "<div class=\"shiphits red\"><img src=\"" + hitsDir + ship.Hits +
-                    "-hitsred.png\"></div></div></li>";
+            if (hits > 0) {
+                html += "<div class=\"shiphits red\"><img src=\"" + hitsDir + hits + "-hitsred.png\"></div></div></li>";
             }
             return html;
         }
@@ -250,22 +262,6 @@
                     html += getShipListItemHtml(ships[i]);
                 }
             }
-            //if (selectedZone == "H5G") {
-            //    var hitsDir = "content/images/search/ships/hits/";
-            //    html += "<li><div id=\"midway\" class=\"noselect shipitem\">" +
-            //        "<img src=\"/content/images/search/ships/midway.png\"  draggable=\"false\"/>";
-            //        + "<div class=\"numplanes torpedo\">" + island.TSquadrons +
-            //            "</div><div class=\"numplanes fighter\">" + island.FSquadrons +
-            //            "</div><div class=\"numplanes divebomber\">" + island.DSquadrons + "</div>";
-
-            //    html += "<div class=\"shiphits green\"><img src=\"" + hitsDir + island.FortificationStrength +
-            //        "-hitsgreen.png\"></div>";
-
-            //    if (island.Hits > 0) {
-            //        html += "<div class=\"shiphits red\"><img src=\"" + hitsDir + island.Hits +
-            //            "-hitsred.png\"></div></div></li>";
-            //    }
-            //}
             $("#zone").html(html + "<ul>");
         }
         
@@ -313,12 +309,12 @@
         
         /*-------------------------------------------------------------------*/
         /* Return true if the zone containing the input coordinates also     */
-        /* constains ships; false if not.                                    */
+        /* constains ships; false if not. Airbases are not counted.          */
         /*-------------------------------------------------------------------*/
         function shipsInZone(coords) {
             var zone = coordsToZone(coords);
             for (var i = 0; i < ships.length; i++) {
-                if (ships[i].Location == zone)
+                if (ships[i].Location == zone && ships.ShipType != "BAS")
                     return true;
             }
             return false;
@@ -497,8 +493,10 @@
                 id;
 
             for (var i = 0; i < $list.length; i++) {
-                id = $list[i].id.substr($list[i].id.indexOf("-") + 1);
-                selShips.push(getShipById(id));
+                if ($list[i].id.indexOf("airbase-") == -1) {
+                    id = $list[i].id.substr($list[i].id.indexOf("-") + 1);
+                    selShips.push(getShipById(id));
+                }
             }
             return selShips;
         }
@@ -507,7 +505,7 @@
         /*-------------------------------------------------------------------*/
         function getShipById(id) {
             for (var i = 0; i < ships.length; i++) {
-                if (ships[i].Id == id) {
+                if (ships[i].ShipId == id) {
                     return ships[i];
                 }
             }
@@ -519,7 +517,7 @@
         function getShipsMinMovePoints(zone) {
             var min = 999;
             for (var i = 0; i < ships.length; i++) {
-                if (ships[i].Location == zone) {
+                if (ships[i].Location == zone && ships[i].ShipType != "BAS") {
                     if (ships[i].MovePoints < min) min = ships[i].MovePoints;
                 }
             }
