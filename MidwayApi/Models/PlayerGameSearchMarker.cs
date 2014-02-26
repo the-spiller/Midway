@@ -6,10 +6,11 @@ namespace MidwayApi.Models
 	{
 		public int GameId { get; set; }
 		public int PlayerId { get; set; }
+        public int Turn { get; set; }
+        public int SearchNumber { get; set; }
 		public string Zone { get; set; }
-        public int PlacedTurn { get; set; }
 		public string TypesFound { get; set; }
 
-		public virtual PlayerGame PlayerGame { get; set; }
+        public virtual PlayerGameSearch PlayerGameSearch { get; set; }
 	}
 }

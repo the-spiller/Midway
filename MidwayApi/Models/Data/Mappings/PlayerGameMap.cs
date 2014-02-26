@@ -24,8 +24,7 @@ namespace MidwayApi.Models.Data.Mappings
 
 			HasMany(p => p.Airbases).WithRequired(i => i.PlayerGame).HasForeignKey(s => new { s.GameId, s.PlayerId });
 			HasMany(p => p.Ships).WithRequired(s => s.PlayerGame).HasForeignKey(s => new { s.GameId, s.PlayerId });
-			HasMany(p => p.SearchMarkers).WithRequired(s => s.PlayerGame).HasForeignKey(s => new { s.GameId, s.PlayerId });
-			HasMany(p => p.SearchResults).WithRequired(s => s.PlayerGame).HasForeignKey(s => new { s.GameId, s.PlayerId });
+		    HasMany(p => p.Searches).WithRequired(s => s.PlayerGame).HasForeignKey(s => new { s.GameId, s.PlayerId });
             HasMany(p => p.AirOps).WithRequired(a => a.PlayerGame).HasForeignKey(a => new { a.GameId, a.PlayerId });
 		}
 	}

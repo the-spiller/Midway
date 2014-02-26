@@ -25,7 +25,7 @@ namespace MidwayApi.Controllers
         }
 
 		// GET api/search?gameId=x&playerId=y
-		public HttpResponseMessage GetSearches(int gameId, int playerId)
+		public HttpResponseMessage GetSearchesForPlayerGame(int playerId, int gameId)
 		{
 			try
 			{
@@ -45,8 +45,10 @@ namespace MidwayApi.Controllers
 		{
 			try
 			{
-				_repo.AddSearch(dtoSearch);
-				return new HttpResponseMessage(HttpStatusCode.NoContent);
+				return new HttpResponseMessage(HttpStatusCode.OK)
+				    {
+				        Content = new StringContent(JsonConvert.SerializeObject(_repo.AddSearch(dtoSearch)))
+				    };
 			}
 			catch (Exception ex)
 			{
@@ -55,11 +57,11 @@ namespace MidwayApi.Controllers
 		}
 
 		// DELETE api/search?gameId=x&playerId=y&zone=z
-		public HttpResponseMessage DeleteSearch(int gameId, int playerId, string zone)
+		public HttpResponseMessage DeleteSearchMarker(DtoSearch search, string zone)
 		{
 			try
 			{
-				_repo.RemoveSearch(gameId, playerId, zone);
+				_repo.RemoveSearchMarker(search, zone);
 				return new HttpResponseMessage(HttpStatusCode.NoContent);
 			}
 			catch (Exception ex)
@@ -68,7 +70,7 @@ namespace MidwayApi.Controllers
 				{
 					return new HttpResponseMessage(HttpStatusCode.NotFound)
 						{
-							Content = new StringContent("Unable to find a marker for the input game, player and zone."),
+							Content = new StringContent("Unable to locate indicated search marker in database."),
 							ReasonPhrase = "Marker Not Found"
 						};
 				}

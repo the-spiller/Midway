@@ -25,8 +25,7 @@ namespace MidwayApi.Models
 
 		public virtual IList<PlayerGameAirbase> Airbases { get; set; }
 		public virtual IList<PlayerGameShip> Ships { get; set; }
-		public virtual IList<PlayerGameSearchMarker> SearchMarkers { get; set; }
-		public virtual IList<PlayerGameSearchResult> SearchResults { get; set; }
+		public virtual IList<PlayerGameSearch> Searches { get; set; }
         public virtual IList<AirOp> AirOps { get; set; }
     }
 }

@@ -160,6 +160,7 @@
     <Compile Include="Models\Airbase.cs" />
     <Compile Include="Models\AirOp.cs" />
     <Compile Include="Models\AirOpAircraft.cs" />
+    <Compile Include="Models\Data\Mappings\PlayerGameSearchMap.cs" />
     <Compile Include="Models\Data\SearchRepository.cs" />
     <Compile Include="Models\Data\IUnitOfWork.cs" />
     <Compile Include="Models\Data\Mappings\ActionMap.cs" />
@@ -172,7 +173,6 @@
     <Compile Include="Models\Data\Mappings\PlayerGameAirbaseMap.cs" />
     <Compile Include="Models\Data\Mappings\PlayerGameMap.cs" />
     <Compile Include="Models\Data\Mappings\PlayerGameSearchMarkerMap.cs" />
-    <Compile Include="Models\Data\Mappings\PlayerGameSearchResultMap.cs" />
     <Compile Include="Models\Data\Mappings\PlayerGameShipMap.cs" />
     <Compile Include="Models\Data\Mappings\PlayerMap.cs" />
     <Compile Include="Models\Data\Mappings\ShipMap.cs" />
@@ -183,14 +183,15 @@
     <Compile Include="Models\DTOs\DtoPlayerGame.cs" />
     <Compile Include="Models\DTOs\DtoPlayer.cs" />
     <Compile Include="Models\DTOs\DtoSearch.cs" />
+    <Compile Include="Models\DTOs\DtoSearchMarker.cs" />
     <Compile Include="Models\DTOs\DtoShip.cs" />
     <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Phase.cs" />
     <Compile Include="Models\PhaseAction.cs" />
     <Compile Include="Models\PlayerGame.cs" />
     <Compile Include="Models\PlayerGameAirbase.cs" />
+    <Compile Include="Models\PlayerGameSearch.cs" />
     <Compile Include="Models\PlayerGameSearchMarker.cs" />
-    <Compile Include="Models\PlayerGameSearchResult.cs" />
     <Compile Include="Models\PlayerGameShip.cs" />
     <Compile Include="Models\Services\BasicAuthenticationMessageHandler.cs" />
     <Compile Include="Models\Services\Caesar.cs" />

@@ -21,7 +21,7 @@ namespace MidwayApi.Models.Data
 		public DbSet<PlayerGame> PlayerGames { get; set; }
         public DbSet<PlayerGameAirbase> PlayerGameAirbases { get; set; }
         public DbSet<PlayerGameSearchMarker> PlayerGameSearchMarkers { get; set; }
-        public DbSet<PlayerGameSearchResult> PlayerGameSearchResults { get; set; }
+        public DbSet<PlayerGameSearch> PlayerGameSearches { get; set; }
         public DbSet<PlayerGameShip> PlayerGameShips { get; set; }
         public DbSet<Ship> Ships { get; set; }
         public DbSet<Side> Sides { get; set; }
@@ -38,7 +38,7 @@ namespace MidwayApi.Models.Data
             modelBuilder.Configurations.Add(new PlayerGameAirbaseMap());
             modelBuilder.Configurations.Add(new PlayerGameMap());
             modelBuilder.Configurations.Add(new PlayerGameSearchMarkerMap());
-            modelBuilder.Configurations.Add(new PlayerGameSearchResultMap());
+            modelBuilder.Configurations.Add(new PlayerGameSearchMap());
             modelBuilder.Configurations.Add(new PlayerGameShipMap());
             modelBuilder.Configurations.Add(new PlayerMap());
             modelBuilder.Configurations.Add(new ShipMap());

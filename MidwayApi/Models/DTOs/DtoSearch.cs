@@ -1,11 +1,16 @@
-﻿namespace MidwayApi.Models.DTOs
+﻿using System.Collections.Generic;
+
+namespace MidwayApi.Models.DTOs
 {
 	public class DtoSearch
 	{
 		public int GameId { get; set; }
 		public int PlayerId { get; set; }
-		public string Zone { get; set; }
-		public int PlacedTurn { get; set; }
-		public string TypesFound { get; set; }
+        public int Turn { get; set; }
+        public int SearchNumber { get; set; }
+        public string SearchType { get; set; }
+        public string Area { get; set; }
+
+        public IList<DtoSearchMarker> Markers { get; set; }
 	}
 }
