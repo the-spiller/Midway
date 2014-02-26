@@ -176,6 +176,7 @@
     <Content Include="content\themes\jquery-ui-1.10.3.css" />
     <Content Include="content\Test.css" />
     <Content Include="favicon.ico" />
+    <Content Include="scripts\vendor\kinetic-v5.0.1.min.js" />
     <Content Include="_search.html" />
     <Content Include="scripts\scenes\about.js" />
     <Content Include="scripts\scenes\search.js" />
@@ -190,7 +191,6 @@
     <Content Include="scripts\utils.js" />
     <Content Include="scripts\vendor\buzz.js" />
     <Content Include="scripts\vendor\jquery-1.9.1.js" />
-    <Content Include="scripts\vendor\jquery-ui-1.10.3.custom.min.js" />
     <Content Include="scripts\vendor\jquery-ui-1.10.3.js" />
     <Content Include="Web.config" />
     <Content Include="_about.html" />

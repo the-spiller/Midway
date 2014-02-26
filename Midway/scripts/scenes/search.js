@@ -4,13 +4,14 @@
             context = canvas.getContext("2d"),
             mapLeft = 5,
             divLeft = 974,
-            bgImg = "content/images/search/bg-usn-search.jpg",
+            imgDir = "content/images/search/",
+            bgImg = imgDir + "bg-usn-search.jpg",
             flagImg = "content/images/usn-med.png",
             captionColor = "usnblue",
             game = player.Games[0],
             side = game.SideShortName,
             ships = [],
-            sightings = [],
+            searches = [],
             lastShipSelected = null,
             zoneSize = 36,
             mapMargin = 27,
@@ -113,7 +114,7 @@
         function drawMap(callback) {
             var img = new Image(), i, thisLoc, shipZones = [];
             
-            img.src = "content/images/search/searchboard.png";
+            img.src = imgDir + "searchboard.png";
             img.onload = function() {
                 canvas.height = img.height;
                 canvas.width = img.width;
@@ -133,8 +134,10 @@
                         }
                     }
                 }
-                for (i = 0; i < sightings.length; i++) {
-                    drawSightingMarker(sightings[i].Location);
+                for (i = 0; i < searches.length; i++) {
+                    for (var j = 0; j < searches[i].Markers.length; j++) {
+                        drawSightingMarker(searches[i].Markers[j]);
+                    }
                 }
                 if (selectedZone) {
                     var coords = zoneToTopLeftCoords(selectedZone),
@@ -160,9 +163,10 @@
         /* Grab preloaded sighting image and draw it at the input canvas     */
         /* coordinates.                                                      */
         /*-------------------------------------------------------------------*/
-        function drawSightingMarker(coords) {
-            var sightingImg = document.getElementById(side.toLowerCase() + "sighting");
-            context.drawImage(sightingImg, coords.x, coords.y);
+        function drawSightingMarker(marker) {
+            var topLeft = zoneToTopLeftCoords(marker.Zone),
+                sightingImg = document.getElementById(side.toLowerCase() + "sighting");
+            context.drawImage(sightingImg, topLeft.x, topLeft.y);
         }
         /*-------------------------------------------------------------------*/
         /* Draw yellow square selected zone marker at the input canvas top   */
@@ -182,8 +186,8 @@
             context.stroke();
         }
         /*-------------------------------------------------------------------*/
-        /* Grab preloaded sighting image and draw it at the input canvas     */
-        /* coordinates.                                                      */
+        /* Draw movement direction band and destination zone indicator       */
+        /* during ship movement dragging.                                    */
         /*-------------------------------------------------------------------*/
         function drawMoveBand(coords) {
             var start = zoneToTopLeftCoords(dragThang.origin),
@@ -229,52 +233,34 @@
             });
         }
         /*-------------------------------------------------------------------*/
-        /* Callback for ajaxLoadShips call above. Set up the various display */
-        /* elements, draw the search map and add event handlers for dynamic  */
-        /* elements (not in the html).                                       */
+        /* Make ajax call to post phase data back to the server.             */
         /*-------------------------------------------------------------------*/
-        function gotShips() {
-            $("#searchcanvas").css("left", mapLeft + "px");
-            $("#searchdiv").css("left", divLeft + "px").draggable({
-                handle: ".floathead",
-                containment: "#pagediv",
-                scroll: false
+        function ajaxPostPhase(successCallback) {
+
+        }
+        /*-------------------------------------------------------------------*/
+        /* Make ajax call to load player's search markers in this game.      */
+        /*-------------------------------------------------------------------*/
+        function ajaxLoadSearches(successCallback) {
+            $.ajax({
+                url: "api/search",
+                type: "GET",
+                data: { gameId: game.GameId, playerId: player.PlayerId },
+                accepts: "application/json",
+                success: function (data) {
+                    searches = JSON.parse(data);
+                    if (successCallback) successCallback();
+                },
+                error: function (xhr, status, errorThrown) {
+                    showAjaxError(xhr, status, errorThrown);
+                }
             });
-            $("#return").css("left", "1330px");
-
-            var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
-                " " + game.PhaseName + " Phase vs. " + game.OpponentNickname + "</span>";
-            $("#gamedesc").addClass(captionColor).html("MIDWAY SEARCH <img src=\"" + flagImg + "\" />" + gameStatus);
-
-            $("#pagediv").css("background-image", "url(\"" + bgImg + "\")");
-
-            if (game.PhaseId == 1 && game.AircraftReadyState == 1)
-                game.AircraftReadyState = 2;
-                
-            showAirReadiness();
-            
-            drawMap();
-
-            if (game.PhaseId == 1) {
-                $("#arrivalstab").css("display", "inline-block").addClass("tabshown");
-                $("#arrivals").addClass("tabshown");
-                showArrivingShips();
-            } else {
-                $("#arrivalstab").css("display", "none");
-                $("#zone, #zonetab").addClass("tabshown");
-            }
-            if (side == "USN") {
-                $("#duetab").css("display", "none");
-            } else {
-                showShipsDue();
-            }
-            showOffMapShips();
         }
         /*-------------------------------------------------------------------*/
         /* Build up and return the HTML for a single ship list item.         */
         /*-------------------------------------------------------------------*/
         function getShipListItemHtml(ship) {
-            var hitsDir = "content/images/search/ships/hits/",
+            var hitsDir = imgDir + "ships/hits/",
                 idPrefix, shipId, imgSuffix, availHits, hits;
             
             if (ship.ShipType == "BAS") {
@@ -309,13 +295,13 @@
         function showAirReadiness() {
             switch (game.AircraftReadyState) {
                 case 0:
-                    document.getElementById("readinessimg").src = "content/images/arnotready.png";
+                    document.getElementById("readinessimg").src = imgDir + side.toLowerCase() + "-airnotready.png";
                     break;
                 case 1:
-                    document.getElementById("readinessimg").src = "content/images/arreadying.png";
+                    document.getElementById("readinessimg").src = imgDir + side.toLowerCase() + "-airreadying.png";
                     break;
                 case 2:
-                    document.getElementById("readinessimg").src = "content/images/arready.png";
+                    document.getElementById("readinessimg").src = imgDir + side.toLowerCase() + "-airready.png";
                     break;
             }
         }
@@ -383,6 +369,16 @@
             var zone = coordsToZone(coords);
             for (var i = 0; i < ships.length; i++) {
                 if (ships[i].Location == zone && ships.ShipType != "BAS")
+                    return true;
+            }
+            return false;
+        }
+        /*-------------------------------------------------------------------*/
+        /* Return true if any ships are due later in the game.               */
+        /*-------------------------------------------------------------------*/
+        function shipsDue() {
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].ArrivalTurn > game.Turn)
                     return true;
             }
             return false;
@@ -736,13 +732,59 @@
             }
             return false;
         }
+        /*-------------------------------------------------------------------*/
+        /* Callback for ajaxLoadShips call. Set up the various ships display */
+        /* elements, draw the search map and add event handlers for dynamic  */
+        /* ship elements.                                                    */
+        /*-------------------------------------------------------------------*/
+        function gotShips() {
+            $("#searchcanvas").css("left", mapLeft + "px");
+            $("#searchdiv").css("left", divLeft + "px").draggable({
+                handle: ".floathead",
+                containment: "#pagediv",
+                scroll: false
+            });
+            $("#return").css("left", "1330px");
+
+            var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
+                " " + game.PhaseName + " Phase vs. " + game.OpponentNickname + "</span>";
+            $("#gamedesc").addClass(captionColor).html("MIDWAY SEARCH <img src=\"" + flagImg + "\" />" + gameStatus);
+
+            $("#pagediv").css("background-image", "url(\"" + bgImg + "\")");
+
+            if (game.PhaseId == 1 && game.AircraftReadyState == 1)
+                game.AircraftReadyState = 2;
+
+            showAirReadiness();
+
+            ajaxLoadSearches(gotSearches);
+            function gotSearches() {
+                drawMap();
+
+                if (game.PhaseId == 1) {
+                    $("#arrivalstab").css("display", "inline-block").addClass("tabshown");
+                    $("#arrivals").addClass("tabshown");
+                    showArrivingShips();
+                } else {
+                    $("#arrivalstab").css("display", "none");
+                    $("#zone, #zonetab").addClass("tabshown");
+                }
+
+                if (shipsDue())
+                    showShipsDue();
+                else
+                    $("#duetab").css("display", "none");
+
+                showOffMapShips();
+            }
+        }
         
         // Initialize..........................................................
         
         if (side == "IJN") {
             mapLeft = 418;
             divLeft = 5;
-            bgImg = "content/images/search/bg-ijn-search.jpg";
+            bgImg = imgDir + "bg-ijn-search.jpg";
             flagImg = "content/images/ijn-med.png";
             captionColor = "ijnred";
         }

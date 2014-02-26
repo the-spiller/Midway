@@ -125,8 +125,9 @@ function parseIso8601(str) {
     return date;
 }
 
-function prettyTimeAgo(date) {
-    var diff = (new Date().getTime() - date.getTime()) / 1000,  //seconds
+function prettyTimeAgo(dateWhen, dateNow) {
+    if (dateNow == null) dateNow = new Date();
+    var diff = (dateNow.getTime() - dateWhen.getTime()) / 1000,  //seconds
         dayDiff = Math.floor(diff / 86400); //days
 
     if (isNaN(dayDiff) || dayDiff < 0)
