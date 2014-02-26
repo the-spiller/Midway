@@ -59,11 +59,11 @@
     <Content Include="content\audio\teletype.mp3" />
     <Content Include="content\elements.css" />
     <Content Include="content\fonts\teletype1945-1985-webfont.svg" />
-    <Content Include="content\images\arnotready.png" />
-    <Content Include="content\images\arready.png" />
-    <Content Include="content\images\arreadying.png" />
     <Content Include="content\images\done.png" />
     <Content Include="content\images\icon.png" />
+    <Content Include="content\images\search\ijn-airnotready.png" />
+    <Content Include="content\images\search\ijn-airready.png" />
+    <Content Include="content\images\search\ijn-airreadying.png" />
     <Content Include="content\images\search\addicon.png" />
     <Content Include="content\images\search\ijnfleet.png" />
     <Content Include="content\images\search\ijnsighting.png" />
@@ -152,6 +152,9 @@
     <Content Include="content\images\search\Ships\zuiho.png" />
     <Content Include="content\images\search\usnfleet.png" />
     <Content Include="content\images\search\usnsighting.png" />
+    <Content Include="content\images\search\usn-airnotready.png" />
+    <Content Include="content\images\search\usn-airready.png" />
+    <Content Include="content\images\search\usn-airreadying.png" />
     <Content Include="content\images\usn-med.png" />
     <Content Include="content\images\USN.gif" />
     <Content Include="content\midway.css" />
