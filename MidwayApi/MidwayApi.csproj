@@ -203,9 +203,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\cm.sdf" />
+    <Content Include="App_Data\data.sql" />
+    <Content Include="App_Data\schema.sql" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="App_Data\del_games.sqlce" />
+    <Content Include="App_Data\del_games.sql" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -214,7 +216,9 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="App_Data\mdb.dgml" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
