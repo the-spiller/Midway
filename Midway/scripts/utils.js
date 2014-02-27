@@ -243,3 +243,11 @@ function findPos(obj) {
 
     return { left: curleft, top: curtop };
 }
+
+// Vector math.................................................................
+
+function addVectors(vector1, vector2) {
+    var retX = vector1.x + vector2.x;
+    var retY = vector1.y + vector2.y;
+    return { x: retX, y: retY };
+}

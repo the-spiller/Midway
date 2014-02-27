@@ -416,3 +416,10 @@ th {
 	position: absolute;
 	top: 60px;
 }
+
+#readinessimg {
+	opacity: 1.0;
+}
+	#readinessimg.disable {
+		opacity: 0.6;
+	}
