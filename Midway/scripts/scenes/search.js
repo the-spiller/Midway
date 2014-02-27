@@ -36,7 +36,7 @@
             if (dirty) {
                 showAlert("Home",
                     "Are you sure you want to return to the home page? Changes you've made will be lost.",
-                    DLG_YESCANCEL, "red", returnChoice);
+                    DLG_YESCANCEL, "blue", returnChoice);
 
                 function returnChoice(choice) {
                     if (choice == "Yes") returnToHome();
@@ -61,8 +61,18 @@
         $("#airreadiness").on("click", function() {
             if (game.AircraftReadyState == 0) 
                 game.AircraftReadyState = 1;
-             else 
+            else if (game.AircraftReadyState == 1)
                 game.AircraftReadyState = 0;
+            else {
+                showAlert("Air Readiness",
+                    "Your aircraft are ready for operations. Are you sure you want to move them down to the hangar deck?",
+                    DLG_YESCANCEL, "blue", readyChoice);
+                
+                function readyChoice(choice) {
+                    if (choice == "Yes")
+                        game.AircraftReadyState = 0;
+                }
+            }
             
             showAirReadiness();
             dirty = true;
@@ -77,7 +87,7 @@
         }).on("mousedown", function (e) {
             canvasMouseDown(e);
         }).on("dblclick", function (e) {
-            if (shipsInZone(windowToCanvas(canvas, e.clientX, e.clientY))) {
+            if (shipsInZone(null, windowToCanvas(canvas, e.clientX, e.clientY))) {
                 $("#zone").find("div.shipitem").addClass("selected");
             }
         });
@@ -309,6 +319,8 @@
         /* Display on the Zone tab any ships in the currently selected zone. */
         /*-------------------------------------------------------------------*/
         function showShipsInZone() {
+            if (!selectedZone) return;
+            
             var html = "<div style=\"margin: 5px;\">" + selectedZone + "</div><ul>";
             
             for (var i = 0; i < ships.length; i++) {
@@ -347,7 +359,12 @@
                     html += getShipListItemHtml(ships[i]);
                 }
             }
-            $("#due").html(html + "</ul>");
+            if (arrivalTurn == 0) // no ships due
+                html = "<div style=\"margin: 5px;\">No future arrivals</div>";
+            else
+                html += "</ul>";
+            
+            $("#due").html(html);
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -365,20 +382,12 @@
         /* Return true if the zone containing the input coordinates also     */
         /* constains ships; false if not. Airbases are not counted.          */
         /*-------------------------------------------------------------------*/
-        function shipsInZone(coords) {
-            var zone = coordsToZone(coords);
+        function shipsInZone(zone, coords) {
+            if (zone == null)
+                zone = coordsToZone(coords);
+            
             for (var i = 0; i < ships.length; i++) {
                 if (ships[i].Location == zone && ships.ShipType != "BAS")
-                    return true;
-            }
-            return false;
-        }
-        /*-------------------------------------------------------------------*/
-        /* Return true if any ships are due later in the game.               */
-        /*-------------------------------------------------------------------*/
-        function shipsDue() {
-            for (var i = 0; i < ships.length; i++) {
-                if (ships[i].ArrivalTurn > game.Turn)
                     return true;
             }
             return false;
@@ -734,8 +743,7 @@
         }
         /*-------------------------------------------------------------------*/
         /* Callback for ajaxLoadShips call. Set up the various ships display */
-        /* elements, draw the search map and add event handlers for dynamic  */
-        /* ship elements.                                                    */
+        /* elements, draw the search map.                                    */
         /*-------------------------------------------------------------------*/
         function gotShips() {
             $("#searchcanvas").css("left", mapLeft + "px");
@@ -770,11 +778,8 @@
                     $("#zone, #zonetab").addClass("tabshown");
                 }
 
-                if (shipsDue())
-                    showShipsDue();
-                else
-                    $("#duetab").css("display", "none");
-
+                showShipsInZone(selectedZone);
+                showShipsDue();
                 showOffMapShips();
             }
         }
