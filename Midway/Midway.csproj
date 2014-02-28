@@ -176,6 +176,7 @@
     <Content Include="content\themes\jquery-ui-1.10.3.css" />
     <Content Include="content\Test.css" />
     <Content Include="favicon.ico" />
+    <Content Include="scripts\scenes\searchgrid.js" />
     <Content Include="scripts\vendor\kinetic-v5.0.1.min.js" />
     <Content Include="_search.html" />
     <Content Include="scripts\scenes\about.js" />
