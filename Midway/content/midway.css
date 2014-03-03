@@ -140,6 +140,10 @@ th {
         font-weight: 600;
     }
 
+#phase {
+    cursor: pointer;
+}
+
 .ijnred {
     color: #a01000;
 }
@@ -423,3 +427,11 @@ th {
 	#readinessimg.disable {
 		opacity: 0.6;
 	}
+
+#buttons {
+    display: inline-block;
+    float: right;
+    height: 35px; 
+    vertical-align: central; 
+    margin: 22px 15px 0 0;
+}

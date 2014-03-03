@@ -18,7 +18,6 @@ namespace Midway.Models.Data.Mappings
 			Property(p => p.TSquadrons);
 			Property(p => p.FSquadrons);
 			Property(p => p.DSquadrons);
-            Property(p => p.AircraftReadyState);
 		}
 	}
 }

@@ -106,16 +106,31 @@ namespace Midway.Models.Data
             return dtoSearch;
 		}
 
-		public void RemoveSearchMarker(DtoSearch search, string zone)
+		public void RemoveSearchMarkers(IList<DtoSearch> searches)
 		{
-			var marker = _context.PlayerGameSearchMarkers
-				.SingleOrDefault(p => p.GameId == search.GameId && p.PlayerId == search.PlayerId 
-                    && p.Turn == search.Turn && p.SearchNumber == search.SearchNumber && p.Zone == zone);
+			if (searches.Count == 0) return;
 
-			if (search == null)
-				throw new Exception("Marker not found");
-			
-			_context.PlayerGameSearchMarkers.Remove(marker);
+			var dbSearches = _context.PlayerGameSearches
+			                         .Include(p => p.SearchMarkers)
+			                         .Where(p => p.GameId == searches[0].GameId && p.PlayerId == searches[0].PlayerId
+										 && p.Turn == searches[0].Turn)
+			                         .ToList();
+			foreach (var dbSearch in dbSearches)
+			{
+				var matchedArea = searches.SingleOrDefault(s => s.Area == dbSearch.Area);
+				if (matchedArea == null)
+				{
+					dbSearches.Remove(dbSearch);
+				}
+				else
+				{
+					foreach (var dbMarker in dbSearch.SearchMarkers)
+					{
+						if (matchedArea.Markers == null || matchedArea.Markers.All(m => m.Zone != dbMarker.Zone))
+							dbSearch.SearchMarkers.Remove(dbMarker);
+					}
+				}
+			}
 			_context.Save();
 		}
 	}

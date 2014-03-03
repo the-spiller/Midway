@@ -279,7 +279,6 @@ namespace Midway.Models.Data
 			var dbGames = _context.PlayerGames
 				.Include(p => p.Side)
 				.Include(p => p.Game)
-                .Include(p => p.Phase)
 				.Where(p => p.PlayerId == playerId)
 				.ToList();
 
@@ -292,7 +291,6 @@ namespace Midway.Models.Data
 						GameId = dbGame.GameId,
 						SideId = dbGame.Side.SideId,
                         PhaseId = dbGame.PhaseId,
-                        PhaseName = dbGame.Phase.Name,
                         Turn = dbGame.Turn,
                         AircraftReadyState = dbGame.AircraftReadyState,
                         CompletedDTime = dbGame.Game.CompletedDTime == null ? "" :

@@ -177,19 +177,15 @@
 .tablistitem {
     font: bold 1.2em Arial, sans-serif;
     display: inline-block;
-    color: #707070;
+    color: #eaecee;
     cursor: pointer;
     padding: 5px 15px 8px 15px;
 }
-    .tablistitem:hover {
-        color: #909090;
-    }
     .tablistitem.tabshown {
-        color: #fff;
         background-color: #2b3d55;
     }
 .tabpanel {
-    color: #fff;
+    color: #eaecee;
     padding: 5px;
     display: none;
     background: linear-gradient(to right, #2b3d55, #2b3d55, #2b3d55, #000);

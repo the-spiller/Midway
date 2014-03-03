@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Midway.Models.DTOs;
 using Newtonsoft.Json;
 using Midway.Helpers;
 using Midway.Models.Data;
@@ -42,7 +44,7 @@ namespace Midway.Controllers
         // GET api/ship?playerId=x&gameId=y
         public HttpResponseMessage GetShipsForPlayerGame(int playerId, int gameId)
         {
-             try
+            try
             {
                 return new HttpResponseMessage(HttpStatusCode.OK)
                 {
@@ -54,7 +56,5 @@ namespace Midway.Controllers
                 return ControllerHelper.GenericErrorResponse(ex);
             }
         }           
-        
-		// PUT api/ship
     }
 }

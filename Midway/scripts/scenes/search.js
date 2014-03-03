@@ -5,11 +5,12 @@
             mapLeft = 5,
             divLeft = 974,
             imgDir = "content/images/search/",
-            bgImg = imgDir + "bg-usn-search.jpg",
+            bgImg = imgDir + "bg-search.jpg",
             flagImg = "content/images/usn-med.png",
             captionColor = "usnblue",
             game = player.Games[0],
             side = game.SideShortName,
+            phase = { },
             ships = [],
             shipZones = [],
             searches = [],
@@ -136,14 +137,25 @@
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        function drawShips() {
+        function drawShips(moveZones) {
+            var drawThis;
+            if (!moveZones) moveZones = [""];
             for (var i = 0; i < ships.length; i++) {
+                drawThis = true;
                 if (ships[i].ShipType != "BAS") {
                     var thisLoc = ships[i].Location;
                     if (isNumber(thisLoc.substr(1, 1))) {
-                        if ($.inArray(shipZones, thisLoc) == -1) {
-                            drawShipsMarker(grid.zoneToTopLeftCoords(thisLoc));
-                            shipZones.push(thisLoc);
+                        for (var j = 0; j < moveZones.length; j++) {
+                            if (thisLoc == moveZones[j]) {
+                                drawThis = false;
+                                break;
+                            }
+                        }
+                        if (drawThis) {
+                            if ($.inArray(shipZones, thisLoc) == -1) {
+                                drawShipsMarker(grid.zoneToTopLeftCoords(thisLoc));
+                                shipZones.push(thisLoc);
+                            }
                         }
                     }
                 }
@@ -460,7 +472,7 @@
 
             drawMap(function() {
                 drawSearchMarkers();
-                //draw SOME ships
+                drawShips([ startZone, endZone ]);
                 mapImg = context.getImageData(0, 0, canvas.width, canvas.height);
                 shipsAnim();
             });
@@ -640,6 +652,23 @@
             return false;
         }
         /*-------------------------------------------------------------------*/
+        /* Make ajax call to load phase data in this game.                   */
+        /*-------------------------------------------------------------------*/
+        function ajaxLoadPhase(successCallback) {
+            $.ajax({
+                url: "api/phase/" + game.PhaseId,
+                type: "GET",
+                accepts: "application/json",
+                success: function(data) {
+                    phase = JSON.parse(data);
+                    if (successCallback) successCallback();
+                },
+                error: function (xhr, status, errorThrown) {
+                    showAjaxError(xhr, status, errorThrown);
+                }
+            });
+        }
+        /*-------------------------------------------------------------------*/
         /* Make ajax call to load player's ships in this game.               */
         /*-------------------------------------------------------------------*/
         function ajaxLoadShips(successCallback) {
@@ -695,10 +724,11 @@
             $("#return").css("left", "1330px");
 
             var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
-                " " + game.PhaseName + " Phase vs. " + game.OpponentNickname + "</span>";
+                " <span id=\"phase\" title=\"" + phase.Description + "\">" + phase.Name + " Phase</span> vs. " +
+                game.OpponentNickname + "</span>";
             $("#gamedesc").addClass(captionColor).html("MIDWAY SEARCH <img src=\"" + flagImg + "\" />" + gameStatus);
 
-            $("#pagediv").css("background-image", "url(\"" + bgImg + "\")");
+            $("#pagediv").css({ "background-image": "url(\"" + bgImg + "\")", "background-repeat": "repeat" });
 
             if (game.PhaseId == 1 && game.AircraftReadyState == 1)
                 game.AircraftReadyState = 2;
@@ -739,11 +769,11 @@
         if (side == "IJN") {
             mapLeft = 418;
             divLeft = 5;
-            bgImg = imgDir + "bg-ijn-search.jpg";
             flagImg = "content/images/ijn-med.png";
             captionColor = "ijnred";
         }
 
+        ajaxLoadPhase();
         selectedZone = game.SelectedZone;
         ajaxLoadShips(gotShips);
     }

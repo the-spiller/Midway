@@ -7,7 +7,7 @@ namespace Midway.Models
 	{
 		public int PhaseId { get; set; }
 		public string ActionKey { get; set; }
-		public int Order { get; set; }
+        public int Order { get; set; }
         public string AvailWhenWaiting { get; set; }
 
 		public virtual Phase Phase { get; set; }

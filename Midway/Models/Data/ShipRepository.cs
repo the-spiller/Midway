@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Data.Entity;
 using Midway.Models.DTOs;
 
@@ -76,7 +74,7 @@ namespace Midway.Models.Data
         {
             var pg = _context.PlayerGames
                 .Include(p => p.Side)
-                .FirstOrDefault(p => p.PlayerId == playerId && p.GameId == gameId);
+                .First(p => p.PlayerId == playerId && p.GameId == gameId);
 
             var movePts = GetMovePoints(pg);
             var sideName = pg.Side.ShortName;
@@ -201,6 +199,77 @@ namespace Midway.Models.Data
             return dtoShips;
         }
 
+		//...........................................................................
+		public void UpdateShips(int gameId, int playerId, IList<DtoShip> ships)
+		{
+			foreach (var ship in ships)
+			{
+				if (ship.AirbaseId > 0)
+				{
+					 var dbAirbase = _context.PlayerGameAirbases
+						.SingleOrDefault(a => a.GameId == gameId && a.PlayerId == playerId 
+							&& a.AirbaseId == ship.AirbaseId);
+					if (dbAirbase == null)
+					{
+						dbAirbase = new PlayerGameAirbase
+						{
+							GameId = gameId,
+							PlayerId = playerId,
+							AirbaseId = ship.AirbaseId
+						};
+
+						var airbase = _context.Airbases
+							.Include(b => b.Side)
+							.Single(b => b.AirbaseId == ship.AirbaseId);
+						if (ship.OwningSide == airbase.Side.ShortName)
+						{
+							dbAirbase.FortificationStrength = airbase.FortificationStrength;
+							dbAirbase.TSquadrons = airbase.TSquadrons;
+							dbAirbase.FSquadrons = airbase.FSquadrons;
+							dbAirbase.DSquadrons = airbase.DSquadrons;
+						}
+						else  //switched sides!
+						{
+							dbAirbase.FortificationStrength = 0;
+							dbAirbase.TSquadrons = 0;
+							dbAirbase.FSquadrons = 0;
+							dbAirbase.DSquadrons = 0;
+						}
+						_context.PlayerGameAirbases.Add(dbAirbase);
+					}
+					else
+					{
+						dbAirbase.FortificationStrength = ship.FortificationStrength;
+						dbAirbase.TSquadrons = ship.TSquadrons;
+						dbAirbase.FSquadrons = ship.FSquadrons;
+						dbAirbase.DSquadrons = ship.DSquadrons;
+					}
+				}
+				else
+				{
+					var dbShip = _context.PlayerGameShips
+						.Include(s => s.Ship)
+						.SingleOrDefault(s => s.GameId == gameId && s.PlayerId == playerId && s.ShipId == ship.ShipId)
+						??
+					    _context.PlayerGameShips.Add(new PlayerGameShip
+							{
+								GameId = gameId,
+								PlayerId = playerId,
+								ShipId = ship.ShipId
+							});
+
+					dbShip.Location = ship.Hits == dbShip.Ship.HitsToSink ? "SNK" : ship.Location;
+					dbShip.Hits = ship.Hits;
+					dbShip.TSquadrons = ship.TSquadrons;
+					dbShip.FSquadrons = ship.FSquadrons;
+					dbShip.DSquadrons = ship.DSquadrons;
+				}
+
+			}
+			_context.Save();
+		}
+
+		//...........................................................................
         private int GetMovePoints(PlayerGame pg)
         {
             if (pg.PhaseId == 1)

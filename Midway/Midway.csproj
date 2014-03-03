@@ -96,10 +96,6 @@
     <Reference Include="System.Web.Providers">
       <HintPath>..\packages\Microsoft.AspNet.Providers.Core.1.2\lib\net40\System.Web.Providers.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.20715.0\lib\net40\System.Web.Razor.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.dll</HintPath>
@@ -107,10 +103,6 @@
     <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http.Tracing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -132,10 +124,6 @@
       <Private>True</Private>
       <HintPath>..\packages\System.Spatial.5.2.0\lib\net40\System.Spatial.dll</HintPath>
     </Reference>
-    <Reference Include="WebGrease">
-      <Private>True</Private>
-      <HintPath>..\packages\WebGrease.1.3.0\lib\WebGrease.dll</HintPath>
-    </Reference>
     <Reference Include="Antlr3.Runtime">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.3.0\lib\Antlr3.Runtime.dll</HintPath>
@@ -144,6 +132,7 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\PhaseController.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\ShipController.cs" />
@@ -172,9 +161,12 @@
     <Compile Include="Models\Data\Mappings\ShipMap.cs" />
     <Compile Include="Models\Data\Mappings\SideMap.cs" />
     <Compile Include="Models\Data\MidwayContext.cs" />
+    <Compile Include="Models\Data\PhaseRepository.cs" />
     <Compile Include="Models\Data\PlayerRepository.cs" />
     <Compile Include="Models\Data\SearchRepository.cs" />
     <Compile Include="Models\Data\ShipRepository.cs" />
+    <Compile Include="Models\DTOs\DtoAction.cs" />
+    <Compile Include="Models\DTOs\DtoPhase.cs" />
     <Compile Include="Models\DTOs\DtoPlayer.cs" />
     <Compile Include="Models\DTOs\DtoPlayerGame.cs" />
     <Compile Include="Models\DTOs\DtoSearch.cs" />
@@ -199,9 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\cm.sdf" />
-    <Content Include="App_Data\data.sql" />
     <Content Include="App_Data\del_games.sql" />
-    <Content Include="App_Data\schema.sql" />
     <Content Include="Content\audio\teletype.mp3" />
     <Content Include="Content\elements.css" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.svg" />
@@ -219,8 +209,7 @@
     <Content Include="Content\images\return.png" />
     <Content Include="Content\images\search\addicon.png" />
     <Content Include="Content\images\search\bg-dispatch.png" />
-    <Content Include="Content\images\search\bg-ijn-search.jpg" />
-    <Content Include="Content\images\search\bg-usn-search.jpg" />
+    <Content Include="Content\images\search\bg-search.jpg" />
     <Content Include="Content\images\search\delicon.png" />
     <Content Include="Content\images\search\editicon.png" />
     <Content Include="Content\images\search\ijn-airnotready.png" />
@@ -229,7 +218,6 @@
     <Content Include="Content\images\search\ijnfleet.png" />
     <Content Include="Content\images\search\ijnsighting.png" />
     <Content Include="Content\images\search\searchboard.png" />
-    <Content Include="Content\images\search\selectedZone.png" />
     <Content Include="Content\images\search\Ships\akagi.png" />
     <Content Include="Content\images\search\Ships\astoria.png" />
     <Content Include="Content\images\search\Ships\atago.png" />
@@ -323,7 +311,6 @@
     <Content Include="Content\themes\jquery-ui-1.10.3.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="App_Data\mdb.dgml" />
     <Content Include="Content\audio\teletype.ogg" />
     <Content Include="Content\fonts\fette___-webfont.eot" />
     <Content Include="Content\fonts\fette___-webfont.ttf" />
