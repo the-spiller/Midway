@@ -1,0 +1,38 @@
+﻿<div id="gamedesc" class="pagecaption"></div>
+<div id="buttons" style="float: right; height: 35px; vertical-align: central; margin: 22px 15px 0 0;">
+    <a id="airreadiness" href="#" title="Toggle aircraft readiness" style="margin-right: 20px;">
+        <img id="readinessimg" />
+    </a>
+    <a id="done" href="#" title="End phase and post"><img src="/content/images/done.png" /></a>
+    <a id="return" href="#" title="Return to home page"><img src="/content/images/return.png" /></a>
+</div>
+
+<canvas id="searchcanvas">
+    Canvas not supported!
+</canvas>
+
+<div id="searchdiv" class="floatingdiv">
+    <div class="floathead"></div>
+    <div id="searchtabs" class="tablist">
+        <ul>
+            <li id="arrivalstab" class="tablistitem" title="Ships that have arrived this turn">Arrived</li>
+            <li id="duetab" class="tablistitem" title="Ships due to arrive on future turns">Due</li>
+            <li id="zonetab" class="tablistitem" title="Forces in the currently selected map zone">Zone</li>
+            <li id="offtab" class="tablistitem" title="Ships that are sunk or voluntarily moved off map">Off</li>
+        </ul>
+    </div> 
+    <div id="arrivals" class="tabpanel"></div>
+    <div id="due" class="tabpanel"></div>
+    <div id="zone" class="tabpanel"></div>
+    <div id="off" class="tabpanel"></div>
+</div>
+
+<div id="imagecache" style="display: none;">
+    <img id="ijnfleet" class="searchmarker" src="/content/images/search/ijnfleet.png" />
+    <img id="ijnsighting" class="searchmarker" src="/content/images/search/ijnsighting.png" />
+    <img id="usnfleet" class="searchmarker" src="/content/images/search/usnfleet.png" />
+    <img id="usnsighting" class="searchmarker" src="/content/images/search/usnsighting.png" />   
+</div>
+
+<script src="/scripts/scenes/search.js"></script>
+<script src="/scripts/scenes/searchgrid.js"></script>

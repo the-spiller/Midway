@@ -16,35 +16,35 @@ var player = undefined,
 // Scenes......................................................................
 
 var logon = function() {
-    $("#content").load("_logon.html", function () {
+    $("#content").load("/views/_logon.html", function () {
         currentScene = logonPage.run();
     });
 };
 scenes["logon"] = logon;
 
 var home = function() {
-    $("#content").load("_home.html", function() {
+    $("#content").load("/views/_home.html", function() {
         currentScene = homePage.run();
     });
 };
 scenes["home"] = home;
 
 var register = function() {
-    $("#content").load("_register.html", function() {
+    $("#content").load("/views/_register.html", function() {
         currentScene = registerPage.run();
     });
 };
 scenes["register"] = register;
 
 var about = function() {
-    $("#content").load("_about.html", function () {
+    $("#content").load("/views/_about.html", function () {
         currentScene = aboutPage.run();
     });
 };
 scenes["about"] = about;
 
 var search = function() {
-    $("#content").load("_search.html", function() {
+    $("#content").load("/views/_search.html", function() {
         currentScene = searchPage.run();
     });
 };
@@ -150,6 +150,9 @@ function ajaxGetPlayer(playerId, successCallback) {
     $.ajax({
         url: "/api/player/" + playerId.toString(),
         accepts: "application/json",
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("Authorization ", makeBaseAuth(player.Email, player.Password));
+        },
         success: function (data) {
             player = JSON.parse(data);
             if (successCallback) successCallback();
@@ -191,6 +194,12 @@ function ajaxGetPlayers(successCallback) {
             showAjaxError(xhr, status, errorThrown);
         }
     });
+}
+
+function makeBaseAuth(user, password) {
+    var token = user + ":" + password;
+    var hash = btoa(token);
+    return "Basic " + hash;
 }
 
 function workTabs(e) {
