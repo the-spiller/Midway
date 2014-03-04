@@ -105,7 +105,7 @@ namespace Midway.Models.Data
 			dbPlayer.Admin = dtoPlayer.Admin;
 
 			// The only game data updated here is retirement/abandonment or the addition of new games.
-            // Anything else is handled in the game controller.
+            // Anything else is handled in the phase controller.
 	        if (dtoPlayer.Games != null)
 	        {
 			    foreach (var dtoPlayerGame in dtoPlayer.Games)
@@ -299,9 +299,9 @@ namespace Midway.Models.Data
                         LastPlayed = dbGame.LastPlayed == null ? "" :
                             dbGame.LastPlayed.Value.ToUniversalTime().ToString("o"),
 						Points = dbGame.Points,
-                        Draw = dbGame.Game.Draw,
 						SelectedLocation = dbGame.SelectedLocation,
-						SideShortName = dbGame.Side.ShortName
+						SideShortName = dbGame.Side.ShortName,
+                        Waiting = "N"
 					};
 
 				// Opponent
@@ -320,11 +320,17 @@ namespace Midway.Models.Data
                         if (dbOpp.LastPlayed.Value > dbGame.LastPlayed)
 				            dtoPlayerGame.LastPlayed = dbOpp.LastPlayed.Value.ToUniversalTime().ToString("o");
 				    }
+				    if (dtoPlayerGame.Turn > 1 || dtoPlayerGame.PhaseId > 1)
+				    {
+				        if (dtoPlayerGame.Turn > dbOpp.Turn || dtoPlayerGame.PhaseId > dbOpp.PhaseId)
+				            dtoPlayerGame.Waiting = "Y";
+				    }
 				}
 				else
 				{
 				    dtoPlayerGame.OpponentId = 0;
 				    dtoPlayerGame.OpponentPoints = 0;
+				    dtoPlayerGame.Waiting = dtoPlayerGame.PhaseId > 1 ? "Y" : "N";
 				}
 				dtoPlayerGames.Add(dtoPlayerGame);
 			}

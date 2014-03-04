@@ -131,7 +131,6 @@ namespace Midway.Models.Data
 					}
 				}
 			}
-			_context.Save();
 		}
 	}
 }

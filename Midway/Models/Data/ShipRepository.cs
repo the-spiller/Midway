@@ -255,7 +255,7 @@ namespace Midway.Models.Data
 							{
 								GameId = gameId,
 								PlayerId = playerId,
-								ShipId = ship.ShipId
+								Ship = _context.Ships.Single(s => s.ShipId == ship.ShipId)
 							});
 
 					dbShip.Location = ship.Hits == dbShip.Ship.HitsToSink ? "SNK" : ship.Location;
@@ -266,7 +266,6 @@ namespace Midway.Models.Data
 				}
 
 			}
-			_context.Save();
 		}
 
 		//...........................................................................

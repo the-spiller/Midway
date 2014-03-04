@@ -19,5 +19,6 @@ namespace Midway.Models.DTOs
 		public string OpponentNickname { get; set; }
 		public int OpponentPoints { get; set; }
         public string Draw { get; set; }
+        public string Waiting { get; set; }
 	}
 }

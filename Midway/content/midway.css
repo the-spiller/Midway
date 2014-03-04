@@ -363,7 +363,7 @@ th {
         width: 50px;
     }
 
-#quitgame, #btncancel {
+#playgame, #quitgame, #btncancel {
     display: none;
 }
 
@@ -373,6 +373,10 @@ th {
 
 #gameselect {
     padding: 20px;
+}
+#gameselectfoot {
+    position: absolute;
+    bottom: 20px;
 }
 
 #recordtable {
@@ -421,11 +425,26 @@ th {
 	top: 60px;
 }
 
-#readinessimg {
-	opacity: 1.0;
+#done {
+    opacity: 1.0;
 }
-	#readinessimg.disable {
-		opacity: 0.6;
+    #done.disable {
+        opacity: 0.5;
+        cursor: default;
+    }
+#airreadiness
+{
+    margin-right: 20px;
+}
+    #airreadiness img {
+        border-right: 1px solid #000;
+        border-bottom: 1px solid #000;
+    }
+	#airreadiness.disable {
+	    cursor: default;
+	}
+	#airreadiness.disable img {
+	    border: none;
 	}
 
 #buttons {

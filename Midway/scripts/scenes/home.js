@@ -28,6 +28,22 @@
             workTabs(e);
         });
 
+        $(document).on("mousedown", ".listitem", function (e) {
+            $(".listitem").removeClass("down");
+            $(e.target).addClass("down");
+            $("#playgame").css("display", "inline-block");
+            selGameId = Number(e.target.id.replace("game", ""));
+            if (selGameId < 0) {
+                $("#optopponent").slideDown();
+                $("#quitgame").css("display", "none");
+                setOppselectPos();
+            } else {
+                $("#optopponent").slideUp();
+                $("#quitgame").css("display", "inline-block")
+                    .text(abandonables[selGameId] ? "Abandon" : "Retire");
+            }
+        });
+        
         $("#quitgame").on("click", function() {
             var caption,
                 msg = "Are you sure you want to abandon this game?",
@@ -197,7 +213,8 @@
                 OpponentId: game.OpponentId,
                 OpponentNickname: game.OpponentNickname,
                 OpponentPoints: game.OpponentPoints,
-                Draw: game.Draw
+                Draw: game.Draw,
+                Waiting: game.Waiting
             };
         }
         
@@ -236,7 +253,8 @@
                 OpponentId: 0,
                 OpponentNickname: nickname,
                 OpponentPoints: 0,
-                Draw: "Y"
+                Draw: "Y",
+                Waiting: "N"
             };
             shallowPlayer.Games.push(game);
 
@@ -351,8 +369,13 @@
                 item += ' vs. ' + game.OpponentNickname;
                 if (game.LastPlayed) {
                     var lp = parseIso8601(game.LastPlayed);
-                    item += ' (last played ' + prettyTimeAgo(lp) + ')</li>';
+                    item += ' (last posted ' + prettyTimeAgo(lp) + ')';
 
+                    if (game.Waiting)
+                        item += "*</li>";
+                    else
+                        item += "</li>";
+                    
                     // Games more than two weeks old can be abandoned; 
                     // if less, to quit one must retire and take a loss.
                     var dateNow = new Date();
@@ -363,7 +386,7 @@
                     abandonables[game.GameId] = true;
                 }
             } else {
-                item += ' waiting for opponent</li>';
+                item += ' waiting for an opponent</li>';
                 abandonables[game.GameId] = true;
             }
             return item;
@@ -385,22 +408,6 @@
                 }
                 gamesPrepend = $(listHtml).prependTo("#gamelist ul");
             }
-
-            // affected event handler needs to follow the prepend
-            $(".listitem").on("mousedown", function (e) {
-                $(".listitem").removeClass("down");
-                $(e.target).addClass("down");
-                selGameId = Number(e.target.id.replace("game", ""));
-                if (selGameId < 0) {
-                    $("#optopponent").slideDown();
-                    $("#quitgame").css("display", "none");
-                    setOppselectPos();
-                } else {
-                    $("#optopponent").slideUp();
-                    $("#quitgame").css("display", "inline-block")
-                        .text(abandonables[selGameId] ? "Abandon": "Retire");
-                }
-            });
         }
 
         function setOppselectPos() {

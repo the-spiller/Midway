@@ -165,7 +165,7 @@ function ajaxGetPlayer(playerId, successCallback) {
 
 function ajaxUpdatePlayer(shallowPlayer, successCallback) {
     $.ajax({
-        url: "/api/player",
+        url: "api/player",
         type: "PUT",
         accepts: "application/json",
         data: shallowPlayer,

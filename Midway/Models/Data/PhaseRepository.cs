@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using Midway.Models.DTOs;
@@ -28,8 +29,8 @@ namespace Midway.Models.Data
         public DtoPhase GetPhase(int id)
         {
             var dbPhase = _context.Phases
-                                   .Include(p => p.PhaseActions)
-                                   .Single(p => p.PhaseId == id);
+                .Include(p => p.PhaseActions)
+                .Single(p => p.PhaseId == id);
             var dtoPhase = new DtoPhase
                 {
                     PhaseId = dbPhase.PhaseId,
@@ -37,7 +38,7 @@ namespace Midway.Models.Data
                     Description = dbPhase.Description,
                     Actions = new List<DtoAction>()
                 };
-            foreach (var pa in dbPhase.PhaseActions)
+            foreach (var pa in dbPhase.PhaseActions.OrderBy(pa => pa.Order))
             {
                 dtoPhase.Actions.Add(new DtoAction
                     {
@@ -45,12 +46,28 @@ namespace Midway.Models.Data
                         Order = pa.Order,
                         AvailWhenWaiting = pa.AvailWhenWaiting,
                         Description = _context.Actions
-                            .Where(a => a.ActionKey == pa.ActionKey)
-                            .Select(a => a.Description)
-                            .Single()
+                                              .Where(a => a.ActionKey == pa.ActionKey)
+                                              .Select(a => a.Description)
+                                              .Single()
                     });
             }
             return dtoPhase;
+        }
+
+        public void AdvancePhase(int gameId, int playerId, string selectedZone, int airReadiness, int points)
+        {
+            var dbPg = _context.PlayerGames.Single(p => p.GameId == gameId && p.PlayerId == playerId);
+            dbPg.SelectedLocation = selectedZone;
+            dbPg.AircraftReadyState = airReadiness;
+            dbPg.Points = points;
+            dbPg.PhaseId++;
+            if (dbPg.PhaseId == _context.Phases.Count())
+            {
+                dbPg.PhaseId = 1;
+                dbPg.Turn++;
+            }
+            dbPg.LastPlayed = DateTime.Now;
+            _context.Save();
         }
     }
 }

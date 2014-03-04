@@ -167,6 +167,7 @@
     <Compile Include="Models\Data\ShipRepository.cs" />
     <Compile Include="Models\DTOs\DtoAction.cs" />
     <Compile Include="Models\DTOs\DtoPhase.cs" />
+    <Compile Include="Models\DTOs\DtoPhaseData.cs" />
     <Compile Include="Models\DTOs\DtoPlayer.cs" />
     <Compile Include="Models\DTOs\DtoPlayerGame.cs" />
     <Compile Include="Models\DTOs\DtoSearch.cs" />

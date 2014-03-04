@@ -105,13 +105,15 @@ function getMonthName(monthNum) {
 
 function parseIso8601(str) {
     // we assume str is a UTC date ending in 'Z'
+    console.log(str);
+    
     var parts = str.split('T'),
     dateParts = parts[0].split('-'),
     timeParts = parts[1].split('Z'),
     timeSubParts = timeParts[0].split(':'),
     timeSecParts = timeSubParts[2].split('.'),
     timeHours = Number(timeSubParts[0]),
-    date = new Date;
+    date = new Date();
 
     date.setUTCFullYear(Number(dateParts[0]));
     date.setUTCMonth(Number(dateParts[1]) - 1);
@@ -121,7 +123,7 @@ function parseIso8601(str) {
     date.setUTCSeconds(Number(timeSecParts[0]));
     if (timeSecParts[1]) date.setUTCMilliseconds(Number(timeSecParts[1]));
 
-    // by using setUTC methods the date has already been converted to local time(?)
+    // by using setUTC methods the date has already been converted to local time
     return date;
 }
 
@@ -139,11 +141,11 @@ function prettyTimeAgo(dateWhen, dateNow) {
         case (diff < 120):
             return "a minute ago";
         case (diff < 3600):
-            return diff / 60 + " minutes ago";
+            return Math.round(diff / 60) + " minutes ago";
         case (diff < 7200):
             return "an hour ago";
         case (diff < 86400):
-            return diff / 3600 + " hours ago";
+            return Math.round(diff / 3600) + " hours ago";
         case (dayDiff == 1):
             return "yesterday";
         case (dayDiff < 14):

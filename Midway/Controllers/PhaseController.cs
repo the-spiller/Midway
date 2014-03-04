@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -12,18 +11,13 @@ namespace Midway.Controllers
 {
     public class PhaseController : ApiController
     {
-        //private readonly PlayerRepository _playerRepo;
+        private readonly IUnitOfWork _uow;
         private readonly PhaseRepository _phaseRepo;
-        private readonly ShipRepository _shipRepo;
-        private readonly SearchRepository _searchRepo;
 
         public PhaseController()
         {
-            IUnitOfWork uow = new MidwayContext();
-            //_playerRepo = new PlayerRepository(uow);
-            _phaseRepo = new PhaseRepository(uow);
-            _shipRepo = new ShipRepository(uow);
-            _searchRepo = new SearchRepository(uow);
+            _uow = new MidwayContext();
+            _phaseRepo = new PhaseRepository(_uow);
         }
 
         // GET api/phase
@@ -63,23 +57,27 @@ namespace Midway.Controllers
                             ReasonPhrase = "Phase Not Found"
                         };
                 }
-                else
-                {
-                    return ControllerHelper.GenericErrorResponse(ex);
-                }
+                return ControllerHelper.GenericErrorResponse(ex);
             }
         }
 
         // PUT api/phase (UPDATE)
-        public HttpResponseMessage PutPhaseData(int gameId, int playerId, IList<DtoShip> ships, IList<DtoSearch> searches)
+        public HttpResponseMessage PutPhaseData(DtoPhaseData phaseData)
         {
             try
             {
-                if (ships != null)
-                    _shipRepo.UpdateShips(gameId, playerId, ships);
+                if (phaseData.Ships != null && phaseData.Ships.Count > 0)
+                    new ShipRepository(_uow).UpdateShips(phaseData.GameId, phaseData.PlayerId, phaseData.Ships);
 
-                if (searches != null)
-                    _searchRepo.RemoveSearchMarkers(searches);
+                if (phaseData.Searches != null && phaseData.Searches.Count > 0)
+                    new SearchRepository(_uow).RemoveSearchMarkers(phaseData.Searches);
+
+                _phaseRepo.AdvancePhase(
+                    phaseData.GameId, 
+                    phaseData.PlayerId, 
+                    phaseData.SelectedZone, 
+                    phaseData.AirReadiness,
+                    phaseData.Points); //must be last -- does commit for all transactions in method
 
                 return new HttpResponseMessage(HttpStatusCode.NoContent);
 
