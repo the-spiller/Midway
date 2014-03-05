@@ -104,24 +104,20 @@ function getMonthName(monthNum) {
 }
 
 function parseIso8601(str) {
-    // we assume str is a UTC date ending in 'Z'
-    console.log(str);
-    
-    var parts = str.split('T'),
-    dateParts = parts[0].split('-'),
-    timeParts = parts[1].split('Z'),
-    timeSubParts = timeParts[0].split(':'),
-    timeSecParts = timeSubParts[2].split('.'),
-    timeHours = Number(timeSubParts[0]),
-    date = new Date();
+    // assumes str is a UTC date string (e.g. "2014-03-05T17:07:51.2573372Z")
+    // and ignores milliseconds
+    var working = str.substr(0, str.indexOf(".")),
+        parts = working.split('T'),
+        dateParts = parts[0].split('-'),
+        timeParts = parts[1].split(':'),
+        date = new Date();
 
     date.setUTCFullYear(Number(dateParts[0]));
     date.setUTCMonth(Number(dateParts[1]) - 1);
     date.setUTCDate(Number(dateParts[2]));
-    date.setUTCHours(Number(timeHours));
-    date.setUTCMinutes(Number(timeSubParts[1]));
-    date.setUTCSeconds(Number(timeSecParts[0]));
-    if (timeSecParts[1]) date.setUTCMilliseconds(Number(timeSecParts[1]));
+    date.setUTCHours(Number(timeParts[0]));
+    date.setUTCMinutes(Number(timeParts[1]));
+    date.setUTCSeconds(Number(timeParts[2]));
 
     // by using setUTC methods the date has already been converted to local time
     return date;

@@ -279,6 +279,7 @@ namespace Midway.Models.Data
 			var dbGames = _context.PlayerGames
 				.Include(p => p.Side)
 				.Include(p => p.Game)
+				.Include(p => p.Airbases)
 				.Where(p => p.PlayerId == playerId)
 				.ToList();
 
@@ -286,6 +287,8 @@ namespace Midway.Models.Data
 
 			foreach (var dbGame in dbGames)
 			{
+				var range = (dbGame.Side.ShortName == "USN" && dbGame.Airbases.Count > 0) ? 0 : 12;
+
 				var dtoPlayerGame = new DtoPlayerGame
 				    {
 						GameId = dbGame.GameId,
@@ -302,7 +305,8 @@ namespace Midway.Models.Data
 						SelectedLocation = dbGame.SelectedLocation,
 						SideShortName = dbGame.Side.ShortName,
                         Waiting = "N",
-                        OppWaiting = "N"
+                        OppWaiting = "N",
+						SearchRange = range
 					};
 
 				// Opponent

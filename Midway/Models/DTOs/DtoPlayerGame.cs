@@ -22,5 +22,6 @@ namespace Midway.Models.DTOs
         public string Draw { get; set; }
         public string Waiting { get; set; }
         public string OppWaiting { get; set; }
+		public int SearchRange { get; set; }
 	}
 }

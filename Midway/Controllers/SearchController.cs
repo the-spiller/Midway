@@ -36,6 +36,13 @@ namespace Midway.Controllers
 			}
 			catch (Exception ex)
 			{
+				if (ex.Message.Contains("Unable to find game"))
+				{
+					return new HttpResponseMessage(HttpStatusCode.NotFound)
+						{
+							Content = new StringContent(ex.Message)
+						};
+				}
 				return ControllerHelper.GenericErrorResponse(ex);
 			}
 		}

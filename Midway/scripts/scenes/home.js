@@ -370,10 +370,9 @@
                 if (game.LastPlayed) {
                     var lp = parseIso8601(game.LastPlayed);
                     var dn = parseIso8601(game.DTimeNow);
-                    alert("lp: " + lp + ", dn: " + dn);
-                    item += ' (last posted ' + prettyTimeAgo(lp, dn) + ')';
+                    item += ' (posted to server ' + prettyTimeAgo(lp, dn) + ')';
 
-                    if (game.Waiting)
+                    if (game.Waiting == "Y")
                         item += "*</li>";
                     else
                         item += "</li>";

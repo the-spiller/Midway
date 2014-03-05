@@ -1,5 +1,5 @@
 ﻿var searchPage = {
-    run: function() {
+    run: function () {
         var canvas = document.getElementById("searchcanvas"),
             context = canvas.getContext("2d"),
             mapLeft = 5,
@@ -141,6 +141,25 @@
             };
         }
         /*-------------------------------------------------------------------*/
+        /* Walk the array of sighting markers and draw each one.             */
+        /*-------------------------------------------------------------------*/
+        function drawSightings() {
+            for (var i = 0; i < searches.length; i++) {
+                for (var j = 0; j < searches[i].Markers.length; j++) {
+                    drawSightingMarker(searches[i].Markers[j]);
+                }
+            }
+        }
+        /*-------------------------------------------------------------------*/
+        /* Grab preloaded sighting image and draw it at the input marker's   */
+        /* canvas coordinates.                                               */
+        /*-------------------------------------------------------------------*/
+        function drawSightingMarker(marker) {
+            var topLeft = grid.zoneToTopLeftCoords(marker.Zone),
+                sightingImg = document.getElementById(side.toLowerCase() + "sighting");
+            context.drawImage(sightingImg, topLeft.x, topLeft.y);
+        }
+        /*-------------------------------------------------------------------*/
         /* Walk the ships array and draw a fleet marker at each              */
         /* ship.Location found, reloading the shipZones array as we go. If   */
         /* the excludedZones array is populated, don't draw a marker at      */
@@ -164,31 +183,28 @@
             }
         }
         /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        function drawSearchMarkers() {
-            for (var i = 0; i < searches.length; i++) {
-                for (var j = 0; j < searches[i].Markers.length; j++) {
-                    drawSightingMarker(searches[i].Markers[j]);
-                }
-            }
-        }
-        /*-------------------------------------------------------------------*/
         /* Grab preloaded fleet image and draw it at the input canvas        */
         /* coordinates (NOT converted to top left).                          */
         /*-------------------------------------------------------------------*/
         function drawShipsMarker(coords) {
             var fleetImg = document.getElementById(side.toLowerCase() + "fleet");
             context.drawImage(fleetImg, coords.x - grid.zoneSize, coords.y);
-            
         }
         /*-------------------------------------------------------------------*/
-        /* Grab preloaded sighting image and draw it at the input canvas     */
-        /* coordinates.                                                      */
+        /* Mark the zone containing the input coordinates as the "current"   */
+        /* zone. If it contains ships, display them on the Zone tab.         */
         /*-------------------------------------------------------------------*/
-        function drawSightingMarker(marker) {
-            var topLeft = grid.zoneToTopLeftCoords(marker.Zone),
-                sightingImg = document.getElementById(side.toLowerCase() + "sighting");
-            context.drawImage(sightingImg, topLeft.x, topLeft.y);
+        function selectZone(coords) {
+            var topLeft = addVectors(grid.coordsToTopLeftCoords(coords), { x: -3, y: -3 });
+            if (selectedZone) {
+                var oldTopLeft = grid.zoneToTopLeftCoords(selectedZone),
+                    oldTop = oldTopLeft.y - 3,
+                    oldLeft = oldTopLeft.x - 3;
+                context.putImageData(selImg, oldLeft, oldTop);
+            }
+            drawZoneSelector(topLeft);
+            selectedZone = grid.coordsToZone(coords);
+            showShipsInZone();
         }
         /*-------------------------------------------------------------------*/
         /* Draw yellow square selected zone marker at the input canvas top   */
@@ -209,6 +225,66 @@
             context.lineTo(left + 2, top + 40);
             context.closePath();
             context.stroke();
+        }
+        /*-------------------------------------------------------------------*/
+        /* Display on the Zone tab any ships in the currently selected zone. */
+        /*-------------------------------------------------------------------*/
+        function showShipsInZone() {
+            if (!selectedZone) return;
+
+            var html = "<div style=\"margin: 5px;\">" + selectedZone + "</div><ul>";
+
+            if ($.inArray(shipZones, selectedZone)) {
+                for (var i = 0; i < ships.length; i++) {
+                    if (ships[i].Location == selectedZone) {
+                        html += getShipListItemHtml(ships[i]);
+                    }
+                }
+            }
+            $("#zone").html(html + "<ul>");
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function showShipsDue() {
+            var arrivalTurn = 0,
+                html = "<ul>";
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == "DUE") {
+                    if (ships[i].ArrivalTurn != arrivalTurn) {
+                        arrivalTurn = ships[i].ArrivalTurn;
+                        var dueDate = militaryDateTimeStr(gameTimeFromTurn(ships[i].ArrivalTurn), false);
+                        var turns = arrivalTurn - game.Turn;
+                        html += "</ul><div style=\"margin: 5px; background-color: #516580; padding: 4px;\">Due " +
+                            dueDate + " (" + turns + " turns)</div><ul>";
+                    }
+                    html += getShipListItemHtml(ships[i]);
+                }
+            }
+            if (arrivalTurn == 0) // no ships due
+                html = "<div style=\"margin: 5px;\">No future arrivals</div>";
+            else
+                html += "</ul>";
+
+            $("#due").html(html);
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function showOffMapShips() {
+            var html = "<ul>", gotOne = false;
+
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == "OFF" || ships[i].Location == "SNK") {
+                    html += getShipListItemHtml(ships[i]);
+                    gotOne = true;
+                }
+            }
+
+            if (!gotOne)    // no ships off map
+                html = "<div style=\"margin: 5px;\">No ships off map</div>";
+            else
+                html += "</ul>";
+
+            $("#off").html(html);
         }
         /*-------------------------------------------------------------------*/
         /* Build up and return the HTML for a single ship list item.         */
@@ -245,54 +321,26 @@
             return html;
         }
         /*-------------------------------------------------------------------*/
+        /* Display image indicating air readiness.                           */
         /*-------------------------------------------------------------------*/
         function showAirReadiness() {
-            var imgElement = document.getElementById("readinessimg");
+            var imgElement = document.getElementById("readinessimg"), readyDesc;
             switch (game.AircraftReadyState) {
                 case 0:
                     imgElement.src = imgDir + side.toLowerCase() + "-airnotready.png";
+                    readyDesc = "not ready";
                     break;
                 case 1:
                     imgElement.src = imgDir + side.toLowerCase() + "-airreadying.png";
+                    readyDesc = "readying";
                     break;
-                case 2:
+                default:
                     imgElement.src = imgDir + side.toLowerCase() + "-airready.png";
+                    readyDesc = "ready";
                     break;
             }
             if (game.PhaseId > 1)
-                $("#airreadiness").addClass("disable");
-        }
-        /*-------------------------------------------------------------------*/
-        /* 
-        /*-------------------------------------------------------------------*/
-        function documentMouseUp(e) {
-            mouseDown = false;
-            if (dragThang.dragging) {
-                dragThang.dragging = false;
-                canvas.removeEventListener("mousemove", canvasMouseMove, false);
-
-                var coords = windowToCanvas(canvas, e.clientX, e.clientY);
-                if (isLegitDrop(coords)) {
-                    var zone = grid.coordsToZone(coords),
-                        cost = 0;
-
-                    if (isNumber(dragThang.origin.substr(1, 1)))
-                        cost = grid.zoneDistance(dragThang.origin, zone);
-
-                    relocateShips(zone, dragThang.dragData, cost);
-
-                    if (dragThang.origin == "arrivals") {
-                        $("#arrivals").find("div.shipitem").remove(".selected").parent();
-                        selectZone(coords);
-                        if ($("#arrivals").find("div.shipitem").length == 0) {
-                            $("#zonetab").trigger("click");
-                        }
-                    } else if (isNumber(dragThang.origin.substr(1, 1))) {
-                        sailShips(dragThang.origin, zone);
-                    }
-                    dirty = true;
-                }
-            }
+                $("#airreadiness").prop("title", "Aircraft " + readyDesc).addClass("disable");
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -335,59 +383,6 @@
             return false;
         }
         /*-------------------------------------------------------------------*/
-        /* Display on the Zone tab any ships in the currently selected zone. */
-        /*-------------------------------------------------------------------*/
-        function showShipsInZone() {
-            if (!selectedZone) return;
-            
-            var html = "<div style=\"margin: 5px;\">" + selectedZone + "</div><ul>";
-
-            if ($.inArray(shipZones, selectedZone)) {
-                for (var i = 0; i < ships.length; i++) {
-                    if (ships[i].Location == selectedZone) {
-                        html += getShipListItemHtml(ships[i]);
-                    }
-                }
-            }
-            $("#zone").html(html + "<ul>");
-        }
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        function showShipsDue() {
-            var arrivalTurn = 0,
-                html = "<ul>";
-            for (var i = 0; i < ships.length; i++) {
-                if (ships[i].Location == "DUE") {
-                    if (ships[i].ArrivalTurn != arrivalTurn) {
-                        arrivalTurn = ships[i].ArrivalTurn;
-                        var dueDate = militaryDateTimeStr(gameTimeFromTurn(ships[i].ArrivalTurn), false);
-                        var turns = arrivalTurn - game.Turn;
-                        html += "</ul><div style=\"margin: 5px; background-color: #516580; padding: 4px;\">Due " +
-                            dueDate + " (" + turns + " turns)</div><ul>";
-                    }
-                    html += getShipListItemHtml(ships[i]);
-                }
-            }
-            if (arrivalTurn == 0) // no ships due
-                html = "<div style=\"margin: 5px;\">No future arrivals</div>";
-            else
-                html += "</ul>";
-            
-            $("#due").html(html);
-        }
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        function showOffMapShips() {
-            var html = "<ul>";
-            
-            for (var i = 0; i < ships.length; i++) {
-                if (ships[i].Location == "OFF" || ships[i].Location == "SNK") {
-                    html += getShipListItemHtml(ships[i]);
-                }
-            }
-            $("#off").html(html + "</ul>");
-        }
-        /*-------------------------------------------------------------------*/
         /* Respond to a click or Shift-click on a ship list item. Click      */
         /* toggles selected state; Shift-click selects or deselects a range. */
         /*-------------------------------------------------------------------*/
@@ -415,45 +410,6 @@
             lastShipSelected = shipItem;
         }
         /*-------------------------------------------------------------------*/
-        /* Mark the zone containing the input coordinates as the "current"   */
-        /* zone. If it contains ships, display them on the Zone tab.         */
-        /*-------------------------------------------------------------------*/
-        function selectZone(coords) {
-            var topLeft = addVectors(grid.coordsToTopLeftCoords(coords), { x: -3, y: -3 });
-            if (selectedZone) {
-                var oldTopLeft = grid.zoneToTopLeftCoords(selectedZone),
-                    oldTop = oldTopLeft.y - 3,
-                    oldLeft = oldTopLeft.x - 3;
-                context.putImageData(selImg, oldLeft, oldTop);
-            }
-            drawZoneSelector(topLeft);
-            selectedZone = grid.coordsToZone(coords);
-            showShipsInZone();
-        }
-        /*-------------------------------------------------------------------*/
-        /* Draw movement direction band and destination zone indicator       */
-        /* during ship movement dragging.                                    */
-        /*-------------------------------------------------------------------*/
-        function drawMoveBand(coords) {
-            var start = grid.zoneToTopLeftCoords(dragThang.origin),
-                topLeft = grid.coordsToTopLeftCoords(coords);
-            start.x += Math.floor(grid.zoneSize / 2);
-            start.y += Math.floor(grid.zoneSize / 2);
-
-            context.lineWidth = 2;
-            context.lineCap = "round";
-            context.strokeStyle = "#ff0000";
-            context.beginPath();
-            context.moveTo(start.x, start.y);
-            context.lineTo(coords.x, coords.y);
-            context.moveTo(topLeft.x, topLeft.y);
-            context.lineTo(topLeft.x + grid.zoneSize, topLeft.y);
-            context.lineTo(topLeft.x + grid.zoneSize, topLeft.y + grid.zoneSize);
-            context.lineTo(topLeft.x, topLeft.y + grid.zoneSize);
-            context.closePath();
-            context.stroke();
-        }
-        /*-------------------------------------------------------------------*/
         /* Move fleet marker to a new location on the map.                   */
         /*-------------------------------------------------------------------*/
         function sailShips(startZone, endZone) {
@@ -468,7 +424,7 @@
                 mapImg;
 
             drawMap(function() {
-                drawSearchMarkers();
+                drawSightings();
                 drawShips([startZone, endZone]);
                 mapImg = context.getImageData(0, 0, canvas.width, canvas.height);
                 shipsAnim();
@@ -481,7 +437,7 @@
                 if (elapsed >= duration) {
                     window.cancelAnimationFrame(handle);
                     drawMap(function() {
-                        drawSearchMarkers();
+                        drawSightings();
                         drawShips();
                         drawZoneSelector(addVectors(grid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }));
                     });
@@ -492,75 +448,6 @@
                     drawShipsMarker({ x: thisX, y: thisY });
                 }
             }
-        }
-        /*-------------------------------------------------------------------*/
-        /* Display on the Arrived tab any ships that arrived this turn.      */
-        /*-------------------------------------------------------------------*/
-        function showArrivingShips() {
-            var html = "<ul>";
-            for (var i = 0; i < ships.length; i++) {
-                if (ships[i].Location == "ARR") {
-                    html += getShipListItemHtml(ships[i]);
-                }
-            }
-            $("#arrivals").html(html + "</ul>").addClass("tabshown");
-            $("#arrivalstab").addClass("tabshown");
-        }
-        /*-------------------------------------------------------------------*/
-        /* Return true if all of this turn's arrivals have been brought on   */
-        /* to the map.                                                       */
-        /*-------------------------------------------------------------------*/
-        function allArrivalsOnMap() {
-            if (game.PhaseId > 1) return true;
-            
-            for (var i = 0; i < ships.length; i++) {
-                if (ships[i].Location == "ARR")
-                    return false;
-            }
-            return true;
-        }
-        /*-------------------------------------------------------------------*/
-        /* Find and return the minimum available movement points among ships */
-        /* in the input zone.
-        /*-------------------------------------------------------------------*/
-        function getShipsMinMovePoints(zone) {
-            var min = 999;
-            for (var i = 0; i < ships.length; i++) {
-                if (ships[i].Location == zone && ships[i].ShipType != "BAS") {
-                    if (ships[i].MovePoints < min) min = ships[i].MovePoints;
-                }
-            }
-            return min == 999 ? 0 : min;
-        }
-
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        function relocateShips(zone, movedShips, cost) {
-            for (var i = 0; i < movedShips.length; i++) {
-                movedShips[i].MovePoints -= cost;
-                movedShips[i].Location = zone;
-            }
-        }
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        function shipitemMouseDown(e) {
-            if (!$("#arrivals").hasClass("tabshown")) return;
-
-            mouseDown = true;
-            var selShips = getSelectedShips("arrivals");
-            if (selShips.length > 0) {
-                dragThang.dragging = false;
-                dragThang.origin = "arrivals";
-                dragThang.dragData = selShips;
-                dragThang.useSnapshot = true;
-                dragThang.snapshot = null;
-                dragThang.restoreFunction = null;
-                dragThang.drawFunction = drawShipsMarker;
-                dragThang.useTopLeft = true;
-
-                setTimeout(beginShipsDrag, 150);
-            }
-            e.preventDefault();
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -590,6 +477,27 @@
                 dragThang.dragging = true;
                 canvas.addEventListener("mousemove", canvasMouseMove, false);
             }
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function shipitemMouseDown(e) {
+            if (!$("#arrivals").hasClass("tabshown")) return;
+
+            mouseDown = true;
+            var selShips = getSelectedShips("arrivals");
+            if (selShips.length > 0) {
+                dragThang.dragging = false;
+                dragThang.origin = "arrivals";
+                dragThang.dragData = selShips;
+                dragThang.useSnapshot = true;
+                dragThang.snapshot = null;
+                dragThang.restoreFunction = null;
+                dragThang.drawFunction = drawShipsMarker;
+                dragThang.useTopLeft = true;
+
+                setTimeout(beginShipsDrag, 150);
+            }
+            e.preventDefault();
         }
         /*-------------------------------------------------------------------*/
         /* Respond to mouse movement during drag. If drag is just starting,  */
@@ -631,6 +539,60 @@
             }
         }
         /*-------------------------------------------------------------------*/
+        /* Draw movement direction band and destination zone indicator       */
+        /* during ship movement dragging.                                    */
+        /*-------------------------------------------------------------------*/
+        function drawMoveBand(coords) {
+            var start = grid.zoneToTopLeftCoords(dragThang.origin),
+                topLeft = grid.coordsToTopLeftCoords(coords);
+            start.x += Math.floor(grid.zoneSize / 2);
+            start.y += Math.floor(grid.zoneSize / 2);
+
+            context.lineWidth = 2;
+            context.lineCap = "round";
+            context.strokeStyle = "#ff0000";
+            context.beginPath();
+            context.moveTo(start.x, start.y);
+            context.lineTo(coords.x, coords.y);
+            context.moveTo(topLeft.x, topLeft.y);
+            context.lineTo(topLeft.x + grid.zoneSize, topLeft.y);
+            context.lineTo(topLeft.x + grid.zoneSize, topLeft.y + grid.zoneSize);
+            context.lineTo(topLeft.x, topLeft.y + grid.zoneSize);
+            context.closePath();
+            context.stroke();
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function documentMouseUp(e) {
+            mouseDown = false;
+            if (dragThang.dragging) {
+                dragThang.dragging = false;
+                canvas.removeEventListener("mousemove", canvasMouseMove, false);
+
+                var coords = windowToCanvas(canvas, e.clientX, e.clientY);
+                if (isLegitDrop(coords)) {
+                    var zone = grid.coordsToZone(coords),
+                        cost = 0;
+
+                    if (isNumber(dragThang.origin.substr(1, 1)))
+                        cost = grid.zoneDistance(dragThang.origin, zone);
+
+                    relocateShips(zone, dragThang.dragData, cost);
+
+                    if (dragThang.origin == "arrivals") {
+                        $("#arrivals").find("div.shipitem").remove(".selected").parent();
+                        selectZone(coords);
+                        if ($("#arrivals").find("div.shipitem").length == 0) {
+                            $("#zonetab").trigger("click");
+                        }
+                    } else if (isNumber(dragThang.origin.substr(1, 1))) {
+                        sailShips(dragThang.origin, zone);
+                    }
+                    dirty = true;
+                }
+            }
+        }
+        /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function isLegitDrop(coords) {
             var dropZone = grid.coordsToZone(coords);
@@ -650,6 +612,63 @@
                 if (zones <= moves) return true;
             }
             return false;
+        }
+        /*-------------------------------------------------------------------*/
+        /* Mark ships data with a new location.                              */
+        /*-------------------------------------------------------------------*/
+        function relocateShips(zone, movedShips, cost) {
+            for (var i = 0; i < movedShips.length; i++) {
+                movedShips[i].MovePoints -= cost;
+                movedShips[i].Location = zone;
+            }
+        }
+        /*-------------------------------------------------------------------*/
+        /* Display on the Arrived tab any ships that arrived this turn.      */
+        /*-------------------------------------------------------------------*/
+        function showArrivingShips() {
+            if (game.PhaseId > 1) return;
+
+            var html = "<ul>";
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == "ARR") {
+                    html += getShipListItemHtml(ships[i]);
+                }
+            }
+            $("#arrivals").html(html + "</ul>").addClass("tabshown");
+            $("#arrivalstab").addClass("tabshown");
+        }
+        /*-------------------------------------------------------------------*/
+        /* Return true if all of this turn's arrivals have been brought on   */
+        /* to the map.                                                       */
+        /*-------------------------------------------------------------------*/
+        function allArrivalsOnMap() {
+            if (game.PhaseId > 1) return true;
+
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == "ARR")
+                    return false;
+            }
+            return true;
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function showSearchControls() {
+            if (game.PhaseId != 2) return;
+            
+
+        }
+        /*-------------------------------------------------------------------*/
+        /* Find and return the minimum available movement points among ships */
+        /* in the input zone.
+        /*-------------------------------------------------------------------*/
+        function getShipsMinMovePoints(zone) {
+            var min = 999;
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location == zone && ships[i].ShipType != "BAS") {
+                    if (ships[i].MovePoints < min) min = ships[i].MovePoints;
+                }
+            }
+            return min == 999 ? 0 : min;
         }
         /*-------------------------------------------------------------------*/
         /* Make ajax call to load phase data in this game.                   */
@@ -733,13 +752,14 @@
         /* actions.                                                          */
         /*-------------------------------------------------------------------*/
         function setTabs() {
-            var tabHtml = "", panelHtml = "";
+            var tabHtml = "", panelHtml = "", showFirst = " tabshown";
             for (var i = 0; i < phase.Actions.length; i++) {
                 var act = phase.Actions[i];
                 if (game.Waiting == "N" || act.AvailWhenWaiting == "Y") {
-                    tabHtml += "<li id=\"" + act.ActionKey.toLowerCase() + "tab\" class=\"tablistitem\" title=\"" +
+                    tabHtml += "<li id=\"" + act.ActionKey.toLowerCase() + "tab\" class=\"tablistitem" + showFirst + "\" title=\"" +
                         act.Description + "\">" + act.ActionKey + "</li>";
-                    panelHtml += "<div id=\"" + act.ActionKey.toLowerCase() + "\" class=\"tabpanel\"></div>";
+                    panelHtml += "<div id=\"" + act.ActionKey.toLowerCase() + "\" class=\"tabpanel" + showFirst + "\"></div>";
+                    showFirst = "";
                 }
             }
             $("#tabs").html(tabHtml);
@@ -774,11 +794,11 @@
             if (game.PhaseId == 1 && game.AircraftReadyState == 1)
                 game.AircraftReadyState = 2;
             showAirReadiness();
-
+            
             ajaxLoadSearches(function () {
                 drawMap(function () {
                     drawShips();
-                    drawSearchMarkers();
+                    drawSightings();
 
                     if (selectedZone) {
                         var coords = addVectors(grid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 });
@@ -786,14 +806,12 @@
                     }
                     showShipsInZone(selectedZone);
 
+                    // each of these knows to bail if it's not their phase
+                    showArrivingShips();
+                    showSearchControls();
+                    
                     showShipsDue();
                     showOffMapShips();
-                    
-                    if (game.PhaseId == 1) {
-                        showArrivingShips();
-                    } else {
-                        $("#zone, #zonetab").addClass("tabshown");
-                    }
                 });
             });
         }
@@ -806,8 +824,10 @@
             captionColor = "ijnred";
         }
 
-        ajaxLoadPhase(setTabs);
-        selectedZone = game.SelectedLocation;
-        ajaxLoadShips(gotShips);
+        ajaxLoadPhase(function() {
+            setTabs();
+            selectedZone = game.SelectedLocation;
+            ajaxLoadShips(gotShips);
+        });
     }
 };

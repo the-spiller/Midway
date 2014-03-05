@@ -61,7 +61,7 @@ namespace Midway.Models.Data
             dbPg.AircraftReadyState = airReadiness;
             dbPg.Points = points;
             dbPg.PhaseId++;
-            if (dbPg.PhaseId == _context.Phases.Count())
+            if (dbPg.PhaseId > _context.Phases.Count())
             {
                 dbPg.PhaseId = 1;
                 dbPg.Turn++;
