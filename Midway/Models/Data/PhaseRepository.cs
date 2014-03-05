@@ -66,7 +66,7 @@ namespace Midway.Models.Data
                 dbPg.PhaseId = 1;
                 dbPg.Turn++;
             }
-            dbPg.LastPlayed = DateTime.Now;
+            dbPg.LastPlayed = DateTime.Now.ToUniversalTime();
             _context.Save();
         }
     }

@@ -117,7 +117,7 @@ namespace Midway.Models.Data
 				    if (dbGame != null && !string.IsNullOrEmpty(dtoPlayerGame.CompletedDTime))
 					{
 					    // game exists and is now marked complete: update fields affected by retire/abandonment
-					    dbGame.CompletedDTime = DateTime.Parse(dtoPlayerGame.CompletedDTime);
+					    dbGame.CompletedDTime = DateTime.Now.ToUniversalTime();
 
 					    var oppPg = dbGame.PlayerGames.FirstOrDefault(p => p.PlayerId == dtoPlayerGame.OpponentId);
 					    if (oppPg != null) oppPg.Points = dtoPlayerGame.OpponentPoints;
@@ -179,7 +179,7 @@ namespace Midway.Models.Data
 					    {
 						    dbGame = new Game
 							    {
-								    CreateDTime = DateTime.Now,
+								    CreateDTime = DateTime.Now.ToUniversalTime(),
 								    Draw = "Y",
 								    PlayerGames = new List<PlayerGame>()
 							    };
@@ -294,14 +294,15 @@ namespace Midway.Models.Data
                         Turn = dbGame.Turn,
                         AircraftReadyState = dbGame.AircraftReadyState,
                         CompletedDTime = dbGame.Game.CompletedDTime == null ? "" :
-                            dbGame.Game.CompletedDTime.Value.ToUniversalTime().ToString("o"),
+                            dbGame.Game.CompletedDTime.Value.ToString("o"),
 						TinyFlagUrl = dbGame.Side.TinyFlagUrl,
-                        LastPlayed = dbGame.LastPlayed == null ? "" :
-                            dbGame.LastPlayed.Value.ToUniversalTime().ToString("o"),
+                        LastPlayed = dbGame.LastPlayed == null ? "" : dbGame.LastPlayed.Value.ToString("o"),
+                        DTimeNow = DateTime.Now.ToUniversalTime().ToString("o"),
 						Points = dbGame.Points,
 						SelectedLocation = dbGame.SelectedLocation,
 						SideShortName = dbGame.Side.ShortName,
-                        Waiting = "N"
+                        Waiting = "N",
+                        OppWaiting = "N"
 					};
 
 				// Opponent
@@ -315,15 +316,17 @@ namespace Midway.Models.Data
 				    dtoPlayerGame.OpponentNickname = dbOpp.Player.Nickname;
 				    dtoPlayerGame.OpponentPoints = dbOpp.Points;
 
-				    if (dbOpp.LastPlayed != null && dbGame.LastPlayed != null)
-				    {
-                        if (dbOpp.LastPlayed.Value > dbGame.LastPlayed)
-				            dtoPlayerGame.LastPlayed = dbOpp.LastPlayed.Value.ToUniversalTime().ToString("o");
+                    if (dbOpp.LastPlayed != null)
+                    {
+                        if (dbGame.LastPlayed == null || dbOpp.LastPlayed > dbGame.LastPlayed) 
+                            dtoPlayerGame.LastPlayed = dbOpp.LastPlayed.Value.ToString("o");
 				    }
 				    if (dtoPlayerGame.Turn > 1 || dtoPlayerGame.PhaseId > 1)
 				    {
-				        if (dtoPlayerGame.Turn > dbOpp.Turn || dtoPlayerGame.PhaseId > dbOpp.PhaseId)
-				            dtoPlayerGame.Waiting = "Y";
+                        if (dbGame.Turn > dbOpp.Turn || (dbGame.Turn == dbOpp.Turn && dbGame.PhaseId > dbOpp.PhaseId))
+                            dtoPlayerGame.Waiting = "Y";
+                        else if (dbOpp.Turn > dbGame.Turn || (dbOpp.Turn == dbGame.Turn && dbOpp.PhaseId > dbGame.PhaseId))
+                            dtoPlayerGame.OppWaiting = "Y";
 				    }
 				}
 				else
@@ -331,6 +334,7 @@ namespace Midway.Models.Data
 				    dtoPlayerGame.OpponentId = 0;
 				    dtoPlayerGame.OpponentPoints = 0;
 				    dtoPlayerGame.Waiting = dtoPlayerGame.PhaseId > 1 ? "Y" : "N";
+				    dtoPlayerGame.OppWaiting = "N";
 				}
 				dtoPlayerGames.Add(dtoPlayerGame);
 			}

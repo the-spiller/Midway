@@ -141,6 +141,10 @@
             };
         }
         /*-------------------------------------------------------------------*/
+        /* Walk the ships array and draw a fleet marker at each              */
+        /* ship.Location found, reloading the shipZones array as we go. If   */
+        /* the excludedZones array is populated, don't draw a marker at      */
+        /* the locations it contains.                                        */
         /*-------------------------------------------------------------------*/
         function drawShips(excludedZones) {
             if (excludedZones == null) excludedZones = [];
@@ -149,10 +153,11 @@
                 if (ships[i].ShipType != "BAS") {
                     var zone = ships[i].Location;
                     if (isNumber(zone.substr(1, 1))) {
-                        if ($.inArray(shipZones, zone) == -1) {
+                        if ($.inArray(zone, shipZones) == -1) {
                             shipZones.push(zone);
-                            if ($.inArray(excludedZones, zone) == -1)
+                            if ($.inArray(zone, excludedZones) == -1) {
                                 drawShipsMarker(grid.zoneToTopLeftCoords(zone));
+                            }
                         }
                     }
                 }
@@ -242,8 +247,7 @@
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function showAirReadiness() {
-            var imgElement = document.getElementById("readinessimg"),
-                title;
+            var imgElement = document.getElementById("readinessimg");
             switch (game.AircraftReadyState) {
                 case 0:
                     imgElement.src = imgDir + side.toLowerCase() + "-airnotready.png";
@@ -256,7 +260,6 @@
                     break;
             }
             if (game.PhaseId > 1)
-                
                 $("#airreadiness").addClass("disable");
         }
         /*-------------------------------------------------------------------*/
@@ -327,7 +330,7 @@
             if (ours == null) ours = true;
 
             if (ours) {
-                return ($.inArray(shipZones, zone));
+                return ($.inArray(zone, shipZones));
             }
             return false;
         }
@@ -416,10 +419,7 @@
         /* zone. If it contains ships, display them on the Zone tab.         */
         /*-------------------------------------------------------------------*/
         function selectZone(coords) {
-            var topLeft = grid.coordsToTopLeftCoords(coords);
-            topLeft.x -= 3;
-            topLeft.y -= 3;
-            
+            var topLeft = addVectors(grid.coordsToTopLeftCoords(coords), { x: -3, y: -3 });
             if (selectedZone) {
                 var oldTopLeft = grid.zoneToTopLeftCoords(selectedZone),
                     oldTop = oldTopLeft.y - 3,
@@ -763,10 +763,10 @@
                 wait = " (waiting)";
                 $("#done").addClass("disable");
             }
-            
+
             var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
-                " <span id=\"phase\" title=\"" + phase.Description + "\">" + phase.Name + " Phase</span> vs. " +
-                (game.OpponentNickname || "?") + wait + "</span>";
+                " vs. " + (game.OpponentNickname || "?") +
+                ": <span id=\"phase\" title=\"" + phase.Description + "\">" + phase.Name + " Phase</span>" + wait + "</span>";
             $("#gamedesc").addClass(captionColor).html("MIDWAY SEARCH <img src=\"" + flagImg + "\" />" + gameStatus);
 
             $("#pagediv").css({ "background-image": "url(\"" + bgImg + "\")", "background-repeat": "repeat" });

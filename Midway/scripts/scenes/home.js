@@ -369,7 +369,9 @@
                 item += ' vs. ' + game.OpponentNickname;
                 if (game.LastPlayed) {
                     var lp = parseIso8601(game.LastPlayed);
-                    item += ' (last posted ' + prettyTimeAgo(lp) + ')';
+                    var dn = parseIso8601(game.DTimeNow);
+                    alert("lp: " + lp + ", dn: " + dn);
+                    item += ' (last posted ' + prettyTimeAgo(lp, dn) + ')';
 
                     if (game.Waiting)
                         item += "*</li>";
@@ -378,9 +380,8 @@
                     
                     // Games more than two weeks old can be abandoned; 
                     // if less, to quit one must retire and take a loss.
-                    var dateNow = new Date();
                     abandonables[game.GameId] =
-                        (dateNow.getTime() - lp.getTime() > twoWeeks);
+                        (dn.getTime() - lp.getTime() > twoWeeks);
                 } else {
                     item += ' not started</li>';
                     abandonables[game.GameId] = true;
