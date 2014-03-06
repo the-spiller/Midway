@@ -72,11 +72,12 @@ namespace Midway.Models.Data
 					        .Count();
 				var airSearchCount = 0;
 				var seaSearchCount = 0;
-
+				var searchNumber = 0;
 				foreach (var s in _context.PlayerGameSearches
 				                          .Include(p => p.SearchMarkers)
 				                          .Where(p => p.GameId == gameId && p.PlayerId == playerId && p.Turn == pg.Turn))
 				{
+					if (s.SearchNumber > searchNumber) searchNumber = s.SearchNumber;
 					var search = new DtoSearch
 						{
 							GameId = gameId,
@@ -111,7 +112,7 @@ namespace Midway.Models.Data
 								GameId = gameId,
 								PlayerId = playerId,
 								Turn = pg.Turn,
-								SearchNumber = airSearchCount + 1,
+								SearchNumber = ++searchNumber,
 								SearchType = "air",
 								Area = "",
 								Markers = new List<DtoSearchMarker>()
@@ -125,7 +126,7 @@ namespace Midway.Models.Data
 								GameId = gameId,
 								PlayerId = playerId,
 								Turn = pg.Turn,
-								SearchNumber = seaSearchCount + 1,
+								SearchNumber = ++searchNumber,
 								SearchType = "sea",
 								Area = "",
 								Markers = new List<DtoSearchMarker>()

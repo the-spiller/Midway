@@ -116,5 +116,12 @@ SearchGrid.prototype = {
             zonesX = Math.floor(Math.abs(zone1Adj.x - zone2Adj.x) / this.zoneSize),
             zonesY = Math.floor(Math.abs(zone1Adj.y - zone2Adj.y) / this.zoneSize);
         return Math.max(zonesX, zonesY);
+    },
+    /*-------------------------------------------------------------------*/
+    /* Convert input canvas coordinates to those of the top left of the  */
+    /* area that contains them.                                          */
+    /*-------------------------------------------------------------------*/
+    coordsToAreaTopLeftCoords: function(coords) {
+        return this.zoneToTopLeftCoords(this.coordsToZone(coords).substr(0, 2) + "A");
     }
 };
