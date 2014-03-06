@@ -230,6 +230,16 @@ th {
         z-index: 3;
     }
 
+.searchitem {
+    position: relative;
+    cursor: pointer;
+	padding: 4px;
+    margin-bottom: 4px;
+}
+    .searchitem:hover {
+        background-color: #253549;
+    }
+
 .searchmarker {
     position: absolute;
     z-index: 5;    

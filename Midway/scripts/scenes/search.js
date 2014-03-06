@@ -103,8 +103,8 @@
         
         $(document).on("click", ".shipitem", function (e) {
             doShipSelection(this, (e.shiftKey));
-        }).on("mousedown", ".shipitem", function (e) {
-            shipitemMouseDown(e);
+        }).on("mousedown", ".shipitem .searchItem", function (e) {
+            controlItemMouseDown(e);
         });
 
         // Functions...........................................................
@@ -480,22 +480,34 @@
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        function shipitemMouseDown(e) {
-            if (!$("#arrivals").hasClass("tabshown")) return;
+        function controlItemMouseDown(e) {
+            if ($("#arrivals").hasClass("tabshown")) {
+                mouseDown = true;
+                var selShips = getSelectedShips("arrivals");
+                if (selShips.length > 0) {
+                    dragThang.dragging = false;
+                    dragThang.origin = "arrivals";
+                    dragThang.dragData = selShips;
+                    dragThang.useSnapshot = true;
+                    dragThang.snapshot = null;
+                    dragThang.restoreFunction = null;
+                    dragThang.drawFunction = drawShipsMarker;
+                    dragThang.useTopLeft = true;
 
-            mouseDown = true;
-            var selShips = getSelectedShips("arrivals");
-            if (selShips.length > 0) {
-                dragThang.dragging = false;
-                dragThang.origin = "arrivals";
-                dragThang.dragData = selShips;
-                dragThang.useSnapshot = true;
-                dragThang.snapshot = null;
-                dragThang.restoreFunction = null;
-                dragThang.drawFunction = drawShipsMarker;
-                dragThang.useTopLeft = true;
-
-                setTimeout(beginShipsDrag, 150);
+                    setTimeout(beginShipsDrag, 150);
+                }
+            } else if ($("#search").hasClass("tabshown")) {
+                var selSearch = getSearch(e.target);
+                if (selSearch) {
+                    mouseDown = true;
+                    dragThang.dragging = false;
+                    dragThang.origin = "search";
+                    dragThang.dragData = selSearch;
+                    dragThang.useSnapshot = false;
+                    dragThang.snapshot = null;
+                    dragThang.restoreFunction = null;
+                    dragThang.drawFunction = null;
+                }
             }
             e.preventDefault();
         }
@@ -529,7 +541,7 @@
                     dragThang.restoreFunction();
                 }
 
-                if (isLegitDrop(canvasCoords)) {
+                if (dragThang.origin != "search" && isLegitDrop(canvasCoords)) {
                     if (dragThang.useTopLeft) {
                         var topLeft = grid.coordsToTopLeftCoords(canvasCoords);
                         dragThang.drawFunction(topLeft);
@@ -655,7 +667,25 @@
         function showSearchControls() {
             if (game.PhaseId != 2) return;
             
+            var html = "<div style=\"margin: 5px 0 15px 5px;\">Available searches</div><ul>",
+                searchDesc;
 
+            for (var i = 0; i < searches.length; i++) {
+                if (searches[i].Turn == game.Turn && !searches[i].Area) {
+                    if (searches[i].SearchType == "sea") {
+                        searchDesc = "Search any area containing one of your ships";
+                    } else if (game.SearchRange == 0) {   //Unlimited
+                        searchDesc = "Search any area";
+                    } else {
+                        searchDesc = "Search any area within " + game.SearchRange + " zones of one of your ships";
+                    }
+                    html += "<li><div id=\"search" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
+                        " title=\"" + searchDesc + "\">" +
+                        "<img src=\"content/images/search/" + side.toLowerCase() + "-" + searches[i].SearchType +
+                        "-search.png\" draggable=\"false\" /></div></li>";
+                }
+            }
+            $("#search").html(html + "<ul>");
         }
         /*-------------------------------------------------------------------*/
         /* Find and return the minimum available movement points among ships */
@@ -767,7 +797,7 @@
         }
         /*-------------------------------------------------------------------*/
         /* Callback for ajaxLoadShips call. Set up the various ships display */
-        /* elements, draw the search map.                                    */
+        /* elements, draw the search map and markers.                        */
         /*-------------------------------------------------------------------*/
         function gotShips() {
             $("#searchcanvas").css("left", mapLeft + "px");

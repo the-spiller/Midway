@@ -447,12 +447,11 @@
                 }
             }
         }
-
-        function buildRecord() {
         /*--------------------------------------------------------------*/
         /* Build up the player's won-lost record from  his or her games */
         /* and display it in a table on the 'Your Record' tab.          */
         /*--------------------------------------------------------------*/
+        function buildRecord() {
             var record = [],
                 recIndex,
                 html = "";

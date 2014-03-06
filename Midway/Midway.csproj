@@ -213,9 +213,13 @@
     <Content Include="Content\images\search\bg-search.jpg" />
     <Content Include="Content\images\search\delicon.png" />
     <Content Include="Content\images\search\editicon.png" />
+    <Content Include="Content\images\search\ijn-air-search.png" />
     <Content Include="Content\images\search\ijn-airnotready.png" />
     <Content Include="Content\images\search\ijn-airready.png" />
     <Content Include="Content\images\search\ijn-airreadying.png" />
+    <Content Include="Content\images\search\ijn-airsearchcursor.png" />
+    <Content Include="Content\images\search\ijn-sea-search.png" />
+    <Content Include="Content\images\search\ijn-seasearchcursor.png" />
     <Content Include="Content\images\search\ijnfleet.png" />
     <Content Include="Content\images\search\ijnsighting.png" />
     <Content Include="Content\images\search\searchboard.png" />
@@ -285,9 +289,13 @@
     <Content Include="Content\images\search\Ships\yorktown.png" />
     <Content Include="Content\images\search\Ships\yura.png" />
     <Content Include="Content\images\search\Ships\zuiho.png" />
+    <Content Include="Content\images\search\usn-air-search.png" />
     <Content Include="Content\images\search\usn-airnotready.png" />
     <Content Include="Content\images\search\usn-airready.png" />
     <Content Include="Content\images\search\usn-airreadying.png" />
+    <Content Include="Content\images\search\usn-airsearchcursor.png" />
+    <Content Include="Content\images\search\usn-sea-search.png" />
+    <Content Include="Content\images\search\usn-seasearchcursor.png" />
     <Content Include="Content\images\search\usnfleet.png" />
     <Content Include="Content\images\search\usnsighting.png" />
     <Content Include="Content\images\usn-med.png" />

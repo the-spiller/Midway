@@ -16,7 +16,7 @@ namespace Midway.Models.Data
             _context = context as MidwayContext;
         }
 
-		public IList<DtoSearch> GetSearches(int gameId, int playerId)
+		public IOrderedEnumerable<DtoSearch> GetSearches(int gameId, int playerId)
 		{
 			// Two parts: searches from prior turns that still have marker records, and
 			// searches for/from the current turn.
@@ -136,7 +136,7 @@ namespace Midway.Models.Data
 						break;
 				}
 			}
-            return searches;
+            return searches.OrderBy(s => s.SearchType);
 		}
 
 		public DtoSearch AddSearch(DtoSearch dtoSearch)

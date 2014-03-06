@@ -105,7 +105,7 @@ function getMonthName(monthNum) {
 
 function parseIso8601(str) {
     // assumes str is a UTC date string (e.g. "2014-03-05T17:07:51.2573372Z")
-    // and ignores milliseconds
+    // ignores milliseconds
     var working = str.substr(0, str.indexOf(".")),
         parts = working.split('T'),
         dateParts = parts[0].split('-'),

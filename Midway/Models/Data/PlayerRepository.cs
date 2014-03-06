@@ -304,6 +304,7 @@ namespace Midway.Models.Data
 						Points = dbGame.Points,
 						SelectedLocation = dbGame.SelectedLocation,
 						SideShortName = dbGame.Side.ShortName,
+                        Draw = dbGame.Game.Draw,
                         Waiting = "N",
                         OppWaiting = "N",
 						SearchRange = range
