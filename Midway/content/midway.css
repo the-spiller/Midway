@@ -243,7 +243,14 @@ th {
 
 .searchmarker {
     position: absolute;
-    z-index: 5;    
+    z-index: 5;
+    display: none; 
+}
+
+.cursorimg {
+    position: absolute;
+    z-index: 10;
+    display: none;
 }
 
 #pagediv {

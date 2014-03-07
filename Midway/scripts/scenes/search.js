@@ -24,6 +24,8 @@
                 dragging: false,
                 origin: "",
                 dragData: null,
+                cursorImgId: "",
+                cursorOffset: { x: 0, y: 0 },
                 useSnapshot: false,
                 snapshot: null,
                 restoreFunction: null,
@@ -93,8 +95,7 @@
             if (mouseDown) {
                 mouseDown = false;
                 dragThang.dragging = false;
-                if (dragThang.origin == "search")
-                    restoreSelectedArea();
+                if (dragThang.origin == "search") hideSearching();
             }
         }).on("click", function (e) {
             selectZone(windowToCanvas(canvas, e.clientX, e.clientY));
@@ -223,23 +224,17 @@
         function selectArea(coords) {
             var tlZone = grid.coordsToZone(coords);
             if (tlZone) {
-                tlZone = tlZone.substr(0, 2) + "A";
+                var area = tlZone.substr(0, 2);
+                if (area == selectedArea) return;
+                
+                tlZone = area + "A";
                 var topLeft = addVectors(grid.zoneToTopLeftCoords(tlZone), { x: -3, y: -3 });
                 restoreSelectedArea();
                 
                 if (withinRange(coords)) {
                     drawSelector(topLeft, 3);
-                    selectedArea = grid.coordsToZone(coords).substr(0, 2);
+                    selectedArea = area;
                 }
-            }
-        }
-        function restoreSelectedArea() {
-            if (selectedArea) {
-                var oldTopLeft = grid.zoneToTopLeftCoords(selectedArea + "A"),
-                   oldTop = oldTopLeft.y - 3,
-                   oldLeft = oldTopLeft.x - 3;
-                context.putImageData(selImg, oldLeft, oldTop);
-                selectedArea = "";
             }
         }
         /*-------------------------------------------------------------------*/
@@ -514,6 +509,7 @@
                     mouseDown = true;
                     dragThang.dragData = selShips;
                     dragThang.useSnapshot = true;
+                    dragThang.cursorImgId = "";
                     dragThang.snapshot = null;
                     dragThang.restoreFunction = null;
                     dragThang.drawFunction = drawShipsMarker;
@@ -524,6 +520,8 @@
                 if (selSearch) {
                     mouseDown = true;
                     dragThang.dragData = selSearch;
+                    dragThang.cursorImgId = side.toLowerCase() + selSearch.SearchType + "searchcursor";
+                    dragThang.cursorOffset = { x: 40, y: 40 },
                     dragThang.useSnapshot = false;
                     dragThang.snapshot = null;
                     dragThang.restoreFunction = null;
@@ -545,6 +543,7 @@
                 dragThang.dragging = false;
                 dragThang.origin = zone;
                 dragThang.dragData = selShips;
+                dragThang.cursorImgId = "";
                 dragThang.useSnapshot = true;
                 dragThang.snapshot = null;
                 dragThang.restoreFunction = null;
@@ -577,6 +576,7 @@
                 if (dragThang.dragging) {
                     dragThang.dragging = false;
                     canvas.removeEventListener("mousemmove", canvasMouseMove);
+                    if (dragThang.origin == "search") hideSearching();
                 }
                 return;
             }
@@ -594,7 +594,7 @@
                 }
 
                 if (dragThang.origin == "search") {
-                    selectArea(canvasCoords);
+                    showSearching({ x: e.clientX, y: e.clientY });
                 }
                 else if (isLegitDrop(canvasCoords)) {
                     if (dragThang.useTopLeft) {
@@ -635,13 +635,13 @@
             if (dragThang.dragging) {
                 dragThang.dragging = false;
                 canvas.removeEventListener("mousemove", canvasMouseMove, false);
-
+                
                 var coords = windowToCanvas(canvas, e.clientX, e.clientY),
                     zone = grid.coordsToZone(coords);
                 
                 if (dragThang.origin == "search") {
                     executeSearch(coords, zone, dragThang.dragData);
-                    restoreSelectedArea();
+                    hideSearching();
                 } else if (isLegitDrop(coords)) {
                     var cost = 0;
 
@@ -692,7 +692,6 @@
                 i;
             
             if (!zone) return false;
-            console.log(zone);
             var area = zone.substr(0, 2);
             if (dragThang.dragData.SearchType == "air") {
                 if (game.SearchRange == 0) return true;
@@ -708,6 +707,36 @@
                 }
             }
             return false;
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function showSearching(coords) {
+            var canvasCoords = windowToCanvas(canvas, coords.x, coords.y);
+            selectArea(canvas, canvasCoords.x, canvasCoords.y);
+            //$(canvas).css("cursor", "none");
+            $("#" + dragThang.cursorImgId).css({
+                top: (coords.y - dragThang.cursorOffset.y) + "px",
+                left: (coords.x - dragThang.cursorOffset.x) + "px",
+                display: "block"
+            });
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function hideSearching() {
+            $(canvas).css("cursor", "auto");
+            $("#" + dragThang.cursorImgId).css("display", "none");
+            restoreSelectedArea();
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function restoreSelectedArea() {
+            if (selectedArea) {
+                var oldTopLeft = grid.zoneToTopLeftCoords(selectedArea + "A"),
+                   oldTop = oldTopLeft.y - 3,
+                   oldLeft = oldTopLeft.x - 3;
+                context.putImageData(selImg, oldLeft, oldTop);
+                selectedArea = "";
+            }
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -959,18 +988,20 @@
             });
         }
         // Initialize..........................................................
-        
-        if (side == "IJN") {
-            mapLeft = 418;
-            divLeft = 5;
-            flagImg = "content/images/ijn-med.png";
-            captionColor = "ijnred";
-        }
 
-        ajaxLoadPhase(function() {
-            setTabs();
-            selectedZone = game.SelectedLocation;
-            ajaxLoadShips(gotShips);
+        $(document).ready(function() {
+            if (side == "IJN") {
+                mapLeft = 418;
+                divLeft = 5;
+                flagImg = "content/images/ijn-med.png";
+                captionColor = "ijnred";
+            }
+
+            ajaxLoadPhase(function() {
+                setTabs();
+                selectedZone = game.SelectedLocation;
+                ajaxLoadShips(gotShips);
+            });
         });
     }
 };
