@@ -153,6 +153,7 @@ namespace Midway.Models.Data
 					PlayerId = dtoSearch.PlayerId,
                     Turn = dtoSearch.Turn,
                     SearchNumber = dtoSearch.SearchNumber,
+                    SearchType = dtoSearch.SearchType,
                     Area = dtoSearch.Area
 				};
 		    _context.PlayerGameSearches.Add(search);

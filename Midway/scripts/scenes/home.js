@@ -258,7 +258,7 @@
             };
             shallowPlayer.Games.push(game);
 
-            // do an update to create it
+            // do a player update to create the new game
             ajaxUpdatePlayer(shallowPlayer, newGameUpdated);
 
             function newGameUpdated() {
@@ -356,11 +356,10 @@
             $("#pwd2").val(player.Password);
             $("#nickname").val(player.Nickname);
         }
-        
-        function getGameListItem(game) {
         /*-------------------------------------------------------*/
         /* Build up html for one game for the 'Your Games' list. */
         /*-------------------------------------------------------*/
+        function getGameListItem(game) {
             var item = '<li id="game' + game.GameId + '" class="listitem"><img src="' +
                 game.TinyFlagUrl + '" />&nbsp;' + game.SideShortName,
             twoWeeks = 1000 * 60 * 60 * 24 * 14;
@@ -391,12 +390,11 @@
             }
             return item;
         }
-
-        function buildGameList() {
         /*----------------------------------------------------*/
         /* Get html for each of the player's incomplete games */
         /* for the 'Your Games' list, and display it.         */
         /*----------------------------------------------------*/
+        function buildGameList() {
             var listHtml = "";
             if (gamesPrepend) gamesPrepend.remove();
             
@@ -409,12 +407,11 @@
                 gamesPrepend = $(listHtml).prependTo("#gamelist ul");
             }
         }
-
-        function setOppselectPos() {
         /*----------------------------------------------------*/
         /* Calc the location and width of the opponent search */
         /* select based on the opponent nickname text input.  */
         /*----------------------------------------------------*/
+        function setOppselectPos() {
             var oppnickname = document.getElementById("oppnickname");
             var oTop = oppnickname.offsetTop + oppnickname.offsetHeight + 12;
             var oLeft = oppnickname.offsetLeft;
@@ -422,21 +419,19 @@
             $("#oppselectdiv").css({ "left": oLeft + "px", "top": oTop + "px" });
             $("#oppselect").css("width", oWidth + "px");
         }
-        
-        function closeOppSelect() {
         /*------------------------------------------------*/
         /* Clear out and hide the nickname search select. */
         /*------------------------------------------------*/
+        function closeOppSelect() {
             $("#oppselect").html("");
             $("#oppselectdiv").css("display", "none");
             $("#oppnickname").focus();
         }
-        
-        function getPlayers() {
         /*----------------------------------------------*/
         /* Get a list of all players' nicknames for the */
         /* new game optional opponent search/select.    */
         /*----------------------------------------------*/
+        function getPlayers() {
             ajaxGetPlayers(gotPlayers);
 
             function gotPlayers(list) {

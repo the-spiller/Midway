@@ -248,6 +248,7 @@ th {
 }
 
 .cursorimg {
+    cursor: none;
     position: absolute;
     z-index: 10;
     display: none;
