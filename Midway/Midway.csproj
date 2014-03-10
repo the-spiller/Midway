@@ -209,6 +209,7 @@
     <Content Include="Content\images\midway_atoll.jpg" />
     <Content Include="Content\images\return.png" />
     <Content Include="Content\images\search\addicon.png" />
+    <Content Include="Content\images\search\atolls.png" />
     <Content Include="Content\images\search\bg-dispatch.png" />
     <Content Include="Content\images\search\bg-search.jpg" />
     <Content Include="Content\images\search\delicon.png" />
@@ -220,6 +221,11 @@
     <Content Include="Content\images\search\ijn-airsearchcursor.png" />
     <Content Include="Content\images\search\ijn-sea-search.png" />
     <Content Include="Content\images\search\ijn-seasearchcursor.png" />
+    <Content Include="Content\images\search\ijnbb.png" />
+    <Content Include="Content\images\search\ijnca.png" />
+    <Content Include="Content\images\search\ijncl.png" />
+    <Content Include="Content\images\search\ijncv.png" />
+    <Content Include="Content\images\search\ijncvl.png" />
     <Content Include="Content\images\search\ijnfleet.png" />
     <Content Include="Content\images\search\ijnsighting.png" />
     <Content Include="Content\images\search\searchboard.png" />
@@ -296,6 +302,9 @@
     <Content Include="Content\images\search\usn-airsearchcursor.png" />
     <Content Include="Content\images\search\usn-sea-search.png" />
     <Content Include="Content\images\search\usn-seasearchcursor.png" />
+    <Content Include="Content\images\search\usnca.png" />
+    <Content Include="Content\images\search\usncl.png" />
+    <Content Include="Content\images\search\usncv.png" />
     <Content Include="Content\images\search\usnfleet.png" />
     <Content Include="Content\images\search\usnsighting.png" />
     <Content Include="Content\images\usn-med.png" />

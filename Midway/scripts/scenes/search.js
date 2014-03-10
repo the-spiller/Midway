@@ -49,7 +49,6 @@
                 returnToHome();
             }
         });
-
         $("#done").on("click", function () {
             if (!$(this).hasClass("disable")) {
                 if (!allArrivalsOnMap()) {
@@ -61,9 +60,8 @@
                 });
             }
         });
-        
-        $("#airreadiness").on("click", function () {
-            if (!$(this).hasClass("disable")) {
+        if (game.PhaseId) {
+            $("#airreadiness").on("click", function() {
                 if (game.AircraftReadyState == 0)
                     game.AircraftReadyState = 1;
                 else if (game.AircraftReadyState == 1)
@@ -71,22 +69,18 @@
                 else {
                     showAlert("Air Readiness",
                         "Your aircraft are ready for operations. Are you sure you want to move them down to the hangar deck?",
-                        DLG_YESCANCEL, "blue", readyChoice);
-
-                    function readyChoice(choice) {
-                        if (choice == "Yes")
-                            game.AircraftReadyState = 0;
-                    }
+                        DLG_YESCANCEL, "blue", function(choice) {
+                            if (choice == "Yes")
+                                game.AircraftReadyState = 0;
+                        });
                 }
                 showAirReadiness();
                 dirty = true;
-            }
-        });
-
+            });
+        }
         $(document).on("mouseup", function (e) {
             documentMouseUp(e);
         });
-
         $(canvas).on("mousedown", function (e) {
             canvasMouseDown(e);
         }).on("click", function (e) {
@@ -98,12 +92,10 @@
                 $("#zone").find("div.shipitem").addClass("selected");
             }
         });
-        
         // Event handlers for dynamically-loaded elements
         $(document).on("click", ".tablistitem", function (e) {
             workTabs(e);
         });
-        
         $(document).on("click", ".shipitem", function (e) {
             doShipSelection(this, (e.shiftKey));
         }).on("mousedown", ".shipitem", function (e) {
@@ -127,22 +119,27 @@
         }
         /*-------------------------------------------------------------------*/
         /* Draw the search map semi-transparently and size the canvas to     */
-        /* match its dimensions. Draw fleet markers and sighting markers on  */
-        /* the map.                                                          */
+        /* match its dimensions. Add the atolls Kure and Midway with no      */
+        /* transparency.
         /*-------------------------------------------------------------------*/
         function drawMap(callback) {
-            var img = new Image();
+            var mapImg = new Image(),
+                atollsImg = new Image();
 
-            img.src = imgDir + "searchboard.png";
-            img.onload = function() {
-                canvas.height = img.height;
-                canvas.width = img.width;
+            mapImg.src = imgDir + "searchboard.png";
+            mapImg.onload = function () {
+                canvas.height = mapImg.height;
+                canvas.width = mapImg.width;
                 context.save();
-                context.globalAlpha = 0.6;
-                context.drawImage(img, 0, 0);
+                context.globalAlpha = 0.4;
+                context.drawImage(mapImg, 0, 0);
                 context.restore();
-                
-                if (callback) callback();
+
+                atollsImg.src = imgDir + "atolls.png";
+                atollsImg.onload = function () {
+                    context.drawImage(atollsImg, 711, 495);
+                    if (callback) callback();
+                };
             };
         }
         /*-------------------------------------------------------------------*/
@@ -151,7 +148,8 @@
         function drawSightings() {
             for (var i = 0; i < searches.length; i++) {
                 for (var j = 0; j < searches[i].Markers.length; j++) {
-                    drawSightingMarker(searches[i].Markers[j]);
+                    console.log("drawing sighting marker at " + searches[i].Markers[j].Zone);
+                    drawSightingMarker(searches[i].Markers[j].Zone);
                 }
             }
         }
@@ -159,9 +157,9 @@
         /* Grab preloaded sighting image and draw it at the input marker's   */
         /* canvas coordinates.                                               */
         /*-------------------------------------------------------------------*/
-        function drawSightingMarker(marker) {
-            var topLeft = grid.zoneToTopLeftCoords(marker.Zone),
-                sightingImg = document.getElementById(side.toLowerCase() + "sighting");
+        function drawSightingMarker(zone) {
+            var topLeft = grid.zoneToTopLeftCoords(zone),
+                sightingImg = document.getElementById("sighting");
             context.drawImage(sightingImg, topLeft.x, topLeft.y);
         }
         /*-------------------------------------------------------------------*/
@@ -197,8 +195,9 @@
         function drawShips(excludedZones) {
             if (excludedZones == null) excludedZones = [];
             loadShipZones();
+            console.log("shipZones: " + shipZones);
             for (var i = 0; i < shipZones.length; i++) {
-                if ($.inArray(shipZones[i], excludedZones) == -1) 
+                if ($.inArray(shipZones[i], excludedZones) == -1)
                     drawShipsMarker(grid.zoneToTopLeftCoords(shipZones[i]));
             }
         }
@@ -207,7 +206,9 @@
         /* coordinates (NOT converted to top left).                          */
         /*-------------------------------------------------------------------*/
         function drawShipsMarker(coords) {
-            var fleetImg = document.getElementById(side.toLowerCase() + "fleet");
+            console.log("drawShipsMarker coords.x: " + coords.x + ", y: " + coords.y);
+            var fleetImg = document.getElementById("fleet");
+            console.log("fleetImg.height = " + fleetImg.height);
             context.drawImage(fleetImg, coords.x - grid.zoneSize, coords.y);
         }
         /*-------------------------------------------------------------------*/
@@ -300,29 +301,50 @@
         function showShipsInZone() {
             if (!selectedZone) return;
 
-            var html = "<div style=\"margin: 5px;\">" + selectedZone + "</div><ul>";
+            var zone = selectedZone;
+            if (zone == "H5G") zone = "Midway";
+            var html = "<div style=\"margin: 5px;\">" + zone + "</div>", i;
             if (shipZones.length == 0) loadShipZones();
             
+            // sightings
+            for (i = 0; i < searches.length; i++) {
+                if (searches[i].Area == selectedZone.substr(0, 2) && searches[i].Markers.length) {
+                    for (var j = 0; j < searches[i].Markers.length; j++) {
+                        if (searches[i].Markers[j].Zone == selectedZone) {
+                            html += getSightedShipsHtml(searches[i]);
+                        }
+                    }
+                }
+            }
+            // own ships
+            html += "<ul>";
             if ($.inArray(selectedZone, shipZones) != -1) {
-                for (var i = 0; i < ships.length; i++) {
+                for (i = 0; i < ships.length; i++) {
                     if (ships[i].Location == selectedZone) {
                         html += getShipListItemHtml(ships[i]);
                     }
                 }
             }
-            $("#zone").html(html + "<ul>");
+            // airbases
+            for (i = 0; i < ships.length; i++) {
+                if (ships[i].Location == selectedZone && ships[i].ShipType == "BAS") {
+                    html += getShipListItemHtml(ships[i]);
+                }
+            }
+            $("#zone").html(html + "</ul>");
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function loadShipZones() {
             shipZones.length = 0;
             for (var i = 0; i < ships.length; i++) {
-                if (ships[i].ShipType != "BAS") {
+                if (ships[i].ShipType != "BAS" && isNumber(ships[i].Location.substr(1, 1))) {
                     if ($.inArray(ships[i].Location, shipZones) == -1) {
                         shipZones.push(ships[i].Location);
                     }
                 }
             }
+            console.log("loaded zones " + shipZones);
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -398,6 +420,27 @@
             
             if (hits > 0) {
                 html += "<div class=\"shiphits red\"><img src=\"" + hitsDir + hits + "-hitsred.png\"></div></div></li>";
+            }
+            return html;
+        }
+        /*-------------------------------------------------------------------*/
+        /* Build up and return the HTML for all sighted ship types in a zone.*/
+        /*-------------------------------------------------------------------*/
+        function getSightedShipsHtml(search) {
+            var html = "",
+                otherside = side == "USN" ? "ijn" : "usn";
+            for (var i = 0; i < search.Markers.length; i++) {
+                if (search.Markers[i].Zone == selectedZone) {
+                    var turns = game.Turn - search.Turn;
+                    var found = turns == 0 ? " this turn:" : turns == 1 ? " a turn ago:" : turns + " turns ago:";
+                    html += "<table class=\"noselect\"><tr><td colspan=\"2\">Ship types sighted " + found + "</td></tr>";
+                    var types = search.Markers[i].TypesFound.split(",");
+                    for (var j = 0; j < types.length; j++) {
+                        html += "<tr><td class=\"sightedlabel\">" + types[j] + "</td><td class=\"sightedship\">" +
+                            "<img src=\"" + imgDir + otherside + types[j] + ".png\" /></td></tr>";
+                    }
+                    html += "</table>";
+                }
             }
             return html;
         }
@@ -517,6 +560,7 @@
                         drawSightings();
                         drawShips();
                         drawSelector(addVectors(grid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
+                        showShipsInZone(selectedZone);
                     });
                 } else {
                     var thisX = startPos.x + ((elapsed / duration) * distX);
@@ -535,7 +579,7 @@
             dragThang.dragging = false;
             dragThang.origin = panelId;
 
-            if (panelId == "arrivals") {
+            if (game.PhaseId == 1 && panelId == "arrivals") {
                 var selShips = getSelectedShips("arrivals");
                 if (selShips.length > 0) {
                     mouseDown = true;
@@ -546,51 +590,47 @@
                     dragThang.restoreFunction = null;
                     dragThang.drawFunction = drawShipsMarker;
                     dragThang.useTopLeft = true;
-                    
                     setTimeout(beginControlsDrag, 150);
                 }
-            } else if (panelId == "search") {
+            } else if (game.PhaseId == 2 & panelId == "search") {
                 var selSearch = getSearch(e.target);
                 if (selSearch) {
                     mouseDown = true;
-                    var img = new Image();
-                    img.src = "/content/images/search/" + side + "-" + selSearch.SearchType + "searchcursor.png";
-                    img.onload = function() {
-                        dragThang.dragData = selSearch;
-                        dragThang.cursorImg = img;
-                        dragThang.cursorOffset = { x: -40, y: -40 },
-                        dragThang.useSnapshot = false;
-                        dragThang.snapshot = null;
-                        dragThang.restoreFunction = null;
-                        dragThang.drawFunction = null;
-                        selectedArea = "";
-
-                        setTimeout(beginControlsDrag, 150);
-                    };
+                    dragThang.dragData = selSearch;
+                    dragThang.cursorImg = document.getElementById(selSearch.SearchType + "searchcursor");
+                    dragThang.cursorOffset = { x: -40, y: -40 },
+                    dragThang.useSnapshot = false;
+                    dragThang.snapshot = null;
+                    dragThang.restoreFunction = null;
+                    dragThang.drawFunction = null;
+                    selectedArea = "";
+                    setTimeout(beginControlsDrag, 150);
                 }
             }
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function canvasMouseDown(e) {
-            mouseDown = true;
-            var zone = grid.coordsToZone(windowToCanvas(canvas, e.clientX, e.clientY)),
-                selShips = getSelectedShips("zone");
+            if (game.PhaseId == 1) {
+                mouseDown = true;
+                var zone = grid.coordsToZone(windowToCanvas(canvas, e.clientX, e.clientY)),
+                    selShips = getSelectedShips("zone");
 
-            if (selShips.length > 0) {
-                dragThang.dragging = false;
-                dragThang.origin = zone;
-                dragThang.dragData = selShips;
-                dragThang.cursorImg = null;
-                dragThang.useSnapshot = true;
-                dragThang.snapshot = null;
-                dragThang.restoreFunction = null;
-                dragThang.drawFunction = drawMoveBand;
-                dragThang.useTopLeft = false;
-                
-                setTimeout(beginControlsDrag, 150);
+                if (selShips.length > 0) {
+                    dragThang.dragging = false;
+                    dragThang.origin = zone;
+                    dragThang.dragData = selShips;
+                    dragThang.cursorImg = null;
+                    dragThang.useSnapshot = true;
+                    dragThang.snapshot = null;
+                    dragThang.restoreFunction = null;
+                    dragThang.drawFunction = drawMoveBand;
+                    dragThang.useTopLeft = false;
+
+                    setTimeout(beginControlsDrag, 150);
+                }
+                e.preventDefault();
             }
-            e.preventDefault();
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -639,36 +679,40 @@
             if (dragThang.dragging) {
                 dragThang.dragging = false;
                 canvas.removeEventListener("mousemove", canvasMouseMove, false);
+                if (dragThang.origin == "arrivals") removeArrivalZoneHighlight();
                 
-                var coords = windowToCanvas(canvas, e.clientX, e.clientY),
-                    zone = grid.coordsToZone(coords);
+                var coords = windowToCanvas(canvas, e.clientX, e.clientY);
+                if (coords.x != "NaN" && coords.x > 0 && coords.y != "NaN" && coords.y > 0) {
+                    var zone = grid.coordsToZone(coords);
 
-                if (dragThang.origin == "search") {
-                    hideSearching();
-                    selectArea(coords);
-                    executeSearch(coords, zone, dragThang.dragData);
-                } else {
-                    if (dragThang.origin == "arrivals") removeArrivalZoneHighlight();
-                    if (isLegitDrop(coords)) {
-                        var cost = 0;
+                    if (dragThang.origin == "search") {
+                        hideSearching();
+                        selectArea(coords);
+                        executeSearch(coords, zone, dragThang.dragData, function() {
+                            context.putImageData(dragThang.snapshot, 0, 0);
+                            drawSightings();
+                        });
+                    } else {
+                        if (isLegitDrop(coords)) {
+                            var cost = 0;
 
-                        if (isNumber(dragThang.origin.substr(1, 1)))
-                            cost = grid.zoneDistance(dragThang.origin, zone);
+                            if (isNumber(dragThang.origin.substr(1, 1)))
+                                cost = grid.zoneDistance(dragThang.origin, zone);
 
-                        relocateShips(zone, dragThang.dragData, cost);
+                            relocateShips(zone, dragThang.dragData, cost);
 
-                        if (dragThang.origin == "arrivals") {
-                            dragThang.drawFunction(grid.coordsToTopLeftCoords(coords));
-                            $("#arrivals").find("div.shipitem").remove(".selected").parent();
-                            selectZone(coords);
-                            if ($("#arrivals").find("div.shipitem").length == 0) {
-                                $("#zonetab").trigger("click");
+                            if (dragThang.origin == "arrivals") {
+                                dragThang.drawFunction(grid.coordsToTopLeftCoords(coords));
+                                $("#arrivals").find("div.shipitem").remove(".selected").parent();
+                                selectZone(coords);
+                                if ($("#arrivals").find("div.shipitem").length == 0) {
+                                    $("#zonetab").trigger("click");
+                                }
+                            } else if (isNumber(dragThang.origin.substr(1, 1))) {
+                                sailShips(dragThang.origin, zone);
                             }
-                        } else if (isNumber(dragThang.origin.substr(1, 1))) {
-                            sailShips(dragThang.origin, zone);
+                            dirty = true;
                         }
-
-                        dirty = true;
                     }
                 }
             }
@@ -740,15 +784,37 @@
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        function executeSearch(coords, zone, search) {
+        function executeSearch(coords, zone, search, callback) {
             if (withinRange(coords)) {
-                search.Area = zone.substr(0, 2);
-                ajaxPostSearch(search, function() {
-                    alert("Search results here");
-                    $("#search-" + search.SearchNumber).remove().parent();
-                });
+                var area = zone.substr(0, 2);
+                if (!alreadySearched(area)) {
+                    search.Area = area;
+                    ajaxPostSearch(search, function () {
+                        $("#search-" + search.SearchNumber).remove().parent();
+                        if (search.Markers.length) {
+                            showAlert("Search", "Enemy ships sighted!", DLG_OK, "blue", callback);
+                        } else {
+                            showAlert("Search", "No sightings.", DLG_OK, "blue", callback);
+                        } 
+                    });
+                } else {
+                    showAlert("Search", "You've already searched area " + area + "!", DLG_OK, "blue", callback);
+                }
+            } else {
+                if (dragThang.snapshot) context.putImageData(dragThang.snapshot, 0, 0);
+                canvas.style.cursor = "auto";
+                if (callback) callback();
             }
-        }     
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function alreadySearched(area) {
+            for (var i = 0; i < searches.length; i++) {
+                if (searches[i].Turn == game.Turn && searches[i].Area == area)
+                    return true;
+            }
+            return false;
+        }
         /*-------------------------------------------------------------------*/
         /* Mark ships data with a new location.                              */
         /*-------------------------------------------------------------------*/
@@ -805,7 +871,7 @@
                     }
                     html += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
                         " title=\"" + searchDesc + "\">" +
-                        "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"content/images/search/" +
+                        "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"" + imgDir +
                         side.toLowerCase() + "-" + searches[i].SearchType + "-search.png\" draggable=\"false\" /></div></li>";
                 }
             }
@@ -942,7 +1008,7 @@
         /* Callback for ajaxLoadShips call. Set up the various ships display */
         /* elements, draw the search map and markers.                        */
         /*-------------------------------------------------------------------*/
-        function gotShips() {
+        function shipsLoaded() {
             $("#searchcanvas").css("left", mapLeft + "px");
             $("#searchdiv").css("left", divLeft + "px").draggable({
                 handle: ".floathead",
@@ -996,12 +1062,17 @@
                 divLeft = 5;
                 flagImg = "content/images/ijn-med.png";
                 captionColor = "ijnred";
+                var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + imgDir + "ijnfleet.png\" />" +
+                    "<img id=\"sighting\" class=\"searchmarker\" src=\"" + imgDir + "usnsighting.png\" />" +
+                    "<img id=\"airsearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-airsearchcursor.png\" />" +
+                    "<img id=\"seasearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-seasearchcursor.png\" />";
+                $("#imagecache").html(html);
             }
 
             ajaxLoadPhase(function() {
                 setTabs();
                 selectedZone = game.SelectedLocation;
-                ajaxLoadShips(gotShips);
+                ajaxLoadShips(shipsLoaded);
             });
         });
     }

@@ -202,6 +202,9 @@ namespace Midway.Models.Data
 		//...........................................................................
 		public void UpdateShips(int gameId, int playerId, IList<DtoShip> ships)
 		{
+		    var phase = _context.PlayerGames.Single(p => p.GameId == gameId && p.PlayerId == playerId).PhaseId;
+            if (phase > 1) return;
+
 			foreach (var ship in ships)
 			{
 				if (ship.AirbaseId > 0)
@@ -249,16 +252,19 @@ namespace Midway.Models.Data
 				{
 					var dbShip = _context.PlayerGameShips
 						.Include(s => s.Ship)
-						.SingleOrDefault(s => s.GameId == gameId && s.PlayerId == playerId && s.ShipId == ship.ShipId)
-						??
-					    _context.PlayerGameShips.Add(new PlayerGameShip
-							{
-								GameId = gameId,
-								PlayerId = playerId,
-								Ship = _context.Ships.Single(s => s.ShipId == ship.ShipId)
-							});
+						.SingleOrDefault(s => s.GameId == gameId && s.PlayerId == playerId && s.ShipId == ship.ShipId);
 
-					dbShip.Location = ship.Hits == dbShip.Ship.HitsToSink ? "SNK" : ship.Location;
+				    if (dbShip == null)
+				    {
+				        dbShip = _context.PlayerGameShips.Add(new PlayerGameShip
+				            {
+				                GameId = gameId,
+				                PlayerId = playerId,
+				                Ship = _context.Ships.Single(s => s.ShipId == ship.ShipId)
+				            });
+				    }
+
+				    dbShip.Location = ship.Hits >= dbShip.Ship.HitsToSink ? "SNK" : ship.Location;
 					dbShip.Hits = ship.Hits;
 					dbShip.TSquadrons = ship.TSquadrons;
 					dbShip.FSquadrons = ship.FSquadrons;

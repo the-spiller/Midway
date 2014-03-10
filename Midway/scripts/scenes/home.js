@@ -360,32 +360,28 @@
         /* Build up html for one game for the 'Your Games' list. */
         /*-------------------------------------------------------*/
         function getGameListItem(game) {
-            var item = '<li id="game' + game.GameId + '" class="listitem"><img src="' +
-                game.TinyFlagUrl + '" />&nbsp;' + game.SideShortName,
-            twoWeeks = 1000 * 60 * 60 * 24 * 14;
+            var item = "<li id=\"game" + game.GameId + "\" class=\"listitem\"><img src=\"" +
+                    game.TinyFlagUrl + "\" />&nbsp;" + game.SideShortName,
+                twoWeeks = 1000 * 60 * 60 * 24 * 14,
+                waiting = game.Waiting == "Y" ? "*" : "";
 
             if (game.OpponentNickname) {
-                item += ' vs. ' + game.OpponentNickname;
+                item += " vs. " + game.OpponentNickname;
                 if (game.LastPlayed) {
                     var lp = parseIso8601(game.LastPlayed);
                     var dn = parseIso8601(game.DTimeNow);
-                    item += ' (posted to server ' + prettyTimeAgo(lp, dn) + ')';
-
-                    if (game.Waiting == "Y")
-                        item += "*</li>";
-                    else
-                        item += "</li>";
+                    item += " (posted to server " + prettyTimeAgo(lp, dn) + ")" + waiting + "</li>";
                     
                     // Games more than two weeks old can be abandoned; 
                     // if less, to quit one must retire and take a loss.
                     abandonables[game.GameId] =
                         (dn.getTime() - lp.getTime() > twoWeeks);
                 } else {
-                    item += ' not started</li>';
+                    item += " not started</li>";
                     abandonables[game.GameId] = true;
                 }
             } else {
-                item += ' waiting for an opponent</li>';
+                item += " waiting for an opponent" + waiting + "</li>";
                 abandonables[game.GameId] = true;
             }
             return item;

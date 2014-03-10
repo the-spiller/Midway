@@ -254,6 +254,14 @@ th {
     display: none;
 }
 
+.sightedlabel {
+    vertical-align: middle;
+}
+.sightedship {
+    padding: 5px;
+    vertical-align: top;
+}
+
 #pagediv {
 	width: 100%;
 	height: 100%;
