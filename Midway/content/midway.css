@@ -25,9 +25,11 @@
 }
 
 body, html { height: 100%; font: normal 14px Arial, sans-serif; }
-a:link, a:visited { text-decoration: none; border: none; }
-a:hover, a:active { text-decoration: none; border: none; }
+
+a:link, a:visited { text-decoration: none; }
+a:hover, a:active { text-decoration: none; }
 a img { border: none; vertical-align: middle; }
+
 ul { list-style-type: none; }
 
 p {

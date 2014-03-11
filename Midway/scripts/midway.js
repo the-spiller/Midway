@@ -105,6 +105,7 @@ function showAlert(title, message, buttons, color, callback) {
 
     $("#dlgbuttons .flatbutton").on("click", function (e) {
         $("#dlgoverlay").css("display", "none");
+        e.stopPropagation();
         if (callback) callback(e.target.innerHTML);
     });
     

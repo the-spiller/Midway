@@ -16,7 +16,7 @@
             searches = [],
             lastShipSelected = null,
             selectedZone = "",
-            selectedArea = "",
+            selectedArea,
             selImg,
             mouseDown = false,
             dirty = false,
@@ -60,7 +60,7 @@
                 });
             }
         });
-        if (game.PhaseId) {
+        if (game.PhaseId == 1) {
             $("#airreadiness").on("click", function() {
                 if (game.AircraftReadyState == 0)
                     game.AircraftReadyState = 1;
@@ -78,11 +78,13 @@
                 dirty = true;
             });
         }
-        $(document).on("mouseup", function (e) {
-            documentMouseUp(e);
+        $(document).on("mouseup", function () {
+            dragThang.dragging = false;
         });
-        $(canvas).on("mousedown", function (e) {
+        $(canvas).on("mousedown", function(e) {
             canvasMouseDown(e);
+        }).on("mouseup", function(e) {
+            canvasMouseUp(e);
         }).on("click", function (e) {
             selectZone(windowToCanvas(canvas, e.clientX, e.clientY));
         }).on("dblclick", function (e) {
@@ -148,7 +150,6 @@
         function drawSightings() {
             for (var i = 0; i < searches.length; i++) {
                 for (var j = 0; j < searches[i].Markers.length; j++) {
-                    console.log("drawing sighting marker at " + searches[i].Markers[j].Zone);
                     drawSightingMarker(searches[i].Markers[j].Zone);
                 }
             }
@@ -195,7 +196,6 @@
         function drawShips(excludedZones) {
             if (excludedZones == null) excludedZones = [];
             loadShipZones();
-            console.log("shipZones: " + shipZones);
             for (var i = 0; i < shipZones.length; i++) {
                 if ($.inArray(shipZones[i], excludedZones) == -1)
                     drawShipsMarker(grid.zoneToTopLeftCoords(shipZones[i]));
@@ -206,9 +206,7 @@
         /* coordinates (NOT converted to top left).                          */
         /*-------------------------------------------------------------------*/
         function drawShipsMarker(coords) {
-            console.log("drawShipsMarker coords.x: " + coords.x + ", y: " + coords.y);
             var fleetImg = document.getElementById("fleet");
-            console.log("fleetImg.height = " + fleetImg.height);
             context.drawImage(fleetImg, coords.x - grid.zoneSize, coords.y);
         }
         /*-------------------------------------------------------------------*/
@@ -249,7 +247,9 @@
                 left = topLeft.x;
 
             var sideLength = (sizeInZones * 36) + 5;
-            selImg = context.getImageData(left, top, sideLength + 3, sideLength + 3);
+            if (sizeInZones == 1)
+                // area-sized selections are restored w/ search cursor, so we only need zone
+                selImg = context.getImageData(left, top, sideLength + 3, sideLength + 3);
             context.save();
             context.globalAlpha = 0.6;
             context.lineWidth = 4;
@@ -344,18 +344,18 @@
                     }
                 }
             }
-            console.log("loaded zones " + shipZones);
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function showShipsDue() {
             var arrivalTurn = 0,
                 html = "<ul>";
+            
             for (var i = 0; i < ships.length; i++) {
                 if (ships[i].Location == "DUE") {
                     if (ships[i].ArrivalTurn != arrivalTurn) {
                         arrivalTurn = ships[i].ArrivalTurn;
-                        var dueDate = militaryDateTimeStr(gameTimeFromTurn(ships[i].ArrivalTurn), false);
+                        var dueDate = militaryDateTimeStr(gameTimeFromTurn(arrivalTurn), false);
                         var turns = arrivalTurn - game.Turn;
                         html += "</ul><div style=\"margin: 5px; background-color: #516580; padding: 4px;\">Due " +
                             dueDate + " (" + turns + " turns)</div><ul>";
@@ -373,7 +373,8 @@
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function showOffMapShips() {
-            var html = "<ul>", gotOne = false;
+            var html = "<ul>",
+                gotOne = false;
 
             for (var i = 0; i < ships.length; i++) {
                 if (ships[i].Location == "OFF" || ships[i].Location == "SNK") {
@@ -381,7 +382,6 @@
                     gotOne = true;
                 }
             }
-
             if (!gotOne)    // no ships off map
                 html = "<div style=\"margin: 5px;\">No ships off map</div>";
             else
@@ -674,7 +674,7 @@
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        function documentMouseUp(e) {
+        function canvasMouseUp(e) {
             mouseDown = false;
             if (dragThang.dragging) {
                 dragThang.dragging = false;
@@ -682,7 +682,6 @@
                 if (dragThang.origin == "arrivals") removeArrivalZoneHighlight();
                 
                 var coords = windowToCanvas(canvas, e.clientX, e.clientY);
-                if (coords.x != "NaN" && coords.x > 0 && coords.y != "NaN" && coords.y > 0) {
                     var zone = grid.coordsToZone(coords);
 
                     if (dragThang.origin == "search") {
@@ -713,7 +712,7 @@
                             }
                             dirty = true;
                         }
-                    }
+                    
                 }
             }
         }
@@ -966,6 +965,12 @@
         /* Make ajax call to post phase data back to the server.             */
         /*-------------------------------------------------------------------*/
         function ajaxPutPhase(successCallback) {
+            // parse out future arrivals
+            var shipsToPass = [];
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].Location != "DUE")
+                    shipsToPass.push(ships[i]);
+            }
             $.ajax({
                 url: "api/phase",
                 type: "PUT",
@@ -975,7 +980,7 @@
                     SelectedZone: selectedZone,
                     AirReadiness: game.AircraftReadyState,
                     Points: game.Points,
-                    Ships: ships,
+                    Ships: shipsToPass,
                     Searches: searches
                 },
                 success: function() {
@@ -1054,9 +1059,10 @@
                 });
             });
         }
+        
         // Initialize..........................................................
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             if (side == "IJN") {
                 mapLeft = 418;
                 divLeft = 5;

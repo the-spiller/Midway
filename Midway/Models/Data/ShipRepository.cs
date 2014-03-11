@@ -109,7 +109,8 @@ namespace Midway.Models.Data
 
 
             var arrivals = _context.Ships
-                                .Where(s => s.Side.SideId == pg.SideId && (s.ArrivalTurn >= pg.Turn))
+                                .Where(s => s.Side.SideId == pg.SideId && 
+                                    (pg.PhaseId == 1 && s.ArrivalTurn == pg.Turn || s.ArrivalTurn > pg.Turn))
                                 .ToList();
             
             dtoShips.AddRange(arrivals.Select(s => new DtoShip
@@ -264,7 +265,7 @@ namespace Midway.Models.Data
 				            });
 				    }
 
-				    dbShip.Location = ship.Hits >= dbShip.Ship.HitsToSink ? "SNK" : ship.Location;
+				    dbShip.Location = ship.Location;
 					dbShip.Hits = ship.Hits;
 					dbShip.TSquadrons = ship.TSquadrons;
 					dbShip.FSquadrons = ship.FSquadrons;
