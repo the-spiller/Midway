@@ -132,38 +132,35 @@ namespace Midway.Models.Data
 					    if (string.IsNullOrEmpty(dtoPlayerGame.OpponentNickname))
 					    {
 						    // anyone out there looking to be the opposition?
-						    var matches = _context.Games
-						        .Include(g => g.PlayerGames)
-						        .Where(g => g.CompletedDTime == null &&
-						                    g.PlayerGames.Count == 1 &&
-						                    g.PlayerGames.Any(p => p.SideId != dtoPlayerGame.SideId &&
-                                                p.PlayerId != dtoPlayer.PlayerId))
-						        .OrderBy(g => g.CreateDTime)
-						        .ToList();
-
-						    if (matches.Any())
+					        var match = _context.Games
+                                .Include(g => g.PlayerGames)
+					            .OrderBy(g => g.CreateDTime)
+					                            .FirstOrDefault(g => (g.CompletedDTime == null) &&
+					                                                 (_context.PlayerGames.Any(pg => (pg.GameId == g.GameId
+					                                                                                  &&
+					                                                                                  pg.SideId != dtoPlayerGame.SideId
+					                                                                                  &&
+					                                                                                  pg.PlayerId != dtoPlayer.PlayerId))) &&
+					                        (!_context.PlayerGames. Any(pg2 => (pg2.GameId == g.GameId
+					                                                            && pg2.SideId == dtoPlayerGame.SideId))));
+                            if (match != null)
 						    {
-							    // hook 'em up w/ the oldest (first) one
-							    foreach (var game in matches)
-							    {
-								    var dbPg = new PlayerGame
-									    {
-										    PlayerId = dtoPlayer.PlayerId,
-										    GameId = game.GameId,
-										    LastPlayed = null,
-										    Points = 0,
-										    SelectedLocation = "",
-										    SurfaceCombatRound = 0,
-										    PhaseIndeterminate = "N",
-                                            AircraftReadyState = 0,
-										    Turn = 1,
-										    PhaseId = 1,
-										    SideId = dtoPlayerGame.SideId,
-										    MidwayInvadedTurn = 0
-									    };
-								    game.PlayerGames.Add(dbPg);
-								    break;
-							    }
+							    var dbPg = new PlayerGame
+								    {
+									    PlayerId = dtoPlayer.PlayerId,
+									    GameId = match.GameId,
+									    LastPlayed = null,
+									    Points = 0,
+									    SelectedLocation = "",
+									    SurfaceCombatRound = 0,
+									    PhaseIndeterminate = "N",
+                                        AircraftReadyState = 0,
+									    Turn = 1,
+									    PhaseId = 1,
+									    SideId = dtoPlayerGame.SideId,
+									    MidwayInvadedTurn = 0
+								    };
+							    match.PlayerGames.Add(dbPg);
 						    }
 						    else
 						    {

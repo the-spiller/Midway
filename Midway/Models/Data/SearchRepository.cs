@@ -169,10 +169,10 @@ namespace Midway.Models.Data
 		    {
 		        // Add a marker for each zone in the searched area where ship(s) were found
 		        // (to both the DB and the DtoSearch we'll return).
-		        search.SearchMarkers = new List<PlayerGameSearchMarker>();
-		        dtoSearch.Markers = new List<DtoSearchMarker>();
+               search.SearchMarkers = new List<PlayerGameSearchMarker>();
+		       dtoSearch.Markers = new List<DtoSearchMarker>();
 
-                // Build up ship type list strings for each location
+		        // Build up ship type list strings for each location
 		        var zones = new Dictionary<string, string>();
 		        foreach (var ship in ships)
 		        {

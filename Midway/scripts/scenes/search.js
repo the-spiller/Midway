@@ -790,8 +790,13 @@
                     search.Area = area;
                     ajaxPostSearch(search, function () {
                         $("#search-" + search.SearchNumber).remove().parent();
-                        if (search.Markers.length) {
-                            showAlert("Search", "Enemy ships sighted!", DLG_OK, "blue", callback);
+                        if (search.Markers && search.Markers.length) {
+                            var msg = "Enemy ships sighted!";
+                            for (var i = 0; i < search.Markers.length; i++) {
+                                msg += "<p>" + search.Markers[i].Zone + ": " + search.Markers[i].TypesFound + "</p>";
+                            }
+                            showAlert("Search", msg, DLG_OK, "blue", callback);
+                            
                         } else {
                             showAlert("Search", "No sightings.", DLG_OK, "blue", callback);
                         } 
@@ -952,8 +957,16 @@
                 url: "api/search",
                 type: "POST",
                 data: search,
-                success: function(data) {
-                    search = JSON.parse(data);
+                success: function (data) {
+                    var retSearch = JSON.parse(data);
+                    if (retSearch.Markers) {
+                        for (var i = 0; i < retSearch.Markers.length; i++) {
+                            search.Markers.push({
+                                Zone: retSearch.Markers[i].Zone,
+                                TypesFound: retSearch.Markers[i].TypesFound
+                            });
+                        }
+                    }
                     if (successCallback) successCallback();
                 },
                 error: function(xhr, status, errorThrown) {
