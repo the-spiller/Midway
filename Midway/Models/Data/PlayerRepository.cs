@@ -132,17 +132,14 @@ namespace Midway.Models.Data
 					    if (string.IsNullOrEmpty(dtoPlayerGame.OpponentNickname))
 					    {
 						    // anyone out there looking to be the opposition?
-					        var match = _context.Games
-                                .Include(g => g.PlayerGames)
-					            .OrderBy(g => g.CreateDTime)
-					                            .FirstOrDefault(g => (g.CompletedDTime == null) &&
-					                                                 (_context.PlayerGames.Any(pg => (pg.GameId == g.GameId
-					                                                                                  &&
-					                                                                                  pg.SideId != dtoPlayerGame.SideId
-					                                                                                  &&
-					                                                                                  pg.PlayerId != dtoPlayer.PlayerId))) &&
-					                        (!_context.PlayerGames. Any(pg2 => (pg2.GameId == g.GameId
-					                                                            && pg2.SideId == dtoPlayerGame.SideId))));
+					        var match = _context.PlayerGames
+					                            .Include(pg => pg.Game)
+					                            .OrderBy(pg => pg.Game.CreateDTime)
+					                            .FirstOrDefault(pg => pg.Game.CompletedDTime == null
+					                                                && pg.SideId != dtoPlayerGame.SideId
+					                                                && pg.PlayerId != dtoPlayer.PlayerId
+					                                                && pg.Game.PlayerGames.Count == 1);
+
                             if (match != null)
 						    {
 							    var dbPg = new PlayerGame
@@ -160,7 +157,7 @@ namespace Midway.Models.Data
 									    SideId = dtoPlayerGame.SideId,
 									    MidwayInvadedTurn = 0
 								    };
-							    match.PlayerGames.Add(dbPg);
+							    match.Game.PlayerGames.Add(dbPg);
 						    }
 						    else
 						    {
@@ -274,6 +271,7 @@ namespace Midway.Models.Data
 		private IEnumerable<DtoPlayerGame> GetPlayerGames(int playerId)
 		{
 			var dbGames = _context.PlayerGames
+                .Include(p => p.Phase)
 				.Include(p => p.Side)
 				.Include(p => p.Game)
 				.Include(p => p.Airbases)
@@ -291,6 +289,7 @@ namespace Midway.Models.Data
 						GameId = dbGame.GameId,
 						SideId = dbGame.Side.SideId,
                         PhaseId = dbGame.PhaseId,
+                        PhaseName = dbGame.Phase.Name,
                         Turn = dbGame.Turn,
                         AircraftReadyState = dbGame.AircraftReadyState,
                         CompletedDTime = dbGame.Game.CompletedDTime == null ? "" :

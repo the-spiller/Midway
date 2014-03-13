@@ -1,7 +1,9 @@
 ﻿function SearchGrid() {
     this.zoneSize = 36;
     this.mapMargin = 27;
-    this.mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+    this.mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
+    this.cnvs = document.getElementById("searchcanvas"),
+    this.ctx = this.cnvs.getContext("2d");
 }
 SearchGrid.prototype = {
     /*-------------------------------------------------------------------*/
@@ -123,5 +125,72 @@ SearchGrid.prototype = {
     /*-------------------------------------------------------------------*/
     coordsToAreaTopLeftCoords: function(coords) {
         return this.zoneToTopLeftCoords(this.coordsToZone(coords).substr(0, 2) + "A");
+    },
+    /*-------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------*/
+    clearCanvas: function() {
+        this.ctx.clearRect(0, 0, this.cnvs.width, this.cnvs.height);
+    },
+    /*-------------------------------------------------------------------*/
+    /* Draw the search map semi-transparently and size the canvas to     */
+    /* match its dimensions. Add the atolls Kure and Midway with no      */
+    /* transparency.
+    /*-------------------------------------------------------------------*/
+    drawMap: function(callback) {
+        var imgDir = "/content/images/search/",
+            mapImg = new Image(),
+            atollsImg = new Image();
+
+        mapImg.src = imgDir + "searchboard.png";
+        mapImg.onload = function () {
+            this.cnvs.height = mapImg.height;
+            this.cnvs.width = mapImg.width;
+            this.ctx.save();
+            this.ctx.globalAlpha = 0.4;
+            this.ctx.drawImage(mapImg, 0, 0);
+            this.ctx.restore();
+
+            atollsImg.src = imgDir + "atolls.png";
+            atollsImg.onload = function () {
+                this.ctx.drawImage(atollsImg, 711, 495);
+                if (callback) callback();
+            };
+        };
+    },
+    /*-------------------------------------------------------------------*/
+    /* Grab preloaded sighting image and draw it at the input zone's     */
+    /* canvas coordinates.                                               */
+    /*-------------------------------------------------------------------*/
+    drawSightingMarker: function(zone) {
+        var topLeft = this.zoneToTopLeftCoords(zone),
+            sightingImg = document.getElementById("sighting");
+        this.ctx.drawImage(sightingImg, topLeft.x, topLeft.y);
+    },
+    /*-------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------*/
+    highlightArrivalZones: function(side) {
+        var topZone = side == "IJN" ? "A1A" : "I1B",
+            bottomZone = side == "IJN" ? "A7D" : "I7E",
+            topCoords = this.zoneToTopLeftCoords(topZone),
+            bottomCoords = addVectors(grid.zoneToTopLeftCoords(bottomZone), { x: grid.zoneSize, y: grid.zoneSize }),
+            width = bottomCoords.x - topCoords.x,
+            height = bottomCoords.y - topCoords.y,
+            restImg;
+
+        restImg = this.ctx.getImageData(topCoords.x, topCoords.y, width, height);
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.2;
+        this.ctx.fillStyle = "#ffd651";
+        this.ctx.rect(topCoords.x, topCoords.y, width, height);
+        this.ctx.fill();
+        this.ctx.restore();
+
+        return restImg;
+    },
+    getImageData: function(left, top, width, height) {
+        return this.ctx.getImageData(left, top, width, height);
+    },
+    restoreImageData: function (data, left, top) {
+        this.ctx.putImageData(data, left, top);
     }
 };

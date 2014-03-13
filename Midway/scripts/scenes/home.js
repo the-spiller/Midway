@@ -6,6 +6,7 @@
             recordAppend,
             selGameId = 0,
             abandonables = [],
+            twoWeeks = 1000 * 60 * 60 * 24 * 14,
             nicknames = FuzzySet();
         
         // Event handlers......................................................
@@ -58,7 +59,7 @@
             } else {
                 caption = "Retire";
                 msg = msg.replace("abandon", "retire from") +
-                    " It will go into your record as a loss (and a free win for your opponent).";
+                    " It will go into your record as a loss (and a win for your opponent).";
             }
             showAlert(caption, msg, DLG_YESCANCEL, "blue", quitResponse);
             
@@ -360,31 +361,43 @@
         /* Build up html for one game for the 'Your Games' list. */
         /*-------------------------------------------------------*/
         function getGameListItem(game) {
-            var item = "<li id=\"game" + game.GameId + "\" class=\"listitem\"><img src=\"" +
-                    game.TinyFlagUrl + "\" />&nbsp;" + game.SideShortName,
-                twoWeeks = 1000 * 60 * 60 * 24 * 14,
-                waiting = game.Waiting == "Y" ? "*" : "";
-
-            if (game.OpponentNickname) {
-                item += " vs. " + game.OpponentNickname;
+            var itemStart = "<li id=\"game" + game.GameId + "\" class=\"listitem\"",
+                title, oppName, icon, waiting;
+            
+            if (game.Waiting == "Y") {
+                icon = "<img src=\"content/images/booblite-red.png\" />";
+                waiting = " (waiting for opponent to post)";
+            } else if (game.OppWaiting == "Y") {
+                icon = "<img src=\"content/images/booblite!-green.png\" />";
+                waiting = " (opponent waiting for you to post)";
+            } else {
+                icon = "<img src=\"content/images/booblite-green.png\" />";
+                waiting = "";
+            }
+            if (game.OpponentNickname == null || game.OpponentNickname == "") {
+                oppName = "?";
+                title = " title=\"No opponent yet " + waiting;
+                abandonables[game.GameId] = true;
+            } else {
+                oppName = game.OpponentNickname;
                 if (game.LastPlayed) {
-                    var lp = parseIso8601(game.LastPlayed);
-                    var dn = parseIso8601(game.DTimeNow);
-                    item += " (posted to server " + prettyTimeAgo(lp, dn) + ")" + waiting + "</li>";
-                    
+                    var lp = parseIso8601(game.LastPlayed),
+                        dn = parseIso8601(game.DTimeNow);
+                    title = " title=\"Posted to server " + prettyTimeAgo(lp, dn) + waiting;
+
                     // Games more than two weeks old can be abandoned; 
                     // if less, to quit one must retire and take a loss.
                     abandonables[game.GameId] =
                         (dn.getTime() - lp.getTime() > twoWeeks);
                 } else {
-                    item += " not started</li>";
+                    title = " title=\"Not started";
                     abandonables[game.GameId] = true;
                 }
-            } else {
-                item += " waiting for an opponent" + waiting + "</li>";
-                abandonables[game.GameId] = true;
             }
-            return item;
+            var html = itemStart + title + "\"><img src=\"" + game.TinyFlagUrl + "\" />" +
+                game.SideShortName + " vs. " + oppName + icon + "Turn " + game.Turn + " " + game.PhaseName + "</li>";
+            console.log(html);
+            return html;
         }
         /*----------------------------------------------------*/
         /* Get html for each of the player's incomplete games */

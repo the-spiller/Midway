@@ -77,7 +77,7 @@ namespace Midway.Controllers
                     phaseData.PlayerId, 
                     phaseData.SelectedZone, 
                     phaseData.AirReadiness,
-                    phaseData.Points); //must be last -- does commit for all transactions in method
+                    phaseData.Points);
 
                 return new HttpResponseMessage(HttpStatusCode.NoContent);
 

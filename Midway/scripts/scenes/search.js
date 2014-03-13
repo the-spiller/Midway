@@ -1,7 +1,6 @@
 ﻿var searchPage = {
     run: function () {
         var canvas = document.getElementById("searchcanvas"),
-            context = canvas.getContext("2d"),
             mapLeft = 5,
             divLeft = 974,
             imgDir = "content/images/search/",
@@ -79,6 +78,7 @@
             });
         }
         $(document).on("mouseup", function () {
+            mouseDown = false;
             dragThang.dragging = false;
         });
         $(canvas).on("mousedown", function(e) {
@@ -100,6 +100,7 @@
         });
         $(document).on("click", ".shipitem", function (e) {
             doShipSelection(this, (e.shiftKey));
+            mouseDown = false;
         }).on("mousedown", ".shipitem", function (e) {
             controlItemMouseDown(e);
         }).on("mousedown", ".searchitem", function(e) {
@@ -112,37 +113,10 @@
         /* Reload player data w/ shallow games and return to home screen.    */
         /*-------------------------------------------------------------------*/
         function returnToHome() {
-            ajaxGetPlayer(player.PlayerId, gotPlayer);
-
-            function gotPlayer() {
-                context.clearRect(0, 0, canvas.width, canvas.height);
+            ajaxGetPlayer(player.PlayerId, function() {
+                grid.clearCanvas();
                 scenes["home"]();
-            }
-        }
-        /*-------------------------------------------------------------------*/
-        /* Draw the search map semi-transparently and size the canvas to     */
-        /* match its dimensions. Add the atolls Kure and Midway with no      */
-        /* transparency.
-        /*-------------------------------------------------------------------*/
-        function drawMap(callback) {
-            var mapImg = new Image(),
-                atollsImg = new Image();
-
-            mapImg.src = imgDir + "searchboard.png";
-            mapImg.onload = function () {
-                canvas.height = mapImg.height;
-                canvas.width = mapImg.width;
-                context.save();
-                context.globalAlpha = 0.4;
-                context.drawImage(mapImg, 0, 0);
-                context.restore();
-
-                atollsImg.src = imgDir + "atolls.png";
-                atollsImg.onload = function () {
-                    context.drawImage(atollsImg, 711, 495);
-                    if (callback) callback();
-                };
-            };
+            });
         }
         /*-------------------------------------------------------------------*/
         /* Walk the array of sighting markers and draw each one.             */
@@ -150,36 +124,9 @@
         function drawSightings() {
             for (var i = 0; i < searches.length; i++) {
                 for (var j = 0; j < searches[i].Markers.length; j++) {
-                    drawSightingMarker(searches[i].Markers[j].Zone);
+                    grid.drawSightingMarker(searches[i].Markers[j].Zone);
                 }
             }
-        }
-        /*-------------------------------------------------------------------*/
-        /* Grab preloaded sighting image and draw it at the input marker's   */
-        /* canvas coordinates.                                               */
-        /*-------------------------------------------------------------------*/
-        function drawSightingMarker(zone) {
-            var topLeft = grid.zoneToTopLeftCoords(zone),
-                sightingImg = document.getElementById("sighting");
-            context.drawImage(sightingImg, topLeft.x, topLeft.y);
-        }
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        function highlightArrivalZones() {
-            var topZone = side == "IJN" ? "A1A" : "I1B",
-                bottomZone = side == "IJN" ? "A7D" : "I7E",
-                topCoords = grid.zoneToTopLeftCoords(topZone),
-                bottomCoords = addVectors(grid.zoneToTopLeftCoords(bottomZone), { x: grid.zoneSize, y: grid.zoneSize }),
-                width = bottomCoords.x - topCoords.x,
-                height = bottomCoords.y - topCoords.y;
-
-            selImg = context.getImageData(topCoords.x, topCoords.y, width, height);
-            context.save();
-            context.globalAlpha = 0.2;
-            context.fillStyle = "#ffd651";
-            context.rect(topCoords.x, topCoords.y, width, height);
-            context.fill();
-            context.restore();
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -303,7 +250,8 @@
 
             var zone = selectedZone;
             if (zone == "H5G") zone = "Midway";
-            var html = "<div style=\"margin: 5px;\">" + zone + "</div>", i;
+            var html = "<div style=\"margin: 5px; font-weight: bold;\">" + zone + "</div>",
+                i;
             if (shipZones.length == 0) loadShipZones();
             
             // sightings
@@ -311,7 +259,7 @@
                 if (searches[i].Area == selectedZone.substr(0, 2) && searches[i].Markers.length) {
                     for (var j = 0; j < searches[i].Markers.length; j++) {
                         if (searches[i].Markers[j].Zone == selectedZone) {
-                            html += getSightedShipsHtml(searches[i]);
+                            html += getSightedShipsHtml(searches[i].Markers[j], searches[i].Turn);
                         }
                     }
                 }
@@ -424,25 +372,20 @@
             return html;
         }
         /*-------------------------------------------------------------------*/
-        /* Build up and return the HTML for all sighted ship types in a zone.*/
+        /* Build up and return the HTML for enemy ship types found in a zone.*/
         /*-------------------------------------------------------------------*/
-        function getSightedShipsHtml(search) {
-            var html = "",
-                otherside = side == "USN" ? "ijn" : "usn";
-            for (var i = 0; i < search.Markers.length; i++) {
-                if (search.Markers[i].Zone == selectedZone) {
-                    var turns = game.Turn - search.Turn;
-                    var found = turns == 0 ? " this turn:" : turns == 1 ? " a turn ago:" : turns + " turns ago:";
-                    html += "<table class=\"noselect\"><tr><td colspan=\"2\">Ship types sighted " + found + "</td></tr>";
-                    var types = search.Markers[i].TypesFound.split(",");
-                    for (var j = 0; j < types.length; j++) {
-                        html += "<tr><td class=\"sightedlabel\">" + types[j] + "</td><td class=\"sightedship\">" +
-                            "<img src=\"" + imgDir + otherside + types[j] + ".png\" /></td></tr>";
-                    }
-                    html += "</table>";
-                }
+        function getSightedShipsHtml(searchMarker, searchTurn) {
+            var otherside = side == "USN" ? "ijn" : "usn",
+                turns = game.Turn - searchTurn,
+                found = turns == 0 ? "this turn" : turns == 1 ? "a turn ago" : turns + " turns ago",
+                html = "<table class=\"noselect\"><tr><td colspan=\"2\">Ship types sighted (" + found + ")</td></tr>",
+                types = searchMarker.TypesFound.split(",");
+            
+            for (var i = 0; i < types.length; i++) {
+                html += "<tr><td class=\"sightedlabel\">" + types[i] + "</td><td class=\"sightedship\">" +
+                    "<img src=\"" + imgDir + otherside + types[i] + ".png\" /></td></tr>";
             }
-            return html;
+            return html + "</table>";
         }
         /*-------------------------------------------------------------------*/
         /* Display image indicating air readiness.                           */
@@ -543,7 +486,7 @@
                 handle,
                 mapImg;
 
-            drawMap(function() {
+            grid.drawMap(function() {
                 drawSightings();
                 drawShips([startZone, endZone]);
                 mapImg = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -556,7 +499,7 @@
 
                 if (elapsed >= duration) {
                     window.cancelAnimationFrame(handle);
-                    drawMap(function() {
+                    grid.drawMap(function() {
                         drawSightings();
                         drawShips();
                         drawSelector(addVectors(grid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
@@ -637,7 +580,8 @@
         function beginControlsDrag() {
             if (mouseDown) {
                 dragThang.dragging = true;
-                if (dragThang.origin == "arrivals") highlightArrivalZones();
+                if (dragThang.origin == "arrivals")
+                    selImg = grid.highlightArrivalZones(side);
                 canvas.addEventListener("mousemove", canvasMouseMove, false);
             }
         }
@@ -654,9 +598,9 @@
                 } else {
                     if (dragThang.useSnapshot) {
                         if (dragThang.snapshot) {
-                            context.putImageData(dragThang.snapshot, 0, 0);
+                            grid.restoreImageData(dragThang.snapshot, 0, 0);
                         } else {
-                            dragThang.snapshot = context.getImageData(0, 0, canvas.width, canvas.height);
+                            dragThang.snapshot = grid.getImageData(0, 0, canvas.width, canvas.height);
                         }
                     }
                     if (dragThang.restoreFunction) {
@@ -1043,7 +987,7 @@
 
             var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
                 " vs. " + (game.OpponentNickname || "?") +
-                ": <span id=\"phase\" title=\"" + phase.Description + "\">" + phase.Name + " Phase</span>" + wait + "</span>";
+                " - <span id=\"phase\" title=\"" + phase.Description + "\">" + phase.Name + " Phase</span>" + wait + "</span>";
             $("#gamedesc").addClass(captionColor).html("MIDWAY SEARCH <img src=\"" + flagImg + "\" />" + gameStatus);
 
             $("#pagediv").css({ "background-image": "url(\"" + bgImg + "\")", "background-repeat": "repeat" });
@@ -1053,7 +997,7 @@
             showAirReadiness();
             
             ajaxLoadSearches(function () {
-                drawMap(function () {
+                grid.drawMap(function () {
                     drawShips();
                     drawSightings();
 
