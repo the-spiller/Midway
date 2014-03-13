@@ -3,7 +3,8 @@
     this.mapMargin = 27;
     this.mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
     this.cnvs = document.getElementById("searchcanvas"),
-    this.ctx = this.cnvs.getContext("2d");
+    this.ctx = this.cnvs.getContext("2d"),
+    this.restImg = undefined;
 }
 SearchGrid.prototype = {
     /*-------------------------------------------------------------------*/
@@ -11,18 +12,19 @@ SearchGrid.prototype = {
     /* zone that contains them.                                          */
     /*-------------------------------------------------------------------*/
     coordsToZone: function (coords) {
-        var x = coords.x,
+        var my = this,
+            x = coords.x,
             y = coords.y;
             
         if (x < 28 || x > 962 || y < 28 || y > 746)
             return "";
 
-        var zoneRow = (y - this.mapMargin) / this.zoneSize;
+        var zoneRow = (y - my.mapMargin) / my.zoneSize;
         var row = Math.floor(zoneRow / 3 + 1).toString();
         var areaRow = Math.floor(zoneRow % 3 + 1);
             
-        var zoneCol = (x - this.mapMargin) / this.zoneSize;
-        var colRow = this.mapCols[Math.floor(zoneCol / 3)] + row;
+        var zoneCol = (x - my.mapMargin) / my.zoneSize;
+        var colRow = my.mapCols[Math.floor(zoneCol / 3)] + row;
         var areaCol = Math.floor(zoneCol % 3 + 1);
             
         var areaRowCol = areaRow * 10 + areaCol;
@@ -51,43 +53,45 @@ SearchGrid.prototype = {
     /* Convert a zone name to its top left canvas coordinates.           */
     /*-------------------------------------------------------------------*/
     zoneToTopLeftCoords: function (zone) {
-        var col = 0;
-        var areaSize = this.zoneSize * 3;
-        for (var i = 0; i < this.mapCols.length; i++) {
-            if (zone.charAt(0) == this.mapCols[i]) {
-                col = (i * areaSize) + this.mapMargin;
+        var my = this,
+            col = 0,
+            areaSize = my.zoneSize * 3;
+        
+        for (var i = 0; i < my.mapCols.length; i++) {
+            if (zone.charAt(0) == my.mapCols[i]) {
+                col = (i * areaSize) + my.mapMargin;
                 break;
             }
         }
-        var row = ((Number(zone.substr(1, 1)) - 1) * areaSize) + this.mapMargin;
+        var row = ((Number(zone.substr(1, 1)) - 1) * areaSize) + my.mapMargin;
         switch(zone.substr(2, 1)) {
             case "B":
-                col += this.zoneSize;
+                col += my.zoneSize;
                 break;
             case "C":
-                col += this.zoneSize * 2;
+                col += my.zoneSize * 2;
                 break;
             case "D":
-                row += this.zoneSize;
+                row += my.zoneSize;
                 break;
             case "E":
-                row += this.zoneSize;
-                col += this.zoneSize;
+                row += my.zoneSize;
+                col += my.zoneSize;
                 break;
             case "F":
-                row += this.zoneSize;
-                col += this.zoneSize * 2;
+                row += my.zoneSize;
+                col += my.zoneSize * 2;
                 break;
             case "G":
-                row += this.zoneSize * 2;
+                row += my.zoneSize * 2;
                 break;
             case "H":
-                row += this.zoneSize * 2;
-                col += this.zoneSize;
+                row += my.zoneSize * 2;
+                col += my.zoneSize;
                 break;
             case "I":
-                row += this.zoneSize * 2;
-                col += this.zoneSize * 2;
+                row += my.zoneSize * 2;
+                col += my.zoneSize * 2;
                 break;
         }
         return { x: col, y: row };
@@ -137,7 +141,7 @@ SearchGrid.prototype = {
     /* transparency.
     /*-------------------------------------------------------------------*/
     drawMap: function(callback) {
-        var imgDir = "/content/images/search/",
+        var imgDir = "content/images/search/",
             mapImg = new Image(),
             atollsImg = new Image();
 
@@ -174,23 +178,107 @@ SearchGrid.prototype = {
             topCoords = this.zoneToTopLeftCoords(topZone),
             bottomCoords = addVectors(grid.zoneToTopLeftCoords(bottomZone), { x: grid.zoneSize, y: grid.zoneSize }),
             width = bottomCoords.x - topCoords.x,
-            height = bottomCoords.y - topCoords.y,
-            restImg;
+            height = bottomCoords.y - topCoords.y;
 
-        restImg = this.ctx.getImageData(topCoords.x, topCoords.y, width, height);
+        this.restImg = this.ctx.getImageData(topCoords.x, topCoords.y, width, height);
         this.ctx.save();
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = "#ffd651";
         this.ctx.rect(topCoords.x, topCoords.y, width, height);
         this.ctx.fill();
         this.ctx.restore();
-
-        return restImg;
     },
-    getImageData: function(left, top, width, height) {
+    /*-------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------*/
+    removeArrivalZoneHighlight: function(side) {
+        var topCoords = this.zoneToTopLeftCoords(side == "IJN" ? "A1A" : "I1B");
+        context.putImageData(this.restImg, topCoords.x, topCoords.y);
+    },
+    /*-------------------------------------------------------------------*/
+    /* Grab preloaded fleet image and draw it at the input canvas        */
+    /* coordinates (NOT converted to top left).                          */
+    /*-------------------------------------------------------------------*/
+    drawShipsMarker: function(coords) {
+        var fleetImg = document.getElementById("fleet");
+        this.ctx.drawImage(fleetImg, coords.x - grid.zoneSize, coords.y);
+    },
+    /*-------------------------------------------------------------------*/
+    /* Draw yellow square selected area/zone marker at the input canvas  */
+    /* top and left coordinates.                                         */
+    /*-------------------------------------------------------------------*/
+    drawSelector: function(topLeft, sizeInZones) {
+        var top = topLeft.y,
+            left = topLeft.x,
+            sideLength = (sizeInZones * 36) + 5;
+        
+        if (sizeInZones == 1)
+            // area-sized selections are restored w/ search cursor, so we only need zone
+            this.restImg = this.ctx.getImageData(left, top, sideLength + 3, sideLength + 3);
+        this.ctx.save();
+        this.ctx.globalAlpha = 0.6;
+        this.ctx.lineWidth = 4;
+        this.ctx.strokeStyle = "#ffd651";
+        this.ctx.beginPath();
+        this.ctx.moveTo(left + 2, top + 2);
+        this.ctx.lineTo(left + sideLength, top + 2);
+        this.ctx.lineTo(left + sideLength, top + sideLength);
+        this.ctx.lineTo(left + 2, top + sideLength);
+        this.ctx.closePath();
+        this.ctx.stroke();
+        this.ctx.restore();
+    },
+    /*-------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------*/
+    removeSelector: function(left, top) {
+        this.ctx.putImageData(this.restImg, left, top);
+    },
+    /*-------------------------------------------------------------------*/
+    /* Draw movement direction band and destination zone indicator       */
+    /* during ship movement dragging.                                    */
+    /*-------------------------------------------------------------------*/
+    drawMoveBand: function(startZone, endCoords) {
+        var start = this.zoneToTopLeftCoords(startZone),
+            topLeft = this.coordsToTopLeftCoords(endCoords);
+        
+        start.x += Math.floor(this.zoneSize / 2);
+        start.y += Math.floor(this.zoneSize / 2);
+
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = "round";
+        this.ctx.strokeStyle = "#ff0000";
+        this.ctx.beginPath();
+        this.ctx.moveTo(start.x, start.y);
+        this.ctx.lineTo(coords.x, coords.y);
+        this.ctx.moveTo(topLeft.x, topLeft.y);
+        this.ctx.lineTo(topLeft.x + this.zoneSize, topLeft.y);
+        this.ctx.lineTo(topLeft.x + this.zoneSize, topLeft.y + this.zoneSize);
+        this.ctx.lineTo(topLeft.x, topLeft.y + this.zoneSize);
+        this.ctx.closePath();
+        this.ctx.stroke();
+    },
+    /*-------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------*/
+    grabImageData: function (left, top, width, height) {
+        if (!left) {
+            left = 0;
+            top = 0;
+            width = this.cnvs.width;
+            height = this.cnvs.height;
+        }
         return this.ctx.getImageData(left, top, width, height);
     },
+    /*-------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------*/
     restoreImageData: function (data, left, top) {
         this.ctx.putImageData(data, left, top);
+    },
+    /*-------------------------------------------------------------------*/
+    /*-------------------------------------------------------------------*/
+    drawSearchCursor: function(restoreData, imageData, left, top) {
+        if (restoreData) {
+            this.ctx.putImageData(restoreData, 0, 0);
+        }
+        var ret = this.grabImageData();
+        this.ctx.drawImage(imageData, left, top);
     }
 };
