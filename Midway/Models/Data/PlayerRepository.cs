@@ -80,6 +80,24 @@ namespace Midway.Models.Data
 			return dtoPlayer;
         }
 
+		internal DtoPlayer GetPlayerWithCurrentGame(int playerId, int gameId)
+		{
+			var dtoPlayer = _context.Players.Select(p => new DtoPlayer
+			{
+				PlayerId = p.PlayerId,
+				Email = p.Email,
+				Password = p.Password,
+				Nickname = p.Nickname,
+				Admin = p.Admin,
+				Lockout = p.Lockout
+			}).FirstOrDefault(p => p.PlayerId == playerId);
+
+			if (dtoPlayer == null) return null;
+
+			dtoPlayer.Games = GetPlayerGames(playerId, gameId);	//only one, actually
+			return dtoPlayer;
+		}
+
         public DtoPlayer UpdatePlayer(DtoPlayer dtoPlayer)
         {
 	        var sendPwd = false;
@@ -268,16 +286,28 @@ namespace Midway.Models.Data
 			return InsertStatus.Ok;
 		}
 
-		private IEnumerable<DtoPlayerGame> GetPlayerGames(int playerId)
+		private IEnumerable<DtoPlayerGame> GetPlayerGames(int playerId, int gameId = 0)
 		{
-			var dbGames = _context.PlayerGames
-                .Include(p => p.Phase)
-				.Include(p => p.Side)
-				.Include(p => p.Game)
-				.Include(p => p.Airbases)
-				.Where(p => p.PlayerId == playerId)
-				.ToList();
-
+			IQueryable<PlayerGame> qry;
+			if (gameId == 0)
+			{
+				qry = _context.PlayerGames
+					.Include(p => p.Phase)
+					.Include(p => p.Side)
+					.Include(p => p.Game)
+					.Include(p => p.Airbases)
+					.Where(p => p.PlayerId == playerId);
+			}
+			else
+			{
+				qry = _context.PlayerGames
+					.Include(p => p.Phase)
+					.Include(p => p.Side)
+					.Include(p => p.Game)
+					.Include(p => p.Airbases)
+					.Where(p => p.PlayerId == playerId && p.GameId == gameId);
+			}
+			var dbGames = qry.ToList();
 			var dtoPlayerGames = new List<DtoPlayerGame>();
 
 			foreach (var dbGame in dbGames)

@@ -27,9 +27,6 @@
                 cursorOffset: { x: 0, y: 0 },
                 useSnapshot: false,
                 snapshot: null,
-                restoreFunction: null,
-                drawFunction: null,
-                useTopLeft: false
             };
 
         // Event handlers......................................................
@@ -41,20 +38,20 @@
                     DLG_YESCANCEL, "blue", returnChoice);
 
                 function returnChoice(choice) {
-                    if (choice == "Yes") returnToHome();
+                    if (choice == "Yes") goHome();
                 }
             } else {
-                returnToHome();
+                goHome();
             }
         });
         $("#done").on("click", function () {
             if (!$(this).hasClass("disable")) {
-                if (!allArrivalsOnMap()) {
+                if (game.PhaseId == 1 && !allArrivalsOnMap()) {
                     showAlert("End Phase", "All arriving ships must be brought on to the map.", DLG_OK, "red");
                     return;
                 }
                 ajaxPutPhase(function() {
-                    returnToHome();
+                    reload();
                 });
             }
         });
@@ -88,7 +85,7 @@
             selectZone(windowToCanvas(canvas, e.clientX, e.clientY));
         }).on("dblclick", function (e) {
             var coords = windowToCanvas(canvas, e.clientX, e.clientY),
-                zone = grid.coordsToZone(coords);
+                zone = grid.coordsToZone.call(grid, coords);
             if ($.inArray(zone, shipZones) != -1) {
                 $("#zone").find("div.shipitem").addClass("selected");
             }
@@ -109,13 +106,20 @@
         // Functions...........................................................
 
         /*-------------------------------------------------------------------*/
-        /* Reload player data w/ shallow games and return to home screen.    */
+        /* Reload player data w/ shallow games and return to the home page.  */
         /*-------------------------------------------------------------------*/
-        function returnToHome() {
-            ajaxGetPlayer(player.PlayerId, function() {
-                grid.clearCanvas();
+        function goHome() {
+            ajaxGetPlayer(player.PlayerId, function () {
+                grid.clearCanvas.call(grid);
                 scenes["home"]();
             });
+        }
+        /*-------------------------------------------------------------------*/
+        /* Start over with the player reset done by ajaxPostPhase.           */
+        /*-------------------------------------------------------------------*/
+        function reload() {
+            grid.clearCanvas.call(grid);
+            scenes["search"]();
         }
         /*-------------------------------------------------------------------*/
         /* Walk the array of sighting markers and draw each one.             */
@@ -123,7 +127,7 @@
         function drawSightings() {
             for (var i = 0; i < searches.length; i++) {
                 for (var j = 0; j < searches[i].Markers.length; j++) {
-                    grid.drawSightingMarker(searches[i].Markers[j].Zone);
+                    grid.drawSightingMarker.call(grid, searches[i].Markers[j].Zone);
                 }
             }
         }
@@ -138,7 +142,7 @@
             loadShipZones();
             for (var i = 0; i < shipZones.length; i++) {
                 if ($.inArray(shipZones[i], excludedZones) == -1)
-                    grid.drawShipsMarker(grid.zoneToTopLeftCoords(shipZones[i]));
+                    grid.drawShipsMarker.call(grid, grid.zoneToTopLeftCoords.call(grid, shipZones[i]));
             }
         }
         /*-------------------------------------------------------------------*/
@@ -146,15 +150,15 @@
         /* zone. If it contains ships, display them on the Zone tab.         */
         /*-------------------------------------------------------------------*/
         function selectZone(coords) {
-            var topLeft = addVectors(grid.coordsToTopLeftCoords(coords), { x: -3, y: -3 });
+            var topLeft = addVectors(grid.coordsToTopLeftCoords.call(grid, coords), { x: -3, y: -3 });
             if (selectedZone) {
-                var oldTopLeft = grid.zoneToTopLeftCoords(selectedZone),
+                var oldTopLeft = grid.zoneToTopLeftCoords.call(grid, selectedZone),
                 oldTop = oldTopLeft.y - 3,
                 oldLeft = oldTopLeft.x - 3;
-                grid.removeSelector(oldLeft, oldTop);
+                grid.removeSelector.call(grid, oldLeft, oldTop);
             }
-            grid.drawSelector(topLeft, 1);
-            selectedZone = grid.coordsToZone(coords);
+            grid.drawSelector.call(grid, topLeft, 1);
+            selectedZone = grid.coordsToZone.call(grid, coords);
             showShipsInZone();
         }
         /*-------------------------------------------------------------------*/
@@ -162,18 +166,18 @@
         /* area.                                                             */
         /*-------------------------------------------------------------------*/
         function selectArea(coords) {
-            var zone = grid.coordsToZone(coords);
+            var zone = grid.coordsToZone.call(grid, coords);
             if (zone) {
                 var area = zone.substr(0, 2);
-                var topLeftCoords = addVectors(grid.zoneToTopLeftCoords(area + "A"), { x: -3, y: -3 });
-                grid.drawSelector(topLeftCoords, 3);
+                var topLeftCoords = addVectors(grid.zoneToTopLeftCoords.call(grid, area + "A"), { x: -3, y: -3 });
+                grid.drawSelector.call(grid, topLeftCoords, 3);
                 selectedArea = area;
             }
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function drawCursorImg(x, y) {
-            dragThang.snapshot = grid.drawSearchCursor(dragThang.snapshot, dragThang.cursorImg, x, y);
+            dragThang.snapshot = grid.drawSearchCursor.call(grid, dragThang.snapshot, dragThang.cursorImg, x, y);
         }
         /*-------------------------------------------------------------------*/
         /* Display on the Zone tab any ships in the currently selected zone. */
@@ -409,8 +413,8 @@
         /* Move fleet marker to a new location on the map.                   */
         /*-------------------------------------------------------------------*/
         function sailShips(startZone, endZone) {
-            var startPos = grid.zoneToTopLeftCoords(startZone),
-                endPos = grid.zoneToTopLeftCoords(endZone),
+            var startPos = grid.zoneToTopLeftCoords.call(grid, startZone),
+                endPos = grid.zoneToTopLeftCoords.call(grid, endZone),
                 distX = endPos.x - startPos.x,
                 distY = endPos.y - startPos.y,
                 startTime = new Date().getTime(),
@@ -419,10 +423,10 @@
                 handle,
                 mapImg;
 
-            grid.drawMap(function() {
+            grid.drawMap.call(grid, function() {
                 drawSightings();
                 drawShips([startZone, endZone]);
-                mapImg = grid.grabImageData();
+                mapImg = grid.grabImageData.call(grid);
                 shipsAnim();
             });
             
@@ -435,18 +439,19 @@
                     grid.drawMap(function() {
                         drawSightings();
                         drawShips();
-                        grid.drawSelector(addVectors(grid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
+                        grid.drawSelector.call(grid, addVectors(grid.zoneToTopLeftCoords.call(grid, selectedZone), { x: -3, y: -3 }), 1);
                         showShipsInZone(selectedZone);
                     });
                 } else {
                     var thisX = startPos.x + ((elapsed / duration) * distX);
                     var thisY = startPos.y + ((elapsed / duration) * distY);
-                    grid.restoreImageData(mapImg, 0, 0);
-                    grid.drawShipsMarker({ x: thisX, y: thisY });
+                    grid.restoreImageData.call(grid, mapImg, 0, 0);
+                    grid.drawShipsMarker.call(grid, { x: thisX, y: thisY });
                 }
             }
         }
         /*-------------------------------------------------------------------*/
+        /* HERE!!
         /*-------------------------------------------------------------------*/
         function controlItemMouseDown(e) {
             var panelId = $("#tabpanels").find("div.tabshown").attr("id");
@@ -461,11 +466,8 @@
                     mouseDown = true;
                     dragThang.dragData = selShips;
                     dragThang.useSnapshot = true;
-                    dragThang.cursorImg = null;
+                    dragThang.cursorImg = document.getElementById("fleet");
                     dragThang.snapshot = null;
-                    dragThang.restoreFunction = null;
-                    dragThang.drawFunction = grid.drawShipsMarker;
-                    dragThang.useTopLeft = true;
                     
                     setTimeout(beginControlsDrag, 150);
                 }
@@ -478,8 +480,6 @@
                     dragThang.cursorOffset = { x: -40, y: -40 },
                     dragThang.useSnapshot = false;
                     dragThang.snapshot = null;
-                    dragThang.restoreFunction = null;
-                    dragThang.drawFunction = null;
                     selectedArea = "";
                     
                     setTimeout(beginControlsDrag, 150);
@@ -491,7 +491,7 @@
         function canvasMouseDown(e) {
             if (game.PhaseId == 1) {
                 mouseDown = true;
-                var zone = grid.coordsToZone(windowToCanvas(canvas, e.clientX, e.clientY)),
+                var zone = grid.coordsToZone.call(grid, windowToCanvas(canvas, e.clientX, e.clientY)),
                     selShips = getSelectedShips("zone");
 
                 if (selShips.length > 0) {
@@ -501,9 +501,6 @@
                     dragThang.cursorImg = null;
                     dragThang.useSnapshot = true;
                     dragThang.snapshot = null;
-                    dragThang.restoreFunction = null;
-                    dragThang.drawFunction = grid.drawMoveBand;
-                    dragThang.useTopLeft = false;
 
                     setTimeout(beginControlsDrag, 150);
                 }
@@ -515,7 +512,7 @@
         function beginControlsDrag() {
             if (mouseDown) {
                 dragThang.dragging = true;
-                if (dragThang.origin == "arrivals") grid.highlightArrivalZones(side);
+                if (dragThang.origin == "arrivals") grid.highlightArrivalZones.call(grid, side);
                 canvas.addEventListener("mousemove", canvasMouseMove, false);
             }
         }
@@ -532,20 +529,19 @@
                 } else {
                     if (dragThang.useSnapshot) {
                         if (dragThang.snapshot) {
-                            grid.restoreImageData(dragThang.snapshot, 0, 0);
+                            grid.restoreImageData.call(grid, dragThang.snapshot, 0, 0);
                         } else {
-                            dragThang.snapshot = grid.grabImageData();
+                            dragThang.snapshot = grid.grabImageData.call(grid);
                         }
                     }
-                    if (dragThang.restoreFunction) {
-                        dragThang.restoreFunction();
-                    }
                     if (isLegitDrop(canvasCoords)) {
-                        if (dragThang.useTopLeft) {
-                            var topLeft = grid.coordsToTopLeftCoords(canvasCoords);
-                            dragThang.drawFunction(topLeft);
-                        } else
-                            dragThang.drawFunction(dragThang.origin, canvasCoords);
+                        if (dragThang.origin == "arrivals") {
+                            var topLeft = grid.coordsToTopLeftCoords.call(grid, canvasCoords);
+                            grid.drawShipsMarker.call(grid, topLeft);
+                        } else {
+                            // a zone -- movement
+                            grid.drawMoveBand.call(grid, dragThang.origin, canvasCoords);
+                        }
                     }
                 }
             }
@@ -557,47 +553,45 @@
             if (dragThang.dragging) {
                 dragThang.dragging = false;
                 canvas.removeEventListener("mousemove", canvasMouseMove, false);
-                if (dragThang.origin == "arrivals") removeArrivalZoneHighlight(side);
+                if (dragThang.origin == "arrivals") grid.removeArrivalZones.call(grid, side);
                 
-                var coords = windowToCanvas(canvas, e.clientX, e.clientY);
-                    var zone = grid.coordsToZone(coords);
+                var coords = windowToCanvas(canvas, e.clientX, e.clientY),
+                    zone = grid.coordsToZone.call(grid, coords);
 
-                    if (dragThang.origin == "search") {
-                        hideSearching();
-                        selectArea(coords);
-                        executeSearch(coords, zone, dragThang.dragData, function() {
-                            grid.restoreImageData(dragThang.snapshot, 0, 0);
-                            drawSightings();
-                        });
-                    } else {
-                        if (isLegitDrop(coords)) {
-                            var cost = 0;
+                if (dragThang.origin == "search") {
+                    hideSearching();
+                    selectArea(coords);
+                    executeSearch(coords, zone, dragThang.dragData, function() {
+                        grid.restoreImageData.call(grid, dragThang.snapshot, 0, 0);
+                        drawSightings();
+                    });
+                } else if (isLegitDrop(coords)) {
+                    var cost = 0;
 
-                            if (isNumber(dragThang.origin.substr(1, 1)))
-                                cost = grid.zoneDistance(dragThang.origin, zone);
+                    if (isNumber(dragThang.origin.substr(1, 1)))
+                        cost = grid.zoneDistance.call(grid, dragThang.origin, zone);
 
-                            relocateShips(zone, dragThang.dragData, cost);
+                    relocateShips(zone, dragThang.dragData, cost);
 
-                            if (dragThang.origin == "arrivals") {
-                                dragThang.drawFunction(grid.coordsToTopLeftCoords(coords));
-                                $("#arrivals").find("div.shipitem").remove(".selected").parent();
-                                selectZone(coords);
-                                if ($("#arrivals").find("div.shipitem").length == 0) {
-                                    $("#zonetab").trigger("click");
-                                }
-                            } else if (isNumber(dragThang.origin.substr(1, 1))) {
-                                sailShips(dragThang.origin, zone);
-                            }
-                            dirty = true;
+                    if (dragThang.origin == "arrivals") {
+                        grid.drawShipsMarker.call(grid, grid.coordsToTopLeftCoords.call(grid, coords));
+                        $("#arrivals").find("div.shipitem").remove(".selected").parent();
+                        selectZone(coords);
+                        if ($("#arrivals").find("div.shipitem").length == 0) {
+                            $("#zonetab").trigger("click");
                         }
-                    
+                    } else {
+                        //movement's done
+                        sailShips(dragThang.origin, zone);
+                    }
+                    dirty = true;
                 }
             }
         }
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function isLegitDrop(coords) {
-            var dropZone = grid.coordsToZone(coords);
+            var dropZone = grid.coordsToZone.call(grid, coords);
             if (dropZone == dragThang.origin) return true;
 
             if (dragThang.origin == "arrivals") {
@@ -609,7 +603,7 @@
                         return true;
                 }
             } else if (isNumber(dragThang.origin.substr(1, 1))) {
-                var zones = grid.zoneDistance(dragThang.origin, dropZone),
+                var zones = grid.zoneDistance.call(grid, dragThang.origin, dropZone),
                     moves = getShipsMinMovePoints(dragThang.origin);
                 if (zones <= moves) return true;
             }
@@ -618,7 +612,7 @@
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         function withinRange(coords) {
-            var zone = grid.coordsToZone(coords),
+            var zone = grid.coordsToZone.call(grid, coords),
                 i;
             
             if (!zone) return false;
@@ -627,7 +621,7 @@
                 if (game.SearchRange == 0) return true;
                 
                 for (i = 0; i < shipZones.length; i++) {
-                    if (grid.zoneDistance(area + "E", shipZones[i]) <= (game.SearchRange + 1))
+                    if (grid.zoneDistance.call(grid, area + "E", shipZones[i]) <= (game.SearchRange + 1))
                         return true;
                 }
             } else {
@@ -647,7 +641,7 @@
                 drawCursorImg(coords.x, coords.y);
                 selectArea(canvasCoords);
             } else {
-                if (dragThang.snapshot) grid.restoreImageData(dragThang.snapshot, 0, 0);
+                if (dragThang.snapshot) grid.restoreImageData.call(grid, dragThang.snapshot, 0, 0);
                 canvas.style.cursor = "auto";
             }
         }
@@ -656,7 +650,7 @@
         function hideSearching() {
             canvas.style.cursor = "auto";
             if (dragThang.snapshot) {
-                grid.restoreImageData(dragThang.snapshot, 0, 0);
+                grid.restoreImageData.call(grid, dragThang.snapshot, 0, 0);
             }
         }
         /*-------------------------------------------------------------------*/
@@ -683,7 +677,7 @@
                     showAlert("Search", "You've already searched area " + area + "!", DLG_OK, "blue", callback);
                 }
             } else {
-                if (dragThang.snapshot) grid.restoreImageData(dragThang.snapshot, 0, 0);
+                if (dragThang.snapshot) grid.restoreImageData.call(grid, dragThang.snapshot, 0, 0);
                 canvas.style.cursor = "auto";
                 if (callback) callback();
             }
@@ -726,8 +720,6 @@
         /* to the map.                                                       */
         /*-------------------------------------------------------------------*/
         function allArrivalsOnMap() {
-            if (game.PhaseId > 1) return true;
-
             for (var i = 0; i < ships.length; i++) {
                 if (ships[i].Location == "ARR")
                     return false;
@@ -874,7 +866,8 @@
                     Ships: shipsToPass,
                     Searches: searches
                 },
-                success: function() {
+                success: function (data) {
+                    player = JSON.parse(data);
                     if (successCallback) successCallback();
                 },
                 error: function (xhr, status, errorThrown) {
@@ -931,13 +924,13 @@
             showAirReadiness();
             
             ajaxLoadSearches(function () {
-                grid.drawMap(function () {
+                grid.drawMap.call(grid, function () {
                     drawShips();
                     drawSightings();
 
                     if (selectedZone) {
-                        var coords = addVectors(grid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 });
-                        grid.drawSelector(coords, 1);
+                        var coords = addVectors(grid.zoneToTopLeftCoords.call(grid, selectedZone), { x: -3, y: -3 });
+                        grid.drawSelector.call(grid, coords, 1);
                     }
                     showShipsInZone(selectedZone);
 

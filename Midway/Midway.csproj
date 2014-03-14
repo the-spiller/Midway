@@ -338,6 +338,7 @@
     <Content Include="Content\fonts\teletype1945-1985-webfont.woff" />
     <Content Include="Scripts\midway.js" />
     <Content Include="Scripts\scenes\about.js" />
+    <Content Include="Scripts\scenes\searchgrid.module.js" />
     <Content Include="Scripts\scenes\home.js" />
     <Content Include="Scripts\scenes\logon.js" />
     <Content Include="Scripts\scenes\register.js" />

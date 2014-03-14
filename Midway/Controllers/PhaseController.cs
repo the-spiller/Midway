@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Midway.Helpers;
+using Midway.Models;
+using Newtonsoft.Json;
 using Midway.Models.DTOs;
 using Midway.Models.Data;
-using Newtonsoft.Json;
 
 namespace Midway.Controllers
 {
@@ -79,7 +82,12 @@ namespace Midway.Controllers
                     phaseData.AirReadiness,
                     phaseData.Points);
 
-                return new HttpResponseMessage(HttpStatusCode.NoContent);
+	            var dtoPlayer = new PlayerRepository(_uow).GetPlayerWithCurrentGame(phaseData.PlayerId, phaseData.GameId);
+
+                return new HttpResponseMessage(HttpStatusCode.OK)
+	                {
+		                Content = new StringContent(JsonConvert.SerializeObject(dtoPlayer))
+	                };
 
             }
             catch (Exception ex)
