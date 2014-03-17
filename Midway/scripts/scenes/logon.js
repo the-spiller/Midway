@@ -1,4 +1,5 @@
 ﻿var logonPage = {
+    name: "logon",
     run: function() {
         var badPwdCount = 0,
             badPwdTries = 5;
@@ -28,12 +29,14 @@
             newPassword();
         });
 
-        $("#register").on("click", function() {
-            scenes["register"]();
+        $("#register").on("click", function () {
+            showWait("Loading", "Loading registration page, please wait ...", "blue");
+            pages.register();
         });
 
-        $("#wat").on("click", function() {
-            scenes["about"]();
+        $("#wat").on("click", function () {
+            showWait("Loading", "Loading about page, please wait ...", "blue");
+            pages.about();
         });
 
         // Functions...........................................................
@@ -61,9 +64,9 @@
                 );
             } else {
                 ajaxGetPlayerByEmail(function() {
-                    if (player.Lockout > new Date().getTime()) {
+                    if (window.player.Lockout > new Date().getTime()) {
                         showLockoutAlert();
-                    } else if (player.Password != $("#pwd").val()) {
+                    } else if (window.player.Password != $("#pwd").val()) {
                         badPwdCount++;
                         if (badPwdCount > badPwdTries) {
                             ajaxSetLockout(function() {
@@ -83,10 +86,10 @@
                             );
                         }
                     } else {
-                        if ($("#stay").prop("checked"))
-                            saveLocal("player", player.PlayerId.toString());
-
-                        scenes["home"]();
+                        createUpdateAuthCookie();
+                        if ($("#stay").prop("checked")) createCookie("mdylogin", window.player.PlayerId.toString(), 2);
+                        showWait("Loading", "Loading home page, please wait ...", "blue");
+                        pages.home();
                     }
                 });
             }
@@ -159,40 +162,41 @@
         }
         
         function ajaxSendPassword(successCallback) {
-            player.Password = null;
+            window.player.Password = null;
             ajaxUpdatePlayer(successCallback);
         }
         // end function ajaxSendPassword()
 
         function ajaxSetLockout(successCallback) {
             var twentyMin = 1000 * 60 * 20;
-            player.Lockout = new Date().getTime() + twentyMin;
+            window.player.Lockout = new Date().getTime() + twentyMin;
             ajaxUpdatePlayer(successCallback);
         }
         // end function ajaxSetLockout()
 
         // Init................................................................
+        $(document).ready(function() {
+            $("#pagediv").css("background-image", "url(\"content/images/bg-logon.jpg\")");
+            $("#infolink").css({ top: "365px", left: "42px" });
+            window.showingInfo = false;
 
-        $("#pagediv").css("background-image", "url(\"content/images/bg-logon.jpg\")");
-        $("#infolink").css({ top: "365px", left: "42px" });
-        window.showingInfo = false;
+            if (!cookiesEnabled()) {
+                showAlert("Cookies", "You must allow cookies in order to play Midway.", "red");
+            }
 
-        if (!localStorageSupported()) {
-            $("#staytd").css("display", "none");
-        }
+            $("#logondiv").draggable({
+                handle: ".floathead",
+                containment: "#pagediv",
+                scroll: false
+            });
 
-        $("#logondiv").draggable({
-            handle: ".floathead",
-            containment: "#pagediv",
-            scroll: false
+            if (player) {
+                $("#email").val(window.player.Email);
+                $("#pwd").focus();
+            } else {
+                $("#email").focus();
+            }
+            window.currentPage = "logon";
         });
-
-        if (player) {
-            $("#email").val(player.Email);
-            $("#pwd").focus();
-        } else {
-            $("#email").focus();
-        }
-        return "logon";
     }
 };

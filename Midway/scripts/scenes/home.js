@@ -1,4 +1,5 @@
 ﻿var homePage = {
+    name: "home",
     run: function () {
         var oppCleared = false,
             oppMatched = false,
@@ -22,7 +23,7 @@
         $("#logofflink").on("click", function () {
             if (unsavedRegChanges()) return;
             removeLocal("player");
-            scenes["logon"]();
+            pages.logon();
         });
 
         $(".tablistitem").on("click", function (e) {
@@ -94,13 +95,14 @@
             if (selGameId < 0) {
                 createGameThenPlay();
             } else {
+                showWait("Loading", "Loading search page, please wait ...", "blue");
                 // find the selected game
                 var game = findGameById();
 
                 // Make this game the only one
-                player.Games = [];
-                player.Games.push(game);
-                scenes["search"]();
+                window.player.Games = [];
+                window.player.Games.push(game);
+                pages.search();
             }
         });
         
@@ -191,12 +193,12 @@
         
         function shallowCopyPlayer() {
             return {
-                playerId: player.PlayerId,
-                Email: player.Email,
-                Nickname: player.Nickname,
-                Password: player.Password,
-                Lockout: player.Lockout,
-                Admin: player.Admin,
+                playerId: window.player.PlayerId,
+                Email: window.player.Email,
+                Nickname: window.player.Nickname,
+                Password: window.player.Password,
+                Lockout: window.player.Lockout,
+                Admin: window.player.Admin,
                 Games: []
             };
         }
@@ -223,13 +225,13 @@
         function getNewestGame() {
             var maxId = 0, retIndex = 0;
             
-            for (var i = 0; i < player.Games.length; i++) {
-                if (player.Games[i].GameId > maxId) {
-                    maxId = player.Games[i].GameId;
+            for (var i = 0; i < window.player.Games.length; i++) {
+                if (window.player.Games[i].GameId > maxId) {
+                    maxId = window.player.Games[i].GameId;
                     retIndex = i;
                 }
             }
-            return player.Games[retIndex];
+            return window.player.Games[retIndex];
         }
         
         function createGameThenPlay() {
@@ -260,16 +262,14 @@
             shallowPlayer.Games.push(game);
 
             // do a player update to create the new game
-            ajaxUpdatePlayer(shallowPlayer, newGameUpdated);
-
-            function newGameUpdated() {
+            ajaxUpdatePlayer(shallowPlayer, function () {
+                showWait("Loading", "Loading search page, please wait ...", "blue");
                 // strip down to just the newly created game
                 var newGame = getNewestGame(); //highest game Id
-                player.Games = [];
-                player.Games.push(newGame);
-                
-                scenes["search"]();
-            }
+                window.player.Games = [];
+                window.player.Games.push(newGame);
+                pages.search();
+            });
         }
         
         function unsavedRegChanges() {
@@ -293,10 +293,10 @@
                 } else if ($("#pwd").val() == "") {
                     caption = "Invalid Password";
                     msg = "You apparently don't care about your security, but we do. You must provide a password!";     
-                } else if ($("#pwd").val() != player.Password && $("#pwd").val() != $("#pwd2").val()) {
+                } else if ($("#pwd").val() != window.player.Password && $("#pwd").val() != $("#pwd2").val()) {
                     caption = "Passwords Don't Match";
                     msg = "The password you've entered does not match the password you've supposedly reentered.";
-                } else if ($("#nickname").val() != player.Nickname) {
+                } else if ($("#nickname").val() != window.player.Nickname) {
                     if ($("#nickname").val() == "") {
                         caption = "Missing Nickname";
                         msg = "We don't share email addresses, so you must provide a nickname. Otherwise, we " +
@@ -310,31 +310,30 @@
                     showAlert(caption, msg, DLG_OK, "blue");
                 } else {
                     var shallowPlayer = {
-                        playerId: player.PlayerId,
+                        playerId: window.player.PlayerId,
                         Email: $("#email").val(),
                         Nickname: $("#nickname").val(),
                         Password: $("#pwd").val(),
-                        Lockout: player.Lockout,
-                        Admin: player.Admin,
+                        Lockout: window.player.Lockout,
+                        Admin: window.player.Admin,
                         Games: []
                     };
-                    ajaxUpdatePlayer(shallowPlayer, updatedReg);
-                }
-                
-                function updatedReg() {
-                    loadRegFields();
-                    $("#cancelreg").css("display", "none");
-                    $("#namespan").text(player.Nickname);
+                    ajaxUpdatePlayer(shallowPlayer, function() {
+                        loadRegFields();
+                        $("#cancelreg").css("display", "none");
+                        $("#namespan").text(window.player.Nickname);
+                        showAlert("Save", "Changes saved.", DLG_OK, "blue");
+                    });
                 }
             }
         }
         
         function anyRegDataChanged() {
-            if ($("#email").val().toLowerCase() != player.Email.toLowerCase())
+            if ($("#email").val().toLowerCase() != window.player.Email.toLowerCase())
                 return true;
-            if ($("#pwd").val() != player.Password)
+            if ($("#pwd").val() != window.player.Password)
                 return true;
-            if ($("#nickname").val() != player.Nickname)
+            if ($("#nickname").val() != window.player.Nickname)
                 return true;
 
             return false;
@@ -342,9 +341,9 @@
         
         function findGameById() {
             var game = {};
-            for (var i = 0; i < player.Games.length; i++) {
-                if (player.Games[i].GameId == selGameId) {
-                    game = player.Games[i];
+            for (var i = 0; i < window.player.Games.length; i++) {
+                if (window.player.Games[i].GameId == selGameId) {
+                    game = window.player.Games[i];
                     break;
                 }
             }
@@ -352,10 +351,10 @@
         }
         
         function loadRegFields() {
-            $("#email").val(player.Email);
-            $("#pwd").val(player.Password);
-            $("#pwd2").val(player.Password);
-            $("#nickname").val(player.Nickname);
+            $("#email").val(window.player.Email);
+            $("#pwd").val(window.player.Password);
+            $("#pwd2").val(window.player.Password);
+            $("#nickname").val(window.player.Nickname);
         }
         /*-------------------------------------------------------*/
         /* Build up html for one game for the 'Your Games' list. */
@@ -396,7 +395,6 @@
             }
             var html = itemStart + title + "\"><img src=\"" + game.TinyFlagUrl + "\" />" +
                 game.SideShortName + " vs. " + oppName + icon + "Turn " + game.Turn + " " + game.PhaseName + "</li>";
-            console.log(html);
             return html;
         }
         /*----------------------------------------------------*/
@@ -407,10 +405,10 @@
             var listHtml = "";
             if (gamesPrepend) gamesPrepend.remove();
             
-            if (player.Games) {
-                for (var i = 0; i < player.Games.length; i++) {
-                    if (player.Games[i].CompletedDTime == null || player.Games[i].CompletedDTime == "") {
-                        listHtml += getGameListItem(player.Games[i]);
+            if (window.player.Games) {
+                for (var i = 0; i < window.player.Games.length; i++) {
+                    if (window.player.Games[i].CompletedDTime == null || window.player.Games[i].CompletedDTime == "") {
+                        listHtml += getGameListItem(window.player.Games[i]);
                     }
                 }
                 gamesPrepend = $(listHtml).prependTo("#gamelist ul");
@@ -445,7 +443,7 @@
 
             function gotPlayers(list) {
                 for (var i = 0; i < list.length; i++) {
-                    if (list[i].Nickname != player.Nickname) {
+                    if (list[i].Nickname != window.player.Nickname) {
                         nicknames.add(list[i].Nickname);
                     }
                 }
@@ -462,8 +460,8 @@
             
             // build table of game outcomes
             if (recordAppend) recordAppend.remove();
-            for (var i = 0; i < player.Games.length; i++) {
-                var game = player.Games[i];
+            for (var i = 0; i < window.player.Games.length; i++) {
+                var game = window.player.Games[i];
                 
                 if (game.OpponentNickname != null) {
                     recIndex = -1;
@@ -496,25 +494,27 @@
         }
         
         // Init................................................................
+        $(document).ready(function() {
+            $("#pagediv").css("background-image", "url(\"content/images/bg-home.jpg\")");
+            $("#namespan").text(window.player.Nickname);
 
-        $("#pagediv").css("background-image", "url(\"content/images/bg-home.jpg\")");
-        $("#namespan").text(player.Nickname);
+            $("#logofflink").css("left", "1240px");
 
-        $("#logofflink").css("left", "1240px");
+            var welcome = document.getElementById("welcome");
+            var top = welcome.offsetTop + welcome.offsetHeight + 20;
 
-        var welcome = document.getElementById("welcome");
-        var top = welcome.offsetTop + welcome.offsetHeight + 20;
-        
-        $("#homediv").css("top", top + "px").draggable({
-            handle: ".floathead",
-            containment: "#pagediv",
-            scroll: false
+            $("#homediv").css("top", top + "px").draggable({
+                handle: ".floathead",
+                containment: "#pagediv",
+                scroll: false
+            });
+            loadRegFields();
+            buildRecord();
+            buildGameList();
+            getPlayers();
+
+            hideWait();
+            window.currentPage = "home";
         });
-        loadRegFields();
-        getPlayers();
-        buildRecord();
-        buildGameList();
-        
-        return "home";
     }
 };

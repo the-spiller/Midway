@@ -10,6 +10,7 @@ using Midway.Models.Data;
 
 namespace Midway.Controllers
 {
+    [Authorize]
     public class ShipController : ApiController
     {
         private readonly ShipRepository _repo;

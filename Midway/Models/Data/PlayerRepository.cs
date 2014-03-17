@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Security;
+using Midway.Helpers;
 using Midway.Models.Services;
 using Midway.Models.DTOs;
 
@@ -52,11 +53,12 @@ namespace Midway.Models.Data
 
 			if (dtoPlayer == null) return null;
 
+	        dtoPlayer.AuthKey = AuthHelper.RegisterPlayer(dtoPlayer.Email, dtoPlayer.Admin);
+
 			if (includeGames)
-			{
 				dtoPlayer.Games = GetPlayerGames(dtoPlayer.PlayerId);
-			}
-			return dtoPlayer;
+
+            return dtoPlayer;
         }
 
         public DtoPlayer GetPlayer(int id, bool includeGames = false)
@@ -73,10 +75,11 @@ namespace Midway.Models.Data
 
 			if (dtoPlayer == null) return null;
 
+            dtoPlayer.AuthKey = AuthHelper.RegisterPlayer(dtoPlayer.Email, dtoPlayer.Admin);
+
 	        if (includeGames)
-	        {
 		        dtoPlayer.Games = GetPlayerGames(dtoPlayer.PlayerId);
-	        }
+
 			return dtoPlayer;
         }
 
@@ -94,6 +97,7 @@ namespace Midway.Models.Data
 
 			if (dtoPlayer == null) return null;
 
+		    dtoPlayer.AuthKey = AuthHelper.GetPlayerKey(dtoPlayer.Email);
 			dtoPlayer.Games = GetPlayerGames(playerId, gameId);	//only one, actually
 			return dtoPlayer;
 		}

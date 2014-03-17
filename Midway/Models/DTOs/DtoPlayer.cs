@@ -10,6 +10,7 @@ namespace Midway.Models.DTOs
 		public string Password { get; set; }
 		public string Admin { get; set; }
 		public long Lockout { get; set; }
+        public string AuthKey { get; set; }
 
 		public IEnumerable<DtoPlayerGame> Games { get; set; }
 	}

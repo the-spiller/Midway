@@ -25,6 +25,7 @@ namespace Midway.Controllers
         }
         
         // GET api/player......................................................
+        [Authorize]
         public HttpResponseMessage GetPlayers()
         {
             try
@@ -46,6 +47,7 @@ namespace Midway.Controllers
             try
             {
                 var player = _repo.GetPlayer(id, true);
+                
                 if (player == null)
                 {
 	                return NotFoundResponse(id);
@@ -115,6 +117,7 @@ namespace Midway.Controllers
         }
 
         // PUT api/player (UPDATE).............................................
+        [Authorize]
         public HttpResponseMessage PutPlayer(DtoPlayer player)
         {
             try

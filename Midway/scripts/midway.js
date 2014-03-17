@@ -2,53 +2,62 @@
 /* Midway game: HTML5 and JQuery                                             */
 /*---------------------------------------------------------------------------*/
 var player = undefined,
-    currentScene = "",
-    scenes = {},
-    sounds = {},
     DLG_WIDTH = 460,
     DLG_OK = 1,
     DLG_OKCANCEL = 2,
     DLG_YESCANCEL = 3,
     showingInfo = false,
     IMG_WIDTH = 1387,
-    IMG_HEIGHT = 857;
+    IMG_HEIGHT = 857,
+    COOKIE_NAMES = [ "mdylogin", "mdyplayer" ];
 
-// Scenes......................................................................
+// Pages......................................................................
 
-var logon = function() {
-    $("#content").load("/views/_logon.html", function () {
-        currentScene = logonPage.run();
-    });
-};
-scenes["logon"] = logon;
+var pages = (function() {
+    var pLogon = function () {
+        $("#content").load("/views/_logon.html", function () {
+            logonPage.run();
+        });
+    },
+        pHome = function() {
+        $("#content").load("/views/_home.html", function() {
+            homePage.run();
+        });
+    },
+        pRegister = function () {
+        $("#content").load("/views/_register.html", function () {
+            registerPage.run();
+        });
+    },
+        pAbout = function () {
+        $("#content").load("/views/_about.html", function () {
+            aboutPage.run();
+        });
+    },
+        pSearch = function () {
+        $("#content").load("/views/_search.html", function () {
+            searchPage.run();
+        });
+    };
 
-var home = function() {
-    $("#content").load("/views/_home.html", function() {
-        currentScene = homePage.run();
-    });
-};
-scenes["home"] = home;
-
-var register = function() {
-    $("#content").load("/views/_register.html", function() {
-        currentScene = registerPage.run();
-    });
-};
-scenes["register"] = register;
-
-var about = function() {
-    $("#content").load("/views/_about.html", function () {
-        currentScene = aboutPage.run();
-    });
-};
-scenes["about"] = about;
-
-var search = function() {
-    $("#content").load("/views/_search.html", function() {
-        currentScene = searchPage.run();
-    });
-};
-scenes["search"] = search;
+    return {
+        logon: function() {
+            return pLogon();
+        },
+        home: function() {
+            return pHome();
+        },
+        register: function() {
+            return pRegister();
+        },
+        about: function() {
+            return pAbout();
+        },
+        search: function() {
+            return pSearch();
+        }
+    };
+})();
 
 // Functions...................................................................
 
@@ -56,7 +65,7 @@ function showPhotoblurb() {
     showingInfo = !showingInfo;
 
     if (showingInfo) {
-        if (currentScene == "logon") {
+        if (currentPage == "logon") {
             $(".photoblurb").css({ "display": "block", "top": "394px", "left": $("#infolink").css("left") });
         } else {
             $(".photoblurb").css({ "display": "block", "top": "40px", "left": getPhotoBlurbLeft() + "px" });
@@ -65,18 +74,15 @@ function showPhotoblurb() {
         $(".photoblurb").css("display", "none");
     }
 }
-
 function getPhotoBlurbLeft() {
     var infolink = document.getElementById("infolink");
     return infolink.offsetLeft - 400;
 }
-
 function getAlertPosition() {
     var left = Math.floor(($(window).width() / 2) - (DLG_WIDTH / 2));
     var top = Math.floor($(window).scrollTop() + $(window).height() / 2) - 150;
     return { x: left, y: top };
 }
-
 function showAlert(title, message, buttons, color, callback) {
     var topLeft = getAlertPosition();
     
@@ -136,26 +142,34 @@ function showWait(title, message, color) {
             containment: "#pagediv",
             scroll: false
         });
-
     $("#dlgoverlay").css("display", "block");
 }
-
+function hideWait() {
+    $("#dlgoverlay").css("display", "none");
+}
 function showAjaxError(xhr, status, errorThrown) {
     if (!errorThrown)
         showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "red");
-    else
-        showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "red");
+    else {
+        var errText = xhr.responseText,
+            idx = errText.indexOf("{\"Message\":");
+        
+        if (idx == 0)
+            errText = errText.substr(12, errText.length - 14);
+     
+        showAlert(xhr.status + " " + errorThrown, errText, DLG_OK, "red");
+    }
 }
-
+function createUpdateAuthCookie() {
+    createCookie(COOKIE_NAMES[1], player.Email + ":" + player.AuthKey, 1);
+}
 function ajaxGetPlayer(playerId, successCallback) {
     $.ajax({
         url: "/api/player/" + playerId.toString(),
         accepts: "application/json",
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader("Authorization ", makeBaseAuth(player.Email, player.Password));
-        },
         success: function (data) {
             player = JSON.parse(data);
+            createUpdateAuthCookie();
             if (successCallback) successCallback();
         },
         error: function (xhr, status, errorThrown) {
@@ -163,7 +177,6 @@ function ajaxGetPlayer(playerId, successCallback) {
         }
     });
 }
-
 function ajaxUpdatePlayer(shallowPlayer, successCallback) {
     $.ajax({
         url: "api/player",
@@ -172,6 +185,7 @@ function ajaxUpdatePlayer(shallowPlayer, successCallback) {
         data: shallowPlayer,
         success: function (data) {
             player = JSON.parse(data);
+            createUpdateAuthCookie();
             if (successCallback) successCallback();
         },
         error: function (xhr, status, errorThrown) {
@@ -189,18 +203,13 @@ function ajaxGetPlayers(successCallback) {
         accepts: "application/json",
         success: function(data) {
             playersList = JSON.parse(data);
+            createUpdateAuthCookie();
             if (successCallback) successCallback(playersList);
         },
         error: function(xhr, status, errorThrown) {
             showAjaxError(xhr, status, errorThrown);
         }
     });
-}
-
-function makeBaseAuth(user, password) {
-    var token = user + ":" + password;
-    var hash = btoa(token);
-    return "Basic " + hash;
 }
 
 function workTabs(e) {
@@ -279,17 +288,14 @@ $(document).ready(function () {
     //sounds["teletype"] = new buzz.sound("/midway/content/audio/teletype", { formats: ["ogg", "mp3"] });
     showingInfo = false;
     
-    var playerId;
-    playerId = readLocal("player");
-    
-    if (playerId !== null) {
-        showWait("Logging On", "Logging on, please wait ...", "blue");
-        
-        player = ajaxGetPlayer(playerId, function () {
-            $("#dlgoverlay").css("display", "none");
-            scenes["home"]();
+    var playerId = readCookie(COOKIE_NAMES[0]);
+    if (playerId) {
+        createCookie(COOKIE_NAMES[0], playerId.toString(), 2);   //re-up the cookie
+        player = ajaxGetPlayer(playerId, function() {
+            pages.home();
             return;
         });
+    } else {
+        pages.logon();
     }
-    scenes["logon"]();
 });

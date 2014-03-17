@@ -1,10 +1,11 @@
 ﻿var aboutPage = {
+    name: "about",
     run: function () {
         
         // Event Handlers......................................................
 
         $("#return").on("click", function () {
-            scenes["logon"]();
+            pages.logon();
         });
 
         $("#infolink").on("click", function () {
@@ -27,12 +28,15 @@
         });
 
         // Init................................................................
+        $(document).ready(function () {
+            $("#return").css({ position: "absolute", top: "10px", left: "1288px" });
+            $("#pagediv").css("background-image", "url(\"content/images/head-about.jpg\")");
 
-        $("#pagediv").css("background-image", "url(\"content/images/head-about.jpg\")");
+            $("#pagetitle").css("top", "85px");
+            $("#welcome").css("top", "195px");
 
-        $("#pagetitle").css("top", "85px");
-        $("#welcome").css("top", "195px");
-
-        return "about";
+            hideWait();
+            window.currentPage = "about";
+        });
     }
 };

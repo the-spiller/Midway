@@ -11,10 +11,19 @@
 @font-face {
     font-family: Teletype_1945_1985;
     src: url("/content/fonts/teletype1945-1985-webfont.eot");
-	src: url("/content/fonts/teletype1945-1985-webfont.eot?#iefix") format("embedded-opentype"),
-	     url("/content/fonts/teletype1945-1985-webfont.woff") format("woff"),
-	     url("/content/fonts/teletype1945-1985-webfont.ttf") format("truetype"),
-	     url("/content/fonts/teletype1945-1985-webfont.svg#Teletype_1945_1985") format("svg");
+    src: url("/content/fonts/teletype1945-1985-webfont.eot?#iefix") format("embedded-opentype"),
+         url("/content/fonts/teletype1945-1985-webfont.woff") format("woff"),
+         url("/content/fonts/teletype1945-1985-webfont.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: Kaneiwa;
+    src: url("/content/fonts/kna__-webfont.eot");
+    src: url("/content/fonts/kna__-webfont.eot?#iefix") format("embedded-opentype"),
+         url("/content/fonts/kna__-webfont.woff") format("woff"),
+         url("/content/fonts/kna__-webfont.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
 }
@@ -172,12 +181,12 @@ th {
 
 .ltextwrap {
     float: left;
-    margin: 0 1em 0 0;
+    margin: .5em 1em .5em 0;
 }
 
 .rtextwrap {
     float: right;
-    margin: 0 0 0 1em;
+    margin: .5em 0 .5em 1em;
 }
 
 .longbutton {
@@ -232,7 +241,6 @@ th {
         z-index: 3;
     }
 
-	
 .searchitem {
     position: relative;
     cursor: pointer;
@@ -356,7 +364,7 @@ th {
 	padding: 0 30px 20px 20px;
 	text-justify: auto;
 	text-align: justify;
-	font: 1.2em "Times New Roman", serif;
+	font: 1.1em Georgia, serif;
 	background-color: #ffe7c4;
 	color: #000;
 	overflow: auto;

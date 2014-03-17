@@ -1,6 +1,7 @@
 ﻿using System.Web.Http;
 using System.Web.Mvc;
 using Midway.App_Start;
+using Midway.Controllers;
 
 namespace Midway
 {
@@ -14,6 +15,7 @@ namespace Midway
             //AreaRegistration.RegisterAllAreas();
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            GlobalConfiguration.Configuration.MessageHandlers.Add(new AuthHandler());
         }
     }
 }

@@ -9,6 +9,7 @@ using Midway.Models.Data;
 
 namespace Midway.Controllers
 {
+    [Authorize]
     public class SearchController : ApiController
     {
         private readonly SearchRepository _repo;

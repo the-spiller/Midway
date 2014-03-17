@@ -18,8 +18,9 @@ namespace Midway.Models.Data
 
 		public IOrderedEnumerable<DtoSearch> GetSearches(int gameId, int playerId)
 		{
-			// Two parts: searches from prior turns that still have marker records, and
-			// searches for/from the current turn.
+			// Three parts: 1) searches from prior turns that still have marker records,
+			// 2) searches for/from the current turn (including as yet unused searches),
+            // and 3) opponent's searches this turn if game phase is Air Operations.
 			var pg = _context.PlayerGames
 				.Include(p => p.Side)
 				.SingleOrDefault(p => p.GameId == gameId && p.PlayerId == playerId);
@@ -136,14 +137,46 @@ namespace Midway.Models.Data
 						break;
 				}
 			}
-            return searches.OrderBy(s => s.SearchType);
+            if (pg.PhaseId == 3) // Air Ops
+            {
+                foreach (var oppsearch in _context.PlayerGameSearches
+                    .Include(p => p.SearchMarkers)
+                    .Where(p => p.GameId == gameId && p.PlayerId != playerId && p.Turn == pg.Turn)
+                    .ToList())
+                {
+                    var search = new DtoSearch
+                        {
+                            GameId = oppsearch.GameId,
+                            PlayerId = oppsearch.PlayerId,
+                            Turn = oppsearch.Turn,
+                            SearchNumber = oppsearch.SearchNumber,
+                            SearchType = oppsearch.SearchType,
+                            Area = oppsearch.Area,
+                            Markers = new List<DtoSearchMarker>()
+                        };
+                    if (search.Markers != null)
+                    {
+                        foreach (var marker in search.Markers)
+                        {
+                            search.Markers.Add(new DtoSearchMarker
+                            {
+                                Zone = marker.Zone,
+                                TypesFound = marker.TypesFound
+                            });
+                        }
+                    }
+                    searches.Add(search);
+                }
+            }
+            return searches.OrderBy(s => s.Turn).ThenBy(s => s.PlayerId).ThenBy(s => s.SearchType).ThenBy(s => s.Area);
+		    //return searches.OrderBy(s => new { s.Turn, s.PlayerId, s.SearchType, s.Area });
 		}
 
 		public DtoSearch AddSearch(DtoSearch dtoSearch)
 		{
-             var pg = _context.PlayerGames
-                 .Include(p => p.Searches)
-                .FirstOrDefault(p => p.GameId == dtoSearch.GameId && p.PlayerId == dtoSearch.PlayerId);
+             //var pg = _context.PlayerGames
+             //    .Include(p => p.Searches)
+             //   .FirstOrDefault(p => p.GameId == dtoSearch.GameId && p.PlayerId == dtoSearch.PlayerId);
 
             // Add the search to the DB
 			var search = new PlayerGameSearch

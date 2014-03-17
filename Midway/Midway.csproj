@@ -132,6 +132,7 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AuthHandler.cs" />
     <Compile Include="Controllers\PhaseController.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\AuthHelper.cs" />
     <Compile Include="Helpers\ControllerHelper.cs" />
     <Compile Include="Models\Action.cs" />
     <Compile Include="Models\Airbase.cs" />
@@ -195,10 +197,12 @@
     <Content Include="App_Data\del_games.sql" />
     <Content Include="Content\audio\teletype.mp3" />
     <Content Include="Content\elements.css" />
-    <Content Include="Content\fonts\teletype1945-1985-webfont.svg" />
     <Content Include="Content\images\bg-home.jpg" />
     <Content Include="Content\images\bg-logon.jpg" />
     <Content Include="Content\images\bg-register.jpg" />
+    <Content Include="Content\images\booblite!-green.png" />
+    <Content Include="Content\images\booblite-green.png" />
+    <Content Include="Content\images\booblite-red.png" />
     <Content Include="Content\images\camera.png" />
     <Content Include="Content\images\done.png" />
     <Content Include="Content\images\geacps.png" />
@@ -338,18 +342,16 @@
     <Content Include="Content\fonts\teletype1945-1985-webfont.woff" />
     <Content Include="Scripts\midway.js" />
     <Content Include="Scripts\scenes\about.js" />
-    <Content Include="Scripts\scenes\searchgrid.module.js" />
+    <Content Include="Scripts\scenes\searchgrid.js" />
     <Content Include="Scripts\scenes\home.js" />
     <Content Include="Scripts\scenes\logon.js" />
     <Content Include="Scripts\scenes\register.js" />
     <Content Include="Scripts\scenes\search.js" />
-    <Content Include="Scripts\scenes\searchgrid.js" />
     <Content Include="Scripts\utils.js" />
     <Content Include="Scripts\vendor\buzz.js" />
     <Content Include="Scripts\vendor\fuzzyset.js" />
     <Content Include="Scripts\vendor\jquery-1.9.1.js" />
     <Content Include="Scripts\vendor\jquery-ui-1.10.3.js" />
-    <Content Include="Scripts\vendor\kinetic-v5.0.1.min.js" />
     <Content Include="index.html" />
     <Content Include="Views\_about.html" />
     <Content Include="Views\_home.html" />
@@ -364,7 +366,11 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Content\fonts\kna__-webfont.eot" />
+    <Content Include="Content\fonts\kna__-webfont.ttf" />
+    <Content Include="Content\fonts\kna__-webfont.woff" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>

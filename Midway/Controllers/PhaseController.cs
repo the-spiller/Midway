@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Midway.Helpers;
-using Midway.Models;
 using Newtonsoft.Json;
 using Midway.Models.DTOs;
 using Midway.Models.Data;
 
 namespace Midway.Controllers
 {
+    [Authorize]
     public class PhaseController : ApiController
     {
         private readonly IUnitOfWork _uow;

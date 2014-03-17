@@ -1,10 +1,11 @@
 ﻿var registerPage = {
+    name: "registration",
     run: function () {
 
         // Event handlers......................................................
 
         $("#return").on("click", function () {
-            scenes["logon"]();
+            pages.logon();
         });
 
         $("#infolink").on("click", function () {
@@ -35,16 +36,13 @@
                     }
                 );
             } else {
-                window.player = new Object();
-                player.Email = $("#email").val();
-                player.Nickname = $("#nickname").val();
-
+                window.player = { Email: $("#email").val(), Nickname: $("#nickname").val() };
                 ajaxRegisterPlayer(function () {
                     showAlert("Registration Successful",
                         "You are now registered. Expect to receive a password in email that will allow you to " +
                             "log in the first time.<br /><br />We hope you enjoy our game!",
                         DLG_OK, "blue", function () {
-                            scenes["logon"]();
+                            pages.logon();
                         });
                 });
             }
@@ -62,9 +60,10 @@
             $.ajax({
                 url: "/api/player",
                 type: "POST",
-                data: player,
+                data: window.player,
                 success: function (data) {
-                    player = JSON.parse(data);
+                    window.player = JSON.parse(data);
+                    createUpdateAuthCookie();
                     if (successCallback) successCallback();
                 },
                 error: function (xhr, status, errorThrown) {
@@ -77,17 +76,20 @@
         }
         
         // Init................................................................
-
-        $("#pagediv").css("background-image", "url(\"content/images/bg-register.jpg\")");
-        $("#welcome").css("width", "1125");
-
-        $("#registerdiv").draggable({
-            handle: ".floathead",
-            containment: "#pagediv",
-            scroll: false
+        $(document).ready(function() {
+            $("#pagediv").css("background-image", "url(\"content/images/bg-register.jpg\")");
+            $("#welcome").css("width", "1125");
+            $("#return").css({ position: "absolute", top: "10px", left: "1288px" });
+            
+            $("#registerdiv").draggable({
+                handle: ".floathead",
+                containment: "#pagediv",
+                scroll: false
+            });
+            
+            hideWait();
+            $("#email").focus();
+            window.currentPage = "register";
         });
-
-        $("#email").focus();
-        return "register";
     }
 };
