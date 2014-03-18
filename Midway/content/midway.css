@@ -241,6 +241,12 @@ th {
         z-index: 3;
     }
 
+.listheader {
+	margin: 5px;
+	background-color: #516580;
+	padding: 4px;
+}
+
 .searchitem {
     position: relative;
     cursor: pointer;
@@ -250,6 +256,18 @@ th {
     .searchitem:hover {
         background-color: #253549;
     }
+
+.oppsearchitem {
+	background-position: -90px 0;
+	background-repeat: no-repeat;
+	min-height: 42px;
+}
+.oppsearchinfo {
+	position: relative;
+	top: 5px;
+	left: 125px;
+	width: 65%;
+}
 
 .searchmarker {
     position: absolute;

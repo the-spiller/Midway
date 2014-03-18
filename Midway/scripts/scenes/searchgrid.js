@@ -18,34 +18,34 @@
             }
             var row = ((Number(zone.substr(1, 1)) - 1) * areaSize) + mapmargin;
             switch (zone.substr(2, 1)) {
-                case "B":
-                    col += zonesize;
-                    break;
-                case "C":
-                    col += zonesize * 2;
-                    break;
-                case "D":
-                    row += zonesize;
-                    break;
-                case "E":
-                    row += zonesize;
-                    col += zonesize;
-                    break;
-                case "F":
-                    row += zonesize;
-                    col += zonesize * 2;
-                    break;
-                case "G":
-                    row += zonesize * 2;
-                    break;
-                case "H":
-                    row += zonesize * 2;
-                    col += zonesize;
-                    break;
-                case "I":
-                    row += zonesize * 2;
-                    col += zonesize * 2;
-                    break;
+            case "B":
+                col += zonesize;
+                break;
+            case "C":
+                col += zonesize * 2;
+                break;
+            case "D":
+                row += zonesize;
+                break;
+            case "E":
+                row += zonesize;
+                col += zonesize;
+                break;
+            case "F":
+                row += zonesize;
+                col += zonesize * 2;
+                break;
+            case "G":
+                row += zonesize * 2;
+                break;
+            case "H":
+                row += zonesize * 2;
+                col += zonesize;
+                break;
+            case "I":
+                row += zonesize * 2;
+                col += zonesize * 2;
+                break;
             }
             return { x: col, y: row };
         },
@@ -90,6 +90,20 @@
             var zonesX = coords.x - mapmargin < 0 ? 0 : Math.floor((coords.x - mapmargin) / zonesize),
                 zonesY = coords.y - mapmargin < 0 ? 0 : Math.floor((coords.y - mapmargin) / zonesize);
             return { x: (zonesX * zonesize) + mapmargin, y: (zonesY * zonesize) + mapmargin };
+        },
+        pDrawSelBox = function(left, top, sideLength) {
+            ctx.save();
+            ctx.globalAlpha = 0.6;
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#ffd651";
+            ctx.beginPath();
+            ctx.moveTo(left + 2, top + 2);
+            ctx.lineTo(left + sideLength, top + 2);
+            ctx.lineTo(left + sideLength, top + sideLength);
+            ctx.lineTo(left + 2, top + sideLength);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.restore();
         };
 
     return {
@@ -223,20 +237,9 @@
                 sideLength = (sizeInZones * 36) + 5;
 
             if (sizeInZones == 1)
-                // area-sized selections are restored w/ search cursor, so we only need single zone
                 restImg = ctx.getImageData(left, top, sideLength + 3, sideLength + 3);
-            ctx.save();
-            ctx.globalAlpha = 0.6;
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = "#ffd651";
-            ctx.beginPath();
-            ctx.moveTo(left + 2, top + 2);
-            ctx.lineTo(left + sideLength, top + 2);
-            ctx.lineTo(left + sideLength, top + sideLength);
-            ctx.lineTo(left + 2, top + sideLength);
-            ctx.closePath();
-            ctx.stroke();
-            ctx.restore();
+
+            pDrawSelBox(left, top, sideLength);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -291,6 +294,14 @@
             var ret = ctx.getImageData(0, 0, cnvs.width, cnvs.height);
             ctx.drawImage(imageData, left, top);
             return ret;
+        },
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        drawOppSearchArea: function(area) {
+            var coords = addVectors(pZoneToTopLeftCoords(area + "A"), { x: -3, y: -3 }),
+                sideLength = (zoneSize * 3) + 6;
+            restImg = ctx.getImageData(coords.x, coords.y, sideLength, sideLength);
+            pDrawSelBox(coords.x, coords.y, sideLength);
         }
     };
 })();

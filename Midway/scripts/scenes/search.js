@@ -100,15 +100,18 @@
         // Event handlers for dynamically-loaded elements
         $(document).on("click", ".tablistitem", function (e) {
             workTabs(e);
-        });
-        $(document).on("click", ".shipitem", function (e) {
-            doShipSelection(this, (e.shiftKey));
-            mouseDown = false;
-        }).on("mousedown", ".shipitem", function (e) {
-            controlItemMouseDown(e);
-        }).on("mousedown", ".searchitem", function(e) {
-            controlItemMouseDown(e);
-        });
+            }).on("click", ".shipitem", function (e) {
+                doShipSelection(this, (e.shiftKey));
+                mouseDown = false;
+            }).on("mousedown", ".shipitem", function (e) {
+                controlItemMouseDown(e);
+            }).on("mousedown", ".searchitem", function(e) {
+                controlItemMouseDown(e);
+            }).on("mouseover", ".oppsearchitem", function(e) {
+                showSearchedArea(e);
+            }).on("mouseout", ".oppsearchitem", function (e) {
+                hideSearchedArea(e);
+            });
 
         // Functions...........................................................
 
@@ -164,7 +167,7 @@
                 oldLeft = oldTopLeft.x - 3;
                 searchGrid.removeSelector(oldLeft, oldTop);
             }
-            searchGrid.drawSelector(topLeft, 1);
+            searchGrid.drawSelector(topLeft, 1, true);
             selectedZone = searchGrid.coordsToZone(coords);
             showShipsInZone();
         }
@@ -185,6 +188,19 @@
         /*-------------------------------------------------------------------*/
         function drawCursorImg(x, y) {
             dragThang.snapshot = searchGrid.drawSearchCursor(dragThang.snapshot, dragThang.cursorImg, x, y);
+        }
+        /*-------------------------------------------------------------------*/
+        /* Load array of zones that contain player's ships.                  */
+        /*-------------------------------------------------------------------*/
+        function loadShipZones() {
+            shipZones.length = 0;
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].ShipType != "BAS" && isNumber(ships[i].Location.substr(1, 1))) {
+                    if ($.inArray(ships[i].Location, shipZones) == -1) {
+                        shipZones.push(ships[i].Location);
+                    }
+                }
+            }
         }
         /*-------------------------------------------------------------------*/
         /* Display on the Zone tab any ships in the currently selected zone. */
@@ -226,18 +242,24 @@
             $("#zone").html(html + "</ul>");
         }
         /*-------------------------------------------------------------------*/
+        /* Display on the Arrived tab any of the player's ships that have    */
+        /* arrived this turn.                                                */
         /*-------------------------------------------------------------------*/
-        function loadShipZones() {
-            shipZones.length = 0;
+        function showArrivingShips() {
+            if (game.PhaseId > 1) return;
+
+            var html = "<ul>";
             for (var i = 0; i < ships.length; i++) {
-                if (ships[i].ShipType != "BAS" && isNumber(ships[i].Location.substr(1, 1))) {
-                    if ($.inArray(ships[i].Location, shipZones) == -1) {
-                        shipZones.push(ships[i].Location);
-                    }
+                if (ships[i].Location == "ARR") {
+                    html += getShipListItemHtml(ships[i]);
                 }
             }
+            $("#arrivals").html(html + "</ul>").addClass("tabshown");
+            $("#arrivalstab").addClass("tabshown");
         }
         /*-------------------------------------------------------------------*/
+        /* Display on the Due tab a list of the player's ships arriving in   */
+        /* the future.                                                       */
         /*-------------------------------------------------------------------*/
         function showShipsDue() {
             var arrivalTurn = 0,
@@ -249,7 +271,7 @@
                         arrivalTurn = ships[i].ArrivalTurn;
                         var dueDate = militaryDateTimeStr(gameTimeFromTurn(arrivalTurn), false);
                         var turns = arrivalTurn - game.Turn;
-                        html += "</ul><div style=\"margin: 5px; background-color: #516580; padding: 4px;\">Due " +
+                        html += "</ul><div class=\"listheader\">Due " +
                             dueDate + " (" + turns + " turns)</div><ul>";
                     }
                     html += getShipListItemHtml(ships[i]);
@@ -263,6 +285,8 @@
             $("#due").html(html);
         }
         /*-------------------------------------------------------------------*/
+        /* Display on the Off tab any of the player's ships that have left   */
+        /* the map or been sunk.                                             */
         /*-------------------------------------------------------------------*/
         function showOffMapShips() {
             var html = "<ul>",
@@ -316,7 +340,7 @@
             return html;
         }
         /*-------------------------------------------------------------------*/
-        /* Build up and return the HTML for enemy ship types found in a zone.*/
+        /* Display on the Zone tab enemy ship types found in a zone.         */
         /*-------------------------------------------------------------------*/
         function getSightedShipsHtml(searchMarker, searchTurn) {
             var otherside = side == "USN" ? "ijn" : "usn",
@@ -458,7 +482,7 @@
             }
         }
         /*-------------------------------------------------------------------*/
-        /* HERE!!
+        /* 
         /*-------------------------------------------------------------------*/
         function controlItemMouseDown(e) {
             var panelId = $("#tabpanels").find("div.tabshown").attr("id");
@@ -708,21 +732,6 @@
             }
         }
         /*-------------------------------------------------------------------*/
-        /* Display on the Arrived tab any ships that arrived this turn.      */
-        /*-------------------------------------------------------------------*/
-        function showArrivingShips() {
-            if (game.PhaseId > 1) return;
-
-            var html = "<ul>";
-            for (var i = 0; i < ships.length; i++) {
-                if (ships[i].Location == "ARR") {
-                    html += getShipListItemHtml(ships[i]);
-                }
-            }
-            $("#arrivals").html(html + "</ul>").addClass("tabshown");
-            $("#arrivalstab").addClass("tabshown");
-        }
-        /*-------------------------------------------------------------------*/
         /* Return true if all of this turn's arrivals have been brought on   */
         /* to the map.                                                       */
         /*-------------------------------------------------------------------*/
@@ -763,31 +772,30 @@
         function showAirOpsControls() {
             if (game.PhaseId != 3) return;
 
-            var opsHtml = "<div style=\"margin: 5px; background-color: #516580; padding: 4px;\">Opponent's searches</div><ul>",
+            var opsHtml = "<div class=\"listheader\">Opponent's searches</div><ul>",
                 path = "content/images/search/",
                 airPath = side == "USN" ? path + "ijn-air-search.png" : path + "usn-air-search.png",
                 seaPath = side == "USN" ? path + "ijn-sea-search.png" : path + "usn-sea-search.png";
             
             // opponent's searches
             if (oppSearches.length == 0) {
-                opsHtml += "Your opponent did not search.";
+                opsHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
             } else {
                 for (var i = 0; i < oppSearches.length; i++) {
                     var zones = "No ships sighted";
-                    if (oppSearches[i].Markers && oppSearches[i].Markers.length) {
+                    if (oppSearches[i].Markers.length) {
                         zones = "Ships sighted at ";
-                        for (var j = 0; j < oppSearches[i].Markers; j++) {
+                        for (var j = 0; j < oppSearches[i].Markers.length; j++) {
                             zones += oppSearches[i].Markers[j].Zone + ", ";
                         }
-                        zones = zones.substr(0, zones.length - 1);
+                        zones = zones.substr(0, zones.length - 2);
                     }
                     var searchImgSrc = airPath;
                     if (oppSearches[i].SearchType == "sea") searchImgSrc = seaPath;
-                    var style = "style=\"background-image: url(" + searchImgSrc + "); background-position: -90px 0; background-repeat: no-repeat; min-height: 42px;\"";
+                    var style = "class=\"oppsearchitem\" style=\"background-image: url(" + searchImgSrc + ");\"";
                     opsHtml += "<li id=\"" + oppSearches[i].Area + "\" class=\"searchitem\">" +
                         "<div " + style + ">" +
-                        "<div style=\"position: relative; top: 5px; left: 125px; width: 50%;\" >Area " +
-                        oppSearches[i].Area + "<br />" + zones + "</div></div></li>";
+                        "<div class=\"oppsearchinfo\">Area " + oppSearches[i].Area + "<br />" + zones + "</div></div></li>";
                 }
             }
             $("#airops").html(opsHtml + "</ul>");
@@ -808,23 +816,36 @@
         /*-------------------------------------------------------------------*/
         /* Copy one search object to another.                                */
         /*-------------------------------------------------------------------*/
-        function copySearch(fromSearch, toSearch) {
-            fromSearch.Markers = [];
-            
+        function copySearch(fromSearch) {
+            var toSearch = {
+                GameId: fromSearch.GameId,
+                PlayerId: fromSearch.PlayerId,
+                Turn: fromSearch.Turn,
+                SearchNumber: fromSearch.SearchNumber,
+                SearchType: fromSearch.SearchType,
+                Area: fromSearch.Area,
+                Markers: []
+            };
+            if (fromSearch.Markers.length) {
+                for (var i = 0; i < fromSearch.Markers.length; i++) {
+                    toSearch.Markers.push({ Zone: fromSearch.Markers[i].Zone, TypesFound: fromSearch.Markers[i].TypesFound });
+                }
+            }
+            return toSearch;
         }
         /*-------------------------------------------------------------------*/
         /* Remove opponent's searches from searches[] and move them to their */
         /* own oppSearches[].                                                */
         /*-------------------------------------------------------------------*/
         function splitOffOpponentSearches() {
-            if (game.PhaseId == 3) {
-                var oppIdx = 0;
-                oppSearches = [];
-                for (var i = 0; i < searches.length; i++) {
-                    if (searches[i].PlayerId != window.player.PlayerId) {
-                        copySearch(searches.splice(i, 1), oppSearches[oppIdx]);
-                        oppIdx++;
-                    }
+            if (game.PhaseId != 3) return;
+            
+            oppSearches = [];
+            var i = searches.length;
+            while (i--) {
+                if (searches[i].PlayerId != window.player.PlayerId) {
+                    oppSearches.push(copySearch(searches[i]));
+                    searches.splice(i, 1);
                 }
             }
         }

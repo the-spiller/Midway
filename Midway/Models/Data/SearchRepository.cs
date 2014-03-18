@@ -137,6 +137,7 @@ namespace Midway.Models.Data
 						break;
 				}
 			}
+			// Part III
             if (pg.PhaseId == 3) // Air Ops
             {
                 foreach (var oppsearch in _context.PlayerGameSearches
@@ -154,9 +155,9 @@ namespace Midway.Models.Data
                             Area = oppsearch.Area,
                             Markers = new List<DtoSearchMarker>()
                         };
-                    if (search.Markers != null)
+                    if (oppsearch.SearchMarkers != null)
                     {
-                        foreach (var marker in search.Markers)
+                        foreach (var marker in oppsearch.SearchMarkers)
                         {
                             search.Markers.Add(new DtoSearchMarker
                             {
