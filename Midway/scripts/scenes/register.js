@@ -63,7 +63,6 @@
                 data: window.player,
                 success: function (data) {
                     window.player = JSON.parse(data);
-                    createUpdateAuthCookie();
                     if (successCallback) successCallback();
                 },
                 error: function (xhr, status, errorThrown) {

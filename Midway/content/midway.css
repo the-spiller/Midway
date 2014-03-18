@@ -244,7 +244,7 @@ th {
 .searchitem {
     position: relative;
     cursor: pointer;
-	padding: 4px;
+	padding: 5px;
     margin-bottom: 4px;
 }
     .searchitem:hover {

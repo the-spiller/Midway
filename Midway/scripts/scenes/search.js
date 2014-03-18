@@ -756,7 +756,41 @@
                         side.toLowerCase() + "-" + searches[i].SearchType + "-search.png\" draggable=\"false\" /></div></li>";
                 }
             }
-            $("#search").html(html + "<ul>");
+            $("#search").html(html + "</ul>");
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function showAirOpsControls() {
+            if (game.PhaseId != 3) return;
+
+            var opsHtml = "<div style=\"margin: 5px; background-color: #516580; padding: 4px;\">Opponent's searches</div><ul>",
+                path = "content/images/search/",
+                airPath = side == "USN" ? path + "ijn-air-search.png" : path + "usn-air-search.png",
+                seaPath = side == "USN" ? path + "ijn-sea-search.png" : path + "usn-sea-search.png";
+            
+            // opponent's searches
+            if (oppSearches.length == 0) {
+                opsHtml += "Your opponent did not search.";
+            } else {
+                for (var i = 0; i < oppSearches.length; i++) {
+                    var zones = "No ships sighted";
+                    if (oppSearches[i].Markers && oppSearches[i].Markers.length) {
+                        zones = "Ships sighted at ";
+                        for (var j = 0; j < oppSearches[i].Markers; j++) {
+                            zones += oppSearches[i].Markers[j].Zone + ", ";
+                        }
+                        zones = zones.substr(0, zones.length - 1);
+                    }
+                    var searchImgSrc = airPath;
+                    if (oppSearches[i].SearchType == "sea") searchImgSrc = seaPath;
+                    var style = "style=\"background-image: url(" + searchImgSrc + "); background-position: -90px 0; background-repeat: no-repeat; min-height: 42px;\"";
+                    opsHtml += "<li id=\"" + oppSearches[i].Area + "\" class=\"searchitem\">" +
+                        "<div " + style + ">" +
+                        "<div style=\"position: relative; top: 5px; left: 125px; width: 50%;\" >Area " +
+                        oppSearches[i].Area + "<br />" + zones + "</div></div></li>";
+                }
+            }
+            $("#airops").html(opsHtml + "</ul>");
         }
         /*-------------------------------------------------------------------*/
         /* Find and return the minimum available movement points among ships */
@@ -772,15 +806,24 @@
             return min == 999 ? 0 : min;
         }
         /*-------------------------------------------------------------------*/
+        /* Copy one search object to another.                                */
+        /*-------------------------------------------------------------------*/
+        function copySearch(fromSearch, toSearch) {
+            fromSearch.Markers = [];
+            
+        }
+        /*-------------------------------------------------------------------*/
         /* Remove opponent's searches from searches[] and move them to their */
         /* own oppSearches[].                                                */
         /*-------------------------------------------------------------------*/
         function splitOffOpponentSearches() {
             if (game.PhaseId == 3) {
+                var oppIdx = 0;
                 oppSearches = [];
                 for (var i = 0; i < searches.length; i++) {
                     if (searches[i].PlayerId != window.player.PlayerId) {
-                        oppSearches.push(searches.splice(i, 1));
+                        copySearch(searches.splice(i, 1), oppSearches[oppIdx]);
+                        oppIdx++;
                     }
                 }
             }
@@ -845,7 +888,6 @@
         /* Make ajax call to post new search to the server and find out if   */
         /* it was successful.                                                */
         /*-------------------------------------------------------------------*/
-
         function ajaxPostSearch(search, successCallback) {
         $.ajax({
                 url: "api/search",
@@ -941,7 +983,7 @@
             var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
                 " vs. " + (game.OpponentNickname || "?") +
                 " - <span id=\"phase\" title=\"" + phase.Description + "\">" + phase.Name + " Phase</span>" + wait + "</span>";
-            $("#gamedesc").addClass(captionColor).html("SEARCH BOARD <img src=\"" + flagImg + "\" />" + gameStatus);
+            $("#gamedesc").addClass(captionColor).html("SEARCH MAP <img src=\"" + flagImg + "\" />" + gameStatus);
 
             $("#pagediv").css({ "background-image": "url(\"" + bgImg + "\")", "background-repeat": "repeat" });
 
@@ -963,6 +1005,7 @@
                     // each of these knows to bail if it's not their phase
                     showArrivingShips();
                     showSearchControls();
+                    showAirOpsControls();
                     
                     showShipsDue();
                     showOffMapShips();
