@@ -299,8 +299,8 @@
         /*-------------------------------------------------------------------*/
         drawOppSearchArea: function(area) {
             var coords = addVectors(pZoneToTopLeftCoords(area + "A"), { x: -3, y: -3 }),
-                sideLength = (zoneSize * 3) + 6;
-            restImg = ctx.getImageData(coords.x, coords.y, sideLength, sideLength);
+                sideLength = (zonesize * 3) + 6;
+            restImg = ctx.getImageData(coords.x, coords.y, sideLength + 3, sideLength + 3);
             pDrawSelBox(coords.x, coords.y, sideLength);
         }
     };

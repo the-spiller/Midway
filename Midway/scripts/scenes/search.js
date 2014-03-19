@@ -108,9 +108,9 @@
             }).on("mousedown", ".searchitem", function(e) {
                 controlItemMouseDown(e);
             }).on("mouseover", ".oppsearchitem", function(e) {
-                showSearchedArea(e);
+                showOppSearchedArea(e);
             }).on("mouseout", ".oppsearchitem", function (e) {
-                hideSearchedArea(e);
+                hideOppSearchedArea(e);
             });
 
         // Functions...........................................................
@@ -258,6 +258,65 @@
             $("#arrivalstab").addClass("tabshown");
         }
         /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function showSearchControls() {
+            if (game.PhaseId != 2) return;
+
+            var html = "<div style=\"margin: 5px 0 15px 5px;\">Available searches</div><ul>",
+                searchDesc;
+
+            for (var i = 0; i < searches.length; i++) {
+                if (searches[i].Turn == game.Turn && !searches[i].Area) {
+                    if (searches[i].SearchType == "sea") {
+                        searchDesc = "Search any area containing one of your ships";
+                    } else if (game.SearchRange == 0) {   //Unlimited
+                        searchDesc = "Search any area";
+                    } else {
+                        searchDesc = "Search any area within " + game.SearchRange + " zones of any of your ships";
+                    }
+                    html += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
+                        " title=\"" + searchDesc + "\">" +
+                        "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"" + imgDir +
+                        side.toLowerCase() + "-" + searches[i].SearchType + "-search.png\" draggable=\"false\" /></div></li>";
+                }
+            }
+            $("#search").html(html + "</ul>");
+        }
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        function showAirOpsControls() {
+            if (game.PhaseId != 3) return;
+
+            var opsHtml = "<div class=\"listheader\">Opponent's searches</div>",
+                path = "content/images/search/",
+                airPath = side == "USN" ? path + "ijn-air-search.png" : path + "usn-air-search.png",
+                seaPath = side == "USN" ? path + "ijn-sea-search.png" : path + "usn-sea-search.png";
+
+            // opponent's searches
+            if (oppSearches.length == 0) {
+                opsHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
+            } else {
+                opsHtml = "<table style=\"border-collapse: collapse;\">";
+                for (var i = 0; i < oppSearches.length; i++) {
+                    var searchImgSrc = airPath;
+                    if (oppSearches[i].SearchType == "sea") searchImgSrc = seaPath;
+                    
+                    var zones = "No ships sighted";
+                    if (oppSearches[i].Markers.length) {
+                        zones = "<span style=\"color: #ffd651;\">Ships sighted at ";
+                        for (var j = 0; j < oppSearches[i].Markers.length; j++) {
+                            zones += oppSearches[i].Markers[j].Zone + ", ";
+                        }
+                        zones = zones.substr(0, zones.length - 2) + "</span>";
+                    }
+                    opsHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 33%;\">" +
+                        "<img src=\"" + searchImgSrc + "\" /></td><td style=\"width: 66%;\">Area " + oppSearches[i].Area +
+                        "<br />" + zones + "</td></tr>";
+                }
+            }
+            $("#airops").html(opsHtml);
+        }
+        /*-------------------------------------------------------------------*/
         /* Display on the Due tab a list of the player's ships arriving in   */
         /* the future.                                                       */
         /*-------------------------------------------------------------------*/
@@ -305,6 +364,24 @@
 
             $("#off").html(html);
         }
+        /*-------------------------------------------------------------------*/
+        /* Highlight the area of an opponent's search item.                  */
+        /*-------------------------------------------------------------------*/
+        function showOppSearchedArea(e) {
+            console.log("show " + e.target.id);
+            if (e.target.id) searchGrid.drawOppSearchArea(e.target.id);
+        }
+        /*-------------------------------------------------------------------*/
+        /* Remove the highlight of an opponent's search item's area.         */
+        /*-------------------------------------------------------------------*/
+        function hideOppSearchedArea(e) {
+            console.log("hide " + e.target.id);
+            if (e.target.id) {
+                var coords = searchGrid.zoneToTopLeftCoords(e.target.id + "A");
+                searchGrid.removeSelector(coords.x - 3, coords.y - 3);
+            }
+        }
+        
         /*-------------------------------------------------------------------*/
         /* Build up and return the HTML for a single ship list item.         */
         /*-------------------------------------------------------------------*/
@@ -741,64 +818,6 @@
                     return false;
             }
             return true;
-        }
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        function showSearchControls() {
-            if (game.PhaseId != 2) return;
-            
-            var html = "<div style=\"margin: 5px 0 15px 5px;\">Available searches</div><ul>",
-                searchDesc;
-
-            for (var i = 0; i < searches.length; i++) {
-                if (searches[i].Turn == game.Turn && !searches[i].Area) {
-                    if (searches[i].SearchType == "sea") {
-                        searchDesc = "Search any area containing one of your ships";
-                    } else if (game.SearchRange == 0) {   //Unlimited
-                        searchDesc = "Search any area";
-                    } else {
-                        searchDesc = "Search any area within " + game.SearchRange + " zones of any of your ships";
-                    }
-                    html += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
-                        " title=\"" + searchDesc + "\">" +
-                        "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"" + imgDir +
-                        side.toLowerCase() + "-" + searches[i].SearchType + "-search.png\" draggable=\"false\" /></div></li>";
-                }
-            }
-            $("#search").html(html + "</ul>");
-        }
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        function showAirOpsControls() {
-            if (game.PhaseId != 3) return;
-
-            var opsHtml = "<div class=\"listheader\">Opponent's searches</div><ul>",
-                path = "content/images/search/",
-                airPath = side == "USN" ? path + "ijn-air-search.png" : path + "usn-air-search.png",
-                seaPath = side == "USN" ? path + "ijn-sea-search.png" : path + "usn-sea-search.png";
-            
-            // opponent's searches
-            if (oppSearches.length == 0) {
-                opsHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
-            } else {
-                for (var i = 0; i < oppSearches.length; i++) {
-                    var zones = "No ships sighted";
-                    if (oppSearches[i].Markers.length) {
-                        zones = "Ships sighted at ";
-                        for (var j = 0; j < oppSearches[i].Markers.length; j++) {
-                            zones += oppSearches[i].Markers[j].Zone + ", ";
-                        }
-                        zones = zones.substr(0, zones.length - 2);
-                    }
-                    var searchImgSrc = airPath;
-                    if (oppSearches[i].SearchType == "sea") searchImgSrc = seaPath;
-                    var style = "class=\"oppsearchitem\" style=\"background-image: url(" + searchImgSrc + ");\"";
-                    opsHtml += "<li id=\"" + oppSearches[i].Area + "\" class=\"searchitem\">" +
-                        "<div " + style + ">" +
-                        "<div class=\"oppsearchinfo\">Area " + oppSearches[i].Area + "<br />" + zones + "</div></div></li>";
-                }
-            }
-            $("#airops").html(opsHtml + "</ul>");
         }
         /*-------------------------------------------------------------------*/
         /* Find and return the minimum available movement points among ships */

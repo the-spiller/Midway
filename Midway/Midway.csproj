@@ -214,7 +214,6 @@
     <Content Include="Content\images\return.png" />
     <Content Include="Content\images\search\addicon.png" />
     <Content Include="Content\images\search\atolls.png" />
-    <Content Include="Content\images\search\bg-dispatch.png" />
     <Content Include="Content\images\search\bg-search.jpg" />
     <Content Include="Content\images\search\delicon.png" />
     <Content Include="Content\images\search\editicon.png" />

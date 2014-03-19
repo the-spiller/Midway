@@ -258,17 +258,16 @@ th {
     }
 
 .oppsearchitem {
-	background-position: -90px 0;
-	background-repeat: no-repeat;
+    cursor: pointer;
 	min-height: 42px;
 }
-.oppsearchinfo {
-	position: relative;
-	top: 5px;
-	left: 125px;
-	width: 65%;
-}
-
+    .oppsearchitem img {
+        position: relative;
+        margin: 0 -90px;
+    }
+    .oppsearchitem:hover {
+        background-color: #253549;
+    }
 .searchmarker {
     position: absolute;
     z-index: 5;
