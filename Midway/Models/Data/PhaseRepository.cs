@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Web.Http;
 using Midway.Models.DTOs;
 
 namespace Midway.Models.Data
 {
+	[Authorize]
     public class PhaseRepository
     {
         private readonly MidwayContext _context;

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
+using System.Web.Http;
 using Midway.Models.DTOs;
 
 namespace Midway.Models.Data
 {
+	[Authorize]
     public class ShipRepository
     {
         private readonly MidwayContext _context;

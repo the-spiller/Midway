@@ -261,6 +261,9 @@ th {
     cursor: pointer;
 	min-height: 42px;
 }
+	.oppsearchitem td {
+		overflow: hidden;
+	}
     .oppsearchitem img {
         position: relative;
         margin: 0 -90px;

@@ -222,7 +222,6 @@
     <Content Include="Content\images\search\ijn-airready.png" />
     <Content Include="Content\images\search\ijn-airreadying.png" />
     <Content Include="Content\images\search\ijn-airsearchcursor.png" />
-    <Content Include="Content\images\search\ijn-sea-search.png" />
     <Content Include="Content\images\search\ijn-seasearchcursor.png" />
     <Content Include="Content\images\search\ijnbb.png" />
     <Content Include="Content\images\search\ijnca.png" />
@@ -231,6 +230,7 @@
     <Content Include="Content\images\search\ijncvl.png" />
     <Content Include="Content\images\search\ijnfleet.png" />
     <Content Include="Content\images\search\ijnsighting.png" />
+    <Content Include="Content\images\search\sea-search.png" />
     <Content Include="Content\images\search\searchboard.png" />
     <Content Include="Content\images\search\Ships\akagi.png" />
     <Content Include="Content\images\search\Ships\astoria.png" />
@@ -303,7 +303,6 @@
     <Content Include="Content\images\search\usn-airready.png" />
     <Content Include="Content\images\search\usn-airreadying.png" />
     <Content Include="Content\images\search\usn-airsearchcursor.png" />
-    <Content Include="Content\images\search\usn-sea-search.png" />
     <Content Include="Content\images\search\usn-seasearchcursor.png" />
     <Content Include="Content\images\search\usnca.png" />
     <Content Include="Content\images\search\usncl.png" />
@@ -339,6 +338,7 @@
     <Content Include="Content\fonts\teletype1945-1985-webfont.eot" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.ttf" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.woff" />
+    <Content Include="logon.html" />
     <Content Include="Scripts\midway.js" />
     <Content Include="Scripts\scenes\about.js" />
     <Content Include="Scripts\scenes\searchgrid.js" />
@@ -351,7 +351,6 @@
     <Content Include="Scripts\vendor\fuzzyset.js" />
     <Content Include="Scripts\vendor\jquery-1.9.1.js" />
     <Content Include="Scripts\vendor\jquery-ui-1.10.3.js" />
-    <Content Include="index.html" />
     <Content Include="Views\_about.html" />
     <Content Include="Views\_home.html" />
     <Content Include="Views\_logon.html" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Web.Http;
 using System.Web.Security;
 using Midway.Helpers;
 using Midway.Models.Services;
@@ -26,6 +27,7 @@ namespace Midway.Models.Data
             _context = context as MidwayContext;
         }
 
+		[Authorize]
         public IList<DtoPlayer> GetPlayers()
         {
 	        return _context.Players.Select(p => new DtoPlayer
@@ -102,6 +104,7 @@ namespace Midway.Models.Data
 			return dtoPlayer;
 		}
 
+		[Authorize]
         public DtoPlayer UpdatePlayer(DtoPlayer dtoPlayer)
         {
 	        var sendPwd = false;

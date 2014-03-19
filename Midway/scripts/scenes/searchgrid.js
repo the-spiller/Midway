@@ -4,7 +4,7 @@
         mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
         cnvs = document.getElementById("searchcanvas"),
         ctx = cnvs.getContext("2d"),
-        restImg = undefined,
+        restImg = null,
         //functions called internally
         pZoneToTopLeftCoords = function(zone) {
             var col = 0,
@@ -299,8 +299,7 @@
         /*-------------------------------------------------------------------*/
         drawOppSearchArea: function(area) {
             var coords = addVectors(pZoneToTopLeftCoords(area + "A"), { x: -3, y: -3 }),
-                sideLength = (zonesize * 3) + 6;
-            restImg = ctx.getImageData(coords.x, coords.y, sideLength + 3, sideLength + 3);
+                sideLength = (zonesize * 3) + 5;
             pDrawSelBox(coords.x, coords.y, sideLength);
         }
     };
