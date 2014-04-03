@@ -44,6 +44,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -132,7 +133,8 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\AuthHandler.cs" />
+    <Compile Include="Models\Services\AuthCacheEntry.cs" />
+    <Compile Include="Models\Services\AuthHandler.cs" />
     <Compile Include="Controllers\PhaseController.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -140,7 +142,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\AuthHelper.cs" />
     <Compile Include="Helpers\ControllerHelper.cs" />
     <Compile Include="Models\Action.cs" />
     <Compile Include="Models\Airbase.cs" />
@@ -184,8 +185,6 @@
     <Compile Include="Models\PlayerGameSearch.cs" />
     <Compile Include="Models\PlayerGameSearchMarker.cs" />
     <Compile Include="Models\PlayerGameShip.cs" />
-    <Compile Include="Models\Services\BasicAuthenticationFilter.cs" />
-    <Compile Include="Models\Services\BasicAuthenticationIdentity.cs" />
     <Compile Include="Models\Services\Caesar.cs" />
     <Compile Include="Models\Services\Mailer.cs" />
     <Compile Include="Models\Ship.cs" />
@@ -193,6 +192,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Views\about.html" />
     <Content Include="App_Data\cm.sdf" />
     <Content Include="App_Data\del_games.sql" />
     <Content Include="Content\audio\teletype.mp3" />
@@ -338,24 +338,22 @@
     <Content Include="Content\fonts\teletype1945-1985-webfont.eot" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.ttf" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.woff" />
-    <Content Include="logon.html" />
+    <Content Include="Views\home.html" />
+    <Content Include="index.html" />
+    <Content Include="Views\register.html" />
     <Content Include="Scripts\midway.js" />
-    <Content Include="Scripts\scenes\about.js" />
-    <Content Include="Scripts\scenes\searchgrid.js" />
-    <Content Include="Scripts\scenes\home.js" />
-    <Content Include="Scripts\scenes\logon.js" />
-    <Content Include="Scripts\scenes\register.js" />
-    <Content Include="Scripts\scenes\search.js" />
+    <Content Include="Scripts\pages\about.js" />
+    <Content Include="Scripts\pages\searchgrid.js" />
+    <Content Include="Scripts\pages\home.js" />
+    <Content Include="Scripts\pages\logon.js" />
+    <Content Include="Scripts\pages\register.js" />
+    <Content Include="Scripts\pages\search.js" />
     <Content Include="Scripts\utils.js" />
     <Content Include="Scripts\vendor\buzz.js" />
     <Content Include="Scripts\vendor\fuzzyset.js" />
     <Content Include="Scripts\vendor\jquery-1.9.1.js" />
     <Content Include="Scripts\vendor\jquery-ui-1.10.3.js" />
-    <Content Include="Views\_about.html" />
-    <Content Include="Views\_home.html" />
-    <Content Include="Views\_logon.html" />
-    <Content Include="Views\_register.html" />
-    <Content Include="Views\_search.html" />
+    <Content Include="Views\search.html" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

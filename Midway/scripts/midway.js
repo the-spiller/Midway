@@ -9,54 +9,19 @@ var player = undefined,
     showingInfo = false,
     IMG_WIDTH = 1387,
     IMG_HEIGHT = 857,
-    COOKIE_NAMES = [ "mdylogin", "mdyplayer" ];
+    COOKIE_NAME = "mdyplayer";
 
-// Pages......................................................................
+var urlParams;
+(window.onpopstate = function () {
+    var match,
+        pl = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query = window.location.search.substring(1);
 
-var pages = (function() {
-    var pLogon = function () {
-        $("#content").load("/views/_logon.html", function () {
-            logonPage.run();
-        });
-    },
-        pHome = function() {
-        $("#content").load("/views/_home.html", function() {
-            homePage.run();
-        });
-    },
-        pRegister = function () {
-        $("#content").load("/views/_register.html", function () {
-            registerPage.run();
-        });
-    },
-        pAbout = function () {
-        $("#content").load("/views/_about.html", function () {
-            aboutPage.run();
-        });
-    },
-        pSearch = function () {
-        $("#content").load("/views/_search.html", function () {
-            searchPage.run();
-        });
-    };
-
-    return {
-        logon: function() {
-            return pLogon();
-        },
-        home: function() {
-            return pHome();
-        },
-        register: function() {
-            return pRegister();
-        },
-        about: function() {
-            return pAbout();
-        },
-        search: function() {
-            return pSearch();
-        }
-    };
+    urlParams = {};
+    while (match = search.exec(query))
+        urlParams[decode(match[1])] = decode(match[2]);
 })();
 
 // Functions...................................................................
@@ -133,10 +98,11 @@ function showWait(title, message, color) {
     
     $("#dlghead").removeClass().addClass(color + "dlghead").html(title);
     $("#dlgbody").html(message);
+    $("#dlgbuttons").css("display", "none");
     $("#dlgcontent").removeClass().addClass(color + "dlg").css({
-        "top": topLeft.y + "px",
-        "left": topLeft.x + "px",
-        "width": DLG_WIDTH
+        top: topLeft.y + "px",
+        left: topLeft.x + "px",
+        width: DLG_WIDTH
         }).draggable({
             handle: "#dlghead",
             containment: "#pagediv",
@@ -160,8 +126,18 @@ function showAjaxError(xhr, status, errorThrown) {
         showAlert(xhr.status + " " + errorThrown, errText, DLG_OK, "red");
     }
 }
+function loadPlayerForPage(callback) {
+    var cookie = readCookie(COOKIE_NAME);
+    if (cookie) {
+        console.log("cookie: '" + cookie + "'");
+        var playerId = cookie.substr(0, cookie.indexOf(":"));
+        ajaxGetPlayer(playerId, function() {
+            if (callback) callback();
+        });
+    }
+}
 function createUpdateAuthCookie() {
-    createCookie(COOKIE_NAMES[1], player.Email + ":" + player.AuthKey, 1);
+    createCookie(COOKIE_NAME, window.player.PlayerId + ":" + player.AuthKey, 1);
 }
 function ajaxGetPlayer(playerId, successCallback) {
     $.ajax({
@@ -179,7 +155,7 @@ function ajaxGetPlayer(playerId, successCallback) {
 }
 function ajaxUpdatePlayer(shallowPlayer, successCallback) {
     $.ajax({
-        url: "api/player",
+        url: "/api/player",
         type: "PUT",
         accepts: "application/json",
         data: shallowPlayer,
@@ -198,7 +174,7 @@ function ajaxGetPlayers(successCallback) {
     var playersList;
 
     $.ajax({
-        url: "api/player",
+        url: "/api/player",
         type: "GET",
         accepts: "application/json",
         success: function(data) {
@@ -259,7 +235,18 @@ function gameTimeFromTurn(turn) {
     return new Date(year, month, day, hour);
 } 
 
-// Global event handlers..............................................................
+function findGameById(id, games) {
+    var game = {};
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].GameId == id) {
+            game = games[i];
+            break;
+        }
+    }
+    return game;
+}
+
+// Global event handler........................................................
 
 $("#dlgoverlay").on("keyup", function (e) {
     if (e.keyCode == 13) {
@@ -272,30 +259,5 @@ $("#dlgoverlay").on("keyup", function (e) {
             $("#dlgbtncancel").trigger("click");
         else if ($("#dlgbtnno").length)
             $("#dlgbtnno").trigger("click");
-    }
-});
-
-// Init........................................................................
-
-$(document).ready(function () {
-
-    // Tooltips................................................................
-
-    $(document).tooltip({ tooltipClass: "mi-tooltip" });
-
-    // Let's go................................................................
-    
-    //sounds["teletype"] = new buzz.sound("/midway/content/audio/teletype", { formats: ["ogg", "mp3"] });
-    showingInfo = false;
-    
-    var playerId = readCookie(COOKIE_NAMES[0]);
-    if (playerId) {
-        createCookie(COOKIE_NAMES[0], playerId.toString(), 2);   //re-up the cookie
-        player = ajaxGetPlayer(playerId, function() {
-            pages.home();
-            return;
-        });
-    } else {
-        pages.logon();
     }
 });

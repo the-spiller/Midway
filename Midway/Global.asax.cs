@@ -1,7 +1,7 @@
 ﻿using System.Web.Http;
 using System.Web.Mvc;
 using Midway.App_Start;
-using Midway.Controllers;
+using Midway.Models.Services;
 
 namespace Midway
 {

@@ -42,11 +42,12 @@ namespace Midway.Controllers
         }
 
         // GET api/player/5....................................................
+        [Authorize]
         public HttpResponseMessage GetPlayer(int id)
         {
             try
             {
-                var player = _repo.GetPlayer(id, true);
+                var player = _repo.GetPlayer(id);
                 
                 if (player == null)
                 {
@@ -65,7 +66,7 @@ namespace Midway.Controllers
         {
             try
             {
-                var player = _repo.GetPlayer(emailAddress, true);
+                var player = _repo.GetPlayer(emailAddress);
                 if (player == null)
                 {
                     return new HttpResponseMessage(HttpStatusCode.NotFound)

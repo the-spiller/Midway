@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
-using System.Web.Http;
 using System.Web.Security;
-using Midway.Helpers;
+using System.Runtime.Caching;
 using Midway.Models.Services;
 using Midway.Models.DTOs;
 
@@ -27,7 +27,6 @@ namespace Midway.Models.Data
             _context = context as MidwayContext;
         }
 
-		[Authorize]
         public IList<DtoPlayer> GetPlayers()
         {
 	        return _context.Players.Select(p => new DtoPlayer
@@ -41,48 +40,47 @@ namespace Midway.Models.Data
 		        }).ToList();
         }
 
-	    public DtoPlayer GetPlayer(string email, bool includeGames = false)
+        // No authorization req'd: called from login page.
+	    public DtoPlayer GetPlayer(string email)
 	    {
-		    var dtoPlayer = _context.Players.Select(p => new DtoPlayer
-			    {
-					PlayerId = p.PlayerId,
-					Email = p.Email,
-					Password = p.Password,
-					Nickname  = p.Nickname,
-					Admin = p.Admin,
-					Lockout = p.Lockout
-				}).FirstOrDefault(p => p.Email.ToLower() == email.ToLower());
+            var dtoPlayer = _context.Players.Select(p => new DtoPlayer
+	                {
+	                    PlayerId = p.PlayerId,
+	                    Email = p.Email,
+	                    Password = p.Password,
+	                    Nickname = p.Nickname,
+	                    Admin = p.Admin,
+	                    Lockout = p.Lockout
+	                }).FirstOrDefault(p => p.Email.ToLower() == email.ToLower());
 
-			if (dtoPlayer == null) return null;
+	        return ReturnDtoPlayer(dtoPlayer);
+	    }
 
-	        dtoPlayer.AuthKey = AuthHelper.RegisterPlayer(dtoPlayer.Email, dtoPlayer.Admin);
-
-			if (includeGames)
-				dtoPlayer.Games = GetPlayerGames(dtoPlayer.PlayerId);
-
-            return dtoPlayer;
-        }
-
-        public DtoPlayer GetPlayer(int id, bool includeGames = false)
+        public DtoPlayer GetPlayer(int id)
         {
-			var dtoPlayer = _context.Players.Select(p => new DtoPlayer
-			{
-				PlayerId = p.PlayerId,
-				Email = p.Email,
-				Password = p.Password,
-				Nickname = p.Nickname,
-				Admin = p.Admin,
-				Lockout = p.Lockout
-			}).FirstOrDefault(p => p.PlayerId == id);
+            var cache = MemoryCache.Default;
+            bool loadGames;
 
-			if (dtoPlayer == null) return null;
+            var dtoPlayer = (DtoPlayer)cache.Get(id.ToString(CultureInfo.InvariantCulture));
+            if (dtoPlayer != null)
+            {
+                loadGames = (dtoPlayer.Games == null || !dtoPlayer.Games.Any());
+            }
+            else
+            {
+                loadGames = true;
 
-            dtoPlayer.AuthKey = AuthHelper.RegisterPlayer(dtoPlayer.Email, dtoPlayer.Admin);
-
-	        if (includeGames)
-		        dtoPlayer.Games = GetPlayerGames(dtoPlayer.PlayerId);
-
-			return dtoPlayer;
+                dtoPlayer = _context.Players.Select(p => new DtoPlayer
+                    {
+                        PlayerId = p.PlayerId,
+                        Email = p.Email,
+                        Password = p.Password,
+                        Nickname = p.Nickname,
+                        Admin = p.Admin,
+                        Lockout = p.Lockout
+                    }).FirstOrDefault(p => p.PlayerId == id);
+            }
+            return ReturnDtoPlayer(dtoPlayer, loadGames);
         }
 
 		internal DtoPlayer GetPlayerWithCurrentGame(int playerId, int gameId)
@@ -99,12 +97,11 @@ namespace Midway.Models.Data
 
 			if (dtoPlayer == null) return null;
 
-		    dtoPlayer.AuthKey = AuthHelper.GetPlayerKey(dtoPlayer.Email);
+		    dtoPlayer.AuthKey = GetPlayerKey(dtoPlayer.PlayerId);
 			dtoPlayer.Games = GetPlayerGames(playerId, gameId);	//only one, actually
 			return dtoPlayer;
 		}
 
-		[Authorize]
         public DtoPlayer UpdatePlayer(DtoPlayer dtoPlayer)
         {
 	        var sendPwd = false;
@@ -255,9 +252,11 @@ namespace Midway.Models.Data
 			if (sendPwd)
 				new Mailer().SendNewPwdMessage(dtoPlayer.Email, dtoPlayer.Password);
 
-			return GetPlayer(dtoPlayer.PlayerId, true);
+		    CachePlayer(dtoPlayer);
+			return GetPlayer(dtoPlayer.PlayerId);
         }
 
+        // No authorization req'd: called to register new player.
         public DtoPlayer AddPlayer(DtoPlayer dtoPlayer)
         {
 	        var newPass = Membership.GeneratePassword(new Random().Next(8, 11), 1);
@@ -292,6 +291,20 @@ namespace Midway.Models.Data
 
 			return InsertStatus.Ok;
 		}
+
+        private DtoPlayer ReturnDtoPlayer(DtoPlayer dtoPlayer, bool loadGames = true)
+        {
+            if (dtoPlayer == null) return null;
+
+            dtoPlayer.AuthKey = RegisterPlayer(dtoPlayer.PlayerId, dtoPlayer.Admin);
+
+            if (loadGames)
+            {
+                dtoPlayer.Games = GetPlayerGames(dtoPlayer.PlayerId);
+                CachePlayer(dtoPlayer);
+            }
+            return dtoPlayer;
+        }
 
 		private IEnumerable<DtoPlayerGame> GetPlayerGames(int playerId, int gameId = 0)
 		{
@@ -378,5 +391,38 @@ namespace Midway.Models.Data
 			}
 			return dtoPlayerGames;
 		}
+
+        private string RegisterPlayer(int id, string admin)
+        {
+            var token = Guid.NewGuid().ToString();
+            var authEntry = new AuthCacheEntry
+            {
+                Id = id,
+                Token = token,
+                Role = (admin == "Y") ? "Admin" : "Player"
+            };
+            var expires = new DateTimeOffset(DateTime.Now.AddHours(authEntry.ExpirationHours));
+
+            var cache = MemoryCache.Default;
+            cache.Add(token, authEntry, expires);
+
+            return token;
+        }
+
+        private string GetPlayerKey(int id)
+        {
+            var cache = MemoryCache.Default;
+            var entry = (DtoPlayer)cache.Get(id.ToString(CultureInfo.InvariantCulture));
+            if (entry == null) return string.Empty;
+            return entry.AuthKey;
+        }
+
+        private void CachePlayer(DtoPlayer dtoPlayer)
+        {
+		    var cache = MemoryCache.Default;
+
+		    cache.Add(dtoPlayer.PlayerId.ToString(CultureInfo.InvariantCulture), dtoPlayer,
+		              new DateTimeOffset(DateTime.Now.AddHours(new AuthCacheEntry().ExpirationHours)));
+        }
     }
 }

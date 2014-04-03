@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Midway Home</title>
+        <link rel="stylesheet" href="/content/midway.css" />
+        <link rel="stylesheet" href="/content/elements.css" />
+        <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
+    </head>
+    <body>
+        <div id="pagediv">
+            <div id="pagetitle" class="orange">HOME</div>
+
+            <a id="logofflink" href="#">Log Off</a>
+            <div id="infolink" title="Photo info"><img id="photoInfo" src="/content/images/camera.png" /></div>
+
+            <div id="welcome" class="orange">
+                Welcome back, <span id="namespan"></span>! Go to a game, edit your registration info or peruse your record.
+            </div>
+
+            <div id="homediv" class="floatingdiv">
+                <div class="floathead"></div>
+                <div id="hometabs" class="tablist">
+                    <ul>
+                        <li id="gameselecttab" class="tablistitem tabshown">Your Games</li>
+                        <li id="editregtab" class="tablistitem">Your Registration</li>
+                        <li id="recordtab" class="tablistitem">Your Record</li>
+                    </ul>
+                </div>
+                <div id="gameselect" class="tabpanel tabshown">
+                    <div id="gamelist">
+                        <ul>
+                            <li id="game-1" class="listitem"><img src="/content/images/usn.gif" />USN New Game</li>
+                            <li id="game-2" class="listitem"><img src="/content/images/ijn.gif" />IJN New Game</li>
+                        </ul>
+                    </div>
+                    <div id="optopponent">
+                        Opponent Nickname (optional):
+                        <input id="oppnickname" type="text" value="First available" />
+                        <div id="oppselectdiv">
+                            <select id="oppselect"></select>
+                        </div>
+                    </div>
+                    <div id="buttondiv">
+                        <a id="playgame" class="longbutton flatbutton graybtn">Play</a>
+                        <a id="quitgame" class="longbutton flatbutton graybtn">Retire</a>
+                    </div>
+                </div>
+                <div id="editreg" class="tabpanel">
+                    <table style="margin-left: 60px;">
+                        <tr>
+                            <td class="right">Email</td>
+                            <td><input id="email" type="text" class="regdata" /></td>
+                        </tr>
+                        <tr>
+                            <td class="right">Password</td>
+                            <td><input id="pwd" type="password" class="regdata" /></td>
+                        </tr>
+                        <tr>
+                            <td class="right">Reenter password</td>
+                            <td><input id="pwd2" type="password" /></td>
+                        </tr>
+                        <tr>
+                            <td class="right">Nickname</td>
+                            <td><input id="nickname" type="text" class="regdata" /></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <a id="savereg" class="longbutton flatbutton graybtn">Save</a>
+                                <a id="cancelreg" class="longbutton flatbutton graybtn">Cancel</a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="record" class="tabpanel">
+                    <table id="recordtable">
+                        <tr>
+                            <th>Opponent</th>
+                            <th class="right">Wins</th>
+                            <th class="right">Losses</th>
+                            <th class="right">No Decision</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="photoblurb">
+                <div class="closex">&times;</div>
+                <p>
+                    Japanese aircraft carrier <span class="i">Akagi</span> photographed leaving Celebes Island on 
+                    26 March 1942 for attacks on British bases in Ceylon. Other carriers and battleships of the Combined 
+                    Fleet striking force <span class="i">Kido Butai</span> follow, from front to back: 
+                    <span class="i">Soryu</span>, <span class="i">Hiryu&#772;</span>, <span class="i">Hiei</span>, 
+                    <span class="i">Kirishima</span>, <span class="i">Haruna</span>, <span class="i">Kongo&#772;</span>, 
+                    <span class="i">Zuikaku</span> and <span class="i">Shokaku</span>. All but the last two would be 
+                    present at Midway some nine weeks later.
+                </p>
+                <p>
+                    We see her island and aft flight deck with parked B5N &ldquo;Kate&rdquo; torpedo bombers. Rolled mattresses 
+                    have been lashed to the island to provide extra protection from enemy attack.
+                </p>
+                <p class="photocredit">
+                    Kure Maritime Museum, Hiroshima
+                </p>
+            </div>
+        </div>
+
+        <div id="dlgoverlay">
+            <div id="dlgcontent">
+                <div id="dlghead"></div>
+                <div id="dlgbody"></div>
+                <div id="dlgbuttons"></div>
+            </div>
+        </div>
+
+        <script type="text/javascript" src="/scripts/vendor/jquery-1.9.1.js"></script>
+        <script type="text/javascript" src="/scripts/vendor/jquery-ui-1.10.3.js"></script>
+        <script type="text/javascript" src="/scripts/utils.js"></script>
+        <script type="text/javascript" src="/scripts/midway.js"></script>
+        <script type="text/javascript" src="/scripts/vendor/fuzzyset.js"></script>
+        <script type="text/javascript" src="/scripts/pages/home.js"></script>
+    </body>
+</html>

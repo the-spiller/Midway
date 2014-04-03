@@ -9,7 +9,7 @@ delete from PlayerGameAirbase;
 go
 delete from PlayerGameSearchMarker;
 go
-delete from PlayerGameSearchResult;
+delete from PlayerGameSearch;
 go
 delete from PlayerGame;
 go

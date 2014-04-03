@@ -166,7 +166,7 @@
         /* transparency.                                                     */
         /*-------------------------------------------------------------------*/
         drawMap: function (callback) {
-            var imgDir = "content/images/search/",
+            var imgDir = "/content/images/search/",
                 mapImg = new Image(),
                 atollsImg = new Image();
 
