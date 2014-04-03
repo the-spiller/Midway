@@ -196,7 +196,6 @@
     <Content Include="App_Data\cm.sdf" />
     <Content Include="App_Data\del_games.sql" />
     <Content Include="Content\audio\teletype.mp3" />
-    <Content Include="Content\elements.css" />
     <Content Include="Content\images\bg-home.jpg" />
     <Content Include="Content\images\bg-logon.jpg" />
     <Content Include="Content\images\bg-register.jpg" />

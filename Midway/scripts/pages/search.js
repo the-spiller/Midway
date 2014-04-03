@@ -1141,7 +1141,7 @@ function shipsLoaded() {
 /* completed phase to server.                                                */
 /*****************************************************************************/
 function loadPage() {
-    game = findGameById(urlParams["gid"], window.player.Games);
+    game = findGameById(getUrlParameter("gid"), window.player.Games);
     side = game.SideShortName;
     
     if (side == "IJN") {
@@ -1161,7 +1161,6 @@ function loadPage() {
         selectedArea = "";
         ajaxLoadShips(shipsLoaded);
     });
-    hideWait();
     window.currentPage = "search";
 }
 

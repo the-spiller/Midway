@@ -13,10 +13,6 @@ $("#infolink").on("click", function() {
     showPhotoblurb();
 });
 
-$(".closex").on("click", function() {
-    $("#infolink").trigger("click");
-});
-
 $("#logofflink").on("click", function () {
     if (unsavedRegChanges()) return;
     eraseCookie(COOKIE_NAME);
@@ -487,7 +483,6 @@ $(document).ready(function () {
         buildGameList();
         getPlayers();
 
-        hideWait();
         window.currentPage = "home";
     });
 });

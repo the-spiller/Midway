@@ -3,7 +3,67 @@
     <head>
         <title>Midway Logon</title>
         <link rel="stylesheet" href="content/midway.css" />
-        <link rel="stylesheet" href="content/elements.css" />
+        <style>
+        @font-face {
+            font-family: FetteEgyptienne;
+            src: url("/content/fonts/fette___-webfont.eot");
+            src: url("/content/fonts/fette___-webfont.eot?#iefix") format("embedded-opentype"),
+                    url("/content/fonts/fette___-webfont.woff") format("woff"),
+                    url("/content/fonts/fette___-webfont.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+        #fronttitle {
+            position: absolute;
+	        top: 0;
+	        left: 10px;
+	        font: 800 21em Arial, sans-serif;
+	        line-height: 260px;
+	        vertical-align: top;
+        }
+        #fronttiny {
+            position: absolute;
+	        top: 255px;
+	        left: 30px;
+	        font: 800 1em Arial, sans-serif;
+        }
+        #frontdate {
+	        position: absolute;
+	        top: 275px;
+	        left: 30px;
+	        font: 5em FetteEgyptienne, "Latin wide", serif;
+        }
+        #logondiv {
+            font-size: 1em;
+            top: 380px;
+            left: 700px;
+	        width: 400px;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+        }
+        td.spacer5 {
+            height: 5px;
+        }
+        .logonlinks {
+            color: #fff;
+        }
+            .logonlinks:hover, .logonlinks:active {
+                color: #ff2b00;
+                background-color: transparent;
+            }
+
+        ._1964  {
+            text-shadow: 2px 2px 3px #fff, -2px -2px 3px #fff;   
+        }
+
+        #pagediv {
+            background-image: url(/content/images/bg-logon.jpg);
+        }
+
+        #infolink {
+            top: 365px;
+            left: 42px;
+        }
+        </style>
         <link rel="stylesheet" href="content/themes/jquery-ui-1.10.3.css" />
     </head>
     <body>
@@ -30,7 +90,7 @@
                     <tr>
                         <td colspan="2"><a id="newpass" href="#" class="logonlinks">I've forgotten my password.</a></td>
                     </tr>
-                    <tr><td colspan="2" style="height: 5px;"></td></tr>
+                    <tr><td colspan="2" class="spacer5"></td></tr>
                     <tr>
                         <td colspan="2"><a id="register" href="#" class="logonlinks"> &rarr; I'd like to register.</a></td>
                     </tr>
@@ -67,10 +127,10 @@
             </div>
         </div>
 
-        <script type="text/javascript" src="scripts/vendor/jquery-1.9.1.js"></script>
-        <script type="text/javascript" src="scripts/vendor/jquery-ui-1.10.3.js"></script>
-        <script type="text/javascript" src="scripts/utils.js"></script>
-        <script type="text/javascript" src="scripts/midway.js"></script>
-        <script type="text/javascript" src="scripts/pages/logon.js"></script>
+        <script src="scripts/vendor/jquery-1.9.1.js"></script>
+        <script src="scripts/vendor/jquery-ui-1.10.3.js"></script>
+        <script src="scripts/utils.js"></script>
+        <script src="scripts/midway.js"></script>
+        <script src="scripts/pages/logon.js"></script>
     </body>
 </html>

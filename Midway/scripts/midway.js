@@ -11,19 +11,6 @@ var player = undefined,
     IMG_HEIGHT = 857,
     COOKIE_NAME = "mdyplayer";
 
-var urlParams;
-(window.onpopstate = function () {
-    var match,
-        pl = /\+/g,  // Regex for replacing addition symbol with a space
-        search = /([^&=]+)=?([^&]*)/g,
-        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
-        query = window.location.search.substring(1);
-
-    urlParams = {};
-    while (match = search.exec(query))
-        urlParams[decode(match[1])] = decode(match[2]);
-})();
-
 // Functions...................................................................
 
 function showPhotoblurb() {
@@ -246,7 +233,7 @@ function findGameById(id, games) {
     return game;
 }
 
-// Global event handler........................................................
+// Global event handlers.......................................................
 
 $("#dlgoverlay").on("keyup", function (e) {
     if (e.keyCode == 13) {
@@ -260,4 +247,8 @@ $("#dlgoverlay").on("keyup", function (e) {
         else if ($("#dlgbtnno").length)
             $("#dlgbtnno").trigger("click");
     }
+});
+
+$(".closex").on("click", function () {
+    $("#infolink").trigger("click");
 });

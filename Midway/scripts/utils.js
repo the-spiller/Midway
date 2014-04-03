@@ -250,3 +250,8 @@ function addVectors(vector1, vector2) {
     return { x: vector1.x + vector2.x, y: vector1.y + vector2.y };
 }
 
+// URL parameters..............................................................
+
+function getUrlParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
+}

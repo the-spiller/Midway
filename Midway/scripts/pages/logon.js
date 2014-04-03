@@ -7,10 +7,6 @@ $("#infolink").on("click", function() {
     showPhotoblurb();
 });
 
-$(".closex").on("click", function() {
-    $("#infolink").trigger("click");
-});
-
 $("#btngo").on("click", function(e) {
     e.preventDefault();
     validateLogon();
@@ -18,7 +14,9 @@ $("#btngo").on("click", function(e) {
 
 $("#logondiv").on("keyup", function(e) {
     if (e.keyCode == 13) {
-        $("#btngo").trigger("click");
+        $("#btngo").css("background-color", "#ff2b00")
+            .animate({ backgroundColor: "#808080" }, 250)
+            .trigger("click");
     }
 });
 
@@ -174,12 +172,8 @@ function ajaxSetLockout(successCallback) {
 // Init........................................................................
 
 $(document).ready(function () {
-    $("#pagediv").css("background-image", "url(\"/content/images/bg-logon.jpg\")");
-    $("#infolink").css({ top: "365px", left: "42px" });
-    window.showingInfo = false;
-    
     if (!cookiesEnabled()) {
-        showAlert("Cookies", "You must allow cookies in order to play Midway.", "red");
+        showAlert("Sorry", "Your browser settings must allow cookies in order to play Midway.", DLG_OK, "red");
     }
 
     $("#logondiv").draggable({
@@ -188,13 +182,7 @@ $(document).ready(function () {
         scroll: false
     });
 
-    if (player) {
-        $("#email").val(window.player.Email);
-        $("#pwd").focus();
-    } else {
-        $("#email").focus();
-    }
-    hideWait();
+    $("#email").focus();
     window.currentPage = "logon";
 });
 

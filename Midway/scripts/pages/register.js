@@ -1,15 +1,11 @@
 ﻿// Event handlers......................................................
 
 $("#return").on("click", function () {
-    document.location.href = "index.html";
+    window.history.back();
 });
 
 $("#infolink").on("click", function () {
     showPhotoblurb();
-});
-        
-$(".closex").on("click", function () {
-    $("#infolink").trigger("click");
 });
 
 $("#btngo").on("click", function () {
@@ -38,7 +34,7 @@ $("#btngo").on("click", function () {
                 "You are now registered. Expect to receive a password in email that will allow you to " +
                     "log in the first time.<br /><br />We hope you enjoy our game!",
                 DLG_OK, "blue", function () {
-                    document.location.href = "index.html";
+                    window.history.back();
                 });
         });
     }
@@ -46,7 +42,9 @@ $("#btngo").on("click", function () {
 
 $("#registerdiv").on("keyup", function (e) {
     if (e.keyCode == 13) {
-        $("#btngo").trigger("click");
+        $("#btngo").css("background-color", "#ff2b00")
+            .animate({ backgroundColor: "#808080" }, 250)
+            .trigger("click");
     }
 });
 
@@ -66,6 +64,12 @@ function ajaxRegisterPlayer(successCallback) {
                 showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "red");
             else
                 showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "red");
+
+            if (xhr.responseText.indexOf("Nickname") > -1) {
+                $("#nickname").select().focus();
+            } else {
+                $("#email").select().focus();
+            }
         }
     });
 }

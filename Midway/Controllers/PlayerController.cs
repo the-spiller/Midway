@@ -95,14 +95,14 @@ namespace Midway.Controllers
                     return new HttpResponseMessage(HttpStatusCode.Conflict)
                         {
                             Content = new StringContent("Email address is already in use."),
-                            ReasonPhrase = "Duplicate Email"
+                            ReasonPhrase = "Conflict"
                         };
 
                 if (insertStatus == InsertStatus.DuplicateNickname)
                     return new HttpResponseMessage(HttpStatusCode.Conflict)
                         {
                             Content = new StringContent("Nickname is taken by another player."),
-                            ReasonPhrase = "Duplicate Nickname"
+                            ReasonPhrase = "Conflict"
                         };
 
                 var addedPlayer = _repo.AddPlayer(player);

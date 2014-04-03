@@ -1,14 +1,4 @@
 ﻿@font-face {
-    font-family: FetteEgyptienne;
-    src: url("/content/fonts/fette___-webfont.eot");
-    src: url("/content/fonts/fette___-webfont.eot?#iefix") format("embedded-opentype"),
-         url("/content/fonts/fette___-webfont.woff") format("woff"),
-         url("/content/fonts/fette___-webfont.ttf") format("truetype");
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
     font-family: Teletype_1945_1985;
     src: url("/content/fonts/teletype1945-1985-webfont.eot");
     src: url("/content/fonts/teletype1945-1985-webfont.eot?#iefix") format("embedded-opentype"),
@@ -167,18 +157,6 @@ th {
 	font-style: italic;
 }
 
-.logonlinks {
-    color: #fff;
-}
-    .logonlinks:hover, .logonlinks:active {
-        color: #ff2b00;
-        background-color: transparent;
-    }
-
-._1964  {
-    text-shadow: 2px 2px 3px #fff, -2px -2px 3px #fff;   
-}
-
 .ltextwrap {
     float: left;
     margin: .5em 1em .5em 0;
@@ -315,43 +293,12 @@ th {
 	width: 715px;
 }
 
-#fronttitle {
-    position: absolute;
-	top: 0;
-	left: 10px;
-	font: 800 21em Arial, sans-serif;
-	line-height: 260px;
-	vertical-align: top;
-}
-
-#fronttiny {
-    position: absolute;
-	top: 255px;
-	left: 30px;
-	font: 800 1em Arial, sans-serif;
-}
-
-#frontdate {
-	position: absolute;
-	top: 275px;
-	left: 30px;
-	font: 5em FetteEgyptienne, "Latin wide", serif;
-}
-
 #infolink {
 	position: absolute;
 	cursor: pointer;
 	display: inline;
 	top: 10px;
 	left: 1325px;
-}
-
-#logondiv {
-    font-size: 1em;
-    top: 380px;
-    left: 700px;
-	width: 400px;
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
 
 #logofflink {
@@ -366,104 +313,6 @@ th {
         color: #000;
         text-decoration: underline;
     }
-
-#registerdiv {
-    font-size: 1em;
-    top: 195px;
-    left: 400px;
-	width: 400px;
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
-}
-
-#words {
-	position: absolute;
-	top: 277px;
-    left: 229px;
-	height: 559px;
-	width: 1108px;
-	padding: 0 30px 20px 20px;
-	text-justify: auto;
-	text-align: justify;
-	font: 1.1em Georgia, serif;
-	background-color: #ffe7c4;
-	color: #000;
-	overflow: auto;
-}
-    #words a {
-        color: #004a7f;
-    }
-    #words a:hover, a:active {
-        color: #000;
-        text-decoration: underline;
-    }
-
-#homediv {
-    font-size: 1em;
-    left: 43px;
-    width: 675px;
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
-}
-
-#optopponent {
-	margin: 10px 0 10px 0;
-	display: none;
-    width: 98%;
-}
-	#optopponent input {
-		font-weight: normal;
-	    margin: 5px 0 5px 5px;
-	    width: 250px;
-	    vertical-align: middle;
-	}
-    #optopponent a {
-        vertical-align: middle;
-        width: 50px;
-    }
-
-#playgame, #quitgame, #btncancel {
-    display: none;
-}
-
-#cancelreg {
-    display: none;
-}
-
-#gameselect {
-    padding: 20px;
-}
-#gameselectfoot {
-    position: absolute;
-    bottom: 20px;
-}
-
-#recordtable {
-    margin: 20px;
-    width: 90%;
-    border-collapse: collapse;
-}
-    #recordtable td.name {
-        width: 33%;
-    }
-    #recordtable td.number {
-        width: 19%;
-        border-right: 1px solid #fff;
-        text-align: right;
-    }
-
-#oppselectdiv {
-    position: absolute;
-    display: none;
-    background-color: #808080;
-    color: #000;
-}
-
-#oppselect {
-    font: 500 1em Arial, sans-serif;
-}
-
-#editreg input[type="text"], #editreg input[type="password"] {
-    width: 300px;
-}
 
 #searchdiv {
     top: 60px;
@@ -511,3 +360,193 @@ th {
     vertical-align: central; 
     margin: 22px 15px 0 0;
 }
+
+/* Flat anchor button........................................................*/
+
+.flatbutton {
+	padding: 4px 10px 4px 10px;
+    margin-right: 5px;
+	font: 600 14px Arial, sans-serif;
+	display: inline-block;
+    min-width: 30px;
+	text-align: center;
+	cursor: pointer;
+	color: #000;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+.flatbutton:active {
+	padding: 5px 10px 3px 10px;
+    box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.6) inset;
+    text-decoration: none;
+    border-bottom: none;
+    border-right: none;
+}
+
+.graybtn {
+	background-color: #808080;
+}
+	.graybtn:hover {
+		background-color: #a0a0a0;
+	}
+.bluebtn {
+	background-color: #2b3d55;
+    color: #c6c6c6;
+}
+	.bluebtn:hover, .bluebtn:active {
+		background-color: #516580;
+	}
+.redbtn {
+    background-color: #CE391B;
+    color: #ebebeb;
+}
+    .redbtn:hover, .redbtn:active {
+        background-color: #cc4e35;
+    }
+
+/* Dialog box................................................................*/
+
+#dlgoverlay {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+}
+#dlgcontent {
+    display: block;
+    position: absolute;
+    text-align: left;
+	padding: 10px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+}
+    #dlgcontent.bluedlg {
+        background-color: #869cb7;
+        color: #202c38;
+    }
+    #dlgcontent.reddlg {
+        background-color: #f9836b;
+        color: #000;
+    }
+#dlghead {
+    display: block;
+    font-weight: bold;
+	padding: 5px;
+    margin-bottom: 10px;
+	cursor: move;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+    #dlghead.bluedlghead {
+        background: linear-gradient(to right, #2b3d55, #2b3d55, #2b3d55, #869cb7);
+        color: #c6c6c6;
+    }
+    #dlghead.reddlghead {
+        background: linear-gradient(to right, #CE391B, #CE391B, #CE391B, #f9836b);
+	    color: #ebebeb;
+    }
+#dlgbody {
+    line-height: 1.2em;
+    padding: 5px;
+    position: relative;
+    display: inline-block;
+}
+#dlgbuttons {
+	padding: 5px;
+    margin-top: 8px;
+}
+    #dlgbuttons a {
+        min-width: 40px;
+    }
+
+/* Photo info popup..........................................................*/
+
+.photoblurb {
+    display: none;
+	position: absolute;
+    line-height: normal;
+    text-justify: auto;
+    text-align: justify;
+    width: 400px;
+    padding: 30px 22px 5px 20px;
+    font: 1em Georgia, serif;
+	background-color: rgba(255, 231, 196, 0.7);
+    color: #000;
+    border-radius: 15px;
+}
+.photocredit {
+	text-align: center;
+    font-style: italic;
+    font-size: .85em;
+}
+.closex {
+	position: absolute;
+	top: -3px;
+	right: 7px;
+	font: 800 1.8em Arial, sans-serif;
+	cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+	.closex:hover, .closex:active {
+		color: #ff2b00;
+	}
+
+/* Tabs......................................................................*/
+
+.tablistitem {
+    font: bold 1.2em Arial, sans-serif;
+    display: inline-block;
+    color: #eaecee;
+    cursor: pointer;
+    padding: 5px 15px 8px 15px;
+}
+    .tablistitem.tabshown {
+        background-color: #2b3d55;
+    }
+.tabpanel {
+    color: #eaecee;
+    padding: 5px;
+    display: none;
+    background: linear-gradient(to right, #2b3d55, #2b3d55, #2b3d55, #000);
+    min-height: 270px;
+    overflow: auto;
+}
+    .tabpanel.tabshown {
+        display: block;
+    }
+
+.tablist {
+    margin-bottom: -5px;
+}
+
+/* List item state buttons...................................................*/
+
+.listitem {
+    display: inline-block;
+    font: 600 1em Arial, sans-serif;
+    text-align: left;
+	padding: 5px;
+    width: 98%;
+    background-color: #808080;
+    color: #000;
+    margin-bottom: 3px;
+    border-bottom: 1px solid #202020;
+    cursor: pointer;
+    overflow: hidden;
+}
+    .listitem.down
+    {
+        padding: 6px 5px 4px 5px;
+        box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
+        color: #fff;
+        border-bottom: none;
+    }
+    .listitem img {
+        padding: 3px 6px 0 5px;
+    }

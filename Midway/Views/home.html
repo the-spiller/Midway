@@ -3,8 +3,72 @@
     <head>
         <title>Midway Home</title>
         <link rel="stylesheet" href="/content/midway.css" />
-        <link rel="stylesheet" href="/content/elements.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
+        <style>
+        #homediv {
+            font-size: 1em;
+            left: 43px;
+            width: 675px;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+        }
+        
+        #optopponent {
+	        margin: 10px 0 10px 0;
+	        display: none;
+            width: 98%;
+        }
+	        #optopponent input {
+		        font-weight: normal;
+	            margin: 5px 0 5px 5px;
+	            width: 250px;
+	            vertical-align: middle;
+	        }
+            #optopponent a {
+                vertical-align: middle;
+                width: 50px;
+            }
+            
+        #recordtable {
+            margin: 20px;
+            width: 90%;
+            border-collapse: collapse;
+        }
+            #recordtable td.name {
+                width: 33%;
+            }
+            #recordtable td.number {
+                width: 19%;
+                border-right: 1px solid #fff;
+                text-align: right;
+            }
+
+            #playgame, #quitgame, #btncancel {
+                display: none;
+            }
+
+            #cancelreg {
+                display: none;
+            }
+
+            #gameselect {
+                padding: 20px;
+            }
+
+            #oppselectdiv {
+                position: absolute;
+                display: none;
+                background-color: #808080;
+                color: #000;
+            }
+
+            #oppselect {
+                font: 500 1em Arial, sans-serif;
+            }
+
+            #editreg input[type="text"], #editreg input[type="password"] {
+                width: 300px;
+            }
+        </style>
     </head>
     <body>
         <div id="pagediv">
@@ -113,11 +177,11 @@
             </div>
         </div>
 
-        <script type="text/javascript" src="/scripts/vendor/jquery-1.9.1.js"></script>
-        <script type="text/javascript" src="/scripts/vendor/jquery-ui-1.10.3.js"></script>
-        <script type="text/javascript" src="/scripts/utils.js"></script>
-        <script type="text/javascript" src="/scripts/midway.js"></script>
-        <script type="text/javascript" src="/scripts/vendor/fuzzyset.js"></script>
-        <script type="text/javascript" src="/scripts/pages/home.js"></script>
+        <script src="/scripts/vendor/jquery-1.9.1.js"></script>
+        <script src="/scripts/vendor/jquery-ui-1.10.3.js"></script>
+        <script src="/scripts/vendor/fuzzyset.js"></script>
+        <script src="/scripts/utils.js"></script>
+        <script src="/scripts/midway.js"></script>
+        <script src="/scripts/pages/home.js"></script>
     </body>
 </html>

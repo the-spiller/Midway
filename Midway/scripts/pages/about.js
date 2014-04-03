@@ -1,15 +1,11 @@
 ﻿// Event Handlers......................................................
 
 $("#return").on("click", function () {
-    document.location.href = "index.html";
+    window.history.back();
 });
 
 $("#infolink").on("click", function () {
     showPhotoblurb();
-});
-
-$(".closex").on("click", function () {
-    $("#infolink").trigger("click");
 });
 
 $(".expander").on("click", function () {
@@ -26,12 +22,5 @@ $(".expander").on("click", function () {
 // Init................................................................
 
 $(document).ready(function () {
-    $("#return").css({ position: "absolute", top: "10px", left: "1288px" });
-    $("#pagediv").css("background-image", "url(\"/content/images/head-about.jpg\")");
-
-    $("#pagetitle").css("top", "85px");
-    $("#welcome").css("top", "195px");
-
-    hideWait();
     window.currentPage = "about";
 });

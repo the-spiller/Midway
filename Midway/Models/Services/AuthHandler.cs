@@ -20,7 +20,7 @@ namespace Midway.Models.Services
             if (cookie != null)
             {
                 string cookieVal = cookie[entry.CookieName].Value;
-              
+
                 string [ ] vals = cookieVal.Split(':'); // PlayerId, then token issued at login
                 ObjectCache cache = MemoryCache.Default;
                 var extEntry = (AuthCacheEntry)cache.Get(vals[1]);
@@ -40,7 +40,7 @@ namespace Midway.Models.Services
                         HttpContext.Current.User = principal;
                     }
                 }
-            } // else redirect to logon page? Better than 400 error
+            }
 
             return base.SendAsync(request, cancellationToken);
         }
