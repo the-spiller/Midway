@@ -192,6 +192,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\pages\search_phase_1.js" />
     <Content Include="Views\about.html" />
     <Content Include="App_Data\cm.sdf" />
     <Content Include="App_Data\del_games.sql" />

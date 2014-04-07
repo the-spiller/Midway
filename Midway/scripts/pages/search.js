@@ -49,8 +49,8 @@ $("#done").on("click", function() {
             showAlert("End Phase", "All arriving ships must be brought on to the map.", DLG_OK, "red");
             return;
         }
-        ajaxPutPhase(function() {
-            reload();
+        ajaxPutPhase(function () {
+            goHome();
         });
     }
 });
@@ -81,57 +81,14 @@ $(document).on("click", ".tablistitem", function (e) {
     hideOppSearchedArea();
 });
 
-if (game.PhaseId == 1) {
-    $("#airreadiness").on("click", function() {
-        if (game.AircraftReadyState == 0)
-            game.AircraftReadyState = 1;
-        else if (game.AircraftReadyState == 1)
-            game.AircraftReadyState = 0;
-        else {
-            showAlert("Air Readiness",
-                "Your aircraft are ready for operations. Are you sure you want to move them down to the hangar deck?",
-                DLG_YESCANCEL, "blue", function(choice) {
-                    if (choice == "Yes")
-                        game.AircraftReadyState = 0;
-                });
-        }
-        showAirReadiness();
-        dirty = true;
-    });
-
-    $(document).on("mouseup", function() {
-        mouseDown = false;
-        if (dragThang.dragging) {
-            dragThang.dragging = false;
-            if (dragThang.origin == "arrivals")
-                searchGrid.removeArrivalZones(side);
-            else if (dragThang.useSnapshot)
-                searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
-        }
-    });
-    $(canvas).on("mousedown", function(e) {
-        canvasMouseDown(e);
-    }).on("mouseup", function(e) {
-        canvasMouseUp(e);
-    });
-}
-
 // Functions...........................................................
 
 /*-------------------------------------------------------------------*/
-/* Return to the home page w/o saving.                               */
+/* Return to the home.                                               */
 /*-------------------------------------------------------------------*/
 function goHome() {
     searchGrid.clearCanvas();
     document.location.href = "/views/home.html";
-}
-
-/*-------------------------------------------------------------------*/
-/* Start over with the player reset done by ajaxPostPhase.           */
-/*-------------------------------------------------------------------*/
-function reload() {
-    searchGrid.clearCanvas();
-    loadPage();
 }
 
 /*-------------------------------------------------------------------*/
@@ -1142,26 +1099,29 @@ function shipsLoaded() {
 /*****************************************************************************/
 function loadPage() {
     game = findGameById(getUrlParameter("gid"), window.player.Games);
-    side = game.SideShortName;
-    
-    if (side == "IJN") {
-        mapLeft = 418;
-        divLeft = 5;
-        flagImg = "/content/images/ijn-med.png";
-        captionColor = "ijnred";
-        var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + imgDir + "ijnfleet.png\" />" +
-            "<img id=\"sighting\" class=\"searchmarker\" src=\"" + imgDir + "usnsighting.png\" />" +
-            "<img id=\"airsearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-airsearchcursor.png\" />" +
-            "<img id=\"seasearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-seasearchcursor.png\" />";
-        $("#imagecache").html(html);
-    }
-    ajaxLoadPhase(function() {
-        setTabs();
-        selectedZone = game.SelectedLocation;
-        selectedArea = "";
-        ajaxLoadShips(shipsLoaded);
+    var scriptPath = "/scripts/pages/search_phase_" + game.PhaseId.toString() + ".js";
+    ajaxLoadScript(scriptPath, function() {
+        side = game.SideShortName;
+
+        if (side == "IJN") {
+            mapLeft = 418;
+            divLeft = 5;
+            flagImg = "/content/images/ijn-med.png";
+            captionColor = "ijnred";
+            var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + imgDir + "ijnfleet.png\" />" +
+                "<img id=\"sighting\" class=\"searchmarker\" src=\"" + imgDir + "usnsighting.png\" />" +
+                "<img id=\"airsearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-airsearchcursor.png\" />" +
+                "<img id=\"seasearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-seasearchcursor.png\" />";
+            $("#imagecache").html(html);
+        }
+        ajaxLoadPhase(function () {
+            setTabs();
+            selectedZone = game.SelectedLocation;
+            selectedArea = "";
+            ajaxLoadShips(shipsLoaded);
+        });
+        window.currentPage = "search";
     });
-    window.currentPage = "search";
 }
 
 // Initialize..........................................................

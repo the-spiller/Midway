@@ -116,7 +116,6 @@ function showAjaxError(xhr, status, errorThrown) {
 function loadPlayerForPage(callback) {
     var cookie = readCookie(COOKIE_NAME);
     if (cookie) {
-        console.log("cookie: '" + cookie + "'");
         var playerId = cookie.substr(0, cookie.indexOf(":"));
         ajaxGetPlayer(playerId, function() {
             if (callback) callback();
@@ -168,6 +167,20 @@ function ajaxGetPlayers(successCallback) {
             playersList = JSON.parse(data);
             createUpdateAuthCookie();
             if (successCallback) successCallback(playersList);
+        },
+        error: function(xhr, status, errorThrown) {
+            showAjaxError(xhr, status, errorThrown);
+        }
+    });
+}
+
+function ajaxLoadScript(script, successCallback) {
+    $.ajax({
+        url: script,
+        dataType: "script",
+        type: "GET",
+        success: function() {
+            if (successCallback) successCallback();
         },
         error: function(xhr, status, errorThrown) {
             showAjaxError(xhr, status, errorThrown);
