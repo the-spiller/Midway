@@ -7,17 +7,16 @@
     mapImg = null,
     captionColor = "usnblue",
     game = {},
+    dirty = false,
+    mouseDown = false,
     side,
     phase = {},
     ships = [],
     shipZones = [],
     searches = [],
-    oppSearches = [],
     lastShipSelected = null,
     selectedZone = "",
-    selectedArea,
-    mouseDown = false,
-    dirty = false,
+    selectedArea = "",
     dragThang = {
         dragging: false,
         origin: "",
@@ -25,7 +24,7 @@
         cursorImg: null,
         cursorOffset: { x: 0, y: 0 },
         useSnapshot: false,
-        snapshot: null,
+        snapshot: null
     };
 
 // Event handlers......................................................
@@ -56,35 +55,33 @@ $("#done").on("click", function() {
 });
 
 $(canvas).on("click", function (e) {
+    // make the zone the 'current' one
     selectZone(windowToCanvas(canvas, e.clientX, e.clientY));
 }).on("dblclick", function (e) {
+    // select all ships in the zone (if any)
     var coords = windowToCanvas(canvas, e.clientX, e.clientY),
         zone = searchGrid.coordsToZone(coords);
     if ($.inArray(zone, shipZones) != -1) {
         $("#zone").find("div.shipitem").addClass("selected");
     }
+}).on("mouseup", function (e) {
+    canvasMouseUp(e);
 });
 
 // Event handlers for dynamically-loaded elements
-$(document).on("click", ".tablistitem", function (e) {
+$(document).on("click", ".tablistitem", function(e) {
     workTabs(e);
-}).on("click", ".shipitem", function (e) {
+}).on("click", ".shipitem", function(e) {
     doShipSelection(this, (e.shiftKey));
-    mouseDown = false;
-}).on("mousedown", ".shipitem", function (e) {
+    window.mouseDown = false;
+}).on("mousedown", ".shipitem", function(e) {
     controlItemMouseDown(e);
-}).on("mousedown", ".searchitem", function (e) {
-    controlItemMouseDown(e);
-}).on("mouseenter", ".oppsearchitem", function (e) {
-    showOppSearchedArea(e);
-}).on("mouseleave", ".oppsearchitem", function () {
-    hideOppSearchedArea();
 });
 
 // Functions...........................................................
 
 /*-------------------------------------------------------------------*/
-/* Return to the home.                                               */
+/* Return to the home page.                                          */
 /*-------------------------------------------------------------------*/
 function goHome() {
     searchGrid.clearCanvas();
@@ -149,16 +146,8 @@ function selectArea(coords) {
 }
 
 /*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
-function drawCursorImg(x, y) {
-    dragThang.snapshot = searchGrid.drawSearchCursor(dragThang.snapshot, dragThang.cursorImg, x, y);
-}
-
-/*-------------------------------------------------------------------*/
 /* Load array of zones that contain player's ships.                  */
 /*-------------------------------------------------------------------*/
-
 function loadShipZones() {
     shipZones.length = 0;
     for (var i = 0; i < ships.length; i++) {
@@ -173,7 +162,6 @@ function loadShipZones() {
 /*-------------------------------------------------------------------*/
 /* Display on the Zone tab any ships in the currently selected zone. */
 /*-------------------------------------------------------------------*/
-
 function showShipsInZone() {
     if (!selectedZone) return;
 
@@ -212,112 +200,9 @@ function showShipsInZone() {
 }
 
 /*-------------------------------------------------------------------*/
-/* Display on the Arrived tab any of the player's ships that have    */
-/* arrived this turn.                                                */
-/*-------------------------------------------------------------------*/
-
-function showArrivingShips() {
-    if (game.PhaseId > 1) return;
-
-    var html = "<ul>";
-    for (var i = 0; i < ships.length; i++) {
-        if (ships[i].Location == "ARR") {
-            html += getShipListItemHtml(ships[i]);
-        }
-    }
-    $("#arrivals").html(html + "</ul>").addClass("tabshown");
-    $("#arrivalstab").addClass("tabshown");
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
-function showSearchControls() {
-    if (game.PhaseId != 2) return;
-
-    var srchHtml = "<div style=\"margin: 5px 0 15px 5px;\">Available searches</div><ul>",
-        searchDesc,
-        searchImg = imgDir + side.toLowerCase() + "-air-search.png";
-
-    for (var i = 0; i < searches.length; i++) {
-        if (searches[i].Turn == game.Turn && !searches[i].Area) {
-            if (searches[i].SearchType == "sea") {
-                searchDesc = "Search any area containing one of your ships";
-                searchImg = imgDir + "sea-search.png";
-            } else if (game.SearchRange == 0) { //Unlimited
-                searchDesc = "Search any area";
-            } else {
-                searchDesc = "Search any area within " + game.SearchRange + " zones of any of your ships";
-            }
-            srchHtml += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
-                " title=\"" + searchDesc + "\">" +
-                "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"" + searchImg + "\" draggable=\"false\" />" +
-                "</div></li>";
-        }
-    }
-    $("#search").html(srchHtml);
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
-function showAirOpsControls() {
-    if (game.PhaseId != 3) return;
-
-    // Opponent's searches
-    var opsHtml = "<div class=\"listheader\">Opponent's searches</div>",
-        airPath = side == "USN" ? imgDir + "ijn-air-search.png" : imgDir + "usn-air-search.png",
-        seaPath = imgDir + "sea-search.png";
-    if (oppSearches.length == 0) {
-        opsHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
-    } else {
-        opsHtml += "<table style=\"border-collapse: collapse;\">";
-        for (var i = 0; i < oppSearches.length; i++) {
-            var searchImgSrc = airPath;
-            var margin = "";
-            if (oppSearches[i].SearchType == "sea") {
-                searchImgSrc = seaPath;
-                margin = " margin: 0 -300px;";
-            }
-
-            var zones = "No ships sighted";
-            if (oppSearches[i].Markers.length) {
-                zones = "<span style=\"color: #ffd651;\">Ships sighted at ";
-                for (var j = 0; j < oppSearches[i].Markers.length; j++) {
-                    zones += oppSearches[i].Markers[j].Zone + ", ";
-                }
-                zones = zones.substr(0, zones.length - 2) + "</span>";
-            }
-            opsHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 33%;"
-                + margin + "\">" +
-                "<img src=\"" + searchImgSrc + "\" /></td><td style=\"width: 66%;\">Area " + oppSearches[i].Area +
-                "<br />" + zones + "</td></tr>";
-        }
-    }
-    $("#airops").html(opsHtml);
-}
-/*-------------------------------------------------------------------*/
-/* Highlight the area of an opponent's search item.                  */
-/*-------------------------------------------------------------------*/
-function showOppSearchedArea(e) {
-    mapImg = searchGrid.grabImageData();
-    var area = $(e.target).text().substr(5, 2);
-    if (area)
-        searchGrid.drawOppSearchArea(area);
-}
-/*-------------------------------------------------------------------*/
-/* Remove the highlight of an opponent's search item's area.         */
-/*-------------------------------------------------------------------*/
-function hideOppSearchedArea() {
-    if (mapImg) {
-        searchGrid.restoreImageData(mapImg, 0, 0);
-    }
-}
-/*-------------------------------------------------------------------*/
 /* Display on the Due tab a list of the player's ships arriving in   */
 /* the future.                                                       */
 /*-------------------------------------------------------------------*/
-
 function showShipsDue() {
     var arrivalTurn = 0,
         html = "<ul>";
@@ -346,7 +231,6 @@ function showShipsDue() {
 /* Display on the Off tab any of the player's ships that have left   */
 /* the map or been sunk.                                             */
 /*-------------------------------------------------------------------*/
-
 function showOffMapShips() {
     var html = "<ul>",
         gotOne = false;
@@ -403,7 +287,6 @@ function getShipListItemHtml(ship) {
 /*-------------------------------------------------------------------*/
 /* Display on the Zone tab enemy ship types found in a zone.         */
 /*-------------------------------------------------------------------*/
-
 function getSightedShipsHtml(searchMarker, searchTurn) {
     var otherside = side == "USN" ? "ijn" : "usn",
         turns = game.Turn - searchTurn,
@@ -421,7 +304,6 @@ function getSightedShipsHtml(searchMarker, searchTurn) {
 /*-------------------------------------------------------------------*/
 /* Display image indicating air readiness.                           */
 /*-------------------------------------------------------------------*/
-
 function showAirReadiness() {
     var imgElement = document.getElementById("readinessimg"), readyDesc;
     switch (game.AircraftReadyState) {
@@ -443,21 +325,9 @@ function showAirReadiness() {
 }
 
 /*-------------------------------------------------------------------*/
+/* Build and return a list of members of the ships[] array that      */
+/* correspond to the selections on the Arrivals or Zone tabs.        */
 /*-------------------------------------------------------------------*/
-
-function getSearch(searchItem) {
-    if (!searchItem) return null;
-    var searchNum = Number(searchItem.id.substr(searchItem.id.indexOf("-") + 1));
-    for (var i = 0; i < searches.length; i++) {
-        if (searches[i].Turn == game.Turn && searches[i].SearchNumber == searchNum)
-            return searches[i];
-    }
-    return null;
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
 function getSelectedShips(tabId) {
     var selShips = [],
         $list = $("#" + tabId).find("div.shipitem.selected"),
@@ -473,8 +343,8 @@ function getSelectedShips(tabId) {
 }
 
 /*-------------------------------------------------------------------*/
+/* Return the individual ships[] array element that has the input Id.*/
 /*-------------------------------------------------------------------*/
-
 function getShipById(id) {
     for (var i = 0; i < ships.length; i++) {
         if (ships[i].ShipId == id) {
@@ -488,7 +358,6 @@ function getShipById(id) {
 /* Respond to a click or Shift-click on a ship list item. Click      */
 /* toggles selected state; Shift-click selects or deselects a range. */
 /*-------------------------------------------------------------------*/
-
 function doShipSelection(shipItem, shiftPressed) {
     if (!lastShipSelected) {
         $(shipItem).addClass("selected");
@@ -514,51 +383,8 @@ function doShipSelection(shipItem, shiftPressed) {
 }
 
 /*-------------------------------------------------------------------*/
-/* Move fleet marker to a new location on the map.                   */
+/* Initialize an arrivals or search drag operation.                  */
 /*-------------------------------------------------------------------*/
-
-function sailShips(startZone, endZone) {
-    var startPos = searchGrid.zoneToTopLeftCoords(startZone),
-        endPos = searchGrid.zoneToTopLeftCoords(endZone),
-        distX = endPos.x - startPos.x,
-        distY = endPos.y - startPos.y,
-        startTime = new Date().getTime(),
-        elapsed = 0,
-        duration = 250 * Math.max(distX, distY), // animate for one second
-        handle;
-
-    searchGrid.drawMap(function() {
-        drawSightings();
-        drawShips([startZone, endZone]);
-        mapImg = searchGrid.grabImageData();
-        shipsAnim();
-    });
-
-    function shipsAnim() {
-        handle = window.requestAnimationFrame(shipsAnim);
-        elapsed = new Date().getTime() - startTime;
-
-        if (elapsed >= duration) {
-            window.cancelAnimationFrame(handle);
-            searchGrid.drawMap(function() {
-                drawSightings();
-                drawShips();
-                searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
-                showShipsInZone(selectedZone);
-            });
-        } else {
-            var thisX = startPos.x + ((elapsed / duration) * distX);
-            var thisY = startPos.y + ((elapsed / duration) * distY);
-            searchGrid.restoreImageData(mapImg, 0, 0);
-            searchGrid.drawShipsMarker({ x: thisX, y: thisY });
-        }
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/* 
-/*-------------------------------------------------------------------*/
-
 function controlItemMouseDown(e) {
     var panelId = $("#tabpanels").find("div.tabshown").attr("id");
     if (!panelId) return;
@@ -567,58 +393,15 @@ function controlItemMouseDown(e) {
     dragThang.origin = panelId;
 
     if (game.PhaseId == 1 && panelId == "arrivals") {
-        var selShips = getSelectedShips("arrivals");
-        if (selShips.length > 0) {
-            mouseDown = true;
-            dragThang.dragData = selShips;
-            dragThang.useSnapshot = true;
-            dragThang.cursorImg = document.getElementById("fleet");
-            dragThang.snapshot = null;
-
-            setTimeout(beginControlsDrag, 150);
-        }
+        prepForArrivalsDrag();
     } else if (game.PhaseId == 2 & panelId == "search") {
-        var selSearch = getSearch(e.target);
-        if (selSearch) {
-            mouseDown = true;
-            dragThang.dragData = selSearch;
-            dragThang.cursorImg = document.getElementById(selSearch.SearchType + "searchcursor");
-            dragThang.cursorOffset = { x: -40, y: -40 },
-            dragThang.useSnapshot = false;
-            dragThang.snapshot = null;
-            selectedArea = "";
-
-            setTimeout(beginControlsDrag, 150);
-        }
+        prepForSearch(e);
     }
 }
 
 /*-------------------------------------------------------------------*/
+/* Called after a fast timer to ensure that we're actually dragging. */
 /*-------------------------------------------------------------------*/
-
-function canvasMouseDown(e) {
-    if (game.PhaseId == 1) {
-        mouseDown = true;
-        var zone = searchGrid.coordsToZone(windowToCanvas(canvas, e.clientX, e.clientY)),
-            selShips = getSelectedShips("zone");
-
-        if (selShips.length > 0) {
-            dragThang.dragging = false;
-            dragThang.origin = zone;
-            dragThang.dragData = selShips;
-            dragThang.cursorImg = null;
-            dragThang.useSnapshot = true;
-            dragThang.snapshot = null;
-
-            setTimeout(beginControlsDrag, 150);
-        }
-        e.preventDefault();
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
 function beginControlsDrag() {
     if (mouseDown) {
         dragThang.dragging = true;
@@ -632,7 +415,6 @@ function beginControlsDrag() {
 /* capture canvas image, otherwise restore canvas image captured at  */
 /* start of drag. Draw element being dragged at new mouse coordinates.*/
 /*-------------------------------------------------------------------*/
-
 function canvasMouseMove(e) {
     if (dragThang.dragging) {
         var canvasCoords = windowToCanvas(canvas, e.clientX, e.clientY);
@@ -660,10 +442,10 @@ function canvasMouseMove(e) {
 }
 
 /*-------------------------------------------------------------------*/
+/* Respond to a potiential drop event.                               */
 /*-------------------------------------------------------------------*/
-
 function canvasMouseUp(e) {
-    mouseDown = false;
+    window.mouseDown = false;
     if (dragThang.dragging) {
         dragThang.dragging = false;
         canvas.removeEventListener("mousemove", canvasMouseMove, false);
@@ -698,201 +480,7 @@ function canvasMouseUp(e) {
                 //movement's done
                 sailShips(dragThang.origin, zone);
             }
-            dirty = true;
-        }
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
-function isLegitDrop(coords) {
-    var dropZone = searchGrid.coordsToZone(coords);
-    if (dropZone == dragThang.origin) return true;
-
-    if (dragThang.origin == "arrivals") {
-        if (side == "USN") {
-            if (dropZone.substr(0, 1) == "I" && "BEH".indexOf(dropZone.substr(2, 1)) != -1)
-                return true;
-        } else {
-            if (dropZone.substr(0, 1) == "A" && "ADG".indexOf(dropZone.substr(2, 1)) != -1)
-                return true;
-        }
-    } else if (isNumber(dragThang.origin.substr(1, 1))) {
-        var zones = searchGrid.zoneDistance(dragThang.origin, dropZone),
-            moves = getShipsMinMovePoints(dragThang.origin);
-        if (zones <= moves) return true;
-    }
-    return false;
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
-function withinSearchRange(coords) {
-    var zone = searchGrid.coordsToZone(coords),
-        i;
-
-    if (!zone) return false;
-    var area = zone.substr(0, 2);
-    if (dragThang.dragData.SearchType == "air") {
-        if (game.SearchRange == 0) return true; //zero = infinite range (entire map)
-
-        for (i = 0; i < shipZones.length; i++) {
-            if (searchGrid.zoneDistance(area + "E", shipZones[i]) <= (game.SearchRange + 1))
-                return true;
-        }
-    } else {
-        for (i = 0; i < shipZones.length; i++) {
-            if (shipZones[i].substr(0, 2) == area)
-                return true;
-        }
-    }
-    return false;
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
-function showSearching(canvasCoords) {
-    if (withinSearchRange(canvasCoords)) {
-        canvas.style.cursor = "none";
-        var coords = addVectors(canvasCoords, dragThang.cursorOffset);
-        drawCursorImg(coords.x, coords.y);
-        selectArea(canvasCoords);
-    } else {
-        if (dragThang.snapshot) searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
-        canvas.style.cursor = "auto";
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
-function hideSearching() {
-    canvas.style.cursor = "auto";
-    if (dragThang.snapshot) {
-        searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
-function executeSearch(coords, zone, search, callback) {
-    if (withinSearchRange(coords)) {
-        var area = zone.substr(0, 2);
-        if (!alreadySearched(area)) {
-            search.Area = area;
-            ajaxPostSearch(search, function() {
-                $("#search-" + search.SearchNumber).remove().parent();
-                if (search.Markers && search.Markers.length) {
-                    var msg = "Enemy ships sighted!";
-                    for (var i = 0; i < search.Markers.length; i++) {
-                        msg += "<p>In zone " + search.Markers[i].Zone + ": " + search.Markers[i].TypesFound + "</p>";
-                    }
-                    showAlert("Search", msg, DLG_OK, "blue", callback);
-
-                } else {
-                    showAlert("Search", "No sightings.", DLG_OK, "blue", callback);
-                }
-            });
-        } else {
-            showAlert("Search", "You've already searched area " + area + "!", DLG_OK, "blue", callback);
-        }
-    } else {
-        if (dragThang.snapshot) searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
-        canvas.style.cursor = "auto";
-        if (callback) callback();
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-
-function alreadySearched(area) {
-    for (var i = 0; i < searches.length; i++) {
-        if (searches[i].Turn == game.Turn && searches[i].Area == area)
-            return true;
-    }
-    return false;
-}
-
-/*-------------------------------------------------------------------*/
-/* Mark ships data with a new location.                              */
-/*-------------------------------------------------------------------*/
-
-function relocateShips(zone, movedShips, cost) {
-    for (var i = 0; i < movedShips.length; i++) {
-        movedShips[i].MovePoints -= cost;
-        movedShips[i].Location = zone;
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/* Return true if all of this turn's arrivals have been brought on   */
-/* to the map.                                                       */
-/*-------------------------------------------------------------------*/
-
-function allArrivalsOnMap() {
-    for (var i = 0; i < ships.length; i++) {
-        if (ships[i].Location == "ARR")
-            return false;
-    }
-    return true;
-}
-
-/*-------------------------------------------------------------------*/
-/* Find and return the minimum available movement points among ships */
-/* in the input zone.
-/*-------------------------------------------------------------------*/
-
-function getShipsMinMovePoints(zone) {
-    var min = 999;
-    for (var i = 0; i < ships.length; i++) {
-        if (ships[i].Location == zone && ships[i].ShipType != "BAS") {
-            if (ships[i].MovePoints < min) min = ships[i].MovePoints;
-        }
-    }
-    return min == 999 ? 0 : min;
-}
-
-/*-------------------------------------------------------------------*/
-/* Copy one search object to another.                                */
-/*-------------------------------------------------------------------*/
-
-function copySearch(fromSearch) {
-    var toSearch = {
-        GameId: fromSearch.GameId,
-        PlayerId: fromSearch.PlayerId,
-        Turn: fromSearch.Turn,
-        SearchNumber: fromSearch.SearchNumber,
-        SearchType: fromSearch.SearchType,
-        Area: fromSearch.Area,
-        Markers: []
-    };
-    if (fromSearch.Markers.length) {
-        for (var i = 0; i < fromSearch.Markers.length; i++) {
-            toSearch.Markers.push({ Zone: fromSearch.Markers[i].Zone, TypesFound: fromSearch.Markers[i].TypesFound });
-        }
-    }
-    return toSearch;
-}
-
-/*-------------------------------------------------------------------*/
-/* Remove opponent's searches from searches[] and move them to their */
-/* own oppSearches[].                                                */
-/*-------------------------------------------------------------------*/
-
-function splitOffOpponentSearches() {
-    if (game.PhaseId != 3) return;
-
-    oppSearches = [];
-    var i = searches.length;
-    while (i--) {
-        if (searches[i].PlayerId != window.player.PlayerId) {
-            oppSearches.push(copySearch(searches[i]));
-            searches.splice(i, 1);
+            window.dirty = true;
         }
     }
 }
@@ -900,7 +488,6 @@ function splitOffOpponentSearches() {
 /*-------------------------------------------------------------------*/
 /* Make ajax call to load phase data in this game.                   */
 /*-------------------------------------------------------------------*/
-
 function ajaxLoadPhase(successCallback) {
     $.ajax({
         url: "/api/phase/" + game.PhaseId,
@@ -920,7 +507,6 @@ function ajaxLoadPhase(successCallback) {
 /*-------------------------------------------------------------------*/
 /* Make ajax call to load player's ships in this game.               */
 /*-------------------------------------------------------------------*/
-
 function ajaxLoadShips(successCallback) {
     $.ajax({
         url: "/api/ship",
@@ -941,7 +527,6 @@ function ajaxLoadShips(successCallback) {
 /*-------------------------------------------------------------------*/
 /* Make ajax call to load player's search markers in this game.      */
 /*-------------------------------------------------------------------*/
-
 function ajaxLoadSearches(successCallback) {
     $.ajax({
         url: "/api/search",
@@ -950,36 +535,7 @@ function ajaxLoadSearches(successCallback) {
         accepts: "application/json",
         success: function(data) {
             searches = JSON.parse(data);
-            splitOffOpponentSearches();
-            if (successCallback) successCallback();
-        },
-        error: function(xhr, status, errorThrown) {
-            showAjaxError(xhr, status, errorThrown);
-        }
-    });
-}
-
-/*-------------------------------------------------------------------*/
-/* Make ajax call to post new search to the server and find out if   */
-/* it was successful.                                                */
-/*-------------------------------------------------------------------*/
-
-function ajaxPostSearch(search, successCallback) {
-    $.ajax({
-        url: "/api/search",
-        type: "POST",
-        data: search,
-        success: function(data) {
-            var retSearch = JSON.parse(data);
-            createUpdateAuthCookie();
-            if (retSearch.Markers) {
-                for (var i = 0; i < retSearch.Markers.length; i++) {
-                    search.Markers.push({
-                        Zone: retSearch.Markers[i].Zone,
-                        TypesFound: retSearch.Markers[i].TypesFound
-                    });
-                }
-            }
+            if (game.PhaseId == 3) splitOffOpponentSearches();
             if (successCallback) successCallback();
         },
         error: function(xhr, status, errorThrown) {
@@ -991,7 +547,6 @@ function ajaxPostSearch(search, successCallback) {
 /*-------------------------------------------------------------------*/
 /* Make ajax call to post phase data back to the server.             */
 /*-------------------------------------------------------------------*/
-
 function ajaxPutPhase(successCallback) {
     // parse out future arrivals
     var shipsToPass = [];
@@ -1026,7 +581,6 @@ function ajaxPutPhase(successCallback) {
 /* Callback for ajaxLoadPhase call. Set up tabs based on phase       */
 /* actions.                                                          */
 /*-------------------------------------------------------------------*/
-
 function setTabs() {
     var tabHtml = "", panelHtml = "", showFirst = " tabshown";
     for (var i = 0; i < phase.Actions.length; i++) {
@@ -1083,10 +637,8 @@ function shipsLoaded() {
             }
             showShipsInZone(selectedZone);
 
-            // each of these knows to bail if it's not their phase
-            showArrivingShips();
-            showSearchControls();
-            showAirOpsControls();
+            
+            loadPhaseTab();
 
             showShipsDue();
             showOffMapShips();
@@ -1117,7 +669,6 @@ function loadPage() {
         ajaxLoadPhase(function () {
             setTabs();
             selectedZone = game.SelectedLocation;
-            selectedArea = "";
             ajaxLoadShips(shipsLoaded);
         });
         window.currentPage = "search";
