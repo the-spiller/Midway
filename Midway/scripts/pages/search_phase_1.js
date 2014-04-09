@@ -19,19 +19,17 @@ $("#airreadiness").on("click", function () {
     showAirReadiness();
 });
 
-$(document).on("mouseup", function () {
-    window.mouseDown = false;
-    if (dragThang.dragging) {
-        dragThang.dragging = false;
-        if (dragThang.origin == "arrivals")
-            searchGrid.removeArrivalZones(side);
-        else if (dragThang.useSnapshot)
-            searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
-    }
-});
+//$(document).on("mouseup", function () {
+//    mouseDown = false;
+//    if (dragThang.dragging) {
+//        dragThang.dragging = false;
+//        if (dragThang.useSnapshot)
+//            searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
+//    }
+//});
 
 $(canvas).on("mousedown", function (e) {
-    window.mouseDown = true;
+    mouseDown = true;
     var zone = searchGrid.coordsToZone(windowToCanvas(canvas, e.clientX, e.clientY)),
         selShips = getSelectedShips("zone");
 
@@ -65,6 +63,21 @@ function loadPhaseTab() {
 
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
+function prepForArrivalsDrag() {
+    var selShips = getSelectedShips("arrivals");
+    if (selShips.length > 0) {
+        mouseDown = true;
+        dragThang.dragData = selShips;
+        dragThang.useSnapshot = true;
+        dragThang.cursorImg = document.getElementById("fleet");
+        dragThang.snapshot = null;
+
+        setTimeout(beginControlsDrag, 150);
+    }
+}
+
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
 function isLegitDrop(coords) {
     var dropZone = searchGrid.coordsToZone(coords);
     if (dropZone == dragThang.origin) return true;
@@ -86,21 +99,6 @@ function isLegitDrop(coords) {
 }
 
 /*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-function prepForArrivalsDrag() {
-    var selShips = getSelectedShips("arrivals");
-    if (selShips.length > 0) {
-        mouseDown = true;
-        dragThang.dragData = selShips;
-        dragThang.useSnapshot = true;
-        dragThang.cursorImg = document.getElementById("fleet");
-        dragThang.snapshot = null;
-
-        setTimeout(beginControlsDrag, 150);
-    }
-}
-
-/*-------------------------------------------------------------------*/
 /* "Sail" fleet marker to a new location on the map.                 */
 /*-------------------------------------------------------------------*/
 function sailShips(startZone, endZone) {
@@ -110,12 +108,11 @@ function sailShips(startZone, endZone) {
         distY = endPos.y - startPos.y,
         startTime = new Date().getTime(),
         elapsed = 0,
-        duration = 250 * Math.max(distX, distY), // set animation duration based on distance to be covered
+        duration = 10 * Math.max(Math.abs(distX), Math.abs(distY)), // set animation duration based on distance to be covered
         handle;
 
-    alert("distx = " + distX + ", disty = " + distY);
-    
     searchGrid.drawMap(function () {
+        searchGrid.highlightArrivalZones(side);
         drawSightings();
         drawShips([startZone, endZone]);
         mapImg = searchGrid.grabImageData();
@@ -129,6 +126,7 @@ function sailShips(startZone, endZone) {
         if (elapsed >= duration) {
             window.cancelAnimationFrame(handle);
             searchGrid.drawMap(function () {
+                searchGrid.highlightArrivalZones(side);
                 drawSightings();
                 drawShips();
                 searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
@@ -157,15 +155,16 @@ function getShipsMinMovePoints(zone) {
     return min == 999 ? 0 : min;
 }
 
-
 /*-------------------------------------------------------------------*/
-/* Mark ships data with a new location.                              */
+/* Mark ships data with a new location and reload the shipZones[]    */
+/* array to reflect the change.                                      */
 /*-------------------------------------------------------------------*/
 function relocateShips(zone, movedShips, cost) {
     for (var i = 0; i < movedShips.length; i++) {
         movedShips[i].MovePoints -= cost;
         movedShips[i].Location = zone;
     }
+    loadShipZones();
 }
 
 /*-------------------------------------------------------------------*/

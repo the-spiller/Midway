@@ -97,9 +97,7 @@ function showWait(title, message, color) {
         });
     $("#dlgoverlay").css("display", "block");
 }
-function hideWait() {
-    $("#dlgoverlay").css("display", "none");
-}
+
 function showAjaxError(xhr, status, errorThrown) {
     if (!errorThrown)
         showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "red");

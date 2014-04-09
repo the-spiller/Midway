@@ -342,15 +342,8 @@ th {
 {
     margin-right: 20px;
 }
-    #airreadiness img {
-        border-right: 1px solid #000;
-        border-bottom: 1px solid #000;
-    }
 	#airreadiness.disable {
 	    cursor: default;
-	}
-	#airreadiness.disable img {
-	    border: none;
 	}
 
 #buttons {

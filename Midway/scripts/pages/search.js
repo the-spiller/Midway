@@ -64,6 +64,7 @@ $(canvas).on("click", function (e) {
     if ($.inArray(zone, shipZones) != -1) {
         $("#zone").find("div.shipitem").addClass("selected");
     }
+    selectZoneTab();
 }).on("mouseup", function (e) {
     canvasMouseUp(e);
 });
@@ -73,7 +74,7 @@ $(document).on("click", ".tablistitem", function(e) {
     workTabs(e);
 }).on("click", ".shipitem", function(e) {
     doShipSelection(this, (e.shiftKey));
-    window.mouseDown = false;
+    mouseDown = false;
 }).on("mousedown", ".shipitem", function(e) {
     controlItemMouseDown(e);
 });
@@ -84,7 +85,6 @@ $(document).on("click", ".tablistitem", function(e) {
 /* Return to the home page.                                          */
 /*-------------------------------------------------------------------*/
 function goHome() {
-    searchGrid.clearCanvas();
     document.location.href = "/views/home.html";
 }
 
@@ -100,10 +100,10 @@ function drawSightings() {
 }
 
 /*-------------------------------------------------------------------*/
-/* Walk the ships array and draw a fleet marker at each              */
-/* ship.Location found, reloading the shipZones array as we go. If   */
-/* the excludedZones array is populated, don't draw a marker at      */
-/* the locations it contains.                                        */
+/* Load the array of unique ship locations shipZones[], then walk it */
+/* drawing a fleet marker at each location. If the excludedZones     */
+/* array argument is populated, don't draw a marker at the locations */
+/* it contains (used during movement).                               */
 /*-------------------------------------------------------------------*/
 function drawShips(excludedZones) {
     if (excludedZones == null) excludedZones = [];
@@ -129,6 +129,16 @@ function selectZone(coords) {
     searchGrid.drawSelector(topLeft, 1, true);
     selectedZone = searchGrid.coordsToZone(coords);
     showShipsInZone();
+}
+
+/*-------------------------------------------------------------------*/
+/* Select the Zone tab in response to a double-click on a fleet      */
+/* marker.                                                           */
+/*-------------------------------------------------------------------*/
+function selectZoneTab() {
+    $(".tablistitem, .tabpanel").removeClass("tabshown");
+    $("#zonetab").addClass("tabshown");
+    $("#zone").addClass("tabshown");
 }
 
 /*-------------------------------------------------------------------*/
@@ -305,18 +315,20 @@ function getSightedShipsHtml(searchMarker, searchTurn) {
 /* Display image indicating air readiness.                           */
 /*-------------------------------------------------------------------*/
 function showAirReadiness() {
-    var imgElement = document.getElementById("readinessimg"), readyDesc;
+    var imgElement = document.getElementById("readinessimg"),
+        readyDesc;
+    
     switch (game.AircraftReadyState) {
     case 0:
-        imgElement.src = imgDir + side.toLowerCase() + "-airnotready.png";
+        imgElement.src = imgDir + "air-notready.png";
         readyDesc = "not ready";
         break;
     case 1:
-        imgElement.src = imgDir + side.toLowerCase() + "-airreadying.png";
+        imgElement.src = imgDir + "air-readying.png";
         readyDesc = "readying";
         break;
     default:
-        imgElement.src = imgDir + side.toLowerCase() + "-airready.png";
+        imgElement.src = imgDir + "air-ready.png";
         readyDesc = "ready";
         break;
     }
@@ -330,12 +342,13 @@ function showAirReadiness() {
 /*-------------------------------------------------------------------*/
 function getSelectedShips(tabId) {
     var selShips = [],
-        $list = $("#" + tabId).find("div.shipitem.selected"),
+        list = $("#" + tabId).find("div.shipitem.selected"),
         id;
 
-    for (var i = 0; i < $list.length; i++) {
-        if ($list[i].id.indexOf("airbase-") == -1) {
-            id = $list[i].id.substr($list[i].id.indexOf("-") + 1);
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].id.indexOf("airbase-") == -1) {
+            id = list[i].id.substr(list[i].id.indexOf("-") + 1);
+            console.log(id);
             selShips.push(getShipById(id));
         }
     }
@@ -405,7 +418,6 @@ function controlItemMouseDown(e) {
 function beginControlsDrag() {
     if (mouseDown) {
         dragThang.dragging = true;
-        if (dragThang.origin == "arrivals") searchGrid.highlightArrivalZones(side);
         canvas.addEventListener("mousemove", canvasMouseMove, false);
     }
 }
@@ -445,15 +457,14 @@ function canvasMouseMove(e) {
 /* Respond to a potiential drop event.                               */
 /*-------------------------------------------------------------------*/
 function canvasMouseUp(e) {
-    window.mouseDown = false;
+    mouseDown = false;
     if (dragThang.dragging) {
         dragThang.dragging = false;
         canvas.removeEventListener("mousemove", canvasMouseMove, false);
-        if (dragThang.origin == "arrivals") searchGrid.removeArrivalZones(side);
 
         var coords = windowToCanvas(canvas, e.clientX, e.clientY),
             zone = searchGrid.coordsToZone(coords);
-
+        
         if (dragThang.origin == "search") {
             hideSearching();
             selectArea(coords);
@@ -470,7 +481,7 @@ function canvasMouseUp(e) {
             relocateShips(zone, dragThang.dragData, cost);
 
             if (dragThang.origin == "arrivals") {
-                searchGrid.drawShipsMarker(searchGrid.coordsToTopLeftCoords(coords));
+                //searchGrid.drawShipsMarker(searchGrid.coordsToTopLeftCoords(coords));
                 $("#arrivals").find("div.shipitem").remove(".selected").parent();
                 selectZone(coords);
                 if ($("#arrivals").find("div.shipitem").length == 0) {
@@ -627,7 +638,8 @@ function shipsLoaded() {
     showAirReadiness();
 
     ajaxLoadSearches(function() {
-        searchGrid.drawMap(function() {
+        searchGrid.drawMap(function () {
+            if (game.PhaseId == 1) searchGrid.highlightArrivalZones(side);
             drawShips();
             drawSightings();
 
@@ -636,10 +648,7 @@ function shipsLoaded() {
                 searchGrid.drawSelector(coords, 1);
             }
             showShipsInZone(selectedZone);
-
-            
             loadPhaseTab();
-
             showShipsDue();
             showOffMapShips();
         });

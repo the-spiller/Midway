@@ -2,11 +2,11 @@
     var zonesize = 36,
         mapmargin = 27,
         mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
-        cnvs = document.getElementById("searchcanvas"),
-        ctx = cnvs.getContext("2d"),
+        cvs = document.getElementById("searchcanvas"),
+        ctx = cvs.getContext("2d"),
         restImg = null,
         //functions called internally
-        pZoneToTopLeftCoords = function(zone) {
+        privZoneToTopLeftCoords = function(zone) {
             var col = 0,
                 areaSize = zonesize * 3;
 
@@ -49,7 +49,7 @@
             }
             return { x: col, y: row };
         },
-        pCoordsToZone = function(coords) {
+        privCoordsToZone = function(coords) {
             var x = coords.x,
                 y = coords.y;
 
@@ -86,12 +86,12 @@
                 return colRow + "I";
             }
         },
-        pCoordsToTopLeftCoords = function(coords) {
+        privCoordsToTopLeftCoords = function(coords) {
             var zonesX = coords.x - mapmargin < 0 ? 0 : Math.floor((coords.x - mapmargin) / zonesize),
                 zonesY = coords.y - mapmargin < 0 ? 0 : Math.floor((coords.y - mapmargin) / zonesize);
             return { x: (zonesX * zonesize) + mapmargin, y: (zonesY * zonesize) + mapmargin };
         },
-        pDrawSelBox = function(left, top, sideLength) {
+        privDrawSelBox = function(left, top, sideLength) {
             ctx.save();
             ctx.globalAlpha = 0.6;
             ctx.lineWidth = 4;
@@ -115,27 +115,27 @@
         /* zone that contains them.                                          */
         /*-------------------------------------------------------------------*/
         coordsToZone: function (coords) {
-            return pCoordsToZone(coords);
+            return privCoordsToZone(coords);
         },
         /*-------------------------------------------------------------------*/
         /* Convert a zone name to its top left canvas coordinates.           */
         /*-------------------------------------------------------------------*/
         zoneToTopLeftCoords: function(zone) {
-            return pZoneToTopLeftCoords(zone);
+            return privZoneToTopLeftCoords(zone);
         },
         /*-------------------------------------------------------------------*/
         /* Convert input canvas coordinates to those of the top left of the  */
         /* zone that contains them.                                          */
         /*-------------------------------------------------------------------*/
         coordsToTopLeftCoords: function (coords) {
-            return pCoordsToTopLeftCoords(coords);
+            return privCoordsToTopLeftCoords(coords);
         },
         /*-------------------------------------------------------------------*/
         /* Calculate and return the distance, in zones, between two zones.   */
         /*-------------------------------------------------------------------*/
         zoneDistance: function (zone1, zone2) {
-            var zone1Coords = pZoneToTopLeftCoords(zone1),
-                zone2Coords = pZoneToTopLeftCoords(zone2),
+            var zone1Coords = privZoneToTopLeftCoords(zone1),
+                zone2Coords = privZoneToTopLeftCoords(zone2),
                 zone1Adj = {
                     x: zone1Coords.x - mapmargin < 0 ? 0 : zone1Coords.x - mapmargin,
                     y: zone1Coords.y - mapmargin < 0 ? 0 : zone1Coords.y - mapmargin
@@ -153,12 +153,12 @@
         /* area that contains them.                                          */
         /*-------------------------------------------------------------------*/
         coordsToAreaTopLeftCoords: function (coords) {
-            return pZoneToTopLeftCoords(pCoordsToZone(coords).substr(0, 2) + "A");
+            return privZoneToTopLeftCoords(privCoordsToZone(coords).substr(0, 2) + "A");
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         clearCanvas: function () {
-            ctx.clearRect(0, 0, cnvs.width, cnvs.height);
+            ctx.clearRect(0, 0, cvs.width, cvs.height);
         },
         /*-------------------------------------------------------------------*/
         /* Draw the search map semi-transparently and size the canvas to     */
@@ -167,23 +167,17 @@
         /*-------------------------------------------------------------------*/
         drawMap: function (callback) {
             var imgDir = "/content/images/search/",
-                mapImg = new Image(),
-                atollsImg = new Image();
+                mapImg = new Image();
 
             mapImg.src = imgDir + "searchboard.png";
             mapImg.onload = function () {
-                cnvs.height = mapImg.height;
-                cnvs.width = mapImg.width;
-                ctx.save();
-                ctx.globalAlpha = 0.4;
+                cvs.height = mapImg.height;
+                cvs.width = mapImg.width;
+                //ctx.save();
+                //ctx.globalAlpha = 0.4;
                 ctx.drawImage(mapImg, 0, 0);
-                ctx.restore();
-
-                atollsImg.src = imgDir + "atolls.png";
-                atollsImg.onload = function () {
-                    ctx.drawImage(atollsImg, 711, 495);
-                    if (callback) callback();
-                };
+                if (callback) callback();
+                //ctx.restore();
             };
         },
         /*-------------------------------------------------------------------*/
@@ -191,7 +185,7 @@
         /* canvas coordinates.                                               */
         /*-------------------------------------------------------------------*/
         drawSightingMarker: function (zone) {
-            var topLeft = pZoneToTopLeftCoords(zone),
+            var topLeft = privZoneToTopLeftCoords(zone),
                 sightingImg = document.getElementById("sighting");
             ctx.drawImage(sightingImg, topLeft.x, topLeft.y);
         },
@@ -200,24 +194,17 @@
         highlightArrivalZones: function (side) {
             var topZone = side == "IJN" ? "A1A" : "I1B",
                 bottomZone = side == "IJN" ? "A7D" : "I7E",
-                topCoords = pZoneToTopLeftCoords(topZone),
-                bottomCoords = addVectors(pZoneToTopLeftCoords(bottomZone), { x: zonesize, y: zonesize }),
+                topCoords = privZoneToTopLeftCoords(topZone),
+                bottomCoords = addVectors(privZoneToTopLeftCoords(bottomZone), { x: zonesize, y: zonesize }),
                 width = bottomCoords.x - topCoords.x,
                 height = bottomCoords.y - topCoords.y;
 
-            restImg = ctx.getImageData(topCoords.x, topCoords.y, width, height);
             ctx.save();
             ctx.globalAlpha = 0.2;
             ctx.fillStyle = side == "USN" ? "#004a7f" : "#ff2b00";
             ctx.rect(topCoords.x, topCoords.y, width, height);
             ctx.fill();
             ctx.restore();
-        },
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        removeArrivalZones: function (side) {
-            var topCoords = pZoneToTopLeftCoords(side == "IJN" ? "A1A" : "I1B");
-            ctx.putImageData(restImg, topCoords.x, topCoords.y);
         },
         /*-------------------------------------------------------------------*/
         /* Grab preloaded fleet image and draw it at the input canvas        */
@@ -228,7 +215,7 @@
             ctx.drawImage(fleetImg, coords.x - zonesize, coords.y);
         },
         /*-------------------------------------------------------------------*/
-        /* Draw yellow square selected area/zone marker at the input canvas  */
+        /* Draw yellow square selected zone marker at the input canvas       */
         /* top and left coordinates.                                         */
         /*-------------------------------------------------------------------*/
         drawSelector: function (topLeft, sizeInZones) {
@@ -239,7 +226,7 @@
             if (sizeInZones == 1)
                 restImg = ctx.getImageData(left, top, sideLength + 3, sideLength + 3);
 
-            pDrawSelBox(left, top, sideLength);
+            privDrawSelBox(left, top, sideLength);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -251,8 +238,8 @@
         /* during ship movement dragging.                                    */
         /*-------------------------------------------------------------------*/
         drawMoveBand: function (startZone, endCoords) {
-            var start = pZoneToTopLeftCoords(startZone),
-                topLeft = pCoordsToTopLeftCoords(endCoords);
+            var start = privZoneToTopLeftCoords(startZone),
+                topLeft = privCoordsToTopLeftCoords(endCoords);
 
             start.x += Math.floor(zonesize / 2);
             start.y += Math.floor(zonesize / 2);
@@ -275,8 +262,8 @@
             if (!left) {
                 left = 0;
                 top = 0;
-                width = cnvs.width;
-                height = cnvs.height;
+                width = cvs.width;
+                height = cvs.height;
             }
             return ctx.getImageData(left, top, width, height);
         },
@@ -291,16 +278,16 @@
             if (restoreData) {
                 ctx.putImageData(restoreData, 0, 0);
             }
-            var ret = ctx.getImageData(0, 0, cnvs.width, cnvs.height);
+            var ret = ctx.getImageData(0, 0, cvs.width, cvs.height);
             ctx.drawImage(imageData, left, top);
             return ret;
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         drawOppSearchArea: function(area) {
-            var coords = addVectors(pZoneToTopLeftCoords(area + "A"), { x: -3, y: -3 }),
+            var coords = addVectors(privZoneToTopLeftCoords(area + "A"), { x: -3, y: -3 }),
                 sideLength = (zonesize * 3) + 5;
-            pDrawSelBox(coords.x, coords.y, sideLength);
+            privDrawSelBox(coords.x, coords.y, sideLength);
         }
     };
 })();

@@ -45,7 +45,7 @@ function drawCursorImg(x, y) {
 function prepForSearch(e) {
     var selSearch = getSearch(e.target);
     if (selSearch) {
-        window.mouseDown = true;
+        mouseDown = true;
         dragThang.dragData = selSearch;
         dragThang.cursorImg = document.getElementById(selSearch.SearchType + "searchcursor");
         dragThang.cursorOffset = { x: -40, y: -40 },
