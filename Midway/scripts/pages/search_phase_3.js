@@ -3,7 +3,7 @@
 
 var oppSearches = [];
 
-document.on("mouseenter", ".oppsearchitem", function (e) {
+$(document).on("mouseenter", ".oppsearchitem", function (e) {
     showOppSearchedArea(e);
 }).on("mouseleave", ".oppsearchitem", function () {
     hideOppSearchedArea();
@@ -13,8 +13,6 @@ document.on("mouseenter", ".oppsearchitem", function (e) {
 /* Load the Air Ops tab with its control elements.                   */
 /*-------------------------------------------------------------------*/
 function loadPhaseTab() {
-    if (game.PhaseId != 3) return;
-
     // Opponent's searches
     var opsHtml = "<div class=\"listheader\">Opponent's searches</div>",
         airPath = side == "USN" ? imgDir + "ijn-air-search.png" : imgDir + "usn-air-search.png",

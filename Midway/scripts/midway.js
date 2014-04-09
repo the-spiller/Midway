@@ -111,6 +111,7 @@ function showAjaxError(xhr, status, errorThrown) {
         showAlert(xhr.status + " " + errorThrown, errText, DLG_OK, "red");
     }
 }
+
 function loadPlayerForPage(callback) {
     var cookie = readCookie(COOKIE_NAME);
     if (cookie) {
@@ -137,6 +138,7 @@ function ajaxGetPlayer(playerId, successCallback) {
         }
     });
 }
+
 function ajaxUpdatePlayer(shallowPlayer, successCallback) {
     $.ajax({
         url: "/api/player",

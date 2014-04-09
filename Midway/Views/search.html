@@ -4,6 +4,133 @@
         <title>Midway Search</title>
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
+        <style>
+        .noselect {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        #phase {
+            cursor: pointer;
+        }
+
+        .shipitem {
+            position: relative;
+            cursor: pointer;
+	        padding: 4px;
+            margin-bottom: 4px;
+        }
+            .shipitem:hover {
+                background-color: #253549;
+            }
+            .shipitem.selected {
+                background-color: #1f2c3d;
+	            padding: 5px 3px 3px 5px;
+		        box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
+
+            }
+
+        .numplanes {
+	        position: absolute;
+	        top: 29px;
+	        font-weight: 500;
+	        color: #fff;
+	        z-index: 5;
+            font-size: .85em;
+        }
+	        .numplanes.torpedo {
+		        left: 186px;
+	        }
+	        .numplanes.fighter {
+		        left: 237px;
+	        }
+	        .numplanes.divebomber {
+		        left: 292px;
+	        }
+
+        .shiphits {
+            position: absolute;
+            left: 4px;
+            top: 35px;
+        }
+            .shiphits.green {
+                z-index: 2;
+            }
+            .shiphits.red {
+                z-index: 3;
+            }
+                
+        .listheader {
+	        margin: 5px;
+	        background-color: #516580;
+	        padding: 4px;
+        }
+        
+        .searchitem {
+            position: relative;
+            cursor: pointer;
+	        padding: 5px;
+            margin-bottom: 4px;
+        }
+            .searchitem:hover {
+                background-color: #253549;
+            }
+
+        .oppsearchitem {
+            cursor: pointer;
+	        min-height: 42px;
+        }
+	        .oppsearchitem td {
+		        overflow: hidden;
+	        }
+            .oppsearchitem img {
+                position: relative;
+                margin: 0 -90px;
+            }
+            .oppsearchitem:hover {
+                background-color: #253549;
+            }
+
+        .searchmarker {
+            position: absolute;
+            z-index: 5;
+            display: none; 
+        }
+        
+        .cursorimg {
+            cursor: none;
+            position: absolute;
+            z-index: 10;
+            display: none;
+        }
+        
+        .sightedlabel {
+            vertical-align: middle;
+        }
+
+        .sightedship {
+            padding: 5px;
+            vertical-align: top;
+        }
+        
+        #searchdiv {
+            top: 60px;
+            width: 400px;
+            height: 737px;
+            opacity: 1.0;
+        }
+            #searchdiv .tabpanel {
+                height: 670px;
+                background: none;
+                background-color: #2b3d55;
+            }
+
+        #searchcanvas {
+	        position: absolute;
+	        top: 60px;
+        }
+        </style>
     </head>
     <body>
         <div id="pagediv">

@@ -49,7 +49,7 @@ $("#done").on("click", function() {
             return;
         }
         ajaxPutPhase(function () {
-            goHome();
+            location.reload(true);
         });
     }
 });
@@ -67,6 +67,13 @@ $(canvas).on("click", function (e) {
     selectZoneTab();
 }).on("mouseup", function (e) {
     canvasMouseUp(e);
+}).on("mouseout", function () {
+    mouseDown = false;
+    if (dragThang.dragging) {
+        dragThang.dragging = false;
+        if (dragThang.useSnapshot)
+            searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
+    }
 });
 
 // Event handlers for dynamically-loaded elements
@@ -75,8 +82,6 @@ $(document).on("click", ".tablistitem", function(e) {
 }).on("click", ".shipitem", function(e) {
     doShipSelection(this, (e.shiftKey));
     mouseDown = false;
-}).on("mousedown", ".shipitem", function(e) {
-    controlItemMouseDown(e);
 });
 
 // Functions...........................................................
@@ -85,7 +90,7 @@ $(document).on("click", ".tablistitem", function(e) {
 /* Return to the home page.                                          */
 /*-------------------------------------------------------------------*/
 function goHome() {
-    document.location.href = "/views/home.html";
+    location.replace("/views/home.html");
 }
 
 /*-------------------------------------------------------------------*/
@@ -396,23 +401,6 @@ function doShipSelection(shipItem, shiftPressed) {
 }
 
 /*-------------------------------------------------------------------*/
-/* Initialize an arrivals or search drag operation.                  */
-/*-------------------------------------------------------------------*/
-function controlItemMouseDown(e) {
-    var panelId = $("#tabpanels").find("div.tabshown").attr("id");
-    if (!panelId) return;
-
-    dragThang.dragging = false;
-    dragThang.origin = panelId;
-
-    if (game.PhaseId == 1 && panelId == "arrivals") {
-        prepForArrivalsDrag();
-    } else if (game.PhaseId == 2 & panelId == "search") {
-        prepForSearch(e);
-    }
-}
-
-/*-------------------------------------------------------------------*/
 /* Called after a fast timer to ensure that we're actually dragging. */
 /*-------------------------------------------------------------------*/
 function beginControlsDrag() {
@@ -579,7 +567,7 @@ function ajaxPutPhase(successCallback) {
         },
         success: function(data) {
             window.player = JSON.parse(data);
-            createUpdateAuthCookie();
+            //createUpdateAuthCookie();
             if (successCallback) successCallback();
         },
         error: function(xhr, status, errorThrown) {

@@ -16,7 +16,7 @@ $("#infolink").on("click", function() {
 $("#logofflink").on("click", function () {
     if (unsavedRegChanges()) return;
     eraseCookie(COOKIE_NAME);
-    document.location.href = "/index.html";
+    location.replace("/index.html");
 });
 
 $(".tablistitem").on("click", function (e) {
@@ -83,11 +83,10 @@ $("#playgame").on("click", function () {
     if (selGameId == 0) return;
     if (unsavedRegChanges()) return;
 
-    if (selGameId < 0) {
-        createGame();
-    }
     showWait("Loading", "Loading search page, please wait ...", "blue");
-    document.location.href = "/views/search.html?gid=" + selGameId;
+    createGame(function () {
+        location.replace("/views/search.html?gid=" + selGameId);
+    });
 });
         
 $("#oppnickname").on("focus", function () {
@@ -207,48 +206,55 @@ function shallowCopyGame(game) {
         
 // Return the game with the highest ID value -- it's the newest
 function getNewestGameId() {
-    var maxId = 0;
-    for (var i = 0; i < window.player.Games.length; i++) {
-        if (window.player.Games[i].GameId > maxId) {
-            maxId = window.player.Games[i].GameId;
+    var maxId = 0,
+        games = window.player.Games;
+    
+    for (var i = 0; i < games.length; i++) {
+        if (games[i].GameId > maxId) {
+            maxId = games[i].GameId;
         }
     }
     return maxId;
 }
         
-function createGame() {
-    // create a new game
-    var nickname = "";
-    if ($("#oppnickname").val() && $("#oppnickname").val() != "First available")
-        nickname = $("#oppnickname").val();
+function createGame(callback) {
+    // create a new game if required
+    if (selGameId < 0) {
+        var nickname = "";
+        if ($("#oppnickname").val() && $("#oppnickname").val() != "First available")
+            nickname = $("#oppnickname").val();
 
-    var shallowPlayer = shallowCopyPlayer();
+        var shallowPlayer = shallowCopyPlayer();
 
-    var game = {
-        GameId: 0,
-        Turn: 1,
-        PhaseId: 1,
-        SideId: Math.abs(selGameId),
-        SideShortName: "",
-        TinyFlagUrl: "",
-        LastPlayed: "",
-        CompletedDTime: "",
-        Points: 0,
-        SelectedLocation: "",
-        OpponentId: 0,
-        OpponentNickname: nickname,
-        OpponentPoints: 0,
-        Draw: "Y",
-        Waiting: "N"
-    };
-    shallowPlayer.Games.push(game);
+        var game = {
+            GameId: 0,
+            Turn: 1,
+            PhaseId: 1,
+            SideId: Math.abs(selGameId),
+            SideShortName: "",
+            TinyFlagUrl: "",
+            LastPlayed: "",
+            CompletedDTime: "",
+            Points: 0,
+            SelectedLocation: "",
+            OpponentId: 0,
+            OpponentNickname: nickname,
+            OpponentPoints: 0,
+            Draw: "Y",
+            Waiting: "N"
+        };
+        shallowPlayer.Games.push(game);
 
-    // do a player update to create the new game
-    ajaxUpdatePlayer(shallowPlayer, function () {
-        showWait("Loading", "Loading search page, please wait ...", "blue");
-        // set the new game Id
-        selGameId = getNewestGameId();   //highest game Id is newest
-    });
+        // do a player update to create the new game
+        ajaxUpdatePlayer(shallowPlayer, function() {
+            showWait("Loading", "Loading search page, please wait ...", "blue");
+            // set the new game Id
+            selGameId = getNewestGameId(); //highest game Id is newest
+            if (callback) callback();
+        });
+    } else {
+        if (callback) callback();
+    }
 }
         
 function unsavedRegChanges() {

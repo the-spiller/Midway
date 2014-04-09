@@ -1,7 +1,8 @@
-﻿// Events and functions for Phase 2 (Search)
+﻿
+// Events and functions for Phase 2 (Search)
 
-document.on("mousedown", ".searchitem", function(e) {
-    controlItemMouseDown(e);
+$(document).on("mousedown", ".searchitem", function(e) {
+    searchItemMouseDown(e);
 });
 
 /*-------------------------------------------------------------------*/
@@ -10,7 +11,7 @@ document.on("mousedown", ".searchitem", function(e) {
 function loadPhaseTab() {
     if (game.PhaseId != 2) return;
 
-    var srchHtml = "<div style=\"margin: 5px 0 15px 5px;\">Available searches</div><ul>",
+    var searchHtml = "<div style=\"margin: 5px 0 15px 5px;\">Available searches</div><ul>",
         searchDesc,
         searchImg = imgDir + side.toLowerCase() + "-air-search.png";
 
@@ -18,31 +19,32 @@ function loadPhaseTab() {
         if (searches[i].Turn == game.Turn && !searches[i].Area) {
             if (searches[i].SearchType == "sea") {
                 searchDesc = "Search any area containing one of your ships";
-                searchImg = imgDir + "sea-search.png";
+                searchImg = imgDir + side.toLowerCase() + "-sea-search.png";
             } else if (game.SearchRange == 0) { //Unlimited
                 searchDesc = "Search any area";
             } else {
                 searchDesc = "Search any area within " + game.SearchRange + " zones of any of your ships";
             }
-            srchHtml += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
+            searchHtml += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
                 " title=\"" + searchDesc + "\">" +
                 "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"" + searchImg + "\" draggable=\"false\" />" +
                 "</div></li>";
         }
     }
-    $("#search").html(srchHtml);
+    $("#search").html(searchHtml);
 }
 
-/*-------------------------------------------------------------------*/
-/* Draw the search cursor at the input coordinates.                  */
-/*-------------------------------------------------------------------*/
-function drawCursorImg(x, y) {
-    dragThang.snapshot = searchGrid.drawSearchCursor(dragThang.snapshot, dragThang.cursorImg, x, y);
-}
 
 /*-------------------------------------------------------------------*/
+/* Initialize a search drag operation.                               */
 /*-------------------------------------------------------------------*/
-function prepForSearch(e) {
+function searchItemMouseDown(e) {
+    var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "null";
+    if (panelId != "search") return;
+
+    dragThang.dragging = false;
+    dragThang.origin = panelId;
+
     var selSearch = getSearch(e.target);
     if (selSearch) {
         mouseDown = true;
@@ -55,6 +57,13 @@ function prepForSearch(e) {
 
         setTimeout(beginControlsDrag, 150);
     }
+}
+
+/*-------------------------------------------------------------------*/
+/* Draw the search cursor at the input coordinates.                  */
+/*-------------------------------------------------------------------*/
+function drawCursorImg(x, y) {
+    dragThang.snapshot = searchGrid.drawSearchCursor(dragThang.snapshot, dragThang.cursorImg, x, y);
 }
 
 /*-------------------------------------------------------------------*/

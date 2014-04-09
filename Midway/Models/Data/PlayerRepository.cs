@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-using System.Web.Security;
 using System.Runtime.Caching;
+using System.Web.Security;
 using Midway.Models.Services;
 using Midway.Models.DTOs;
 
@@ -58,29 +58,17 @@ namespace Midway.Models.Data
 
         public DtoPlayer GetPlayer(int id)
         {
-            var cache = MemoryCache.Default;
-            bool loadGames;
-
-            var dtoPlayer = (DtoPlayer)cache.Get(id.ToString(CultureInfo.InvariantCulture));
-            if (dtoPlayer != null)
-            {
-                loadGames = (dtoPlayer.Games == null || !dtoPlayer.Games.Any());
-            }
-            else
-            {
-                loadGames = true;
-
-                dtoPlayer = _context.Players.Select(p => new DtoPlayer
-                    {
-                        PlayerId = p.PlayerId,
-                        Email = p.Email,
-                        Password = p.Password,
-                        Nickname = p.Nickname,
-                        Admin = p.Admin,
-                        Lockout = p.Lockout
-                    }).FirstOrDefault(p => p.PlayerId == id);
-            }
-            return ReturnDtoPlayer(dtoPlayer, loadGames);
+			var dtoPlayer = _context.Players.Select(p => new DtoPlayer
+					{
+						PlayerId = p.PlayerId,
+						Email = p.Email,
+						Password = p.Password,
+						Nickname = p.Nickname,
+						Admin = p.Admin,
+						Lockout = p.Lockout
+					}).FirstOrDefault(p => p.PlayerId == id);
+            
+            return ReturnDtoPlayer(dtoPlayer, true);
         }
 
 		internal DtoPlayer GetPlayerWithCurrentGame(int playerId, int gameId)
@@ -252,7 +240,6 @@ namespace Midway.Models.Data
 			if (sendPwd)
 				new Mailer().SendNewPwdMessage(dtoPlayer.Email, dtoPlayer.Password);
 
-		    CachePlayer(dtoPlayer);
 			return GetPlayer(dtoPlayer.PlayerId);
         }
 
@@ -301,7 +288,6 @@ namespace Midway.Models.Data
             if (loadGames)
             {
                 dtoPlayer.Games = GetPlayerGames(dtoPlayer.PlayerId);
-                CachePlayer(dtoPlayer);
             }
             return dtoPlayer;
         }
@@ -332,7 +318,7 @@ namespace Midway.Models.Data
 
 			foreach (var dbGame in dbGames)
 			{
-				var range = (dbGame.Side.ShortName == "USN" && dbGame.Airbases.Count > 0) ? 0 : 12;
+				var range = (dbGame.Side.ShortName == "USN" && dbGame.Airbases.Count > 0) ? 0 : 12;  //zero = range is whole map
 
 				var dtoPlayerGame = new DtoPlayerGame
 				    {
@@ -415,14 +401,6 @@ namespace Midway.Models.Data
             var entry = (DtoPlayer)cache.Get(id.ToString(CultureInfo.InvariantCulture));
             if (entry == null) return string.Empty;
             return entry.AuthKey;
-        }
-
-        private void CachePlayer(DtoPlayer dtoPlayer)
-        {
-		    var cache = MemoryCache.Default;
-
-		    cache.Add(dtoPlayer.PlayerId.ToString(CultureInfo.InvariantCulture), dtoPlayer,
-		              new DateTimeOffset(DateTime.Now.AddHours(new AuthCacheEntry().ExpirationHours)));
         }
     }
 }

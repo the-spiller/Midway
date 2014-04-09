@@ -1,4 +1,6 @@
-﻿// Events and functions for Phase 1 (Search Map Move)
+﻿
+// Events and functions for Phase 1 (Search Map Move)
+
 $("#airreadiness").on("click", function () {
     if (game.AircraftReadyState == 0) {
         game.AircraftReadyState = 1;
@@ -19,14 +21,9 @@ $("#airreadiness").on("click", function () {
     showAirReadiness();
 });
 
-//$(document).on("mouseup", function () {
-//    mouseDown = false;
-//    if (dragThang.dragging) {
-//        dragThang.dragging = false;
-//        if (dragThang.useSnapshot)
-//            searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
-//    }
-//});
+$(document).on("mousedown", ".shipitem", function() {
+    shipItemMouseDown();
+});
 
 $(canvas).on("mousedown", function (e) {
     mouseDown = true;
@@ -62,9 +59,16 @@ function loadPhaseTab() {
 }
 
 /*-------------------------------------------------------------------*/
+/* Initialize an arrivals drag operation.                            */
 /*-------------------------------------------------------------------*/
-function prepForArrivalsDrag() {
-    var selShips = getSelectedShips("arrivals");
+function shipItemMouseDown() {
+    var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "null";
+    if (panelId != "arrivals") return;
+
+    dragThang.dragging = false;
+    dragThang.origin = panelId;
+
+    var selShips = getSelectedShips(panelId);
     if (selShips.length > 0) {
         mouseDown = true;
         dragThang.dragData = selShips;
