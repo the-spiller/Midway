@@ -87,7 +87,6 @@ $(document).ready(function() {
         scroll: false
     });
             
-    hideWait();
     $("#email").focus();
     window.currentPage = "register";
 });

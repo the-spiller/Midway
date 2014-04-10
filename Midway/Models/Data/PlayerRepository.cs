@@ -90,39 +90,33 @@ namespace Midway.Models.Data
 			return dtoPlayer;
 		}
 
+        public void SendPassword(int playerId)
+        {
+            Player dbPlayer = GetDbPlayer(playerId);
+            var newPass = Membership.GeneratePassword(new Random().Next(8, 12), 1);
+
+            dbPlayer.Password = newPass;
+            dbPlayer.Lockout = 0; // remove any lockout condition
+            _context.Save();
+
+            new Mailer().SendNewPwdMessage(dbPlayer.Email, dbPlayer.Password);
+        }
+
         public void SetPlayerLockout(int playerId, long lockout)
         {
-            var dbPlayer = _context.Players.FirstOrDefault(p => p.PlayerId == playerId);
-            if (dbPlayer == null)
-            {
-                throw new Exception("Player not found");
-            }
+            Player dbPlayer = GetDbPlayer(playerId);
             dbPlayer.Lockout = lockout;
             _context.Save();
         }
 
         public DtoPlayer UpdatePlayer(DtoPlayer dtoPlayer)
         {
-	        var sendPwd = false;
 			var buildNew = false;
-			var dbPlayer = _context.Players.FirstOrDefault(p => p.PlayerId == dtoPlayer.PlayerId);
 
-			if (dbPlayer == null)
-			{
-				throw new Exception("Player not found");
-			}
-
-            if (dtoPlayer.Password == null)  //Send new password to dtoPlayer's email addr.
-            {
-                var newPass = Membership.GeneratePassword(new Random().Next(8, 11), 1);
-                dtoPlayer.Password = newPass;
-				sendPwd = true;
-            }
-            
+            Player dbPlayer = GetDbPlayer(dtoPlayer.PlayerId);           
             dbPlayer.Email = dtoPlayer.Email;
             dbPlayer.Password = dtoPlayer.Password;
             dbPlayer.Nickname = dtoPlayer.Nickname;
-            dbPlayer.Lockout = dtoPlayer.Lockout;
 			dbPlayer.Admin = dtoPlayer.Admin;
 
 			// The only game data updated here is retirement/abandonment or the addition of new games.
@@ -247,10 +241,6 @@ namespace Midway.Models.Data
 			    }
 		    }
 			_context.Save();
-			
-			if (sendPwd)
-				new Mailer().SendNewPwdMessage(dtoPlayer.Email, dtoPlayer.Password);
-
 			return GetPlayer(dtoPlayer.PlayerId);
         }
 
@@ -289,6 +279,13 @@ namespace Midway.Models.Data
 
 			return InsertStatus.Ok;
 		}
+
+        private Player GetDbPlayer(int playerId)
+        {
+            var dbPlayer = _context.Players.FirstOrDefault(p => p.PlayerId == playerId);
+            if (dbPlayer == null) throw new Exception("Player not found");
+            return dbPlayer;
+        }
 
         private DtoPlayer ReturnDtoPlayer(DtoPlayer dtoPlayer, bool loadGames = true)
         {

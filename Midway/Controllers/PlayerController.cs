@@ -117,12 +117,20 @@ namespace Midway.Controllers
             }
         }
 
-        // PUT api/player/playerId&lockout=lockout (UPDATE)...................
+        // PUT api/player?playerId=playerId&lockout=lockout (UPDATE)...........
+        // Open call to reset password or set lockout.
         public HttpResponseMessage PutPlayer(int playerId, long lockout)
         {
             try
             {
-                _repo.SetPlayerLockout(playerId, lockout);
+                if (lockout > 0)
+                {
+                    _repo.SetPlayerLockout(playerId, lockout);
+                }
+                else
+                {
+                    _repo.SendPassword(playerId);
+                }
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -135,6 +143,7 @@ namespace Midway.Controllers
         }
 
         // PUT api/player (UPDATE).............................................
+        // Authorized call for real player updates incl. new games
         [Authorize]
         public HttpResponseMessage PutPlayer(DtoPlayer player)
         {

@@ -38,15 +38,7 @@ $("#wat").on("click", function () {
 
 function validateLogon() {
     if (!validEmail("email")) {
-        showAlert(
-            "Missing or Bogus Email Address",
-            "C'mon. You don't mean that this is supposed to be an email address.",
-            DLG_OK,
-            "blue",
-            function() {
-                $("#email").select().focus();
-            }
-        );
+        showBadEmailAlert();
     } else if (!hasText("pwd")) {
         showAlert(
             "That Won't Work",
@@ -88,7 +80,18 @@ function validateLogon() {
         });
     }
 }
-// end function validateLogon()
+
+function showBadEmailAlert() {
+    showAlert(
+        "Missing or Bogus Email Address",
+        "C'mon. You don't mean that this is supposed to be an email address.",
+        DLG_OK,
+        "blue",
+        function () {
+            $("#email").select().focus();
+        }
+    );
+}
 
 function showLockoutAlert() {
     showAlert(
@@ -99,7 +102,6 @@ function showLockoutAlert() {
         "red"
     );
 }
-// end function showLockoutAlert()
 
 function newPassword() {
     if (!hasText("email")) {
@@ -109,13 +111,16 @@ function newPassword() {
             DLG_OK,
             "blue"
         );
+    } else if (!validEmail("email")) {
+        showBadEmailAlert();
     } else {
         ajaxGetPlayerByEmail(function() {
-            ajaxSendPassword(function() {
+            ajaxPutWithUrlArgs(0, function () {
+                window.player.Lockout = 0;  // Remove any lockout condition
                 showAlert(
                     "Password Sent",
                     "We sent a new password to your email address. Log on using it and you can change " +
-                        "it to something more reasonable at 'Your Registration' on the home page.",
+                        "it to something more reasonable on the home page.",
                     DLG_OK,
                     "blue"
                 );
@@ -149,24 +154,12 @@ function ajaxGetPlayerByEmail(successCallback) {
         }
     });
 }
-// end function ajaxGetPlayerByEmail()
 
-function hilightEmail() {
-    $("#email").select();
-    $("#email").focus();
-}
-        
-function ajaxSendPassword(successCallback) {
-    window.player.Password = null;
-    ajaxUpdatePlayer(successCallback);
-}
-
-function ajaxSetLockout(successCallback) {
-    var twentyMin = 1000 * 60 * 20;
-    window.player.Lockout = new Date().getTime() + twentyMin;
-    
+// Make unsecured PUTs to modify our player by setting lockout or mailing new password.
+// Full update is not called from this page and is secured.
+function ajaxPutWithUrlArgs(lockout, successCallback) {
     $.ajax({
-        url: "/api/player?playerId=" + window.player.PlayerId + "&lockout=" + window.player.Lockout,
+        url: "/api/player?playerId=" + window.player.PlayerId + "&lockout=" + lockout,
         type: "PUT",
         success: function () {
             if (successCallback) successCallback();
@@ -179,6 +172,19 @@ function ajaxSetLockout(successCallback) {
             }
         }
     });
+}
+
+function hilightEmail() {
+    $("#email").select();
+    $("#email").focus();
+}
+
+function ajaxSetLockout(successCallback) {
+    var twentyMin = 1000 * 60 * 20,
+        lockout = new Date().getTime() + twentyMin;
+
+    window.player.Lockout = lockout;
+    ajaxPutWithUrlArgs(lockout, successCallback);
 }
 
 // Init........................................................................

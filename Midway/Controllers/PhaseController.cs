@@ -22,7 +22,6 @@ namespace Midway.Controllers
         }
 
         // GET api/phase
-		[Authorize]
         public HttpResponseMessage GetPhases()
         {
             try
@@ -39,7 +38,6 @@ namespace Midway.Controllers
         }
 
         // GET api/phase/id
-		[Authorize]
         public HttpResponseMessage GetPhase(int id)
         {
             try
@@ -65,7 +63,6 @@ namespace Midway.Controllers
         }
 
         // PUT api/phase (UPDATE)
-		[Authorize]
         public HttpResponseMessage PutPhaseData(DtoPhaseData phaseData)
         {
             try
