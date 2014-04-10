@@ -68,7 +68,7 @@ namespace Midway.Models.Data
 						Lockout = p.Lockout
 					}).FirstOrDefault(p => p.PlayerId == id);
             
-            return ReturnDtoPlayer(dtoPlayer, true);
+            return ReturnDtoPlayer(dtoPlayer);
         }
 
 		internal DtoPlayer GetPlayerWithCurrentGame(int playerId, int gameId)
@@ -89,6 +89,17 @@ namespace Midway.Models.Data
 			dtoPlayer.Games = GetPlayerGames(playerId, gameId);	//only one, actually
 			return dtoPlayer;
 		}
+
+        public void SetPlayerLockout(int playerId, long lockout)
+        {
+            var dbPlayer = _context.Players.FirstOrDefault(p => p.PlayerId == playerId);
+            if (dbPlayer == null)
+            {
+                throw new Exception("Player not found");
+            }
+            dbPlayer.Lockout = lockout;
+            _context.Save();
+        }
 
         public DtoPlayer UpdatePlayer(DtoPlayer dtoPlayer)
         {

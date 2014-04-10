@@ -117,6 +117,23 @@ namespace Midway.Controllers
             }
         }
 
+        // PUT api/player/playerId&lockout=lockout (UPDATE)...................
+        public HttpResponseMessage PutPlayer(int playerId, long lockout)
+        {
+            try
+            {
+                _repo.SetPlayerLockout(playerId, lockout);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Player not found")
+                    return NotFoundResponse(playerId);
+
+                return ControllerHelper.GenericErrorResponse(ex);
+            }
+        }
+
         // PUT api/player (UPDATE).............................................
         [Authorize]
         public HttpResponseMessage PutPlayer(DtoPlayer player)

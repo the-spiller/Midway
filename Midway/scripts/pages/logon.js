@@ -1,5 +1,5 @@
 ﻿var badPwdCount = 0,
-    badPwdTries = 5;
+    badPwdTries = 4;
 
 // Event handlers......................................................
 
@@ -123,11 +123,11 @@ function newPassword() {
         });
     }
 }
-// end function newPassword()
 
 function ajaxGetPlayerByEmail(successCallback) {
     $.ajax({
         url: "/api/player",
+        type: "GET",
         accepts: "application/json",
         data: { "emailAddress": $("#email").val() },
         success: function(data) {
@@ -160,14 +160,26 @@ function ajaxSendPassword(successCallback) {
     window.player.Password = null;
     ajaxUpdatePlayer(successCallback);
 }
-// end function ajaxSendPassword()
 
 function ajaxSetLockout(successCallback) {
     var twentyMin = 1000 * 60 * 20;
     window.player.Lockout = new Date().getTime() + twentyMin;
-    ajaxUpdatePlayer(successCallback);
+    
+    $.ajax({
+        url: "/api/player?playerId=" + window.player.PlayerId + "&lockout=" + window.player.Lockout,
+        type: "PUT",
+        success: function () {
+            if (successCallback) successCallback();
+        },
+        error: function (xhr, status, errorThrown) {
+            if (!errorThrown) {
+                showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "red");
+            } else {
+                showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "red");
+            }
+        }
+    });
 }
-// end function ajaxSetLockout()
 
 // Init........................................................................
 
