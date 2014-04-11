@@ -35,16 +35,6 @@ p {
     line-height: normal;
     padding-bottom: 1em;
 }
-	p.heading {
-		color: #093a67;
-		font: bold 1.2em Arial, sans-serif;
-		padding-top: 20px;
-	}
-
-	p.subheading {
-		color: #093a67;
-		font: bold 1em Arial, sans-serif;
-	}
 
 input[type="text"], input[type="password"] {
     display: inline;
