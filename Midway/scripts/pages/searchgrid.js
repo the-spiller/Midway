@@ -201,7 +201,7 @@
 
             ctx.save();
             ctx.globalAlpha = 0.2;
-            ctx.fillStyle = side == "USN" ? "#004a7f" : "#ff2b00";
+            ctx.fillStyle = side == "USN" ? "#004757" : "#ff2b00";
             ctx.rect(topCoords.x, topCoords.y, width, height);
             ctx.fill();
             ctx.restore();

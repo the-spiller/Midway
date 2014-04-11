@@ -36,13 +36,13 @@ p {
     padding-bottom: 1em;
 }
 	p.heading {
-		color: #004a7f;
+		color: #093a67;
 		font: bold 1.2em Arial, sans-serif;
 		padding-top: 20px;
 	}
 
 	p.subheading {
-		color: #004a7f;
+		color: #093a67;
 		font: bold 1em Arial, sans-serif;
 	}
 
@@ -134,7 +134,7 @@ th {
 }
 
 .usnblue {
-    color: #004a7f;
+    color: #093a67;
 }
 
 .i {
@@ -178,7 +178,7 @@ th {
     top: 18px;
 	width: 75px;
 	font: bold 1.2em Stencil, sans-serif;
-    color: #004a7f;
+    color: #093a67;
 }
     #logofflink:hover, #logofflink:active {
         color: #000;
@@ -241,11 +241,11 @@ th {
 		background-color: #a0a0a0;
 	}
 .bluebtn {
-	background-color: #2b3d55;
+	background-color: #093a67;
     color: #c6c6c6;
 }
 	.bluebtn:hover, .bluebtn:active {
-		background-color: #516580;
+		background-color: #225481;
 	}
 .redbtn {
     background-color: #CE391B;
@@ -274,7 +274,7 @@ th {
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
     #dlgcontent.bluedlg {
-        background-color: #869cb7;
+        background-color: #6c8dab;
         color: #202c38;
     }
     #dlgcontent.reddlg {
@@ -292,7 +292,7 @@ th {
     -ms-user-select: none;
 }
     #dlghead.bluedlghead {
-        background: linear-gradient(to right, #2b3d55, #2b3d55, #2b3d55, #869cb7);
+        background: linear-gradient(to right, #093a67, #093a67, #093a67, #6c8dab);
         color: #c6c6c6;
     }
     #dlghead.reddlghead {
@@ -357,13 +357,13 @@ th {
     padding: 5px 15px 8px 15px;
 }
     .tablistitem.tabshown {
-        background-color: #2b3d55;
+        background-color: #3d3d3d;
     }
 .tabpanel {
     color: #eaecee;
     padding: 5px;
     display: none;
-    background: linear-gradient(to right, #2b3d55, #2b3d55, #2b3d55, #000);
+    background: linear-gradient(to right, #3d3d3d, #3d3d3d, #3d3d3d, #000);
     min-height: 270px;
     overflow: auto;
 }

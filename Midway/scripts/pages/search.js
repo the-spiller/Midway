@@ -48,6 +48,7 @@ $("#done").on("click", function() {
             showAlert("End Phase", "All arriving ships must be brought on to the map.", DLG_OK, "red");
             return;
         }
+        showWait("Reloading", "Reloading page, please wait ...", "blue");
         ajaxPutPhase(function () {
             location.reload(true);
         });
@@ -90,6 +91,7 @@ $(document).on("click", ".tablistitem", function(e) {
 /* Return to the home page.                                          */
 /*-------------------------------------------------------------------*/
 function goHome() {
+    showWait("Loading", "Loading home page, please wait ...", "blue");
     location.replace("/views/home.html");
 }
 
@@ -581,7 +583,10 @@ function ajaxPutPhase(successCallback) {
 /* actions.                                                          */
 /*-------------------------------------------------------------------*/
 function setTabs() {
-    var tabHtml = "", panelHtml = "", showFirst = " tabshown";
+    var tabHtml = "",
+        panelHtml = "",
+        showFirst = " tabshown";
+    
     for (var i = 0; i < phase.Actions.length; i++) {
         var act = phase.Actions[i];
         if (game.Waiting == "N" || act.AvailWhenWaiting == "Y") {
