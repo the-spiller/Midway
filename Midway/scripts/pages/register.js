@@ -1,7 +1,7 @@
 ﻿// Event handlers......................................................
 
 $("#return").on("click", function () {
-    window.history.back();
+    location.replace("/index.html");
 });
 
 $("#infolink").on("click", function () {
@@ -34,7 +34,7 @@ $("#btngo").on("click", function () {
                 "You are now registered. Expect to receive a password in email that will allow you to " +
                     "log in the first time.<br /><br />We hope you enjoy our game!",
                 DLG_OK, "blue", function () {
-                    window.history.back();
+                    location.replace("/index.html");
                 });
         });
     }

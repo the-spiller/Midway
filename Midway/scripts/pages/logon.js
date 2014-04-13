@@ -26,12 +26,12 @@ $("#newpass").on("click", function() {
 
 $("#register").on("click", function () {
     showWait("Loading", "Loading registration page, please wait ...", "blue");
-    document.location.href("views/register.html");
+    location.href = "/views/register.html";
 });
 
 $("#wat").on("click", function () {
     showWait("Loading", "Loading about page, please wait ...", "blue");
-    document.location.href = "views/about.html";
+    location.href = "/views/about.html";
 });
 
 // Functions...........................................................

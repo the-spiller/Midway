@@ -386,23 +386,22 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <None Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
-    <None Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
-    <None Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
-    <None Include="_bin_deployableAssemblies\x86\sqlceer40EN.dll" />
-    <None Include="_bin_deployableAssemblies\x86\sqlcecompact40.dll" />
-    <None Include="_bin_deployableAssemblies\x86\sqlceca40.dll" />
-    <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\README_ENU.txt" />
-    <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\msvcr90.dll" />
-    <None Include="_bin_deployableAssemblies\amd64\sqlcese40.dll" />
-    <None Include="_bin_deployableAssemblies\amd64\sqlceqp40.dll" />
-    <None Include="_bin_deployableAssemblies\amd64\sqlceme40.dll" />
-    <None Include="_bin_deployableAssemblies\amd64\sqlceer40EN.dll" />
-    <None Include="_bin_deployableAssemblies\amd64\sqlcecompact40.dll" />
-    <None Include="_bin_deployableAssemblies\amd64\sqlceca40.dll" />
-    <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\README_ENU.txt" />
-    <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\msvcr90.dll" />
-    <None Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+    <Content Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\msvcr90.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\README_ENU.txt" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlceca40.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlcecompact40.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlceer40EN.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlceme40.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlceqp40.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlcese40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\msvcr90.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\README_ENU.txt" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlceca40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlcecompact40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlceer40EN.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\fonts\kna__-webfont.eot" />
@@ -414,8 +413,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\PublishProfiles\Files.pubxml" />
-    <None Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+    <Content Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+    <Content Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
   </ItemGroup>
+  <ItemGroup>
+    <AvailableItemName Include="ThirdPartyAssemblies">
+        <Visible>false</Visible>
+    </AvailableItemName>
+  </ItemGroup>
+  <Target Name="AfterBuild">
+    <Message Text="Build | Copying third party assemblies to output folder ($(OutputPath))" Importance="high" />
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(ThirdPartyAssemblies)" SkipUnchangedFiles="true" />
+  </Target>
+  <Target Name="CopyBinFiles" AfterTargets="CopyAllFilesToSingleFolderForPackage" BeforeTargets="MSDeployPublish">
+    <Message Text="Deploy | Copying third party assemblies to output folder ($(_PackageTempDir)\bin\)" Importance="high" />
+    <Copy DestinationFolder="$(_PackageTempDir)\bin\" SourceFiles="@(ThirdPartyAssemblies)" SkipUnchangedFiles="true" />
+  </Target>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
