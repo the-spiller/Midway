@@ -224,6 +224,8 @@
     <Content Include="Content\images\search\air-notready.png" />
     <Content Include="Content\images\search\air-ready.png" />
     <Content Include="Content\images\search\air-readying.png" />
+    <Content Include="Content\images\search\ijn-sea-search.png" />
+    <Content Include="Content\images\search\usn-sea-search.png" />
     <Content Include="Scripts\pages\search_phase_1.js" />
     <Content Include="Scripts\pages\search_phase_2.js" />
     <Content Include="Scripts\pages\search_phase_3.js" />
@@ -418,7 +420,7 @@
   </ItemGroup>
   <ItemGroup>
     <AvailableItemName Include="ThirdPartyAssemblies">
-        <Visible>false</Visible>
+      <Visible>false</Visible>
     </AvailableItemName>
   </ItemGroup>
   <Target Name="AfterBuild">

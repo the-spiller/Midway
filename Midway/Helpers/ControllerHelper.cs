@@ -6,12 +6,12 @@ namespace Midway.Helpers
 {
 	public static class ControllerHelper
 	{
-		public static HttpResponseMessage GenericErrorResponse(Exception ex)
+		public static HttpResponseMessage GenericErrorResponse(Exception ex, string apiMethod)
 		{
 			return new HttpResponseMessage(HttpStatusCode.InternalServerError)
 			{
 				Content = new StringContent(ex.Message),
-				ReasonPhrase = "Server Error"
+				ReasonPhrase = "Server Error (" + apiMethod + ")"
 			};
 		}
 	}

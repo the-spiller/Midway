@@ -33,7 +33,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/phase");
             }
         }
 
@@ -58,7 +58,7 @@ namespace Midway.Controllers
                             ReasonPhrase = "Phase Not Found"
                         };
                 }
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/phase/id");
             }
         }
 
@@ -90,7 +90,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "PUT /api/phase");
             }
         }
     }

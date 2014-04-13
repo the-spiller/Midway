@@ -25,7 +25,7 @@ namespace Midway.Controllers
             _repo = new SearchRepository(uow);
         }
 
-		// GET api/search?gameId=x&playerId=y
+		// GET api/search?gameId=x&playerId=y..................................
 		public HttpResponseMessage GetSearchesForPlayerGame(int playerId, int gameId)
 		{
 			try
@@ -44,7 +44,7 @@ namespace Midway.Controllers
 							Content = new StringContent(ex.Message)
 						};
 				}
-				return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/search?gameId&playerId");
 			}
 		}
 
@@ -60,7 +60,7 @@ namespace Midway.Controllers
 			}
 			catch (Exception ex)
 			{
-				return ControllerHelper.GenericErrorResponse(ex);
+				return ControllerHelper.GenericErrorResponse(ex,"POST /api/search");
 			}
 		}
     }

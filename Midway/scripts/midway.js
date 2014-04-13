@@ -39,7 +39,7 @@ function showAlert(title, message, buttons, color, callback) {
     var topLeft = getAlertPosition();
     
     function getAlertButtonHtml(text) {
-        return "<a id='dlgbtn" + text.toLowerCase() + "' class='flatbutton " + color + "btn'>" + text + "</a>";
+        return "<a id=\"dlgbtn\"" + text.toLowerCase() + " class=\"flatbutton " + color + "btn\">" + text + "</a>";
     }
 
     $("#dlghead").removeClass()
@@ -80,24 +80,6 @@ function showAlert(title, message, buttons, color, callback) {
     $("#dlgoverlay").css("display", "block").focus();
 }
 
-function showWait(title, message, color) {
-    var topLeft = getAlertPosition();
-    
-    $("#dlghead").removeClass().addClass(color + "dlghead").html(title);
-    $("#dlgbody").html(message);
-    $("#dlgbuttons").css("display", "none");
-    $("#dlgcontent").removeClass().addClass(color + "dlg").css({
-        top: topLeft.y + "px",
-        left: topLeft.x + "px",
-        width: DLG_WIDTH
-        }).draggable({
-            handle: "#dlghead",
-            containment: "#pagediv",
-            scroll: false
-        });
-    $("#dlgoverlay").css("display", "block");
-}
-
 function showAjaxError(xhr, status, errorThrown) {
     if (!errorThrown)
         showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "red");
@@ -122,14 +104,14 @@ function loadPlayerForPage(callback) {
     }
 }
 function createUpdateAuthCookie() {
-    createCookie(COOKIE_NAME, window.player.PlayerId + ":" + player.AuthKey, 1);
+    createCookie(COOKIE_NAME, window.player.PlayerId + ":" + window.player.AuthKey, 1);
 }
 function ajaxGetPlayer(playerId, successCallback) {
     $.ajax({
         url: "/api/player/" + playerId.toString(),
         accepts: "application/json",
         success: function (data) {
-            player = JSON.parse(data);
+            window.player = JSON.parse(data);
             createUpdateAuthCookie();
             if (successCallback) successCallback();
         },
@@ -143,10 +125,11 @@ function ajaxUpdatePlayer(shallowPlayer, successCallback) {
     $.ajax({
         url: "/api/player",
         type: "PUT",
+        contentType: "application/json",
         accepts: "application/json",
         data: shallowPlayer,
         success: function (data) {
-            player = JSON.parse(data);
+            window.player = JSON.parse(data);
             createUpdateAuthCookie();
             if (successCallback) successCallback();
         },

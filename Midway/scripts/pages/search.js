@@ -48,7 +48,6 @@ $("#done").on("click", function() {
             showAlert("End Phase", "All arriving ships must be brought on to the map.", DLG_OK, "red");
             return;
         }
-        showWait("Reloading", "Reloading page, please wait ...", "blue");
         ajaxPutPhase(function () {
             location.reload(true);
         });
@@ -91,7 +90,6 @@ $(document).on("click", ".tablistitem", function(e) {
 /* Return to the home page.                                          */
 /*-------------------------------------------------------------------*/
 function goHome() {
-    showWait("Loading", "Loading home page, please wait ...", "blue");
     location.replace("/views/home.html");
 }
 

@@ -25,12 +25,10 @@ $("#newpass").on("click", function() {
 });
 
 $("#register").on("click", function () {
-    showWait("Loading", "Loading registration page, please wait ...", "blue");
     location.href = "/views/register.html";
 });
 
 $("#wat").on("click", function () {
-    showWait("Loading", "Loading about page, please wait ...", "blue");
     location.href = "/views/about.html";
 });
 
@@ -74,7 +72,6 @@ function validateLogon() {
                 }
             } else {
                 createUpdateAuthCookie();
-                showWait("Loading", "Loading home page, please wait ...", "blue");
                 document.location.href = "/views/home.html";
             }
         });

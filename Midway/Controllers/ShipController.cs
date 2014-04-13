@@ -36,7 +36,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/ship");
             }
         }
 
@@ -52,7 +52,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/ship?playerId&gameId");
             }
         }           
     }

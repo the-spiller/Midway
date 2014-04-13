@@ -83,9 +83,8 @@ $("#playgame").on("click", function () {
     if (selGameId == 0) return;
     if (unsavedRegChanges()) return;
 
-    showWait("Loading", "Loading search page, please wait ...", "blue");
     createGame(function () {
-        location.replace("/views/search.html?gid=" + selGameId);
+        location.href = "/views/search.html?gid=" + selGameId;
     });
 });
         
@@ -247,7 +246,6 @@ function createGame(callback) {
 
         // do a player update to create the new game
         ajaxUpdatePlayer(shallowPlayer, function() {
-            showWait("Loading", "Loading search page, please wait ...", "blue");
             // set the new game Id
             selGameId = getNewestGameId(); //highest game Id is newest
             if (callback) callback();
@@ -437,7 +435,7 @@ function buildRecord() {
     for (var i = 0; i < window.player.Games.length; i++) {
         var game = window.player.Games[i];
                 
-        if (game.OpponentNickname != null) {
+        if (game.CompletedDTime != "") {
             recIndex = -1;
             for (var j = 0; j < record.length; j++) {
                 if (game.OpponentNickname == record[j][0]) {
