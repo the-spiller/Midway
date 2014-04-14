@@ -39,9 +39,11 @@ function showAlert(title, message, buttons, color, callback) {
     var topLeft = getAlertPosition();
     
     function getAlertButtonHtml(text) {
-        return "<a id=\"dlgbtn\"" + text.toLowerCase() + " class=\"flatbutton " + color + "btn\">" + text + "</a>";
+        return "<a id=\"dlgbtn" + text.toLowerCase() + "\" class=\"flatbutton " + color + "btn\">" + text + "</a>";
     }
 
+    hideWait();
+    
     $("#dlghead").removeClass()
         .addClass(color + "dlghead")
         .css("width", (DLG_WIDTH - 10) + "px")
@@ -62,9 +64,24 @@ function showAlert(title, message, buttons, color, callback) {
     }
 
     $("#dlgbuttons .flatbutton").on("click", function (e) {
-        $("#dlgoverlay").css("display", "none");
         e.stopPropagation();
+        $("#dlgoverlay").css("display", "none");
         if (callback) callback(e.target.innerHTML);
+    });
+    
+    $("#dlgoverlay").on("keyup", function (e) {
+        e.stopPropagation();
+        if (e.keyCode == 13) {
+            if ($("#dlgbtnok").length)
+                $("#dlgbtnok").trigger("click");
+            else if ($("#dlgbtnyes").length)
+                $("#dlgbtnyes").trigger("click");
+        } else if (e.keyCode == 27) {
+            if ($("#dlgbtncancel").length)
+                $("#dlgbtncancel").trigger("click");
+            else if ($("#dlgbtnno").length)
+                $("#dlgbtnno").trigger("click");
+        }
     });
     
     $("#dlgcontent").removeClass().addClass(color + "dlg").css({
@@ -78,6 +95,25 @@ function showAlert(title, message, buttons, color, callback) {
         });
 
     $("#dlgoverlay").css("display", "block").focus();
+}
+
+function showWait(waitMsg) {
+    var topLeft = getAlertPosition(),
+        waitHtml = "<img src=\"/content/images/blueloader.gif\" style=\"margin-right: 10px;\">" + waitMsg;
+    
+    $("#waitmsg").removeClass().addClass("bluedlg").css({
+        top: topLeft.y + "px",
+        left: topLeft.x + "px",
+        width: DLG_WIDTH + "px",
+        display: "block"
+    }).html(waitHtml);
+
+    $("#dlgoverlay").css("display", "block");
+}
+
+function hideWait() {
+    $("#waitmsg").css("display", "none");
+    $("#dlgoverlay").css("display", "none");
 }
 
 function showAjaxError(xhr, status, errorThrown) {
@@ -230,20 +266,6 @@ function findGameById(id, games) {
 }
 
 // Global event handlers.......................................................
-
-$("#dlgoverlay").on("keyup", function (e) {
-    if (e.keyCode == 13) {
-        if ($("#dlgbtnok").length)
-            $("#dlgbtnok").trigger("click");
-        else if ($("#dlgbtnyes").length)
-            $("#dlgbtnyes").trigger("click");
-    } else if (e.keyCode == 27) {
-        if ($("#dlgbtncancel").length)
-            $("#dlgbtncancel").trigger("click");
-        else if ($("#dlgbtnno").length)
-            $("#dlgbtnno").trigger("click");
-    }
-});
 
 $(".closex").on("click", function () {
     $("#infolink").trigger("click");
