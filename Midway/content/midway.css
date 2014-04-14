@@ -172,7 +172,7 @@ th {
     display: inline;
     top: 18px;
 	width: 75px;
-	font: bold 1.2em Stencil, sans-serif;
+	font: bold 1.2em Arial, sans-serif;
     color: #093a67;
 }
     #logofflink:hover, #logofflink:active {
@@ -261,6 +261,13 @@ th {
     height: 100%;
     background-color: rgba(0, 0, 0, 0);
 }
+#waitmsg {
+    display: none;
+    position: absolute;
+    text-align: center;
+    padding: 10px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+}
 #dlgcontent {
     display: block;
     position: absolute;
@@ -268,14 +275,14 @@ th {
 	padding: 10px;
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
-    #dlgcontent.bluedlg {
-        background-color: #6c8dab;
-        color: #202c38;
-    }
-    #dlgcontent.reddlg {
-        background-color: #f9836b;
-        color: #000;
-    }
+.bluedlg {
+    background-color: #6c8dab;
+    color: #202c38;
+}
+.reddlg {
+    background-color: #f9836b;
+    color: #000;
+}
 #dlghead {
     display: block;
     font-weight: bold;

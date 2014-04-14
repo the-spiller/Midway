@@ -13,7 +13,7 @@ $("#btngo").on("click", function(e) {
 });
 
 $("#logondiv").on("keyup", function(e) {
-    if (e.keyCode == 13) {
+    if (e.keyCode == 13 && $("#dlgoverlay").css("display") != "block") {
         $("#btngo").css("background-color", "#ff2b00")
             .animate({ backgroundColor: "#808080" }, 250)
             .trigger("click");
@@ -48,6 +48,7 @@ function validateLogon() {
             }
         );
     } else {
+        showWait("Logging on ...");
         ajaxGetPlayerByEmail(function() {
             if (window.player.Lockout > new Date().getTime()) {
                 showLockoutAlert();
@@ -59,6 +60,7 @@ function validateLogon() {
                         showLockoutAlert();
                     });
                 } else {
+                    hideWait();
                     showAlert(
                         "Bad Password",
                         "No way, pal. The password you've entered is a no-go.<br /><br />" +
@@ -72,6 +74,7 @@ function validateLogon() {
                 }
             } else {
                 createUpdateAuthCookie();
+                hideWait();
                 document.location.href = "/views/home.html";
             }
         });
@@ -91,6 +94,7 @@ function showBadEmailAlert() {
 }
 
 function showLockoutAlert() {
+    hideWait();
     showAlert(
         "Locked Out",
         "You've exceeded the maximum number of attempts to log on with an incorrect " +

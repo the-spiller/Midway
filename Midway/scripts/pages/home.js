@@ -340,7 +340,7 @@ function getGameListItem(game) {
         waiting = " (waiting for opponent to post)";
     } else if (game.OppWaiting == "Y") {
         icon = "<img src=\"/content/images/booblite!-green.png\" />";
-        waiting = " (opponent waiting for you to post)";
+        waiting = " (waiting for you to post)";
     } else {
         icon = "<img src=\"/content/images/booblite-green.png\" />";
         waiting = "";
