@@ -1,0 +1,8 @@
+﻿Alternative to System.Web.Security.Membership password generation? It keeps adding its own user and role tables to the DB.
+
+Remove knockout.js package
+
+Email send apparently successful but delayed
+
+
+

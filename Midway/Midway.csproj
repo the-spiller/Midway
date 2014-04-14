@@ -214,7 +214,6 @@
     <Compile Include="Models\PlayerGameSearch.cs" />
     <Compile Include="Models\PlayerGameSearchMarker.cs" />
     <Compile Include="Models\PlayerGameShip.cs" />
-    <Compile Include="Models\Services\Caesar.cs" />
     <Compile Include="Models\Services\Mailer.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Side.cs" />
@@ -226,6 +225,7 @@
     <Content Include="Content\images\search\air-readying.png" />
     <Content Include="Content\images\search\ijn-sea-search.png" />
     <Content Include="Content\images\search\usn-sea-search.png" />
+    <Content Include="Notes.txt" />
     <Content Include="Scripts\pages\search_phase_1.js" />
     <Content Include="Scripts\pages\search_phase_2.js" />
     <Content Include="Scripts\pages\search_phase_3.js" />

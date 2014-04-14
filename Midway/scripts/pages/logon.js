@@ -134,7 +134,6 @@ function ajaxGetPlayerByEmail(successCallback) {
         data: { "emailAddress": $("#email").val() },
         success: function(data) {
             window.player = JSON.parse(data);
-            console.log(window.player.PlayerId);
             if (successCallback) successCallback();
         },
         error: function(xhr, status, errorThrown) {

@@ -99,7 +99,7 @@ namespace Midway.Models.Data
             dbPlayer.Lockout = 0; // remove any lockout condition
             _context.Save();
 
-            new Mailer().SendNewPwdMessage(dbPlayer.Email, dbPlayer.Password);
+            new Mailer().SendNewPwdMessage(dbPlayer.Email, dbPlayer.Nickname, dbPlayer.Password);
         }
 
         public void SetPlayerLockout(int playerId, long lockout)
@@ -265,7 +265,7 @@ namespace Midway.Models.Data
             _context.Save();
 			dtoPlayer.PlayerId = newDbPlayer.PlayerId;
 
-			new Mailer().SendNewRegMessage(dtoPlayer.Email, newPass);
+			new Mailer().SendNewRegMessage(dtoPlayer.Email, dtoPlayer.Nickname, newPass);
             return dtoPlayer;
         }
 

@@ -54,7 +54,9 @@ function ajaxRegisterPlayer(successCallback) {
     $.ajax({
         url: "/api/player",
         type: "POST",
-        data: window.player,
+        contentType: "application/json",
+        accept: "application/json",
+        data: JSON.stringify(window.player),
         success: function (data) {
             window.player = JSON.parse(data);
             if (successCallback) successCallback();
