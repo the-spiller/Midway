@@ -153,7 +153,9 @@ function ajaxPostSearch(search, successCallback) {
     $.ajax({
         url: "/api/search",
         type: "POST",
-        data: search,
+        contentType: "application/json",
+        accepts: "application/json",
+        data: JSON.stringify(search),
         success: function (data) {
             var retSearch = JSON.parse(data);
             createUpdateAuthCookie();

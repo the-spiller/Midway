@@ -2,6 +2,7 @@
 using System.Web.Mvc;
 using Midway.App_Start;
 using Midway.Models.Services;
+using System.Web.Helpers;
 
 namespace Midway
 {
@@ -16,6 +17,14 @@ namespace Midway
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             GlobalConfiguration.Configuration.MessageHandlers.Add(new AuthHandler());
+
+            //WebMail settings
+            WebMail.SmtpServer = "smtpout.secureserver.net";
+            WebMail.SmtpPort = 25;
+            WebMail.EnableSsl = false;
+            WebMail.UserName = "midway_admin@jeffcahill.net";
+            WebMail.From = WebMail.UserName;
+            WebMail.Password = "bullrun1";
         }
     }
 }

@@ -127,7 +127,7 @@ function ajaxUpdatePlayer(shallowPlayer, successCallback) {
         type: "PUT",
         contentType: "application/json",
         accepts: "application/json",
-        data: shallowPlayer,
+        data: JSON.stringify(shallowPlayer),
         success: function (data) {
             window.player = JSON.parse(data);
             createUpdateAuthCookie();

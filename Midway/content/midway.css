@@ -59,6 +59,11 @@ td, th {
     td.right, th.right {
 	    text-align: right;
     }
+
+td.spacer5 {
+    height: 5px;
+
+}
 th {
     border-bottom: 1px solid #fff;
 }

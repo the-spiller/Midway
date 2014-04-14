@@ -1,13 +1,12 @@
 ﻿using System;
+using System.Configuration;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Web.Helpers;
 
 namespace Midway.Models.Services
 {
     public class Message
     {
-        public string FromAddress { get; set; }
         public IList<string> RecipientAddresses { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
@@ -17,42 +16,44 @@ namespace Midway.Models.Services
     {
         public void Send(Message message)
         {
-            // TODO: once we've got a site and SMTP server,
-            // we'll actually send out email.
+            if (ConfigurationManager.AppSettings["actuallySendEmail"] != "true") return;
+
+            string recipList = string.Empty;
+            foreach (string recip in message.RecipientAddresses)
+            {
+                recipList += recip + ";";
+            }
+            recipList = recipList.Substring(0, recipList.Length - 2);
+
+            WebMail.Send(recipList, message.Subject, message.Body);
         }
 
-        public void SendNewPwdMessage(string addr, string newPwd)
+        public void SendNewPwdMessage(string addr, string nickname, string newPwd)
         {
-            var recips = new List<string>();
-            recips.Add(addr);
-
+            var recips = new List<string> { addr };
             var msg = new Message
                 {
-                    FromAddress = "admin@midwaygame.net",
                     RecipientAddresses = recips,
-                    Subject = "Midway Administrators Message",
-                    Body = "Here's the replacement password you requested for Midway:<br /><br />" +
-                           newPwd + "<br /><br />Use it once to log on and then you can change it at Midway Home " +
-                           " on the Your Registration tab."
+                    Subject = "Midway Administrator's Message",
+                    Body = nickname + ",<br /><br />Here's the nasty, computer-generated replacement password you requested for " +
+                        "Midway:<br /><br />" + newPwd + "<br /><br />Use it once to log on and thoen you can change it on the " +
+                        "Midway Home page's &ldquo;Your Registration&rdquo; tab.<br /><br />Midway Site Administrators"
                 };
             Send(msg);
         }
 
-	    public void SendNewRegMessage(string addr, string pwd)
+	    public void SendNewRegMessage(string addr, string nickname, string pwd)
 	    {
-		    var recips = new List<string>();
-		    recips.Add(addr);
-
-		    var msg = new Message
+		    var recips = new List<string> { addr };
+	        var msg = new Message
 			    {
-				    FromAddress = "admin@midwaygame.net",
 				    RecipientAddresses = recips,
-				    Subject = "Midway Administrators Message",
-				    Body = "Hello!\r\n\r\n" +
-				           "Welcome! Here is your first-time password for the Midway game site. Use it " +
-				           "the next time you log in:\r\n\t" + pwd +
-				           "\r\n\r\nYou can change it on the home page \"Your Registration\" tab. " +
-						   "Thanks, and we hope you enjoy our game.\r\nMIDWAY Site Admins"
+				    Subject = "Midway Administrator's Message",
+				    Body = "Hello and welcome, " + nickname + "!<br /><br />" +
+				           "Here is your nasty, computer-generated password for the Midway game site. Use it " +
+				           "the next time you log in:<br /><br />" + pwd + "<br /><br />You can change it on the Miday Home page " +
+				           "&ldquo;Your Registration&rdquo; tab.<br /><br />Thanks, and we hope your enjoy the game.<br /><br />" +
+                           "Midway Site Administrators"
 			    };
 		    Send(msg);
 	    }

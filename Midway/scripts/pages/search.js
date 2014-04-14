@@ -556,7 +556,9 @@ function ajaxPutPhase(successCallback) {
     $.ajax({
         url: "/api/phase",
         type: "PUT",
-        data: {
+        contentType: "application/json",
+        accepts: "application/json",
+        data: JSON.stringify({
             GameId: game.GameId,
             PlayerId: window.player.PlayerId,
             SelectedZone: selectedZone,
@@ -564,7 +566,7 @@ function ajaxPutPhase(successCallback) {
             Points: game.Points,
             Ships: shipsToPass,
             Searches: searches
-        },
+        }),
         success: function(data) {
             window.player = JSON.parse(data);
             //createUpdateAuthCookie();
