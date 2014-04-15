@@ -282,7 +282,7 @@ function saveRegData() {
             msg = "You apparently don't care about your security, but we do. You must provide a password!";     
         } else if ($("#pwd").val() != window.player.Password && $("#pwd").val() != $("#pwd2").val()) {
             caption = "Passwords Don't Match";
-            msg = "The password you've entered does not match the password you've supposedly reentered.";
+            msg = "The password you've entered is not the same as the one you've ostensibly confirmed.";
         } else if ($("#nickname").val() != window.player.Nickname) {
             if ($("#nickname").val() == "") {
                 caption = "Missing Nickname";

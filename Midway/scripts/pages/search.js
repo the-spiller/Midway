@@ -41,6 +41,7 @@ $("#return").on("click", function() {
         goHome();
     }
 });
+
 $("#done").on("click", function() {
     if (!$(this).hasClass("disable")) {
         if (game.PhaseId == 1 && !allArrivalsOnMap()) {
@@ -456,10 +457,10 @@ function canvasMouseUp(e) {
         
         if (dragThang.origin == "search") {
             hideSearching();
-            selectArea(coords);
             executeSearch(coords, zone, dragThang.dragData, function() {
                 searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
                 drawSightings();
+                selectArea(coords);
             });
         } else if (isLegitDrop(coords)) {
             var cost = 0;
@@ -578,7 +579,6 @@ function ajaxPutPhase(successCallback) {
         }
     });
 }
-
 /*-------------------------------------------------------------------*/
 /* Callback for ajaxLoadPhase call. Set up tabs based on phase       */
 /* actions.                                                          */
@@ -600,7 +600,6 @@ function setTabs() {
     $("#tabs").html(tabHtml);
     $("#tabpanels").html(panelHtml);
 }
-
 /*-------------------------------------------------------------------*/
 /* Callback for ajaxLoadShips call. Set up the various ships display */
 /* elements, draw the search map and markers.                        */

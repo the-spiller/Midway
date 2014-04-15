@@ -1,6 +1,9 @@
-﻿No showWait for mail delivery
+﻿Buggy display of search marker and ships in marker's zone during search phase (OK after phase is advanced). Seems caused by draw/removal
+of zone highlight (which appears too late anyhow).
 
-Buggy display of search marker and ships in marker's zone during search phase (OK after phase is advanced)
+Occasional reload of last-loaded game when new game option selected.
 
-Try qTip2 for triggering tooltip display (they don't work on a touch screen)
+Error in RemoveSearchMarkers during end of phase PUT -- remove stuff from a collection while looping through it
+
+Try qTip2 for triggering tooltip display (they don't work on a touch screen)?
 

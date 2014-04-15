@@ -91,7 +91,6 @@ function withinSearchRange(coords) {
     return false;
 }
 
-
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function showSearching(canvasCoords) {
