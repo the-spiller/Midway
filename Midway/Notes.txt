@@ -1,0 +1,6 @@
+﻿No showWait for mail delivery
+
+Buggy display of search marker and ships in marker's zone during search phase (OK after phase is advanced)
+
+Try qTip2 for triggering tooltip display (they don't work on a touch screen)
+

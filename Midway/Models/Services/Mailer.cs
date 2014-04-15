@@ -1,13 +1,12 @@
-﻿using System;
+﻿using System.Configuration;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Text;
+using System.Web.Helpers;
 
 namespace Midway.Models.Services
 {
     public class Message
     {
-        public string FromAddress { get; set; }
         public IList<string> RecipientAddresses { get; set; }
         public string Subject { get; set; }
         public string Body { get; set; }
@@ -15,44 +14,62 @@ namespace Midway.Models.Services
 
     public class Mailer
     {
+        private const string BRBR = "<br /><br />";
+        private const string SIG = "<span style=\"font-style: italic;\">Midway Site Administrators</span>";
+
         public void Send(Message message)
         {
-            // TODO: once we've got a site and SMTP server,
-            // we'll actually send out email.
+            if (ConfigurationManager.AppSettings["actuallySendEmail"] != "true") return;
+
+            var recipList = string.Empty;
+            foreach (string recip in message.RecipientAddresses)
+            {
+                recipList += recip + ";";
+            }
+            recipList = recipList.Substring(0, recipList.Length - 1);
+
+            WebMail.Send(recipList, message.Subject, message.Body);
         }
 
-        public void SendNewPwdMessage(string addr, string newPwd)
+        public void SendNewPwdMessage(string addr, string nickname, string newPwd)
         {
-            var recips = new List<string>();
-            recips.Add(addr);
+            var recips = new List<string> { addr };
+
+            var msgBody = new StringBuilder(string.Format("{0},{1}", nickname, BRBR));
+            msgBody.Append("Here&rsquo;s the nasty, computer-generated replacement password you requested for the ");
+            msgBody.AppendFormat("<a href=\"http://midwaydev.jeffcahill.net\">Midway game site</a>:{0}", BRBR);
+            msgBody.AppendFormat("<span style=\"font-weight: bold;\">{0}</span>{1}", newPwd, BRBR);
+            msgBody.Append("Use it to log on, and then you can change it on the Midway Home page ");
+            msgBody.AppendFormat("&ldquo;Your Registration&rdquo; tab.{0}", BRBR);
+            msgBody.Append(SIG);
 
             var msg = new Message
                 {
-                    FromAddress = "admin@midwaygame.net",
                     RecipientAddresses = recips,
-                    Subject = "Midway Administrators Message",
-                    Body = "Here's the replacement password you requested for Midway:<br /><br />" +
-                           newPwd + "<br /><br />Use it once to log on and then you can change it at Midway Home " +
-                           " on the Your Registration tab."
+                    Subject = "Midway Administrator's Message",
+                    Body = msgBody.ToString()
                 };
             Send(msg);
         }
 
-	    public void SendNewRegMessage(string addr, string pwd)
+	    public void SendNewRegMessage(string addr, string nickname, string pwd)
 	    {
-		    var recips = new List<string>();
-		    recips.Add(addr);
+		    var recips = new List<string> { addr };
 
-		    var msg = new Message
+            var msgBody = new StringBuilder("<span style=\"font-weight: bold;\">");
+	        msgBody.AppendFormat("Hello and welcome, {0}!</span>{1}", nickname, BRBR);
+	        msgBody.Append("Here is your nasty, computer-generated password for the ");
+	        msgBody.AppendFormat("<a href=\"http:\\midwaydev.jeffcahill.net\">Midway game site</a>. Use it to log in:{0}", BRBR);
+	        msgBody.AppendFormat("<span style=\"font-weight: bold;\">{0}</span>{1}", pwd, BRBR);
+	        msgBody.AppendFormat("You can change it on the Miday Home page &ldquo;Your Registration&rdquo; tab.{0}", BRBR);
+	        msgBody.AppendFormat("Thanks, and we hope you enjoy the game.{0}", BRBR);
+	        msgBody.Append(SIG);
+
+	        var msg = new Message
 			    {
-				    FromAddress = "admin@midwaygame.net",
 				    RecipientAddresses = recips,
-				    Subject = "Midway Administrators Message",
-				    Body = "Hello!\r\n\r\n" +
-				           "Welcome! Here is your first-time password for the Midway game site. Use it " +
-				           "the next time you log in:\r\n\t" + pwd +
-				           "\r\n\r\nYou can change it on the home page \"Your Registration\" tab. " +
-						   "Thanks, and we hope you enjoy our game.\r\nMIDWAY Site Admins"
+				    Subject = "Midway Administrator's Message",
+				    Body = msgBody.ToString()
 			    };
 		    Send(msg);
 	    }

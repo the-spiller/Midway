@@ -1,7 +1,7 @@
 ﻿// Event handlers......................................................
 
 $("#return").on("click", function () {
-    window.history.back();
+    location.replace("/index.html");
 });
 
 $("#infolink").on("click", function () {
@@ -28,20 +28,21 @@ $("#btngo").on("click", function () {
             }
         );
     } else {
+        showWait("Registering ...");
         window.player = { Email: $("#email").val(), Nickname: $("#nickname").val() };
         ajaxRegisterPlayer(function () {
             showAlert("Registration Successful",
                 "You are now registered. Expect to receive a password in email that will allow you to " +
                     "log in the first time.<br /><br />We hope you enjoy our game!",
                 DLG_OK, "blue", function () {
-                    window.history.back();
+                    location.replace("/index.html");
                 });
         });
     }
 });
 
 $("#registerdiv").on("keyup", function (e) {
-    if (e.keyCode == 13) {
+    if (e.keyCode == 13 && $("#dlgoverlay").css("display") != "block") {
         $("#btngo").css("background-color", "#ff2b00")
             .animate({ backgroundColor: "#808080" }, 250)
             .trigger("click");
@@ -54,7 +55,9 @@ function ajaxRegisterPlayer(successCallback) {
     $.ajax({
         url: "/api/player",
         type: "POST",
-        data: window.player,
+        contentType: "application/json",
+        accept: "application/json",
+        data: JSON.stringify(window.player),
         success: function (data) {
             window.player = JSON.parse(data);
             if (successCallback) successCallback();
@@ -77,10 +80,6 @@ function ajaxRegisterPlayer(successCallback) {
 // Init................................................................
 
 $(document).ready(function() {
-    $("#pagediv").css("background-image", "url(\"/content/images/bg-register.jpg\")");
-    $("#welcome").css("width", "1125");
-    $("#return").css({ position: "absolute", top: "10px", left: "1288px" });
-            
     $("#registerdiv").draggable({
         handle: ".floathead",
         containment: "#pagediv",

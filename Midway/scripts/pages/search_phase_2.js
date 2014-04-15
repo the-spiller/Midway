@@ -18,17 +18,17 @@ function loadPhaseTab() {
     for (var i = 0; i < searches.length; i++) {
         if (searches[i].Turn == game.Turn && !searches[i].Area) {
             if (searches[i].SearchType == "sea") {
-                searchDesc = "Search any area containing one of your ships";
+                searchDesc = "Drag and drop to search any area containing one of your ships";
                 searchImg = imgDir + side.toLowerCase() + "-sea-search.png";
             } else if (game.SearchRange == 0) { //Unlimited
-                searchDesc = "Search any area";
+                searchDesc = "Drag and drop to search any area";
             } else {
-                searchDesc = "Search any area within " + game.SearchRange + " zones of any of your ships";
+                searchDesc = "Drag and drop to search any area within " + game.SearchRange + " zones of any of your ships";
             }
             searchHtml += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
-                " title=\"" + searchDesc + "\">" +
-                "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"" + searchImg + "\" draggable=\"false\" />" +
-                "</div></li>";
+                    " title=\"" + searchDesc + "\">" + 
+                    "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"" + searchImg + "\" draggable=\"false\" />" +
+                    "</div></li>";
         }
     }
     $("#search").html(searchHtml);
@@ -110,6 +110,7 @@ function showSearching(canvasCoords) {
 /*-------------------------------------------------------------------*/
 function hideSearching() {
     canvas.style.cursor = "auto";
+    dragThang.dragging = false;
     if (dragThang.snapshot) {
         searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
     }
@@ -153,7 +154,9 @@ function ajaxPostSearch(search, successCallback) {
     $.ajax({
         url: "/api/search",
         type: "POST",
-        data: search,
+        contentType: "application/json",
+        accepts: "application/json",
+        data: JSON.stringify(search),
         success: function (data) {
             var retSearch = JSON.parse(data);
             createUpdateAuthCookie();

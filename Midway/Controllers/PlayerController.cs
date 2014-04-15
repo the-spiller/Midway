@@ -37,11 +37,11 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-				return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/player");
             }
         }
 
-        // GET api/player/5....................................................
+        // GET api/player/id...................................................
         [Authorize]
         public HttpResponseMessage GetPlayer(int id)
         {
@@ -57,7 +57,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-				return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/player/id");
             }
         }
 
@@ -80,7 +80,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/player?emailAddress");
             }
         }
 
@@ -113,7 +113,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "POST /api/player");
             }
         }
 
@@ -138,7 +138,7 @@ namespace Midway.Controllers
                 if (ex.Message == "Player not found")
                     return NotFoundResponse(playerId);
 
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "PUT /api/player?playerId&lockout");
             }
         }
 
@@ -167,7 +167,7 @@ namespace Midway.Controllers
 							ReasonPhrase = "Opponent Not Found"
 			            };
 
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "PUT /api/player");
             }
         }
         

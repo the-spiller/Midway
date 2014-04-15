@@ -5,13 +5,31 @@
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
         <style>
+        #pagediv {
+            background-image: url(/content/images/bg-home.jpg);
+            background-repeat: no-repeat;
+        }
+
         #homediv {
             font-size: 1em;
-            left: 43px;
+            top: 200px;
+            left: 60px;
             width: 675px;
             box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
         }
-        
+
+        #logofflink {
+            position: absolute;
+            top: 18px;
+            left: 1250px;
+            color: #202020;
+            font: bold 1.2em Arial, sans-serif;
+        }
+            #logofflink:hover, #logofflink:active {
+                color: #000;
+                text-decoration: underline;
+            }
+
         #optopponent {
 	        margin: 10px 0 10px 0;
 	        display: none;

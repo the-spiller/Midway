@@ -59,6 +59,11 @@ td, th {
     td.right, th.right {
 	    text-align: right;
     }
+
+td.spacer5 {
+    height: 5px;
+
+}
 th {
     border-bottom: 1px solid #fff;
 }
@@ -72,6 +77,14 @@ th {
     padding: 5px;
 	font: 1em Arial, sans-serif;
 }
+
+.divlinks {
+    color: #fff;
+}
+    .divlinks:hover, .divlinks:active {
+        color: #ff2b00;
+        background-color: transparent;
+    }
 
 .floattable {
     width: 100%;
@@ -131,6 +144,10 @@ th {
 	font-style: italic;
 }
 
+.helpicon:hover {
+    cursor: pointer;
+}
+
 #pagediv {
 	width: 100%;
 	height: 100%;
@@ -161,19 +178,6 @@ th {
 	top: 10px;
 	left: 1325px;
 }
-
-#logofflink {
-	position: absolute;
-    display: inline;
-    top: 18px;
-	width: 75px;
-	font: bold 1.2em Stencil, sans-serif;
-    color: #093a67;
-}
-    #logofflink:hover, #logofflink:active {
-        color: #000;
-        text-decoration: underline;
-    }
 
 #done {
     opacity: 1.0;
@@ -256,21 +260,29 @@ th {
     height: 100%;
     background-color: rgba(0, 0, 0, 0);
 }
+#waitmsg {
+    display: none;
+    position: absolute;
+    text-align: center;
+    padding: 30px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+    font-weight: bold; 
+}
 #dlgcontent {
-    display: block;
+    display: none;
     position: absolute;
     text-align: left;
 	padding: 10px;
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
-    #dlgcontent.bluedlg {
-        background-color: #6c8dab;
-        color: #202c38;
-    }
-    #dlgcontent.reddlg {
-        background-color: #f9836b;
-        color: #000;
-    }
+.bluedlg {
+    background-color: #6c8dab;
+    color: #202c38;
+}
+.reddlg {
+    background-color: #f9836b;
+    color: #000;
+}
 #dlghead {
     display: block;
     font-weight: bold;

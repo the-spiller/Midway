@@ -1,7 +1,7 @@
 ﻿// Event Handlers......................................................
 
 $("#return").on("click", function () {
-    window.history.back();
+    location.replace("/index.html");
 });
 
 $("#infolink").on("click", function () {

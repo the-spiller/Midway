@@ -83,9 +83,8 @@ $("#playgame").on("click", function () {
     if (selGameId == 0) return;
     if (unsavedRegChanges()) return;
 
-    showWait("Loading", "Loading search page, please wait ...", "blue");
     createGame(function () {
-        location.replace("/views/search.html?gid=" + selGameId);
+        location.href = "/views/search.html?gid=" + selGameId;
     });
 });
         
@@ -100,6 +99,8 @@ $("#oppnickname").on("focus", function () {
         oppCleared = false;
     }
 }).on("keyup", function (e) {
+    if ($("#dlgoverlay").css("display") == "block") return;
+    
     var oppselect = document.getElementById("oppselect");
     if ($(this).val()) {
         if (oppselect.length && e.keyCode == 40) {
@@ -136,7 +137,9 @@ $("#oppnickname").on("focus", function () {
     }
 });
 
-$("#oppselect").on("keyup", function(e) {
+$("#oppselect").on("keyup", function (e) {
+    if ($("#dlgoverlay").css("display") == "block") return;
+    
     if (e.keyCode == 38 && $(this).prop("selectedIndex") == 0) {
         $("#oppnickname").focus();
     } else {
@@ -247,7 +250,6 @@ function createGame(callback) {
 
         // do a player update to create the new game
         ajaxUpdatePlayer(shallowPlayer, function() {
-            showWait("Loading", "Loading search page, please wait ...", "blue");
             // set the new game Id
             selGameId = getNewestGameId(); //highest game Id is newest
             if (callback) callback();
@@ -342,7 +344,7 @@ function getGameListItem(game) {
         waiting = " (waiting for opponent to post)";
     } else if (game.OppWaiting == "Y") {
         icon = "<img src=\"/content/images/booblite!-green.png\" />";
-        waiting = " (opponent waiting for you to post)";
+        waiting = " (waiting for you to post)";
     } else {
         icon = "<img src=\"/content/images/booblite-green.png\" />";
         waiting = "";
@@ -437,7 +439,7 @@ function buildRecord() {
     for (var i = 0; i < window.player.Games.length; i++) {
         var game = window.player.Games[i];
                 
-        if (game.OpponentNickname != null) {
+        if (game.CompletedDTime != "") {
             recIndex = -1;
             for (var j = 0; j < record.length; j++) {
                 if (game.OpponentNickname == record[j][0]) {
@@ -471,19 +473,14 @@ function buildRecord() {
 
 $(document).ready(function () {
     loadPlayerForPage(function() {
-        $("#pagediv").css("background-image", "url(\"/content/images/bg-home.jpg\")");
         $("#namespan").text(window.player.Nickname);
 
-        $("#logofflink").css("left", "1240px");
-    
-        var welcome = document.getElementById("welcome");
-        var top = welcome.offsetTop + welcome.offsetHeight + 20;
-
-        $("#homediv").css("top", top + "px").draggable({
+        $("#homediv").draggable({
             handle: ".floathead",
             containment: "#pagediv",
             scroll: false
         });
+        
         loadRegFields();
         buildRecord();
         buildGameList();
