@@ -41,20 +41,13 @@
             box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
         }
 
-        .logonlinks {
-            color: #fff;
-        }
-            .logonlinks:hover, .logonlinks:active {
-                color: #ff2b00;
-                background-color: transparent;
-            }
-
         ._1964  {
             text-shadow: 2px 2px 3px #fff, -2px -2px 3px #fff;   
         }
 
         #pagediv {
             background-image: url(/content/images/bg-logon.jpg);
+            background-repeat: no-repeat;
         }
 
         #infolink {
@@ -85,15 +78,16 @@
                         <td class="right">Password</td>
                         <td><input id="pwd" type="password" /><a id="btngo" class="flatbutton graybtn">Go</a></td>
                     </tr>
+                    <tr><td colspan="2" class="spacer5"></td></tr>
                     <tr>
-                        <td colspan="2"><a id="newpass" href="#" class="logonlinks">I've forgotten my password.</a></td>
+                        <td colspan="2"><a id="newpass" href="#" class="divlinks">I've forgotten my password.</a></td>
                     </tr>
                     <tr><td colspan="2" class="spacer5"></td></tr>
                     <tr>
-                        <td colspan="2"><a id="register" href="#" class="logonlinks"> &rarr; I'd like to register.</a></td>
+                        <td colspan="2"><a id="register" href="#" class="divlinks"> &rarr; I'd like to register.</a></td>
                     </tr>
                     <tr>
-                        <td colspan="2"><a id="wat" href="#" class="logonlinks"> &rarr; What is this?</a></td>
+                        <td colspan="2"><a id="wat" href="#" class="divlinks"> &rarr; What is this?</a></td>
                     </tr>
                 </table>
             </div>

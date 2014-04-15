@@ -78,6 +78,14 @@ th {
 	font: 1em Arial, sans-serif;
 }
 
+.divlinks {
+    color: #fff;
+}
+    .divlinks:hover, .divlinks:active {
+        color: #ff2b00;
+        background-color: transparent;
+    }
+
 .floattable {
     width: 100%;
     padding: 0 15px 25px 15px;
@@ -136,6 +144,10 @@ th {
 	font-style: italic;
 }
 
+.helpicon:hover {
+    cursor: pointer;
+}
+
 #pagediv {
 	width: 100%;
 	height: 100%;
@@ -166,19 +178,6 @@ th {
 	top: 10px;
 	left: 1325px;
 }
-
-#logofflink {
-	position: absolute;
-    display: inline;
-    top: 18px;
-	width: 75px;
-	font: bold 1.2em Arial, sans-serif;
-    color: #093a67;
-}
-    #logofflink:hover, #logofflink:active {
-        color: #000;
-        text-decoration: underline;
-    }
 
 #done {
     opacity: 1.0;
@@ -265,11 +264,12 @@ th {
     display: none;
     position: absolute;
     text-align: center;
-    padding: 10px;
+    padding: 30px;
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+    font-weight: bold; 
 }
 #dlgcontent {
-    display: block;
+    display: none;
     position: absolute;
     text-align: left;
 	padding: 10px;

@@ -32,7 +32,7 @@ function getPhotoBlurbLeft() {
 }
 function getAlertPosition() {
     var left = Math.floor(($(window).width() / 2) - (DLG_WIDTH / 2));
-    var top = Math.floor($(window).scrollTop() + $(window).height() / 2) - 150;
+    var top = Math.floor($(window).scrollTop() + $(window).height() / 2) - 150;  //150 px above center
     return { x: left, y: top };
 }
 function showAlert(title, message, buttons, color, callback) {
@@ -41,8 +41,6 @@ function showAlert(title, message, buttons, color, callback) {
     function getAlertButtonHtml(text) {
         return "<a id=\"dlgbtn" + text.toLowerCase() + "\" class=\"flatbutton " + color + "btn\">" + text + "</a>";
     }
-
-    hideWait();
     
     $("#dlghead").removeClass()
         .addClass(color + "dlghead")
@@ -65,6 +63,7 @@ function showAlert(title, message, buttons, color, callback) {
 
     $("#dlgbuttons .flatbutton").on("click", function (e) {
         e.stopPropagation();
+        $("#dlgcontent").css("display", "none");
         $("#dlgoverlay").css("display", "none");
         if (callback) callback(e.target.innerHTML);
     });
@@ -85,22 +84,24 @@ function showAlert(title, message, buttons, color, callback) {
     });
     
     $("#dlgcontent").removeClass().addClass(color + "dlg").css({
-        "top": topLeft.y + "px",
-        "left": topLeft.x + "px",
-        "width": DLG_WIDTH + "px"
+        display: "block",
+        top: topLeft.y + "px",
+        left: topLeft.x + "px",
+        width: DLG_WIDTH + "px"
         }).draggable({
             handle: "#dlghead",
             containment: "#pagediv",
             scroll: false
         });
 
+    hideWait();
     $("#dlgoverlay").css("display", "block").focus();
 }
 
 function showWait(waitMsg) {
     var topLeft = getAlertPosition(),
         waitHtml = "<img src=\"/content/images/blueloader.gif\" style=\"margin-right: 10px;\">" + waitMsg;
-    
+
     $("#waitmsg").removeClass().addClass("bluedlg").css({
         top: topLeft.y + "px",
         left: topLeft.x + "px",

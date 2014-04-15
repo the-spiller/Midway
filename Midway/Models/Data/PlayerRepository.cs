@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.Caching;
-using System.Web.Security;
 using Midway.Models.Services;
 using Midway.Models.DTOs;
 
@@ -93,7 +92,7 @@ namespace Midway.Models.Data
         public void SendPassword(int playerId)
         {
             Player dbPlayer = GetDbPlayer(playerId);
-            var newPass = Membership.GeneratePassword(new Random().Next(8, 12), 1);
+            var newPass = CreatePassword();
 
             dbPlayer.Password = newPass;
             dbPlayer.Lockout = 0; // remove any lockout condition
@@ -247,7 +246,7 @@ namespace Midway.Models.Data
         // No authorization req'd: called to register new player.
         public DtoPlayer AddPlayer(DtoPlayer dtoPlayer)
         {
-	        var newPass = Membership.GeneratePassword(new Random().Next(8, 11), 1);
+            var newPass = CreatePassword();
 
 			dtoPlayer.Password = newPass;
 	        dtoPlayer.Admin = "N";
@@ -386,6 +385,17 @@ namespace Midway.Models.Data
 			return dtoPlayerGames;
 		}
 
+        private string CreatePassword()
+        {
+            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!$%*0123456789";
+            string newPass = "";
+            var rnd = new Random(Guid.NewGuid().GetHashCode());
+            var length = rnd.Next(8, 12);
+            while (0 < length--)
+                newPass += validChars[rnd.Next(validChars.Length)];
+            return newPass;
+        }
+        
         private string RegisterPlayer(int id, string admin)
         {
             var token = Guid.NewGuid().ToString();

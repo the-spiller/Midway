@@ -2,7 +2,6 @@
     mapLeft = 5,
     divLeft = 974,
     imgDir = "/content/images/search/",
-    bgImg = imgDir + "bg-search.jpg",
     flagImg = "/content/images/usn-med.png",
     mapImg = null,
     captionColor = "usnblue",
@@ -69,7 +68,9 @@ $(canvas).on("click", function (e) {
     canvasMouseUp(e);
 }).on("mouseout", function () {
     mouseDown = false;
-    if (dragThang.dragging) {
+    if (dragThang.origin == "search") {
+        hideSearching();
+    } else if (dragThang.dragging) {
         dragThang.dragging = false;
         if (dragThang.useSnapshot)
             searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
@@ -605,14 +606,6 @@ function setTabs() {
 /* elements, draw the search map and markers.                        */
 /*-------------------------------------------------------------------*/
 function shipsLoaded() {
-    $("#searchcanvas").css("left", mapLeft + "px");
-    $("#searchdiv").css("left", divLeft + "px").draggable({
-        handle: ".floathead",
-        containment: "#pagediv",
-        scroll: false
-    });
-    $("#return").css("left", "1330px");
-
     var wait = "";
     if (game.Waiting == "Y") {
         wait = " (waiting)";
@@ -620,17 +613,18 @@ function shipsLoaded() {
     }
 
     var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
-        " vs. " + (game.OpponentNickname || "?") +
-        " - <span id=\"phase\" title=\"" + phase.Description + "\">" + phase.Name + " Phase</span>" + wait + "</span>";
+        " vs. " + (game.OpponentNickname || "?") + " - " + phase.Name +
+        "Phase <img class=\"helpicon\" src=\"/content/images/helpicon.png\" title=\"" + phase.Description + "\" /> " + wait;
     $("#gamedesc").addClass(captionColor).html("SEARCH MAP <img src=\"" + flagImg + "\" />" + gameStatus);
-
-    $("#pagediv").css({ "background-image": "url(\"" + bgImg + "\")", "background-repeat": "repeat" });
 
     if (game.PhaseId == 1 && game.AircraftReadyState == 1)
         game.AircraftReadyState = 2;
     showAirReadiness();
 
-    ajaxLoadSearches(function() {
+    ajaxLoadSearches(function () {
+        $("#searchdiv").css("display", "block");
+        $("#searchcanvas").css("display", "block");
+        
         searchGrid.drawMap(function () {
             if (game.PhaseId == 1) searchGrid.highlightArrivalZones(side);
             drawShips();
@@ -648,10 +642,9 @@ function shipsLoaded() {
     });
 }
 /*****************************************************************************/
-/* Base page load function called at $(document).ready and after posting     */
-/* completed phase to server.                                                */
+/* Base page load function called at $(document).ready.                      */
 /*****************************************************************************/
-function loadPage() {
+function loadPage(callback) {
     game = findGameById(getUrlParameter("gid"), window.player.Games);
     var scriptPath = "/scripts/pages/search_phase_" + game.PhaseId.toString() + ".js";
     ajaxLoadScript(scriptPath, function() {
@@ -668,12 +661,22 @@ function loadPage() {
                 "<img id=\"seasearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-seasearchcursor.png\" />";
             $("#imagecache").html(html);
         }
+        
         ajaxLoadPhase(function () {
             setTabs();
             selectedZone = game.SelectedLocation;
+
+            $("#searchcanvas").css("left", mapLeft + "px");        
+            $("#searchdiv").css("left", divLeft + "px").draggable({
+                handle: ".floathead",
+                containment: "#pagediv",
+                scroll: false
+            });
+            
             ajaxLoadShips(shipsLoaded);
         });
         window.currentPage = "search";
+        if (callback) callback();
     });
 }
 
@@ -681,6 +684,6 @@ function loadPage() {
 
 $(document).ready(function () {
     loadPlayerForPage(function() {
-        loadPage();
+        loadPage(hideWait());
     });
 });

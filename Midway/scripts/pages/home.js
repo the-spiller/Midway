@@ -99,6 +99,8 @@ $("#oppnickname").on("focus", function () {
         oppCleared = false;
     }
 }).on("keyup", function (e) {
+    if ($("#dlgoverlay").css("display") == "block") return;
+    
     var oppselect = document.getElementById("oppselect");
     if ($(this).val()) {
         if (oppselect.length && e.keyCode == 40) {
@@ -135,7 +137,9 @@ $("#oppnickname").on("focus", function () {
     }
 });
 
-$("#oppselect").on("keyup", function(e) {
+$("#oppselect").on("keyup", function (e) {
+    if ($("#dlgoverlay").css("display") == "block") return;
+    
     if (e.keyCode == 38 && $(this).prop("selectedIndex") == 0) {
         $("#oppnickname").focus();
     } else {
@@ -469,19 +473,14 @@ function buildRecord() {
 
 $(document).ready(function () {
     loadPlayerForPage(function() {
-        $("#pagediv").css("background-image", "url(\"/content/images/bg-home.jpg\")");
         $("#namespan").text(window.player.Nickname);
 
-        $("#logofflink").css("left", "1240px");
-    
-        var welcome = document.getElementById("welcome");
-        var top = welcome.offsetTop + welcome.offsetHeight + 20;
-
-        $("#homediv").css("top", top + "px").draggable({
+        $("#homediv").draggable({
             handle: ".floathead",
             containment: "#pagediv",
             scroll: false
         });
+        
         loadRegFields();
         buildRecord();
         buildGameList();

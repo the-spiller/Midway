@@ -1,8 +1,6 @@
-﻿Alternative to System.Web.Security.Membership password generation? It keeps adding its own user and role tables to the DB.
+﻿No showWait for mail delivery
 
-Remove knockout.js package
+Buggy display of search marker and ships in marker's zone during search phase (OK after phase is advanced)
 
-Email send apparently successful but delayed
-
-
+Try qTip2 for triggering tooltip display (they don't work on a touch screen)
 

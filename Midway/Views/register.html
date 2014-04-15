@@ -5,6 +5,15 @@
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
         <style>
+        #pagediv {
+            background-image: url(/content/images/bg-register.jpg);
+            background-repeat: no-repeat;
+        }
+
+        #welcome { width: 1125px; }
+
+        #return { position: absolute; top: 10px; left: 1288px; }
+
         #registerdiv {
             font-size: 1em;
             top: 165px;
@@ -12,13 +21,6 @@
 	        width: 400px;
             box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
         }
-        #registerdiv a {
-            color: #fff;
-        }
-            #registerdiv a:hover, a:active {
-                color: #ff2b00;
-                background-color: transparent;
-            }
         </style>
     </head>
     <body>
@@ -44,7 +46,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <a href="/views/about.html#registering"> &rarr; More info on registration</a>
+                            <a href="/views/about.html#registering" class="divlinks"> &rarr; More info on registration</a>
                         </td>
                     </tr>
                     <tr>

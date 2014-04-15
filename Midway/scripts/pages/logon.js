@@ -20,7 +20,7 @@ $("#logondiv").on("keyup", function(e) {
     }
 });
 
-$("#newpass").on("click", function() {
+$("#newpass").on("click", function () {
     newPassword();
 });
 
@@ -108,13 +108,14 @@ function newPassword() {
     if (!hasText("email")) {
         showAlert(
             "Missing Email",
-            "We need your email address if we're going to send you a new password, don't you think?",
+            "We'll need your email address if we're going to send you a new password, don't you think?",
             DLG_OK,
             "blue"
         );
     } else if (!validEmail("email")) {
         showBadEmailAlert();
     } else {
+        showWait("Generating password and sending email ...");
         ajaxGetPlayerByEmail(function() {
             ajaxPutWithUrlArgs(0, function () {
                 window.player.Lockout = 0;  // Remove any lockout condition
@@ -145,8 +146,8 @@ function ajaxGetPlayerByEmail(successCallback) {
                 showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "red");
             } else if (errorThrown.indexOf("Player") == 0) {
                 showAlert(errorThrown,
-                    "We looked <span class='i'>everywhere</span> for your email address and just " +
-                        "couldn't find it.<br /><br />I'd suggest that perhaps you mistyped it.",
+                    "We looked <span class='i'>everywhere</span> for your email address and just couldn't find it among those of " +
+                        "our registered players.<br /><br />I'd suggest that perhaps you mistyped it.",
                     DLG_OK, "red", hilightEmail);
             } else {
                 showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "red", hilightEmail);
