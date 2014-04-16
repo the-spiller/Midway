@@ -19,14 +19,12 @@
         }
 
         #logofflink {
-            position: absolute;
-            top: 18px;
-            left: 1250px;
-            color: #202020;
-            font: bold 1.2em Arial, sans-serif;
+            vertical-align: super;
+            margin-right: 25px;
+            color: #000;
+            font: 600 1.2em Arial, sans-serif;
         }
             #logofflink:hover, #logofflink:active {
-                color: #000;
                 text-decoration: underline;
             }
 
@@ -36,7 +34,6 @@
             width: 98%;
         }
 	        #optopponent input {
-		        font-weight: normal;
 	            margin: 5px 0 5px 5px;
 	            width: 250px;
 	            vertical-align: middle;
@@ -86,7 +83,7 @@
             #editreg input[type="text"], #editreg input[type="password"] {
                 width: 300px;
             }
-            
+
             .longbutton {
                 width: 70px;
                 margin-top: 10px;
@@ -97,10 +94,12 @@
     </head>
     <body>
         <div id="pagediv" class="noselect">
-            <div id="pagetitle" class="orange">MIDWAY HOME</div>
+            <div id="linksdiv">
+                <div id="infolink" title="Photo info"><img id="photoInfo" src="/content/images/camera.png" /></div>
+                <a id="logofflink" href="#">Log Off</a>
+            </div>
 
-            <a id="logofflink" href="#">Log Off</a>
-            <div id="infolink" title="Photo info"><img id="photoInfo" src="/content/images/camera.png" /></div>
+            <div id="pagetitle" class="orange">MIDWAY HOME</div>
 
             <div id="welcome" class="orange">
                 Welcome back, <span id="namespan"></span>! Go to a game, edit your registration info or peruse your record.
@@ -123,7 +122,7 @@
                         </ul>
                     </div>
                     <div id="optopponent">
-                        Opponent Nickname (optional):
+                        Optional opponent nickname:
                         <input id="oppnickname" type="text" value="First available" />
                         <div id="oppselectdiv">
                             <select id="oppselect"></select>
@@ -150,7 +149,7 @@
                         </tr>
                         <tr>
                             <td class="right">Nickname</td>
-                            <td><input id="nickname" type="text" class="regdata" /></td>
+                            <td><input id="nickname" type="text" maxlength="45" class="regdata" /></td>
                         </tr>
                         <tr>
                             <td></td>
@@ -174,7 +173,6 @@
             </div>
 
             <div class="photoblurb">
-                <div class="closex">&times;</div>
                 <p>
                     Japanese aircraft carrier <span class="i">Akagi</span> photographed leaving Celebes Island on 
                     26 March 1942 for attacks on British bases in Ceylon. Other carriers and battleships of the Combined 
@@ -182,7 +180,7 @@
                     <span class="i">Soryu</span>, <span class="i">Hiryu&#772;</span>, <span class="i">Hiei</span>, 
                     <span class="i">Kirishima</span>, <span class="i">Haruna</span>, <span class="i">Kongo&#772;</span>, 
                     <span class="i">Zuikaku</span> and <span class="i">Shokaku</span>. All but the last two would be 
-                    present at Midway some nine weeks later.
+                    en route to Midway some nine weeks later.
                 </p>
                 <p>
                     We see her island and aft flight deck with parked B5N &ldquo;Kate&rdquo; torpedo bombers. Rolled mattresses 

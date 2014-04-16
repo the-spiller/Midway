@@ -7,6 +7,20 @@ function windowToCanvas(canvas, x, y) {
     };
 }
 
+function getElementTopLeft(elem) {
+    var box = elem.getBoundingClientRect(),
+        body = document.body,
+        docElem = document.documentElement,
+        scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop,
+        scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft,
+        clientTop = docElem.clientTop || body.clientTop || 0,
+        clientLeft = docElem.clientLeft || body.clientLeft || 0,
+        x = box.left + scrollLeft - clientLeft,
+        y = box.top + scrollTop - clientTop;
+
+    return { x: Math.round(x), y: Math.round(y) };
+}
+
 function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }

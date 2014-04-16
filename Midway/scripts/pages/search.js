@@ -131,9 +131,9 @@ function selectZone(coords) {
         var oldTopLeft = searchGrid.zoneToTopLeftCoords(selectedZone),
             oldTop = oldTopLeft.y - 3,
             oldLeft = oldTopLeft.x - 3;
-        searchGrid.removeSelector(oldLeft, oldTop);
+        searchGrid.removeZoneSelector(oldLeft, oldTop);
     }
-    searchGrid.drawSelector(topLeft, 1, true);
+    searchGrid.drawSelector(topLeft, 1);
     selectedZone = searchGrid.coordsToZone(coords);
     showShipsInZone();
 }
@@ -153,13 +153,18 @@ function selectZoneTab() {
 /* area.                                                             */
 /*-------------------------------------------------------------------*/
 function selectArea(coords) {
-    var zone = searchGrid.coordsToZone(coords);
+    var topLeft = addVectors(searchGrid.coordsToTopLeftCoords(coords), { x: -3, y: -3 }),
+        zone = searchGrid.coordsToZone(coords);
+    
     if (zone) {
-        var area = zone.substr(0, 2);
-        var topLeftCoords = addVectors(searchGrid.zoneToTopLeftCoords(area + "A"), { x: -3, y: -3 });
-        searchGrid.drawSelector(topLeftCoords, 3);
-        selectedArea = area;
+        if (selectedArea) {
+            var oldTopLeft = searchGrid.zoneToTopLeftCoords(selectedArea + "A"),
+                oldTop = oldTopLeft.y - 3,
+                oldLeft = oldTopLeft.x - 3;
+            searchGrid.removeAreaSelector(oldLeft, oldTop);
+        }
     }
+    searchGrid.drawSelector(topLeft, 3);
 }
 
 /*-------------------------------------------------------------------*/
@@ -460,7 +465,6 @@ function canvasMouseUp(e) {
             executeSearch(coords, zone, dragThang.dragData, function() {
                 searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
                 drawSightings();
-                selectArea(coords);
             });
         } else if (isLegitDrop(coords)) {
             var cost = 0;

@@ -1,5 +1,5 @@
-﻿Buggy display of search marker and ships in marker's zone during search phase (OK after phase is advanced). Seems caused by draw/removal
-of zone highlight (which appears too late anyhow).
+﻿Buggy display of search marker and ships in marker's zone during search phase (OK after phase is advanced). Seems caused by 
+draw/removal of zone highlight (which appears too late anyhow).
 
 Occasional reload of last-loaded game when new game option selected.
 

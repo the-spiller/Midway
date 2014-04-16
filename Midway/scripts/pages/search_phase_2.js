@@ -98,7 +98,7 @@ function showSearching(canvasCoords) {
         canvas.style.cursor = "none";
         var coords = addVectors(canvasCoords, dragThang.cursorOffset);
         drawCursorImg(coords.x, coords.y);
-        selectArea(canvasCoords);
+        selectArea(coords);
     } else {
         if (dragThang.snapshot) searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
         canvas.style.cursor = "auto";
@@ -120,6 +120,7 @@ function hideSearching() {
 function executeSearch(coords, zone, search, callback) {
     if (withinSearchRange(coords)) {
         var area = zone.substr(0, 2);
+        selectArea(coords);
         if (!alreadySearched(area)) {
             search.Area = area;
             ajaxPostSearch(search, function () {

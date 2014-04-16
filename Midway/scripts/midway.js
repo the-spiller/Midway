@@ -15,24 +15,25 @@ var player = undefined,
 
 function showPhotoblurb() {
     showingInfo = !showingInfo;
+    var coords = getPhotoBlurbPosition(),
+        displayVal = showingInfo ? "block" : "none";
+    
+    $(".photoblurb").css({ "top": coords.y + "px", "left": coords.x + "px", "display": displayVal });
+}
 
-    if (showingInfo) {
-        if (currentPage == "logon") {
-            $(".photoblurb").css({ "display": "block", "top": "394px", "left": $("#infolink").css("left") });
-        } else {
-            $(".photoblurb").css({ "display": "block", "top": "40px", "left": getPhotoBlurbLeft() + "px" });
-        }
-    } else {
-        $(".photoblurb").css("display", "none");
+function getPhotoBlurbPosition() {
+    var pos = getElementTopLeft(document.getElementById("infolink"));
+
+    if (currentPage != "logon") {
+        pos.x = pos.x - 410;
+        pos.y = pos.y - 18;
     }
+    return pos;
 }
-function getPhotoBlurbLeft() {
-    var infolink = document.getElementById("infolink");
-    return infolink.offsetLeft - 400;
-}
+
 function getAlertPosition() {
     var left = Math.floor(($(window).width() / 2) - (DLG_WIDTH / 2));
-    var top = Math.floor($(window).scrollTop() + $(window).height() / 2) - 150;  //150 px above center
+    var top = Math.floor($(window).scrollTop() + $(window).height() / 2) - 150;  //150px above center
     return { x: left, y: top };
 }
 function showAlert(title, message, buttons, color, callback) {
@@ -268,6 +269,6 @@ function findGameById(id, games) {
 
 // Global event handlers.......................................................
 
-$(".closex").on("click", function () {
+$(".photoblurb").on("click", function () {
     $("#infolink").trigger("click");
 });

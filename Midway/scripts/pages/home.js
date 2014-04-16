@@ -290,7 +290,7 @@ function saveRegData() {
                     " won't know what to call you!";
             } else if ($("#nickname").val().toLowerCase() == "first available") {
                 caption = "Invalid Nickname";
-                msg = "You trying to be funny? That'll screw up the way the nickname search works.";
+                msg = "You trying to be funny? That'll thoroughly screw up the way the nickname search works.";
             }
         }
         if (msg) {

@@ -4,7 +4,8 @@
         mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
         cvs = document.getElementById("searchcanvas"),
         ctx = cvs.getContext("2d"),
-        selRemoveImage = null,
+        selRemoveZone = null,
+        selRemoveArea = null,
         //functions called internally
         privZoneToTopLeftCoords = function(zone) {
             var col = 0,
@@ -221,17 +222,25 @@
         drawSelector: function (topLeft, sizeInZones) {
             var top = topLeft.y,
                 left = topLeft.x,
-                sideLength = (sizeInZones * 36) + 5;
-
+                sideLength = (sizeInZones * zonesize) + 5,
+                savedData = ctx.getImageData(left, top, sideLength + 3, sideLength + 3);
+            
             if (sizeInZones == 1)
-                selRemoveImage = ctx.getImageData(left, top, sideLength + 3, sideLength + 3);
-
+                selRemoveZone = savedData;
+            else
+                selRemoveArea = savedData;
+            
             privDrawSelBox(left, top, sideLength);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        removeSelector: function (left, top) {
-            ctx.putImageData(selRemoveImage, left, top);
+        removeZoneSelector: function (left, top) {
+            ctx.putImageData(selRemoveZone, left, top);
+        },
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        removeAreaSelector: function (left, top) {
+            ctx.putImageData(selRemoveArea, left, top);
         },
         /*-------------------------------------------------------------------*/
         /* Draw movement direction band and destination zone indicator       */
