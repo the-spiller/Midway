@@ -25,6 +25,7 @@ namespace Midway.Controllers
         }
         
         // GET api/player......................................................
+        // List all players
         [Authorize]
         public HttpResponseMessage GetPlayers()
         {
@@ -42,6 +43,7 @@ namespace Midway.Controllers
         }
 
         // GET api/player/id...................................................
+        // Get one player by id
         [Authorize]
         public HttpResponseMessage GetPlayer(int id)
         {
@@ -61,7 +63,8 @@ namespace Midway.Controllers
             }
         }
 
-        // GET api/player?emailAddress=value
+        // GET api/player?emailAddress=value...................................
+        // Get one player by email address
         public HttpResponseMessage GetPlayer(string emailAddress)
         {
             try
@@ -85,6 +88,7 @@ namespace Midway.Controllers
         }
 
         // POST api/player (INSERT)............................................
+        // Open call to add a new player
         public HttpResponseMessage PostPlayer(DtoPlayer player)
         {
             try
@@ -143,7 +147,7 @@ namespace Midway.Controllers
         }
 
         // PUT api/player (UPDATE).............................................
-        // Authorized call for real player updates incl. new games
+        // Call for player updates incl. new games
         [Authorize]
         public HttpResponseMessage PutPlayer(DtoPlayer player)
         {

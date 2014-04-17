@@ -98,7 +98,7 @@ function showSearching(canvasCoords) {
         canvas.style.cursor = "none";
         var coords = addVectors(canvasCoords, dragThang.cursorOffset);
         drawCursorImg(coords.x, coords.y);
-        selectArea(coords);
+        selectArea(canvasCoords);
     } else {
         if (dragThang.snapshot) searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
         canvas.style.cursor = "auto";
@@ -110,6 +110,7 @@ function showSearching(canvasCoords) {
 function hideSearching() {
     canvas.style.cursor = "auto";
     dragThang.dragging = false;
+    dragThang.origin = "";
     if (dragThang.snapshot) {
         searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
     }
@@ -120,30 +121,63 @@ function hideSearching() {
 function executeSearch(coords, zone, search, callback) {
     if (withinSearchRange(coords)) {
         var area = zone.substr(0, 2);
-        selectArea(coords);
+       
         if (!alreadySearched(area)) {
             search.Area = area;
             ajaxPostSearch(search, function () {
                 $("#search-" + search.SearchNumber).remove().parent();
                 if (search.Markers && search.Markers.length) {
-                    var msg = "Enemy ships sighted!";
+                    var msg = "<p style=\"font-weight: bold;\">Enemy ships sighted!<p>";
                     for (var i = 0; i < search.Markers.length; i++) {
-                        msg += "<p>In zone " + search.Markers[i].Zone + ": " + search.Markers[i].TypesFound + "</p>";
+                        msg += "<p>" + search.Markers[i].Zone + " contains one or more of each of thse types:<br />" +
+                            expandTypesFound(search.Markers[i].TypesFound) + "</p>";
                     }
-                    showAlert("Search", msg, DLG_OK, "blue", callback);
+                    showAlert("Search " + area, msg, DLG_OK, "blue", callback);
 
                 } else {
-                    showAlert("Search", "No sightings.", DLG_OK, "blue", callback);
+                    showAlert("Search " + area, "No sightings.", DLG_OK, "blue", callback);
                 }
             });
         } else {
-            showAlert("Search", "You've already searched area " + area + "!", DLG_OK, "blue", callback);
+            showAlert("Search " + area, "You've already searched area " + area + " on this turn!", DLG_OK, "blue", callback);
         }
     } else {
-        if (dragThang.snapshot) searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
-        canvas.style.cursor = "auto";
+        hideSearching();
         if (callback) callback();
     }
+}
+
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+function expandTypesFound(typesFound) {
+    var types = typesFound.split(","),
+        expandedType, 
+        expanded = "";
+    
+    for (var i = 0; i < types.length; i++) {
+        switch (types[i]) {
+            case "BB":
+                expandedType = "battleship";
+                break;
+            case "CV":
+                expandedType = "aircraft carrier";
+                break;
+            case "CVL":
+                expandedType = "light aircraft carrier";
+                break;
+            case "CA":
+                expandedType = "cruiser";
+                break;
+            case "CL":
+                expandedType = "light cruiser";
+                break;
+            default:
+                expandedType = "";
+                break;
+        }
+        expanded += expandedType + ", ";
+    }
+    return expanded.substr(0, expanded.length - 2);
 }
 
 /*-------------------------------------------------------------------*/

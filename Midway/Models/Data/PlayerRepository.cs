@@ -249,22 +249,21 @@ namespace Midway.Models.Data
             var newPass = CreatePassword();
 
 			dtoPlayer.Password = newPass;
-	        dtoPlayer.Admin = "N";
 	        dtoPlayer.Lockout = 0;
 	        var newDbPlayer = new Player
 	            {
 			        Email = dtoPlayer.Email,
 			        Password = dtoPlayer.Password,
 			        Nickname = dtoPlayer.Nickname,
-			        Admin = dtoPlayer.Admin,
+			        Admin = string.IsNullOrEmpty(dtoPlayer.Admin) ? "N" : dtoPlayer.Admin,
 			        Lockout = dtoPlayer.Lockout,
 					PlayerGames = new List<PlayerGame>()
 		        };
             _context.Players.Add(newDbPlayer);
+			new Mailer().SendNewRegMessage(dtoPlayer.Email, dtoPlayer.Nickname, newPass);
             _context.Save();
 			dtoPlayer.PlayerId = newDbPlayer.PlayerId;
 
-			new Mailer().SendNewRegMessage(dtoPlayer.Email, dtoPlayer.Nickname, newPass);
             return dtoPlayer;
         }
 
@@ -387,7 +386,7 @@ namespace Midway.Models.Data
 
         private string CreatePassword()
         {
-            const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!$%*0123456789";
+            const string validChars = "abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ1234567890!$%*23456789";
             string newPass = "";
             var rnd = new Random(Guid.NewGuid().GetHashCode());
             var length = rnd.Next(8, 12);

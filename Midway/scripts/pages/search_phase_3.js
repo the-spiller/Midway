@@ -14,7 +14,7 @@ $(document).on("mouseenter", ".oppsearchitem", function (e) {
 /*-------------------------------------------------------------------*/
 function loadPhaseTab() {
     // Opponent's searches
-    var opsHtml = "<div class=\"listheader\">Opponent's searches</div>",
+    var opsHtml = "<div class=\"listheader\">Your opponent's searches</div>",
         airPath = side == "USN" ? imgDir + "ijn-air-search.png" : imgDir + "usn-air-search.png",
         seaPath = imgDir + "sea-search.png";
     if (oppSearches.length == 0) {

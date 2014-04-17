@@ -1,7 +1,4 @@
-﻿Buggy display of search marker and ships in marker's zone during search phase (OK after phase is advanced). Seems caused by 
-draw/removal of zone highlight (which appears too late anyhow).
-
-Occasional reload of last-loaded game when new game option selected.
+﻿Occasional reload of last-loaded game when new game option selected (???)
 
 Error in RemoveSearchMarkers during end of phase PUT -- remove stuff from a collection while looping through it
 

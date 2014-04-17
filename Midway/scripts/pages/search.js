@@ -153,18 +153,22 @@ function selectZoneTab() {
 /* area.                                                             */
 /*-------------------------------------------------------------------*/
 function selectArea(coords) {
-    var topLeft = addVectors(searchGrid.coordsToTopLeftCoords(coords), { x: -3, y: -3 }),
-        zone = searchGrid.coordsToZone(coords);
-    
-    if (zone) {
-        if (selectedArea) {
-            var oldTopLeft = searchGrid.zoneToTopLeftCoords(selectedArea + "A"),
-                oldTop = oldTopLeft.y - 3,
-                oldLeft = oldTopLeft.x - 3;
-            searchGrid.removeAreaSelector(oldLeft, oldTop);
-        }
-    }
+    var topLeft = searchGrid.coordsToAreaTopLeftCoords(coords);
+    deselectArea();
+    topLeft.x = topLeft.x - 3;
+    topLeft.y = topLeft.y - 3;
     searchGrid.drawSelector(topLeft, 3);
+}
+
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+function deselectArea() {
+    if (selectedArea) {
+        var oldTopLeft = searchGrid.zoneToTopLeftCoords(selectedArea + "A"),
+            oldTop = oldTopLeft.y - 3,
+            oldLeft = oldTopLeft.x - 3;
+        searchGrid.removeAreaSelector(oldLeft, oldTop);
+    }
 }
 
 /*-------------------------------------------------------------------*/
@@ -462,8 +466,11 @@ function canvasMouseUp(e) {
         
         if (dragThang.origin == "search") {
             hideSearching();
-            executeSearch(coords, zone, dragThang.dragData, function() {
-                searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
+            selectArea(coords);
+            selectedArea = zone.substr(0, 2);
+            
+            executeSearch(coords, zone, dragThang.dragData, function () {
+                deselectArea();
                 drawSightings();
             });
         } else if (isLegitDrop(coords)) {

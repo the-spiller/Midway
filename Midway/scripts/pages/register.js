@@ -33,7 +33,7 @@ $("#btngo").on("click", function () {
         ajaxRegisterPlayer(function () {
             showAlert("Registration Successful",
                 "You are now registered. Expect to receive a password in email that will allow you to " +
-                    "log in the first time.<br /><br />We hope you enjoy our game!",
+                    "log on.<br /><br />We hope you enjoy our game!",
                 DLG_OK, "blue", function () {
                     location.replace("/index.html");
                 });
