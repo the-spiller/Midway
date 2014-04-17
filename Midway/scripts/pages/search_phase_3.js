@@ -16,7 +16,7 @@ function loadPhaseTab() {
     // Opponent's searches
     var opsHtml = "<div class=\"listheader\">Your opponent's searches</div>",
         airPath = side == "USN" ? imgDir + "ijn-air-search.png" : imgDir + "usn-air-search.png",
-        seaPath = imgDir + "sea-search.png";
+        seaPath = side == "USN" ? imgDir + "ijn-sea-search.png" : imgDir + "usn-sea-search.png";
     if (oppSearches.length == 0) {
         opsHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
     } else {
@@ -26,7 +26,7 @@ function loadPhaseTab() {
             var margin = "";
             if (oppSearches[i].SearchType == "sea") {
                 searchImgSrc = seaPath;
-                margin = " margin: 0 -300px;";
+                //margin = " margin: 0 -300px;";
             }
 
             var zones = "No ships sighted";
@@ -37,9 +37,9 @@ function loadPhaseTab() {
                 }
                 zones = zones.substr(0, zones.length - 2) + "</span>";
             }
-            opsHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 33%;"
+            opsHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 40%;"
                 + margin + "\">" +
-                "<img src=\"" + searchImgSrc + "\" /></td><td style=\"width: 66%;\">Area " + oppSearches[i].Area +
+                "<img src=\"" + searchImgSrc + "\" /></td><td style=\"width: 60%;\">Area " + oppSearches[i].Area +
                 "<br />" + zones + "</td></tr>";
         }
     }

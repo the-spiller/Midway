@@ -3,4 +3,3 @@
 Error in RemoveSearchMarkers during end of phase PUT -- remove stuff from a collection while looping through it
 
 Try qTip2 for triggering tooltip display (they don't work on a touch screen)?
-
