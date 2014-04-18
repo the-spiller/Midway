@@ -242,32 +242,40 @@ namespace Midway.Models.Data
 
 		public void RemoveSearchMarkers(IList<DtoSearch> searches)
 		{
+            // Keep only those searches represented by markers on the player's search map.
 			if (searches.Count == 0) return;
 
-		    var gameId = searches[0].GameId;
-		    var playerId = searches[0].PlayerId;
-            var turn = searches[0].Turn;
-			var dbSearches = _context.PlayerGameSearches
-			                         .Include(p => p.SearchMarkers)
-			                         .Where(p => p.GameId == gameId && p.PlayerId == playerId
-										 && p.Turn == turn)
-			                         .ToList();
-			foreach (var dbSearch in dbSearches)
-			{
-				var matchedArea = searches.SingleOrDefault(s => s.Area == dbSearch.Area);
-				if (matchedArea == null)
-				{
-					dbSearches.Remove(dbSearch);
-				}
-				else
-				{
-					foreach (var dbMarker in dbSearch.SearchMarkers)
-					{
-						if (matchedArea.Markers == null || matchedArea.Markers.All(m => m.Zone != dbMarker.Zone))
-							dbSearch.SearchMarkers.Remove(dbMarker);
-					}
-				}
-			}
+            foreach (var search in searches)
+            {
+                var dbMatch = _context.PlayerGameSearches
+                    .Include(p => p.SearchMarkers)
+                    .SingleOrDefault(p => p.GameId == search.GameId 
+                        && p.PlayerId == search.PlayerId
+                        && p.Turn == search.Turn
+                        && p.Area == search.Area);
+                
+                if (dbMatch != null) {
+                    if (search.Markers != null && search.Markers.Count > 0 && dbMatch.SearchMarkers != null 
+                        && dbMatch.SearchMarkers.Count > 0)
+                    {
+                        // Remove search marker zones not present among the input zones for this area.
+                        IList<string> inputZones = search.Markers.Select(m => m.Zone).ToList();
+                        var noGood = dbMatch.SearchMarkers.Where(m => !inputZones.Contains(m.Zone)).ToList();
+
+                        while (noGood.Count > 0)
+                        {
+                            dbMatch.SearchMarkers.Remove(noGood[0]);
+                        }
+                    }
+
+                    if (dbMatch.SearchMarkers == null || dbMatch.SearchMarkers.Count == 0)
+                    {
+                        //Remove dbMatch from the collection
+                        _context.PlayerGameSearches.Remove(dbMatch);
+                    }
+                }
+            }
+		    _context.Save();
 		}
 	}
 }
