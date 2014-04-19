@@ -19,7 +19,8 @@ namespace Midway.Models.Data.Mappings
 
             HasMany(p => p.SearchMarkers)
                 .WithRequired(g => g.PlayerGameSearch)
-                .HasForeignKey(g => new { g.GameId, g.PlayerId, g.Turn, g.SearchNumber});
+                .HasForeignKey(g => new { g.GameId, g.PlayerId, g.Turn, g.SearchNumber})
+                .WillCascadeOnDelete();
         }
     }
 }

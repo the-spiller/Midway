@@ -71,7 +71,7 @@ namespace Midway.Controllers
                     new ShipRepository(_uow).UpdateShips(phaseData.GameId, phaseData.PlayerId, phaseData.Ships);
 
                 if (phaseData.Searches != null && phaseData.Searches.Count > 0)
-                    new SearchRepository(_uow).RemoveSearchMarkers(phaseData.Searches);
+                    new SearchRepository(_uow).RemoveSearchMarkers(phaseData.GameId, phaseData.PlayerId, phaseData.Searches);
 
                 _phaseRepo.AdvancePhase(
                     phaseData.GameId, 

@@ -88,75 +88,81 @@ $("#playgame").on("click", function () {
     });
 });
         
-$("#oppnickname").on("focus", function () {
-    if (!oppCleared) {
-        $(this).val("");
-        oppCleared = true;
-    }
-}).on("blur", function() {
-    if (!$(this).val()) {
-        $(this).val("First available");
-        oppCleared = false;
-    }
-}).on("keyup", function (e) {
-    if ($("#dlgoverlay").css("display") == "block") return;
+$("#oppnickname")
+    .on("focus", function () {
+        if (!oppCleared) {
+            $(this).val("");
+            oppCleared = true;
+        }
+    })
+    .on("blur", function () {
+        if (!$(this).val()) {
+            $(this).val("First available");
+            oppCleared = false;
+        }
+    })
+    .on("keyup", function (e) {
+        if ($("#dlgoverlay").css("display") == "block") return;
     
-    var oppselect = document.getElementById("oppselect");
-    if ($(this).val()) {
-        if (oppselect.length && e.keyCode == 40) {
-            $(oppselect).focus();
-        } else {
-            var results = nicknames.get($(this).val());
-            if (results == null || results.length > 10) {
-                closeOppSelect();
-                oppMatched = false;
+        var oppselect = document.getElementById("oppselect");
+        if ($(this).val()) {
+            if (oppselect.length && e.keyCode == 40) {
+                $(oppselect).focus();
             } else {
-                var selHtml = "";
-                for (var i = 0; i < results.length; i++) {
-                    selHtml += "<option>" + results[i][1] + "</option>";
-                }
-                $(oppselect).attr("size", results.length).html(selHtml);
-                $("#oppselectdiv").css({ "display": "block" });
-            }
-            if (oppselect.length == 1 && !oppMatched) {
-                $(this).val($(oppselect).text());
-                setTimeout(function () {
+                var results = nicknames.get($(this).val());
+                if (results == null || results.length > 10) {
                     closeOppSelect();
-                    oppMatched = true;
-                }, 500);
+                    oppMatched = false;
+                } else {
+                    var selHtml = "";
+                    for (var i = 0; i < results.length; i++) {
+                        selHtml += "<option>" + results[i][1] + "</option>";
+                    }
+                    $(oppselect).attr("size", results.length).html(selHtml);
+                    $("#oppselectdiv").css({ "display": "block" });
+                }
+                if (oppselect.length == 1 && !oppMatched) {
+                    $(this).val($(oppselect).text());
+                    setTimeout(function () {
+                        closeOppSelect();
+                        oppMatched = true;
+                    }, 500);
+                }
+            }
+        } else {
+            closeOppSelect();
+            oppMatched = false;
+        }
+    })
+    .on("input", function () {
+        if (!$(this).val()) {
+            closeOppSelect();
+            oppMatched = false;
+        }
+    });
+
+$("#oppselect")
+    .on("keyup", function(e) {
+        if ($("#dlgoverlay").css("display") == "block") return;
+
+        if (e.keyCode == 38 && $(this).prop("selectedIndex") == 0) {
+            $("#oppnickname").focus();
+        } else {
+            var selText = $("#oppselect>option:selected").text();
+            if (e.keyCode == 13 && selText) {
+                $("#oppnickname").val(selText);
+                closeOppSelect();
+                oppMatched = true;
             }
         }
-    } else {
-        closeOppSelect();
-        oppMatched = false;
-    }
-}).on("input", function () {
-    if (!$(this).val()) {
-        closeOppSelect();
-        oppMatched = false;
-    }
-});
-
-$("#oppselect").on("keyup", function (e) {
-    if ($("#dlgoverlay").css("display") == "block") return;
-    
-    if (e.keyCode == 38 && $(this).prop("selectedIndex") == 0) {
-        $("#oppnickname").focus();
-    } else {
-        var selText = $("#oppselect>option:selected").text();
-        if (e.keyCode == 13 && selText) {
-            $("#oppnickname").val(selText);
+    })
+    .on("click", function (e) {
+        if (e.target) {
+            $("#oppnickname").val($(e.target).val());
             closeOppSelect();
             oppMatched = true;
         }
-    }
-}).on("click", function(e) {
-    if (e.target) {
-        $("#oppnickname").val($(e.target).val());
-        closeOppSelect();
-        oppMatched = true;
-    }
-});
+    });
 
 $(".regdata").on("input", function () {
     if (anyRegDataChanged()) {
@@ -174,7 +180,14 @@ $("#cancelreg").on("click", function() {
 $("#savereg").on("click", function () {
     saveRegData();
 });
-        
+
+$("#editreg").on("keyup", function(e) {
+    if (e.keyCode == 13 && $("#savereg").css("display") == "inline-block")
+        $("#savereg").trigger("click");
+    else if (e.keyCode == 27 && $("#cancelreg").css("display") == "inline-block")
+        $("#cancelreg").trigger("click");
+});
+
 // Functions...........................................................
         
 function shallowCopyPlayer() {

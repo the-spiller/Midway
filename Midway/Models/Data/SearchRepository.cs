@@ -240,25 +240,29 @@ namespace Midway.Models.Data
             return dtoSearch;
 		}
 
-		public void RemoveSearchMarkers(IList<DtoSearch> searches)
+		internal void RemoveSearchMarkers(int gameId, int playerId, IList<DtoSearch> searches)
 		{
-            // Keep only those searches represented by markers on the player's search map.
-			if (searches.Count == 0) return;
+			if (searches == null || searches.Count == 0) return;
 
+		    int currentTurn =  _context.PlayerGames
+                .Where(p => p.GameId == gameId && p.PlayerId == playerId)
+                .Select(p => p.Turn)
+                .Single();
+
+            // Becuase users can delete search markers, remove search marker records without a corresponding marker
+            // in the input search.
             foreach (var search in searches)
             {
                 var dbMatch = _context.PlayerGameSearches
-                    .Include(p => p.SearchMarkers)
-                    .SingleOrDefault(p => p.GameId == search.GameId 
+                    .SingleOrDefault(p => p.GameId == search.GameId
                         && p.PlayerId == search.PlayerId
                         && p.Turn == search.Turn
                         && p.Area == search.Area);
-                
-                if (dbMatch != null) {
-                    if (search.Markers != null && search.Markers.Count > 0 && dbMatch.SearchMarkers != null 
-                        && dbMatch.SearchMarkers.Count > 0)
+
+                if (dbMatch != null)
+                {
+                    if (search.Markers != null && search.Markers.Count > 0)
                     {
-                        // Remove search marker zones not present among the input zones for this area.
                         IList<string> inputZones = search.Markers.Select(m => m.Zone).ToList();
                         var noGood = dbMatch.SearchMarkers.Where(m => !inputZones.Contains(m.Zone)).ToList();
 
@@ -267,13 +271,18 @@ namespace Midway.Models.Data
                             dbMatch.SearchMarkers.Remove(noGood[0]);
                         }
                     }
-
-                    if (dbMatch.SearchMarkers == null || dbMatch.SearchMarkers.Count == 0)
-                    {
-                        //Remove dbMatch from the collection
-                        _context.PlayerGameSearches.Remove(dbMatch);
-                    }
                 }
+            }
+
+            // Remove all searches from earlier turns that do not have markers
+		    var searchesToDelete = _context.PlayerGameSearches
+                .Include(p => p.SearchMarkers)
+		        .Where(p => p.Turn < currentTurn && p.SearchMarkers.Count == 0)
+                .ToList();
+
+            while (searchesToDelete.Count > 0)
+            {
+                _context.PlayerGameSearches.Remove(searchesToDelete[0]);
             }
 		    _context.Save();
 		}

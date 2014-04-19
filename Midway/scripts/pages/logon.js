@@ -147,7 +147,7 @@ function ajaxGetPlayerByEmail(successCallback) {
             } else if (errorThrown.indexOf("Player") == 0) {
                 showAlert(errorThrown,
                     "We looked <span class='i'>everywhere</span> for your email address and just couldn't find it among those of " +
-                        "our registered players.<br /><br />I'd suggest that perhaps you mistyped it.",
+                        "our registered players.<br /><br />Are you registered? If so, I'd suggest that perhaps you mistyped it.",
                     DLG_OK, "red", hilightEmail);
             } else {
                 showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "red", hilightEmail);

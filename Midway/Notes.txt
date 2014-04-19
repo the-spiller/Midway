@@ -1,5 +1,5 @@
-﻿Occasional reload of last-loaded game when new game option selected (???)
+﻿"Cancel my registration" link on home page registration tab.
 
-Error in RemoveSearchMarkers during end of phase PUT -- remove stuff from a collection while looping through it
+Occasional reload of last-loaded game when new game option selected (???)
 
 Try qTip2 for triggering tooltip display (they don't work on a touch screen)?

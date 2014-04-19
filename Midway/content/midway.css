@@ -31,8 +31,8 @@ a img { border: none; vertical-align: middle; }
 ul { list-style-type: none; }
 
 p {
-    line-height: normal;
-    padding-bottom: .75em;
+    line-height: 1.25em;
+    padding-bottom: 1em;
 }
 
 input[type="text"], input[type="password"] {
@@ -61,8 +61,8 @@ td, th {
 
 td.spacer5 {
     height: 5px;
-
 }
+
 th {
     border-bottom: 1px solid #fff;
 }
