@@ -1,5 +1,3 @@
-﻿"Cancel my registration" link on home page registration tab.
-
-Occasional reload of last-loaded game when new game option selected (???)
+﻿Occasional reload of last-loaded game when new game option selected (???)
 
 Try qTip2 for triggering tooltip display (they don't work on a touch screen)?

@@ -187,7 +187,7 @@ $("#cancelreg").on("click", function() {
         "this is what you want to do?";
     
     showAlert("Cancel Registration", msg, DLG_YESNO, "red", function (resp) {
-        if (resp == "YES") {
+        if (resp == "Yes") {
             cancelRegistration(function () {
                 eraseCookie(COOKIE_NAME);
                 location.replace("/index.html");
@@ -197,8 +197,8 @@ $("#cancelreg").on("click", function() {
 });
 
 $("#editreg").on("keyup", function(e) {
-    if (e.keyCode == 13 && $("#savereg").css("display") == "inline-block")
-        $("#savereg").trigger("click");
+    if (e.keyCode == 13 && $("#saveedit").css("display") == "inline-block")
+        $("#saveedit").trigger("click");
     else if (e.keyCode == 27 && $("#canceledit").css("display") == "inline-block")
         $("#canceledit").trigger("click");
 });
@@ -366,7 +366,7 @@ function loadRegFields() {
 /*-------------------------------------------------------*/
 function cancelRegistration(successCallback) {
     $.ajax({
-        url: "/api/player/" + player.Id,
+        url: "/api/player/" + player.PlayerId,
         type: "DELETE",
         success: function () {
             if (successCallback) successCallback();

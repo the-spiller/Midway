@@ -55,6 +55,7 @@ function showOppSearchedArea(e) {
     if (area)
         searchGrid.drawOppSearchArea(area);
 }
+
 /*-------------------------------------------------------------------*/
 /* Remove the highlight of an opponent's search item's area.         */
 /*-------------------------------------------------------------------*/

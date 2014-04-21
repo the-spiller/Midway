@@ -233,7 +233,6 @@
     <Content Include="Scripts\pages\search_phase_3.js" />
     <Content Include="Views\about.html" />
     <Content Include="App_Data\cm.sdf" />
-    <Content Include="App_Data\del_games.sql" />
     <Content Include="Content\audio\teletype.mp3" />
     <Content Include="Content\images\bg-home.jpg" />
     <Content Include="Content\images\bg-logon.jpg" />

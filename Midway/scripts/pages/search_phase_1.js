@@ -118,7 +118,6 @@ function sailShips(startZone, endZone) {
         handle;
 
     searchGrid.drawMap(function () {
-        searchGrid.highlightArrivalZones(side);
         drawSightings();
         drawShips([startZone, endZone]);
         mapImg = searchGrid.grabImageData();
@@ -132,7 +131,6 @@ function sailShips(startZone, endZone) {
         if (elapsed >= duration) {
             window.cancelAnimationFrame(handle);
             searchGrid.drawMap(function () {
-                searchGrid.highlightArrivalZones(side);
                 drawSightings();
                 drawShips();
                 searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);

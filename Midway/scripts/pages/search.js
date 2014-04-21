@@ -16,6 +16,7 @@
     lastShipSelected = null,
     selectedZone = "",
     selectedArea = "",
+    arrivalZonesHighlighted = false,
     dragMgr = {
         dragging: false,
         origin: "",
@@ -30,7 +31,7 @@
 
 $("#return").on("click", function() {
     if (dirty) {
-        showAlert("Home",
+        showAlert("Return Home",
             "Are you sure you want to return to the home page without posting? Changes you've made will be lost.",
             DLG_YESCANCEL, "blue", returnChoice);
 
@@ -388,8 +389,13 @@ function getShipById(id) {
 /* toggles selected state; Shift-click selects or deselects a range. */
 /*-------------------------------------------------------------------*/
 function doShipSelection(shipItem, shiftPressed) {
+    
     if (!lastShipSelected) {
         $(shipItem).addClass("selected");
+        if (game.PhaseId == 1 && !arrivalZonesHighlighted) {
+            searchGrid.putArrivalZonesHighlight(side);
+            arrivalZonesHighlighted = true;
+        }
         lastShipSelected = shipItem;
         return;
     }
@@ -409,7 +415,19 @@ function doShipSelection(shipItem, shiftPressed) {
             $(shipItem).addClass("selected");
     }
     lastShipSelected = shipItem;
+    
+    if (game.PhaseId == 1) {
+        var arrivals = getSelectedShips("arrivals");
+        if (arrivals.length > 0 && !arrivalZonesHighlighted) {
+            searchGrid.putArrivalZonesHighlight(side);
+            arrivalZonesHighlighted = true;
+        } else if (arrivals.length == 0 && arrivalZonesHighlighted) {
+            searchGrid.removeArrivalZonesHighlight(side);
+            arrivalZonesHighlighted = false;
+        }
+    }
 }
+
 
 /*-------------------------------------------------------------------*/
 /* Called after a fast timer to ensure that we're actually dragging. */
@@ -484,7 +502,6 @@ function canvasMouseUp(e) {
             relocateShips(zone, dragMgr.dragData, cost);
 
             if (dragMgr.origin == "arrivals") {
-                //searchGrid.drawShipsMarker(searchGrid.coordsToTopLeftCoords(coords));
                 $("#arrivals").find("div.shipitem").remove(".selected").parent();
                 selectZone(coords);
                 if ($("#arrivals").find("div.shipitem").length == 0) {
@@ -638,7 +655,6 @@ function shipsLoaded() {
         $("#searchcanvas").css("display", "block");
         
         searchGrid.drawMap(function () {
-            if (game.PhaseId == 1) searchGrid.highlightArrivalZones(side);
             drawShips();
             drawSightings();
 
@@ -660,7 +676,7 @@ function shipsLoaded() {
 function touchToMouseHandler(event) {
     var touches = event.changedTouches,
         first = touches[0],
-        type = "";
+        type;
 
     // figure which mouse event to use
     switch (event.type) {
@@ -731,6 +747,8 @@ function loadPage(callback) {
 }
 
 // Initialize..........................................................
+
+showWait("Loading ...");
 
 $(document).ready(function () {
     //init touchevents for drag-drop

@@ -6,6 +6,7 @@
         ctx = cvs.getContext("2d"),
         selRemoveZone = null,
         selRemoveArea = null,
+        highlightRemoveZones = null,
         //functions called internally
         privZoneToTopLeftCoords = function(zone) {
             var col = 0,
@@ -188,11 +189,13 @@
         drawSightingMarker: function (zone) {
             var topLeft = privZoneToTopLeftCoords(zone),
                 sightingImg = document.getElementById("sighting");
+            
             ctx.drawImage(sightingImg, topLeft.x, topLeft.y);
         },
         /*-------------------------------------------------------------------*/
+        /*  */
         /*-------------------------------------------------------------------*/
-        highlightArrivalZones: function (side) {
+        putArrivalZonesHighlight: function (side) {
             var topZone = side == "IJN" ? "A1A" : "I1B",
                 bottomZone = side == "IJN" ? "A7D" : "I7E",
                 topCoords = privZoneToTopLeftCoords(topZone),
@@ -200,12 +203,25 @@
                 width = bottomCoords.x - topCoords.x,
                 height = bottomCoords.y - topCoords.y;
 
+            highlightRemoveZones = ctx.getImageData(topCoords.x, topCoords.y, width, height);
             ctx.save();
             ctx.globalAlpha = 0.2;
-            ctx.fillStyle = side == "USN" ? "#004757" : "#ff2b00";
+            ctx.fillStyle = "#fff";
             ctx.rect(topCoords.x, topCoords.y, width, height);
             ctx.fill();
             ctx.restore();
+        },
+        /*-------------------------------------------------------------------*/
+        /*  */
+        /*-------------------------------------------------------------------*/
+        removeArrivalZonesHighlight: function (side) {
+            if (!highlightRemoveZones) return;
+            
+            var topZone = side == "IJN" ? "A1A" : "I1B",
+                topCoords = privZoneToTopLeftCoords(topZone);
+            
+            ctx.putImageData(highlightRemoveZones, topCoords.x, topCoords.y);
+            highlightRemoveZones = null;
         },
         /*-------------------------------------------------------------------*/
         /* Grab preloaded fleet image and draw it at the input canvas        */
