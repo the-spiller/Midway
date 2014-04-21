@@ -42,17 +42,17 @@ function searchItemMouseDown(e) {
     var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "null";
     if (panelId != "search") return;
 
-    dragThang.dragging = false;
-    dragThang.origin = panelId;
+    dragMgr.dragging = false;
+    dragMgr.origin = panelId;
 
     var selSearch = getSearch(e.target);
     if (selSearch) {
         mouseDown = true;
-        dragThang.dragData = selSearch;
-        dragThang.cursorImg = document.getElementById(selSearch.SearchType + "searchcursor");
-        dragThang.cursorOffset = { x: -40, y: -40 },
-        dragThang.useSnapshot = false;
-        dragThang.snapshot = null;
+        dragMgr.dragData = selSearch;
+        dragMgr.cursorImg = document.getElementById(selSearch.SearchType + "searchcursor");
+        dragMgr.cursorOffset = { x: -40, y: -40 },
+        dragMgr.useSnapshot = false;
+        dragMgr.snapshot = null;
         selectedArea = "";
 
         setTimeout(beginControlsDrag, 150);
@@ -63,7 +63,7 @@ function searchItemMouseDown(e) {
 /* Draw the search cursor at the input coordinates.                  */
 /*-------------------------------------------------------------------*/
 function drawCursorImg(x, y) {
-    dragThang.snapshot = searchGrid.drawSearchCursor(dragThang.snapshot, dragThang.cursorImg, x, y);
+    dragMgr.snapshot = searchGrid.drawSearchCursor(dragMgr.snapshot, dragMgr.cursorImg, x, y);
 }
 
 /*-------------------------------------------------------------------*/
@@ -75,7 +75,7 @@ function withinSearchRange(coords) {
 
     if (!zone) return false;
     var area = zone.substr(0, 2);
-    if (dragThang.dragData.SearchType == "air") {
+    if (dragMgr.dragData.SearchType == "air") {
         if (game.SearchRange == 0) return true; //zero = infinite range (entire map)
 
         for (i = 0; i < shipZones.length; i++) {
@@ -96,11 +96,11 @@ function withinSearchRange(coords) {
 function showSearching(canvasCoords) {
     if (withinSearchRange(canvasCoords)) {
         canvas.style.cursor = "none";
-        var coords = addVectors(canvasCoords, dragThang.cursorOffset);
+        var coords = addVectors(canvasCoords, dragMgr.cursorOffset);
         drawCursorImg(coords.x, coords.y);
         selectArea(canvasCoords);
     } else {
-        if (dragThang.snapshot) searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
+        if (dragMgr.snapshot) searchGrid.restoreImageData(dragMgr.snapshot, 0, 0);
         canvas.style.cursor = "auto";
     }
 }
@@ -109,10 +109,10 @@ function showSearching(canvasCoords) {
 /*-------------------------------------------------------------------*/
 function hideSearching() {
     canvas.style.cursor = "auto";
-    dragThang.dragging = false;
-    dragThang.origin = "";
-    if (dragThang.snapshot) {
-        searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
+    dragMgr.dragging = false;
+    dragMgr.origin = "";
+    if (dragMgr.snapshot) {
+        searchGrid.restoreImageData(dragMgr.snapshot, 0, 0);
     }
 }
 

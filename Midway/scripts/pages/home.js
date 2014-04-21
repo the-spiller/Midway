@@ -166,26 +166,41 @@ $("#oppselect")
 
 $(".regdata").on("input", function () {
     if (anyRegDataChanged()) {
-        $("#cancelreg").css("display", "inline-block");
+        $("#canceledit").css("display", "inline-block");
     } else {
-        $("#cancelreg").css("display", "none");
+        $("#canceledit").css("display", "none");
     }
 });
 
-$("#cancelreg").on("click", function() {
+$("#canceledit").on("click", function() {
     loadRegFields();
     $(this).css("display", "none");
 });
         
-$("#savereg").on("click", function () {
+$("#saveedit").on("click", function () {
     saveRegData();
+});
+
+$("#cancelreg").on("click", function() {
+    var msg = "<p>If you cancel your Midway registration, all your unfinished games will be forefeited, your " +
+        "record will be lost, you will no longer be able to log on, and none of this can be undone.</p><p>Are you sure that " +
+        "this is what you want to do?";
+    
+    showAlert("Cancel Registration", msg, DLG_YESNO, "red", function (resp) {
+        if (resp == "YES") {
+            cancelRegistration(function () {
+                eraseCookie(COOKIE_NAME);
+                location.replace("/index.html");
+            });
+        }
+    });
 });
 
 $("#editreg").on("keyup", function(e) {
     if (e.keyCode == 13 && $("#savereg").css("display") == "inline-block")
         $("#savereg").trigger("click");
-    else if (e.keyCode == 27 && $("#cancelreg").css("display") == "inline-block")
-        $("#cancelreg").trigger("click");
+    else if (e.keyCode == 27 && $("#canceledit").css("display") == "inline-block")
+        $("#canceledit").trigger("click");
 });
 
 // Functions...........................................................
@@ -273,7 +288,7 @@ function createGame(callback) {
 }
         
 function unsavedRegChanges() {
-    if ($("#cancelreg").css("display") == "inline-block") {
+    if ($("#canceledit").css("display") == "inline-block") {
         showAlert("Unsaved Changes", "You've made changes to your registration info that haven't been " +
             "saved. Please save or cancel them.", DLG_OK, "blue");
         $(".tablistitem, .tabpanel").removeClass("tabshown");
@@ -320,7 +335,7 @@ function saveRegData() {
             };
             ajaxUpdatePlayer(shallowPlayer, function() {
                 loadRegFields();
-                $("#cancelreg").css("display", "none");
+                $("#canceledit").css("display", "none");
                 $("#namespan").text(window.player.Nickname);
                 showAlert("Save", "Changes saved.", DLG_OK, "blue");
             });
@@ -345,6 +360,23 @@ function loadRegFields() {
     $("#pwd2").val(window.player.Password);
     $("#nickname").val(window.player.Nickname);
 }
+
+/*-------------------------------------------------------*/
+/* Delete this player and his/her games from the system. */
+/*-------------------------------------------------------*/
+function cancelRegistration(successCallback) {
+    $.ajax({
+        url: "/api/player/" + player.Id,
+        type: "DELETE",
+        success: function () {
+            if (successCallback) successCallback();
+        },
+        error: function (xhr, status, errorThrown) {
+            showAjaxError(xhr, status, errorThrown);
+        }
+    });
+}
+
 /*-------------------------------------------------------*/
 /* Build up html for one game for the 'Your Games' list. */
 /*-------------------------------------------------------*/

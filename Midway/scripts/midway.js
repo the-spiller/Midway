@@ -6,10 +6,12 @@ var player = undefined,
     DLG_OK = 1,
     DLG_OKCANCEL = 2,
     DLG_YESCANCEL = 3,
+    DLG_YESNO = 4,
     showingInfo = false,
     IMG_WIDTH = 1387,
     IMG_HEIGHT = 857,
-    COOKIE_NAME = "mdyplayer";
+    COOKIE_NAME = "mdyplayer",
+    supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
 
 // Functions...................................................................
 
@@ -36,6 +38,10 @@ function getAlertPosition() {
     var top = Math.floor($(window).scrollTop() + $(window).height() / 2) - 150;  //150px above center
     return { x: left, y: top };
 }
+
+/*-----------------------------------------------------------------------------*/
+/* Display modal "message box"                                                 */
+/*-----------------------------------------------------------------------------*/
 function showAlert(title, message, buttons, color, callback) {
     var topLeft = getAlertPosition();
     
@@ -60,6 +66,8 @@ function showAlert(title, message, buttons, color, callback) {
         case (DLG_YESCANCEL):
             $("#dlgbuttons").html(getAlertButtonHtml("Yes") + getAlertButtonHtml("Cancel"));
             break;
+        case (DLG_YESNO):
+            $("#dlgbuttons").html(getAlertButtonHtml("Yes") + getAlertButtonHtml("No"));
     }
 
     $("#dlgbuttons .flatbutton").on("click", function (e) {

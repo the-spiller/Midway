@@ -59,7 +59,7 @@ namespace Midway.Models.Services
             var msgBody = new StringBuilder("<span style=\"font-weight: bold;\">");
 	        msgBody.AppendFormat("Hello and welcome, {0}!</span>{1}", nickname, BRBR);
 	        msgBody.Append("Here is your nasty, computer-generated password for the ");
-	        msgBody.AppendFormat("<a href=\"http:\\midwaydev.jeffcahill.net\">Midway game site</a>. Use it to log in:{0}", BRBR);
+	        msgBody.AppendFormat("<a href=\"http:\\midwaydev.jeffcahill.net\">Midway game site</a>. Use it to log on:{0}", BRBR);
 	        msgBody.AppendFormat("<span style=\"font-weight: bold;\">{0}</span>{1}", pwd, BRBR);
 	        msgBody.AppendFormat("You can change it on the Miday Home page &ldquo;Your Registration&rdquo; tab.{0}", BRBR);
 	        msgBody.AppendFormat("Thanks, and we hope you enjoy the game.{0}", BRBR);

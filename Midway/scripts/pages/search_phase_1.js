@@ -31,12 +31,12 @@ $(canvas).on("mousedown", function (e) {
         selShips = getSelectedShips("zone");
 
     if (selShips.length > 0) {
-        dragThang.dragging = false;
-        dragThang.origin = zone;
-        dragThang.dragData = selShips;
-        dragThang.cursorImg = null;
-        dragThang.useSnapshot = true;
-        dragThang.snapshot = null;
+        dragMgr.dragging = false;
+        dragMgr.origin = zone;
+        dragMgr.dragData = selShips;
+        dragMgr.cursorImg = null;
+        dragMgr.useSnapshot = true;
+        dragMgr.snapshot = null;
 
         setTimeout(beginControlsDrag, 150);
     }
@@ -65,28 +65,30 @@ function shipItemMouseDown() {
     var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "null";
     if (panelId != "arrivals") return;
 
-    dragThang.dragging = false;
-    dragThang.origin = panelId;
+    dragMgr.dragging = false;
+    dragMgr.origin = panelId;
 
     var selShips = getSelectedShips(panelId);
     if (selShips.length > 0) {
         mouseDown = true;
-        dragThang.dragData = selShips;
-        dragThang.useSnapshot = true;
-        dragThang.cursorImg = document.getElementById("fleet");
-        dragThang.snapshot = null;
+        dragMgr.dragData = selShips;
+        dragMgr.useSnapshot = true;
+        dragMgr.cursorImg = document.getElementById("fleet");
+        dragMgr.snapshot = null;
 
         setTimeout(beginControlsDrag, 150);
     }
 }
 
 /*-------------------------------------------------------------------*/
+/* Reads dragging context to determine if drop location is           */
+/* legitimate. If so, return true, otherwise false.                  */
 /*-------------------------------------------------------------------*/
 function isLegitDrop(coords) {
     var dropZone = searchGrid.coordsToZone(coords);
-    if (dropZone == dragThang.origin) return true;
+    if (dropZone == dragMgr.origin) return true;
 
-    if (dragThang.origin == "arrivals") {
+    if (dragMgr.origin == "arrivals") {
         if (side == "USN") {
             if (dropZone.substr(0, 1) == "I" && "BEH".indexOf(dropZone.substr(2, 1)) != -1)
                 return true;
@@ -94,9 +96,9 @@ function isLegitDrop(coords) {
             if (dropZone.substr(0, 1) == "A" && "ADG".indexOf(dropZone.substr(2, 1)) != -1)
                 return true;
         }
-    } else if (isNumber(dragThang.origin.substr(1, 1))) {
-        var zones = searchGrid.zoneDistance(dragThang.origin, dropZone),
-            moves = getShipsMinMovePoints(dragThang.origin);
+    } else if (isNumber(dragMgr.origin.substr(1, 1))) {
+        var zones = searchGrid.zoneDistance(dragMgr.origin, dropZone),
+            moves = getShipsMinMovePoints(dragMgr.origin);
         if (zones <= moves) return true;
     }
     return false;

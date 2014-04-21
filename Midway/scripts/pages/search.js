@@ -16,7 +16,7 @@
     lastShipSelected = null,
     selectedZone = "",
     selectedArea = "",
-    dragThang = {
+    dragMgr = {
         dragging: false,
         origin: "",
         dragData: null,
@@ -69,12 +69,12 @@ $(canvas).on("click", function (e) {
     canvasMouseUp(e);
 }).on("mouseout", function () {
     mouseDown = false;
-    if (dragThang.origin == "search") {
+    if (dragMgr.origin == "search") {
         hideSearching();
-    } else if (dragThang.dragging) {
-        dragThang.dragging = false;
-        if (dragThang.useSnapshot)
-            searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
+    } else if (dragMgr.dragging) {
+        dragMgr.dragging = false;
+        if (dragMgr.useSnapshot)
+            searchGrid.restoreImageData(dragMgr.snapshot, 0, 0);
     }
 });
 
@@ -416,8 +416,9 @@ function doShipSelection(shipItem, shiftPressed) {
 /*-------------------------------------------------------------------*/
 function beginControlsDrag() {
     if (mouseDown) {
-        dragThang.dragging = true;
+        dragMgr.dragging = true;
         canvas.addEventListener("mousemove", canvasMouseMove, false);
+        canvas.addEventListener("touchmove", canvasMouseMove, false);
     }
 }
 
@@ -427,25 +428,25 @@ function beginControlsDrag() {
 /* start of drag. Draw element being dragged at new mouse coordinates.*/
 /*-------------------------------------------------------------------*/
 function canvasMouseMove(e) {
-    if (dragThang.dragging) {
+    if (dragMgr.dragging) {
         var canvasCoords = windowToCanvas(canvas, e.clientX, e.clientY);
-        if (dragThang.origin == "search") {
+        if (dragMgr.origin == "search") {
             showSearching(canvasCoords);
         } else {
-            if (dragThang.useSnapshot) {
-                if (dragThang.snapshot) {
-                    searchGrid.restoreImageData(dragThang.snapshot, 0, 0);
+            if (dragMgr.useSnapshot) {
+                if (dragMgr.snapshot) {
+                    searchGrid.restoreImageData(dragMgr.snapshot, 0, 0);
                 } else {
-                    dragThang.snapshot = searchGrid.grabImageData();
+                    dragMgr.snapshot = searchGrid.grabImageData();
                 }
             }
             if (isLegitDrop(canvasCoords)) {
-                if (dragThang.origin == "arrivals") {
+                if (dragMgr.origin == "arrivals") {
                     var topLeft = searchGrid.coordsToTopLeftCoords(canvasCoords);
                     searchGrid.drawShipsMarker(topLeft);
                 } else {
                     // a zone -- movement
-                    searchGrid.drawMoveBand(dragThang.origin, canvasCoords);
+                    searchGrid.drawMoveBand(dragMgr.origin, canvasCoords);
                 }
             }
         }
@@ -457,31 +458,32 @@ function canvasMouseMove(e) {
 /*-------------------------------------------------------------------*/
 function canvasMouseUp(e) {
     mouseDown = false;
-    if (dragThang.dragging) {
-        dragThang.dragging = false;
+    if (dragMgr.dragging) {
+        dragMgr.dragging = false;
+        canvas.removeEventListener("touchmove", canvasMouseMove, false);
         canvas.removeEventListener("mousemove", canvasMouseMove, false);
-
+        
         var coords = windowToCanvas(canvas, e.clientX, e.clientY),
             zone = searchGrid.coordsToZone(coords);
         
-        if (dragThang.origin == "search") {
+        if (dragMgr.origin == "search") {
             hideSearching();
             selectArea(coords);
             selectedArea = zone.substr(0, 2);
             
-            executeSearch(coords, zone, dragThang.dragData, function () {
+            executeSearch(coords, zone, dragMgr.dragData, function () {
                 deselectArea();
                 drawSightings();
             });
         } else if (isLegitDrop(coords)) {
             var cost = 0;
 
-            if (isNumber(dragThang.origin.substr(1, 1)))
-                cost = searchGrid.zoneDistance(dragThang.origin, zone);
+            if (isNumber(dragMgr.origin.substr(1, 1)))
+                cost = searchGrid.zoneDistance(dragMgr.origin, zone);
 
-            relocateShips(zone, dragThang.dragData, cost);
+            relocateShips(zone, dragMgr.dragData, cost);
 
-            if (dragThang.origin == "arrivals") {
+            if (dragMgr.origin == "arrivals") {
                 //searchGrid.drawShipsMarker(searchGrid.coordsToTopLeftCoords(coords));
                 $("#arrivals").find("div.shipitem").remove(".selected").parent();
                 selectZone(coords);
@@ -490,7 +492,7 @@ function canvasMouseUp(e) {
                 }
             } else {
                 //movement's done
-                sailShips(dragThang.origin, zone);
+                sailShips(dragMgr.origin, zone);
             }
             window.dirty = true;
         }
@@ -651,6 +653,44 @@ function shipsLoaded() {
         });
     });
 }
+
+/*****************************************************************************/
+/* Touch event to mouse event translator called from touch events.           */
+/*****************************************************************************/
+function touchToMouseHandler(event) {
+    var touches = event.changedTouches,
+        first = touches[0],
+        type = "";
+
+    // figure which mouse event to use
+    switch (event.type) {
+        case "touchstart":
+            type = "mousedown";
+            break;
+        case "touchmove":
+            type = "mousemove";
+            break;
+        case "touchend":
+            type = "mouseup";
+            break;
+        case "touchenter":
+            type = "mouseenter";
+            break;
+        case "touchcancel":
+        case "touchleave":
+            type = "mouseleave";
+            break;
+        default:
+            return;
+    }
+
+    //create and fire mouse event
+    var mouseHandler = document.createEvent("MouseEvent");
+    mouseHandler.initMouseEvent(type, true, true, window, 1,
+        first.screenX, first.screenY, first.clientX, first.clientY,
+        false, false, false, false, 0, null);
+}
+
 /*****************************************************************************/
 /* Base page load function called at $(document).ready.                      */
 /*****************************************************************************/
@@ -693,6 +733,15 @@ function loadPage(callback) {
 // Initialize..........................................................
 
 $(document).ready(function () {
+    //init touchevents for drag-drop
+    if ('ontouchstart' in window || navigator.msMaxTouchPoints) {
+        document.addEventListener("touchstart", touchToMouseHandler, false);
+        document.addEventListener("touchend", touchToMouseHandler, false);
+        document.addEventListener("touchcancel", touchToMouseHandler, false);
+        document.addEventListener("touchenter", touchToMouseHandler, false);
+        document.addEventListener("touchleave", touchToMouseHandler, false);
+    }
+    
     loadPlayerForPage(function() {
         loadPage(hideWait());
     });

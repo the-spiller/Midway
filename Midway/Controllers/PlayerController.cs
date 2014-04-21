@@ -174,7 +174,24 @@ namespace Midway.Controllers
                 return ControllerHelper.GenericErrorResponse(ex, "PUT /api/player");
             }
         }
-        
+        // DELETE api/player/id................................................
+        [Authorize]
+        public HttpResponseMessage DeletePlayer(int id)
+        {
+            try
+            {
+                _repo.DeletePlayer(id);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Player not found")
+                    return NotFoundResponse(id);
+
+                return ControllerHelper.GenericErrorResponse(ex, "DELETE /api/player/id");
+            }
+        }
+
         // Private methods.....................................................
 		private HttpResponseMessage NotFoundResponse(int playerId)
 		{

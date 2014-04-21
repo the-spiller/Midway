@@ -267,7 +267,48 @@ namespace Midway.Models.Data
             return dtoPlayer;
         }
 
-		internal InsertStatus GetInsertStatus(DtoPlayer player)
+        public void DeletePlayer(int playerId)
+        {
+            var player = _context.Players
+                                 .Include(p => p.PlayerGames)
+                                 .SingleOrDefault(p => p.PlayerId == playerId);
+
+            if (player == null) throw new Exception("Player not found");
+
+            player.Email = "";
+            player.Password = "";
+            player.Nickname = "Player " + player.PlayerId + " (registration cancelled)";
+
+            foreach (var playerGame in player.PlayerGames)
+            {
+                if (playerGame.Game.CompletedDTime == null)
+                {
+                    var oppPg = _context.PlayerGames
+                                        .Single(
+                                            pg => pg.GameId == playerGame.GameId && pg.PlayerId != playerGame.PlayerId);
+                    if (oppPg != null)
+                    {
+                        // If the game has been played in the last two weeks, make this opponent the winner.
+                        if (playerGame.LastPlayed != null && oppPg.LastPlayed != null)
+                        {
+                            var lastPlayed = playerGame.LastPlayed;
+                            if (oppPg.LastPlayed > lastPlayed) lastPlayed = oppPg.LastPlayed;
+
+                            TimeSpan diff = DateTime.Now.ToUniversalTime() - lastPlayed.Value;
+                            if (diff.Days < 15)
+                            {
+                                oppPg.Points = playerGame.Points + 1;
+                                playerGame.Game.Draw = "N";
+                            }
+                        }
+                    }
+                    playerGame.Game.CompletedDTime = DateTime.Now.ToUniversalTime();
+                }
+            }
+            _context.Save();
+        }
+
+        internal InsertStatus GetInsertStatus(DtoPlayer player)
 		{
 			if (_context.Players.Any(p => p.Email == player.Email))
 				return InsertStatus.DuplicateEmail;
