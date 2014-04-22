@@ -7,6 +7,8 @@ $(document).on("mouseenter", ".oppsearchitem", function (e) {
     showOppSearchedArea(e);
 }).on("mouseleave", ".oppsearchitem", function () {
     hideOppSearchedArea();
+}).on("click", "#airopadd", function () {
+    addAirOperation();
 });
 
 /*-------------------------------------------------------------------*/
@@ -20,13 +22,11 @@ function loadPhaseTab() {
     if (oppSearches.length == 0) {
         opsHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
     } else {
-        opsHtml += "<table style=\"border-collapse: collapse;\">";
+        opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">";
         for (var i = 0; i < oppSearches.length; i++) {
             var searchImgSrc = airPath;
-            var margin = "";
             if (oppSearches[i].SearchType == "sea") {
                 searchImgSrc = seaPath;
-                //margin = " margin: 0 -300px;";
             }
 
             var zones = "No ships sighted";
@@ -37,11 +37,22 @@ function loadPhaseTab() {
                 }
                 zones = zones.substr(0, zones.length - 2) + "</span>";
             }
-            opsHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 40%;"
-                + margin + "\">" +
-                "<img src=\"" + searchImgSrc + "\" /></td><td style=\"width: 60%;\">Area " + oppSearches[i].Area +
+            opsHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 40%;\">" +
+                "<img src=\"" + searchImgSrc + "\" /></td><td>Area " + oppSearches[i].Area +
                 "<br />" + zones + "</td></tr>";
         }
+        opsHtml += "</table>";
+    }
+    
+    // Air Operations
+    opsHtml += "<div class=\"listheader\">Air Operations</div>";
+    if (game.AircraftReadyState < 2) {
+        opsHtml += "<div style=\"padding: 8px;\">None of your aircraft are ready for operations.</div>";
+    } else {
+        opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">" +
+            "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>" +
+            "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"Add an air operation\" src=\"" +
+            imgDir + "addicon.png\"></td></tr></table>";
     }
     $("#airops").html(opsHtml);
 }
@@ -99,5 +110,19 @@ function splitOffOpponentSearches() {
             searches.splice(i, 1);
         }
     }
+}
+
+/*-------------------------------------------------------------------*/
+/* Show air op dialog and capture data for new aip op. Display in    */
+/* table on AirOps tab.                                              */
+/*-------------------------------------------------------------------*/
+function addAirOperation() {
+    captureAirOpInputs(function (resp) {
+        hideDialog();
+        if (resp == "OK") {
+            
+        }
+    });
+    
 }
 

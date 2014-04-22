@@ -208,19 +208,19 @@ function showShipsInZone() {
             }
         }
     }
-    // own ships
-    html += "<ul>";
-    if ($.inArray(selectedZone, shipZones) != -1) {
-        for (i = 0; i < ships.length; i++) {
-            if (ships[i].Location == selectedZone) {
-                html += getShipListItemHtml(ships[i]);
-            }
-        }
-    }
     // airbases
     for (i = 0; i < ships.length; i++) {
         if (ships[i].Location == selectedZone && ships[i].ShipType == "BAS") {
             html += getShipListItemHtml(ships[i]);
+        }
+    }
+    // own ships
+    html += "<ul>";
+    if ($.inArray(selectedZone, shipZones) != -1) {
+        for (i = 0; i < ships.length; i++) {
+            if (ships[i].Location == selectedZone && ships[i].ShipType != "BAS") {
+                html += getShipListItemHtml(ships[i]);
+            }
         }
     }
     $("#zone").html(html + "</ul>");
@@ -306,9 +306,9 @@ function getShipListItemHtml(ship) {
     html += "<div class=\"shiphits green\"><img src=\"" + hitsDir + availHits + "-hitsgreen.png\"></div>";
 
     if (hits > 0) {
-        html += "<div class=\"shiphits red\"><img src=\"" + hitsDir + hits + "-hitsred.png\"></div></div></li>";
+        html += "<div class=\"shiphits red\"><img src=\"" + hitsDir + hits + "-hitsred.png\"></div>";
     }
-    return html;
+    return html + "</div></li>";
 }
 
 /*-------------------------------------------------------------------*/
@@ -748,8 +748,6 @@ function loadPage(callback) {
 
 // Initialize..........................................................
 
-showWait("Loading ...");
-
 $(document).ready(function () {
     //init touchevents for drag-drop
     if ('ontouchstart' in window || navigator.msMaxTouchPoints) {
@@ -761,6 +759,6 @@ $(document).ready(function () {
     }
     
     loadPlayerForPage(function() {
-        loadPage(hideWait());
+        loadPage();
     });
 });

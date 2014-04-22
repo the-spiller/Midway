@@ -62,14 +62,55 @@ namespace Midway.Models.Data
             dbPg.SelectedLocation = selectedZone;
             dbPg.AircraftReadyState = airReadiness;
             dbPg.Points = points;
-            dbPg.PhaseId++;
-            if (dbPg.PhaseId > _context.Phases.Count())
+            IncrementPhase(dbPg);
+
+            var phase = _context.Phases.Single(p => p.PhaseId == dbPg.PhaseId);
+            while (phase.MightSkip == "Y")
             {
-                dbPg.PhaseId = 1;
-                dbPg.Turn++;
+                switch (phase.PhaseId)
+                {
+                    case 4: //	Air Defense Setup
+                    case 6: //  Allocate and Resolve
+                        if (!UnderAirAttack(dbPg)) dbPg.PhaseId++;
+                        break;
+                    case 5: //	Air Attack Setup
+                    case 7: //	Air Attack Recovery
+                        if (!MakingAirAttacks(dbPg)) dbPg.PhaseId++;
+                        break;
+                    case 8: //	Surface Combat Setup
+                        break;
+                    default:
+                        break;
+                }
+
+                if (dbPg.PhaseId == phase.PhaseId) break;
+                phase = _context.Phases.Single(p => p.PhaseId == dbPg.PhaseId);
             }
+
             dbPg.LastPlayed = DateTime.Now.ToUniversalTime();
             _context.Save();
+        }
+
+        private void IncrementPhase(PlayerGame playerGame)
+        {
+            playerGame.PhaseId++;
+            if (playerGame.PhaseId > _context.Phases.Count())
+            {
+                playerGame.PhaseId = 1;
+                playerGame.Turn++;
+            }
+        }
+
+        private bool UnderAirAttack(PlayerGame playerGame)
+        {
+            return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId != playerGame.PlayerId
+                                            && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
+        }
+
+        private bool MakingAirAttacks(PlayerGame playerGame)
+        {
+            return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId == playerGame.PlayerId
+                                               && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
         }
     }
 }
