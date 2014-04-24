@@ -15,7 +15,7 @@ namespace Midway.Models.Services
     public class Mailer
     {
         private const string BRBR = "<br /><br />";
-        private const string SIG = "<span style=\"font-style: italic;\">Midway Site Administrators</span>";
+        private const string SIG = "<span style=\"font-style: bold;\">Midway Site Administrators</span>";
 
         public void Send(Message message)
         {
@@ -35,13 +35,13 @@ namespace Midway.Models.Services
         {
             var recips = new List<string> { addr };
 
-            var msgBody = new StringBuilder(string.Format("{0},{1}", nickname, BRBR));
+            var msgBody = new StringBuilder("<div style=\"font: 12px Arial, sans-serif\">" + string.Format("{0},{1}", nickname, BRBR));
             msgBody.Append("Here&rsquo;s the nasty, computer-generated replacement password you requested for the ");
             msgBody.AppendFormat("<a href=\"http://midwaydev.jeffcahill.net\">Midway game site</a>:{0}", BRBR);
             msgBody.AppendFormat("<span style=\"font-weight: bold;\">{0}</span>{1}", newPwd, BRBR);
             msgBody.Append("Use it to log on, and then you can change it on the Midway Home page ");
             msgBody.AppendFormat("&ldquo;Your Registration&rdquo; tab.{0}", BRBR);
-            msgBody.Append(SIG);
+            msgBody.Append(SIG + "</div>");
 
             var msg = new Message
                 {
@@ -56,14 +56,14 @@ namespace Midway.Models.Services
 	    {
 		    var recips = new List<string> { addr };
 
-            var msgBody = new StringBuilder("<span style=\"font-weight: bold;\">");
+            var msgBody = new StringBuilder("<div style=\"font: 12px Arial, sans-serif\"><span style=\"font-weight: bold;\">");
 	        msgBody.AppendFormat("Hello and welcome, {0}!</span>{1}", nickname, BRBR);
 	        msgBody.Append("Here is your nasty, computer-generated password for the ");
 	        msgBody.AppendFormat("<a href=\"http:\\midwaydev.jeffcahill.net\">Midway game site</a>. Use it to log on:{0}", BRBR);
 	        msgBody.AppendFormat("<span style=\"font-weight: bold;\">{0}</span>{1}", pwd, BRBR);
 	        msgBody.AppendFormat("You can change it on the Miday Home page &ldquo;Your Registration&rdquo; tab.{0}", BRBR);
 	        msgBody.AppendFormat("Thanks, and we hope you enjoy the game.{0}", BRBR);
-	        msgBody.Append(SIG);
+	        msgBody.Append(SIG + "</div>");
 
 	        var msg = new Message
 			    {

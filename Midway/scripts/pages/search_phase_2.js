@@ -43,7 +43,7 @@ function searchItemMouseDown(e) {
     if (panelId != "search") return;
 
     dragMgr.dragging = false;
-    dragMgr.origin = panelId;
+    dragMgr.source = panelId;
 
     var selSearch = getSearch(e.target);
     if (selSearch) {
@@ -110,7 +110,7 @@ function showSearching(canvasCoords) {
 function hideSearching() {
     canvas.style.cursor = "auto";
     dragMgr.dragging = false;
-    dragMgr.origin = "";
+    dragMgr.source = "";
     if (dragMgr.snapshot) {
         searchGrid.restoreImageData(dragMgr.snapshot, 0, 0);
     }

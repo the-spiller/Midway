@@ -32,7 +32,7 @@ $(canvas).on("mousedown", function (e) {
 
     if (selShips.length > 0) {
         dragMgr.dragging = false;
-        dragMgr.origin = zone;
+        dragMgr.source = zone;
         dragMgr.dragData = selShips;
         dragMgr.cursorImg = null;
         dragMgr.useSnapshot = true;
@@ -66,7 +66,7 @@ function shipItemMouseDown() {
     if (panelId != "arrivals") return;
 
     dragMgr.dragging = false;
-    dragMgr.origin = panelId;
+    dragMgr.source = panelId;
 
     var selShips = getSelectedShips(panelId);
     if (selShips.length > 0) {
@@ -86,9 +86,9 @@ function shipItemMouseDown() {
 /*-------------------------------------------------------------------*/
 function isLegitDrop(coords) {
     var dropZone = searchGrid.coordsToZone(coords);
-    if (dropZone == dragMgr.origin) return true;
+    if (dropZone == dragMgr.source) return true;
 
-    if (dragMgr.origin == "arrivals") {
+    if (dragMgr.source == "arrivals") {
         if (side == "USN") {
             if (dropZone.substr(0, 1) == "I" && "BEH".indexOf(dropZone.substr(2, 1)) != -1)
                 return true;
@@ -96,9 +96,9 @@ function isLegitDrop(coords) {
             if (dropZone.substr(0, 1) == "A" && "ADG".indexOf(dropZone.substr(2, 1)) != -1)
                 return true;
         }
-    } else if (isNumber(dragMgr.origin.substr(1, 1))) {
-        var zones = searchGrid.zoneDistance(dragMgr.origin, dropZone),
-            moves = getShipsMinMovePoints(dragMgr.origin);
+    } else if (isNumber(dragMgr.source.substr(1, 1))) {
+        var zones = searchGrid.zoneDistance(dragMgr.source, dropZone),
+            moves = getShipsMinMovePoints(dragMgr.source);
         if (zones <= moves) return true;
     }
     return false;
@@ -108,13 +108,15 @@ function isLegitDrop(coords) {
 /* "Sail" fleet marker to a new location on the map.                 */
 /*-------------------------------------------------------------------*/
 function sailShips(startZone, endZone) {
+    sfxSailing.play();
+    
     var startPos = searchGrid.zoneToTopLeftCoords(startZone),
         endPos = searchGrid.zoneToTopLeftCoords(endZone),
         distX = endPos.x - startPos.x,
         distY = endPos.y - startPos.y,
         startTime = new Date().getTime(),
         elapsed = 0,
-        duration = 10 * Math.max(Math.abs(distX), Math.abs(distY)), // set animation duration based on distance to be covered
+        duration = 15 * Math.max(Math.abs(distX), Math.abs(distY)), // set animation duration based on distance to be covered
         handle;
 
     searchGrid.drawMap(function () {
@@ -135,6 +137,7 @@ function sailShips(startZone, endZone) {
                 drawShips();
                 searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
                 showShipsInZone(selectedZone);
+                sfxSailing.fadeOut(1000);
             });
         } else {
             var thisX = startPos.x + ((elapsed / duration) * distX);

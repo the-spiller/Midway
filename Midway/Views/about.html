@@ -38,11 +38,11 @@
             }
 
             .navheading {
-                font: bold 1.4em Arial, sans-serif;
+                font: bold 1.5em Arial, sans-serif;
             }
 
             .navsubheading {
-                font: bold 1.2em Arial, sans-serif;
+                font: bold 1.3em Arial, sans-serif;
                 padding-left: 20px;
             }
 
@@ -100,6 +100,11 @@
                 float: right;
                 margin: .5em 0 .5em 1em;
             }
+            
+            .numberedhanging {
+                padding-left: 40px;
+                text-indent: -18px;
+            }
         </style>
     </head>
     <body>
@@ -107,7 +112,7 @@
             <div id="headdiv">
                 <div id="linksdiv">
                     <div id="infolink" title="Photo info"><img id="Img1" src="/content/images/camera.png" /></div>
-                    <div id="return" title="Return to logon page"><img src="/content/images/return.png" /></div>
+                    <div id="return" title="Back" onclick="history.back();"><img src="/content/images/return.png" /></div>
                 </div>
                 <div id="pagetitle"  class="orange">ABOUT MIDWAY</div>
                 <div id="welcome" class="orange">Our game and the history it portrays.</div>
@@ -174,12 +179,6 @@
                     above).
                 </p>
                 <p>
-                    The game is played in turns representing two hours in daylight or five hours at night. It begins at     
-                    0500 3 June 1942, and runs out 34 turns later at 1700 on 6 June. The game ends when this last 
-                    turn is completed or when either player chooses to retire. The winner is determined by points given for control 
-                    of Midway Atoll and the destruction of enemy ships.
-                </p>
-                <p>
                     At first glance, the game might appear to be a more sophisticated version of Battleship, and that&rsquo;s not 
                     far wrong. Most of the game is played on a map of the central Pacific around Midway Atoll on which
                     each player sees only their own ships and airfields. The map has a square grid (about 20 miles to a side) that&rsquo;s 
@@ -189,9 +188,22 @@
                     specific ship.
                 </p>
                 <p>
-                    Combat occurs in two ways. Usually it&rsquo;s one player launching planes from carriers to attack his 
-                    or her opponent from the air. Should ships of both players wind up sharing one square on the map grid, 
-                    ship-to-ship surface combat may ensue, but this is quite unusual (and never happened historically).
+                    The game is played in turns representing two hours in daylight or five hours at night. It begins at     
+                    0500 3 June 1942, and runs out 34 turns later at 1700 on 6 June. The game ends when this last 
+                    turn is completed or when either player chooses to retire. The winner is determined by points given for control 
+                    of Midway Atoll and the destruction of enemy ships.
+                </p>
+                <p>
+                    Each turn is divided into phases: movement, search, air operations planning, air operations execution, 
+                    Midway reduction, and surface combat (each is described in more detail below). In a given turn some phases might 
+                    not happen; e.g. if neither player plans air 
+                    operations, there will be no air operations execution phase.
+                </p>
+                <p>
+                    Combat can occur in two ways. Usually it&rsquo;s air operations attack missions: sending aircraft that are 
+                    available and in range to attack a grid square containing enemy ships. Should ships of both players 
+                    wind up sharing one square on the map grid, ship-to-ship surface combat ensues, but this is quite unusual (and 
+                    never happened during the actual battle).
                 </p>
                 <p id="registering" class="subheading">
                     Registration
@@ -199,9 +211,9 @@
                 <p>
                     To register for the game, select the &ldquo;I&rsquo;d like to register&rdquo; link on the login page.
                 </p>
-                <p> Here you submit an email address and a nickname. We&rsquo;ll use your email address to send you a nasty, 
-                    computer-generated password so you can log in. Your nickname is how you will be known in the game. Both your 
-                    email address and nickname must be unique or they will be rejected.
+                <p> On the Midway Registration page, submit an email address and a nickname. We&rsquo;ll use your email address to send 
+                    you a nasty, computer-generated password so you can log in. Your nickname is how you will be known in the game. Both 
+                    your email address and nickname must be unique or they will be rejected.
                 </p>
                 <p>                   
                     Rest assured that other players can&rsquo;t see your email address and that we&rsquo;ll never give it away 
@@ -215,16 +227,24 @@
                 </p>
                 <p>
                     When you log in using the password we send, you&rsquo;ll arrive at Midway Home page. Click the 
-                    Registration tab to edit your registration information, including changing your password to something you'll 
-                    be able to remember. You can also cancel your registration here by simply clicking on the &ldquo;Cancel my 
+                    Registration tab to edit your registration information (including changing your password to something you&rsquo;ll 
+                    be able to remember). Cancel your registration here by simply clicking on the &ldquo;Cancel my 
                     registration&rdquo; link and confiming that that&rsquo;s what you want to do.
                 </p>
                 <p id="starting" class="subheading">
                     Starting a Game
                 </p>
                 <p>
-                    On the Home page, players are presented with a list of the games that they are participating in. 
-                    
+                    On the Home page, players are presented with a list of the games that they are participating in. Select one 
+                    and press the Play button to pick it up where it was left off.
+                </p>
+                <p>
+                    To start a new 
+                    game, select the &ldquo;New Game&rdquo; entry for the side you&rsquo;d like to play. If there's a specific opponent 
+                    you&rsquo;r looking for, enter their nickname in the &ldquo;Optional opponent nickname&rdquo; text box. If you 
+                    don&rsquo;t enter a nickname, the first player seeking a new game on the other side will become your opponent. 
+                    Click on the Play button to create the game and begin play. Once a new game is created, it is added to the 
+                    list of available games and will appear there until completed.
                 </p>
                 <p id="play" class="subheading">
                     Game Play
@@ -235,7 +255,7 @@
                 <p>
                     During the game points are awarded to the players as follows:
                 </p>
-                <p style="padding-left: 40px; text-indent: -18px;">
+                <p class="numberedhanging">
                     1. Starting with the 19th turn (0500 5 June) the U.S. player gets one point for each turn in which Midway is not 
                     taken by the Japanese player, for a possible total of 15.
                 </p>
@@ -245,12 +265,12 @@
                         Sunk, Enterprise is worth 10 points to the IJN player
                     </div>
                 </div>
-                <p style="padding-left: 40px; text-indent: -18px;">
+                <p class="numberedhanging">
                     2. The Japanese player receives 15 points for taking Midway before the game ends.
                 </p>
-                <p style="padding-left: 40px; text-indent: -18px;">
+                <p class="numberedhanging">
                     3. Ships are assigned point values, and players receive them when they sink an opponent&rsquo;s ship. These point 
-                    values are circled on ship images on the Search Map Arrivals and Zone tabs, and on the Battle Map.
+                    values are shown circled on ship images on the Search Map Arrivals and Zone tabs, and on the Battle Map.
                 </p>
                 <p>
                     When the game ends, the player with the most points has won!
@@ -291,17 +311,16 @@
                 </p>
                 <p>
                     Japanese soldiers, sailors and airmen came to believe themselves invincible. Much like today&rsquo;s radical 
-                    <span class="i">mujahideen</span>, they believed that Americans were spoiled and weak and could not summon the 
-                    will to effectively respond.
+                    <span class="i">mujahideen</span>, they believed that Americans were spoiled and weak and lacked the will to 
+                    effectively respond.
                 </p>
                 <p>        
-                    In April, 1942 a bright spot appeared for the U.S. and her allies. A Pacific Fleet task force, including 
+                    In April, a bright spot emerged for the U.S. and her allies. A Pacific Fleet task force, including 
                     one of the aircraft carriers that the Pearl Harbor attack missed, snuck close to the Japanese home islands 
-                    and launched sixteen Army B-25 &ldquo;Mitchell&rdquo; medium bombers against Tokyo and other Japanese cities (history 
-                    recalls this as the 
-                    <a href="http://en.wikipedia.org/wiki/Doolittle_Raid" target="_blank">Doolittle Raid</a>). Little real damage was 
-                    done, but the raid accomplished its primary goal of raising American morale at a time when it was at its lowest. 
-                    More, it embarassed and enraged Japanese military leaders!
+                    and launched sixteen Army B-25 &ldquo;Mitchell&rdquo; medium bombers against Tokyo and other Japanese 
+                    cities&mdash;the <a href="http://en.wikipedia.org/wiki/Doolittle_Raid" target="_blank">Doolittle Raid</a>. Little 
+                    real damage was done, but the raid accomplished its primary goal of raising American morale at a time when it was 
+                    at its lowest. More, it embarassed and enraged Japanese military leaders!
                 </p>
                 <p>
                     Imperial Navy Combined Fleet  

@@ -17,9 +17,11 @@
     selectedZone = "",
     selectedArea = "",
     arrivalZonesHighlighted = false,
+    soundInit = { formats: ["mp3", "ogg"] },
+    sfxArrived, sfxSailing,
     dragMgr = {
         dragging: false,
-        origin: "",
+        source: "",
         dragData: null,
         cursorImg: null,
         cursorOffset: { x: 0, y: 0 },
@@ -70,7 +72,8 @@ $(canvas).on("click", function (e) {
     canvasMouseUp(e);
 }).on("mouseout", function () {
     mouseDown = false;
-    if (dragMgr.origin == "search") {
+    if (dragMgr.source == "search") {
+        if (sfxSearching) sfxSearching.fadeOut(500);
         hideSearching();
     } else if (dragMgr.dragging) {
         dragMgr.dragging = false;
@@ -434,6 +437,7 @@ function doShipSelection(shipItem, shiftPressed) {
 /*-------------------------------------------------------------------*/
 function beginControlsDrag() {
     if (mouseDown) {
+        if (dragMgr.source = "search" && sfxSearching) sfxSearching.fadeIn(500);
         dragMgr.dragging = true;
         canvas.addEventListener("mousemove", canvasMouseMove, false);
         canvas.addEventListener("touchmove", canvasMouseMove, false);
@@ -448,7 +452,7 @@ function beginControlsDrag() {
 function canvasMouseMove(e) {
     if (dragMgr.dragging) {
         var canvasCoords = windowToCanvas(canvas, e.clientX, e.clientY);
-        if (dragMgr.origin == "search") {
+        if (dragMgr.source == "search") {
             showSearching(canvasCoords);
         } else {
             if (dragMgr.useSnapshot) {
@@ -459,12 +463,12 @@ function canvasMouseMove(e) {
                 }
             }
             if (isLegitDrop(canvasCoords)) {
-                if (dragMgr.origin == "arrivals") {
+                if (dragMgr.source == "arrivals") {
                     var topLeft = searchGrid.coordsToTopLeftCoords(canvasCoords);
                     searchGrid.drawShipsMarker(topLeft);
                 } else {
                     // a zone -- movement
-                    searchGrid.drawMoveBand(dragMgr.origin, canvasCoords);
+                    searchGrid.drawMoveBand(dragMgr.source, canvasCoords);
                 }
             }
         }
@@ -484,8 +488,9 @@ function canvasMouseUp(e) {
         var coords = windowToCanvas(canvas, e.clientX, e.clientY),
             zone = searchGrid.coordsToZone(coords);
         
-        if (dragMgr.origin == "search") {
+        if (dragMgr.source == "search") {
             hideSearching();
+            if (sfxSearching) sfxSearching.fadeOut(500);
             selectArea(coords);
             selectedArea = zone.substr(0, 2);
             
@@ -494,14 +499,15 @@ function canvasMouseUp(e) {
                 drawSightings();
             });
         } else if (isLegitDrop(coords)) {
+            if (dragMgr.source == "arrivals" && sfxArrived) sfxArrived.play().fadeOut();
             var cost = 0;
 
-            if (isNumber(dragMgr.origin.substr(1, 1)))
-                cost = searchGrid.zoneDistance(dragMgr.origin, zone);
+            if (isNumber(dragMgr.source.substr(1, 1)))
+                cost = searchGrid.zoneDistance(dragMgr.source, zone);
 
             relocateShips(zone, dragMgr.dragData, cost);
 
-            if (dragMgr.origin == "arrivals") {
+            if (dragMgr.source == "arrivals") {
                 $("#arrivals").find("div.shipitem").remove(".selected").parent();
                 selectZone(coords);
                 if ($("#arrivals").find("div.shipitem").length == 0) {
@@ -509,7 +515,7 @@ function canvasMouseUp(e) {
                 }
             } else {
                 //movement's done
-                sailShips(dragMgr.origin, zone);
+                sailShips(dragMgr.source, zone);
             }
             window.dirty = true;
         }
@@ -759,6 +765,19 @@ $(document).ready(function () {
     }
     
     loadPlayerForPage(function() {
-        loadPage();
+        loadPage(function() {
+            if (buzz.isSupported()) {
+                switch (game.PhaseId) {
+                    case 1:
+                        sfxArrived = new buzz.sound("/content/audio/boat-horn", soundInit).load();
+                        sfxSailing = new buzz.sound("/content/audio/ship-underway", soundInit).load();
+                        break;
+                    case 2:
+                        sfxSearching = new buzz.sound("/content/audio/air-search", soundInit).load();
+                    default:
+                        break;
+                }
+            }
+        });
     });
 });

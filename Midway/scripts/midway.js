@@ -77,21 +77,6 @@ function showAlert(title, message, buttons, color, callback) {
         if (callback) callback(e.target.innerHTML);
     });
     
-    $("#dlgoverlay").on("keyup", function (e) {
-        e.stopPropagation();
-        if (e.keyCode == 13) {
-            if ($("#dlgbtnok").length)
-                $("#dlgbtnok").trigger("click");
-            else if ($("#dlgbtnyes").length)
-                $("#dlgbtnyes").trigger("click");
-        } else if (e.keyCode == 27) {
-            if ($("#dlgbtncancel").length)
-                $("#dlgbtncancel").trigger("click");
-            else if ($("#dlgbtnno").length)
-                $("#dlgbtnno").trigger("click");
-        }
-    });
-    
     $("#dlgcontent").removeClass().addClass(color + "dlg").css({
         display: "block",
         top: topLeft.y + "px",
@@ -280,3 +265,19 @@ function findGameById(id, games) {
 $(".photoblurb").on("click", function () {
     $("#infolink").trigger("click");
 });
+
+$("#dlgoverlay").on("keyup", function (e) {
+    e.stopPropagation();
+    if (e.keyCode == 13) {
+        if ($("#dlgbtnok").length)
+            $("#dlgbtnok").trigger("click");
+        else if ($("#dlgbtnyes").length)
+            $("#dlgbtnyes").trigger("click");
+    } else if (e.keyCode == 27) {
+        if ($("#dlgbtncancel").length)
+            $("#dlgbtncancel").trigger("click");
+        else if ($("#dlgbtnno").length)
+            $("#dlgbtnno").trigger("click");
+    }
+});
+

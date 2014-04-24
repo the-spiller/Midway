@@ -1,9 +1,5 @@
 ﻿// Event Handlers......................................................
 
-$("#return").on("click", function () {
-    location.replace("/index.html");
-});
-
 $("#infolink").on("click", function () {
     showPhotoblurb();
 });
