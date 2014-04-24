@@ -17,8 +17,6 @@
     selectedZone = "",
     selectedArea = "",
     arrivalZonesHighlighted = false,
-    soundInit = { formats: ["mp3", "ogg"] },
-    sfxArrived, sfxSailing,
     dragMgr = {
         dragging: false,
         source: "",
@@ -27,7 +25,10 @@
         cursorOffset: { x: 0, y: 0 },
         useSnapshot: false,
         snapshot: null
-    };
+    },
+    soundInit = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: false },
+    soundInitLoop = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: true },
+    sfxArrived, sfxSailing, sfxSearching;
 
 // Event handlers......................................................
 
@@ -431,23 +432,24 @@ function doShipSelection(shipItem, shiftPressed) {
     }
 }
 
-
 /*-------------------------------------------------------------------*/
 /* Called after a fast timer to ensure that we're actually dragging. */
 /*-------------------------------------------------------------------*/
 function beginControlsDrag() {
     if (mouseDown) {
-        if (dragMgr.source = "search" && sfxSearching) sfxSearching.fadeIn(500);
-        dragMgr.dragging = true;
-        canvas.addEventListener("mousemove", canvasMouseMove, false);
-        canvas.addEventListener("touchmove", canvasMouseMove, false);
+        if (sfxSearching && dragMgr.source == "search") sfxSearching.fadeIn(500, function() {
+            dragMgr.dragging = true;
+            canvas.addEventListener("mousemove", canvasMouseMove, false);
+            canvas.addEventListener("touchmove", canvasMouseMove, false);
+        }).loop();
     }
 }
 
 /*-------------------------------------------------------------------*/
 /* Respond to mouse movement during drag. If drag is just starting,  */
 /* capture canvas image, otherwise restore canvas image captured at  */
-/* start of drag. Draw element being dragged at new mouse coordinates.*/
+/* start of drag. Draw element being dragged at new mouse            */
+/* coordinates.                                                      */
 /*-------------------------------------------------------------------*/
 function canvasMouseMove(e) {
     if (dragMgr.dragging) {
@@ -580,7 +582,6 @@ function ajaxLoadSearches(successCallback) {
         }
     });
 }
-
 /*-------------------------------------------------------------------*/
 /* Make ajax call to post phase data back to the server.             */
 /*-------------------------------------------------------------------*/
@@ -660,7 +661,7 @@ function shipsLoaded() {
         $("#searchdiv").css("display", "block");
         $("#searchcanvas").css("display", "block");
         
-        searchGrid.drawMap(function () {
+            searchGrid.drawMap(function () {
             drawShips();
             drawSightings();
 
@@ -769,11 +770,11 @@ $(document).ready(function () {
             if (buzz.isSupported()) {
                 switch (game.PhaseId) {
                     case 1:
-                        sfxArrived = new buzz.sound("/content/audio/boat-horn", soundInit).load();
-                        sfxSailing = new buzz.sound("/content/audio/ship-underway", soundInit).load();
+                        sfxArrived = new buzz.sound("/content/audio/boat-horn", soundInit);
+                        sfxSailing = new buzz.sound("/content/audio/ship-underway", soundInit);
                         break;
                     case 2:
-                        sfxSearching = new buzz.sound("/content/audio/air-search", soundInit).load();
+                        sfxSearching = new buzz.sound("/content/audio/air-search", soundInitLoop);
                     default:
                         break;
                 }
