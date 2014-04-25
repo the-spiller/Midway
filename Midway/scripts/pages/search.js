@@ -437,11 +437,11 @@ function doShipSelection(shipItem, shiftPressed) {
 /*-------------------------------------------------------------------*/
 function beginControlsDrag() {
     if (mouseDown) {
-        if (sfxSearching && dragMgr.source == "search") sfxSearching.fadeIn(500, function() {
-            dragMgr.dragging = true;
-            canvas.addEventListener("mousemove", canvasMouseMove, false);
-            canvas.addEventListener("touchmove", canvasMouseMove, false);
-        }).loop();
+        if (sfxSearching && dragMgr.source == "search") sfxSearching.fadeIn(500);
+        scrollClouds();
+        dragMgr.dragging = true;
+        canvas.addEventListener("mousemove", canvasMouseMove, false);
+        canvas.addEventListener("touchmove", canvasMouseMove, false);
     }
 }
 

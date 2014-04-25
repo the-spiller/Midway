@@ -94,17 +94,42 @@ function withinSearchRange(coords) {
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function showSearching(canvasCoords) {
-    if (withinSearchRange(canvasCoords)) {
-        canvas.style.cursor = "none";
-        var coords = addVectors(canvasCoords, dragMgr.cursorOffset);
-        drawCursorImg(coords.x, coords.y);
+    canvas.style.cursor = "none";
+    var coords = addVectors(canvasCoords, dragMgr.cursorOffset);
+    drawCursorImg(coords.x, coords.y);
+    
+    if (withinSearchRange(canvasCoords)) 
         selectArea(canvasCoords);
-    } else {
-        if (dragMgr.snapshot) searchGrid.restoreImageData(dragMgr.snapshot, 0, 0);
-        canvas.style.cursor = "auto";
-    }
 }
 
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+function scrollClouds() {
+    var cloudsTopLeft = { x: 0, y: 0 },
+        distVector = { x: side == "USN" ? 10 : -10, y: 0 },
+        startTime = new Date().getTime(),
+        cloudsImg = new Image(),
+        elapsed,
+        animReqHandle;
+
+    searchGrid.drawMap(function () {
+        drawSightings();
+        drawShips();
+        searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
+        mapImg = searchGrid.grabImageData();
+        cloudsAnim();
+    });
+
+    function cloudsAnim() {
+        handle = window.requestAnimationFrame(cloudsAnim);
+        elapsed = new Date().getTime() - startTime;
+
+        if (elapsed >= 1/30 of a second) {
+            searchGrid.restoreImageData(mapImg, 0, 0);
+            searchGrid.drawSearchClouds(addVectors(cloudsTopLeft, distVector));
+        }
+    }
+}
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function hideSearching() {
