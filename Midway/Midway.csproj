@@ -229,6 +229,7 @@
     <Content Include="Content\images\search\air-notready.png" />
     <Content Include="Content\images\search\air-ready.png" />
     <Content Include="Content\images\search\air-readying.png" />
+    <Content Include="Content\images\search\cloud-layer.png" />
     <Content Include="Content\images\search\ijn-sea-search.png" />
     <Content Include="Content\images\search\usn-sea-search.png" />
     <Content Include="Notes.txt" />

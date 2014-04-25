@@ -28,7 +28,8 @@
     },
     soundInit = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: false },
     soundInitLoop = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: true },
-    sfxArrived, sfxSailing, sfxSearching;
+    sfxArrived, sfxSailing, sfxSearching,
+    cloudsAnimHandle;
 
 // Event handlers......................................................
 
@@ -89,6 +90,10 @@ $(document).on("click", ".tablistitem", function(e) {
 }).on("click", ".shipitem", function(e) {
     doShipSelection(this, (e.shiftKey));
     mouseDown = false;
+}).on("click", ".searchitem", function() {
+    mouseDown = false;
+    dragMgr.dragging = false;
+    if (sfxSearching) sfxSearching.fadeOut(500);
 });
 
 // Functions...........................................................
@@ -437,8 +442,10 @@ function doShipSelection(shipItem, shiftPressed) {
 /*-------------------------------------------------------------------*/
 function beginControlsDrag() {
     if (mouseDown) {
-        if (sfxSearching && dragMgr.source == "search") sfxSearching.fadeIn(500);
-        scrollClouds();
+        if (dragMgr.source == "search") {
+            if (sfxSearching) sfxSearching.fadeIn(500);
+            //scrollClouds();
+        }
         dragMgr.dragging = true;
         canvas.addEventListener("mousemove", canvasMouseMove, false);
         canvas.addEventListener("touchmove", canvasMouseMove, false);

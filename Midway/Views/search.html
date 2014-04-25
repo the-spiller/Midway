@@ -134,7 +134,7 @@
         .cursorimg {
             cursor: none;
             position: absolute;
-            z-index: 10;
+            z-index: 20;
             display: none;
         }
         
@@ -159,6 +159,16 @@
             .airopbutton:active {
                 margin: 2px 0 0 2px;
             }
+
+        #canvasmsg {
+            display: none;
+            position: absolute;
+            z-index: 10;
+            top: 160px;
+            left: 700px;
+            color: red;
+            font: 600 2em Arial, sans-serif;
+        }
         </style>
     </head>
     <body>
@@ -171,7 +181,8 @@
                 <a id="done" href="#" title="End phase and post"><img src="/content/images/done.png" /></a>
                 <a id="return" href="#" title="Return to home page"><img src="/content/images/return.png" /></a>
             </div>
-
+            
+            <div id="canvasmsg"></div>
             <canvas id="searchcanvas">
                 Canvas not supported! Get thee a new browser, for God's sake!
             </canvas>
@@ -188,8 +199,9 @@
                 <img id="fleet" class="searchmarker" src="/content/images/search/usnfleet.png" />
                 <img id="sighting" class="searchmarker" src="/content/images/search/ijnsighting.png" /> 
                 <img id="airsearchcursor" class="cursorimg" src="/content/images/search/usn-airsearchcursor.png" /> 
-                <img id="seasearchcursor" class="cursorimg" src="/content/images/search/usn-seasearchcursor.png" />  
+                <img id="seasearchcursor" class="cursorimg" src="/content/images/search/usn-seasearchcursor.png" /> 
             </div>
+            <img id="cloudLayer" style="display: none; z-index: 10;" src="/content/images/search/cloud-layer.png" /> 
         </div>
 
         <div id="dlgoverlay">

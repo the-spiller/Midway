@@ -90,27 +90,31 @@ function withinSearchRange(coords) {
     }
     return false;
 }
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
 
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
 function showSearching(canvasCoords) {
     canvas.style.cursor = "none";
     var coords = addVectors(canvasCoords, dragMgr.cursorOffset);
     drawCursorImg(coords.x, coords.y);
-    
-    if (withinSearchRange(canvasCoords)) 
+
+    if (withinSearchRange(canvasCoords)) {
+        $("#canvasmsg").css("display", "none");
         selectArea(canvasCoords);
+    } else {
+        setTimeout(function() {
+            $("#canvasmsg").css("display", "block").text("Out of range!");
+        }, 100);
+    }
 }
 
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function scrollClouds() {
     var cloudsTopLeft = { x: 0, y: 0 },
-        distVector = { x: side == "USN" ? 10 : -10, y: 0 },
-        startTime = new Date().getTime(),
-        cloudsImg = new Image(),
-        elapsed,
-        animReqHandle;
+        distVector = { x: side == "USN" ? 3 : -3, y: 0 },
+        lastTime = new Date().getTime(),
+        elapsed;
 
     searchGrid.drawMap(function () {
         drawSightings();
@@ -121,18 +125,21 @@ function scrollClouds() {
     });
 
     function cloudsAnim() {
-        handle = window.requestAnimationFrame(cloudsAnim);
-        elapsed = new Date().getTime() - startTime;
+        cloudsAnimHandle = window.requestAnimationFrame(cloudsAnim);
+        elapsed = new Date().getTime() - lastTime;
 
-        if (elapsed >= 1/30 of a second) {
+        if (elapsed >= 34) {
             searchGrid.restoreImageData(mapImg, 0, 0);
-            searchGrid.drawSearchClouds(addVectors(cloudsTopLeft, distVector));
+            cloudsTopLeft = addVectors(cloudsTopLeft, distVector);
+            searchGrid.drawSearchClouds(cloudsTopLeft);
+            lastTime = new Date().getTime();
         }
     }
 }
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function hideSearching() {
+    $("#canvasmsg").css("display", "none");
     canvas.style.cursor = "auto";
     dragMgr.dragging = false;
     dragMgr.source = "";
