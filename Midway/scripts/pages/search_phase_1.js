@@ -25,9 +25,9 @@ $(document).on("mousedown", ".shipitem", function() {
     shipItemMouseDown();
 });
 
-$(canvas).on("mousedown", function (e) {
+$(cvs).on("mousedown", function (e) {
     mouseDown = true;
-    var zone = searchGrid.coordsToZone(windowToCanvas(canvas, e.clientX, e.clientY)),
+    var zone = searchGrid.coordsToZone(windowToCanvas(cvs, e.clientX, e.clientY)),
         selShips = getSelectedShips("zone");
 
     if (selShips.length > 0) {

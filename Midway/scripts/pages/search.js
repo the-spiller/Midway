@@ -1,4 +1,4 @@
-﻿var canvas = document.getElementById("searchcanvas"),
+﻿var cvs = document.getElementById("searchcanvas"),
     mapLeft = 5,
     divLeft = 974,
     imgDir = "/content/images/search/",
@@ -28,7 +28,7 @@
     },
     soundInit = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: false },
     soundInitLoop = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: true },
-    sfxArrived, sfxSailing, sfxSearching,
+    sfxArrived, sfxSailing, sfxAirSearch, sfxSeaSearch, sfxSearch,
     cloudsAnimHandle;
 
 // Event handlers......................................................
@@ -59,12 +59,12 @@ $("#done").on("click", function() {
     }
 });
 
-$(canvas).on("click", function (e) {
+$(cvs).on("click", function (e) {
     // make the zone the 'current' one
-    selectZone(windowToCanvas(canvas, e.clientX, e.clientY));
+    selectZone(windowToCanvas(cvs, e.clientX, e.clientY));
 }).on("dblclick", function (e) {
     // select all ships in the zone (if any)
-    var coords = windowToCanvas(canvas, e.clientX, e.clientY),
+    var coords = windowToCanvas(cvs, e.clientX, e.clientY),
         zone = searchGrid.coordsToZone(coords);
     if ($.inArray(zone, shipZones) != -1) {
         $("#zone").find("div.shipitem").addClass("selected");
@@ -75,7 +75,10 @@ $(canvas).on("click", function (e) {
 }).on("mouseout", function () {
     mouseDown = false;
     if (dragMgr.source == "search") {
-        if (sfxSearching) sfxSearching.fadeOut(500);
+        if (sfxSearch) {
+            sfxSearch.fadeOut(500);
+            sfxSearch = null;
+        }
         hideSearching();
     } else if (dragMgr.dragging) {
         dragMgr.dragging = false;
@@ -85,7 +88,7 @@ $(canvas).on("click", function (e) {
 });
 
 // Event handlers for dynamically-loaded elements
-$(document).on("click", ".tablistitem", function(e) {
+$(document).on("click", ".tablistitem", function (e) {
     workTabs(e);
 }).on("click", ".shipitem", function(e) {
     doShipSelection(this, (e.shiftKey));
@@ -93,7 +96,10 @@ $(document).on("click", ".tablistitem", function(e) {
 }).on("click", ".searchitem", function() {
     mouseDown = false;
     dragMgr.dragging = false;
-    if (sfxSearching) sfxSearching.fadeOut(500);
+    if (sfxSearch) {
+        sfxSearch.fadeOut(500);
+        sfxSearch = null;
+    }
 });
 
 // Functions...........................................................
@@ -443,12 +449,12 @@ function doShipSelection(shipItem, shiftPressed) {
 function beginControlsDrag() {
     if (mouseDown) {
         if (dragMgr.source == "search") {
-            if (sfxSearching) sfxSearching.fadeIn(500);
+            if (sfxSearch) sfxSearch.fadeIn(500);
             //scrollClouds();
         }
         dragMgr.dragging = true;
-        canvas.addEventListener("mousemove", canvasMouseMove, false);
-        canvas.addEventListener("touchmove", canvasMouseMove, false);
+        cvs.addEventListener("mousemove", canvasMouseMove, false);
+        cvs.addEventListener("touchmove", canvasMouseMove, false);
     }
 }
 
@@ -460,7 +466,7 @@ function beginControlsDrag() {
 /*-------------------------------------------------------------------*/
 function canvasMouseMove(e) {
     if (dragMgr.dragging) {
-        var canvasCoords = windowToCanvas(canvas, e.clientX, e.clientY);
+        var canvasCoords = windowToCanvas(cvs, e.clientX, e.clientY);
         if (dragMgr.source == "search") {
             showSearching(canvasCoords);
         } else {
@@ -491,15 +497,18 @@ function canvasMouseUp(e) {
     mouseDown = false;
     if (dragMgr.dragging) {
         dragMgr.dragging = false;
-        canvas.removeEventListener("touchmove", canvasMouseMove, false);
-        canvas.removeEventListener("mousemove", canvasMouseMove, false);
+        cvs.removeEventListener("touchmove", canvasMouseMove, false);
+        cvs.removeEventListener("mousemove", canvasMouseMove, false);
         
-        var coords = windowToCanvas(canvas, e.clientX, e.clientY),
+        var coords = windowToCanvas(cvs, e.clientX, e.clientY),
             zone = searchGrid.coordsToZone(coords);
         
         if (dragMgr.source == "search") {
             hideSearching();
-            if (sfxSearching) sfxSearching.fadeOut(500);
+            if (sfxSearch) {
+                sfxSearch.fadeOut(500);
+                sfxSearch = null;
+            }
             selectArea(coords);
             selectedArea = zone.substr(0, 2);
             
@@ -752,6 +761,8 @@ function loadPage(callback) {
                 containment: "#pagediv",
                 scroll: false
             });
+            if (game.PhaseId == 2)
+                searchGrid.addSearchCanvases();
             
             ajaxLoadShips(shipsLoaded);
         });
@@ -781,7 +792,8 @@ $(document).ready(function () {
                         sfxSailing = new buzz.sound("/content/audio/ship-underway", soundInit);
                         break;
                     case 2:
-                        sfxSearching = new buzz.sound("/content/audio/air-search", soundInitLoop);
+                        sfxAirSearch = new buzz.sound("/content/audio/air-search", soundInitLoop);
+                        sfxSeaSearch = new buzz.sound("/content/audio/sea-search", soundInitLoop);
                     default:
                         break;
                 }

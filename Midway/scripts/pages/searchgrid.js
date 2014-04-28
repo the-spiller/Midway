@@ -11,7 +11,7 @@
         privZoneToTopLeftCoords = function(zone) {
             var col = 0,
                 areaSize = zonesize * 3;
-
+            
             for (var i = 0; i < mapCols.length; i++) {
                 if (zone.charAt(0) == mapCols[i]) {
                     col = (i * areaSize) + mapmargin;
@@ -106,6 +106,14 @@
             ctx.closePath();
             ctx.stroke();
             ctx.restore();
+        },
+        privDrawSearchClouds = function (coords) {
+            ctx.clearRect(0, 0, cvs.height, cvs.width);
+            var cloudsCvs = document.getElementById("cloudscanvas"),
+                cloudsCtx = cloudsCvs.getContext("2d"),
+                clouds = document.getElementById("cloudLayer");
+            cloudsCtx.clearRect(0, 0, cloudsCvs.height, cloudsCvs.width);
+            cloudsCtx.drawImage(clouds, coords.x, coords.y);
         };
 
     return {
@@ -175,11 +183,8 @@
             mapImg.onload = function () {
                 cvs.height = mapImg.height;
                 cvs.width = mapImg.width;
-                //ctx.save();
-                //ctx.globalAlpha = 0.4;
                 ctx.drawImage(mapImg, 0, 0);
                 if (callback) callback();
-                //ctx.restore();
             };
         },
         /*-------------------------------------------------------------------*/
@@ -299,9 +304,35 @@
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
+        addSearchCanvases: function() {
+            var cloudsCvs = document.createElement("canvas");
+            cloudsCvs.id = "cloudscanvas";
+            cloudsCvs.height = 748;
+            cloudsCvs.width = 964;
+            cloudsCvs.style.position = "absolute";
+            cloudsCvs.style.top = "60px";
+            cloudsCvs.style.left = cvs.style.left;
+            cloudsCvs.style.zIndex = 10;
+
+            var searchCursorCvs = document.createElement("canvas");
+            searchCursorCvs.id = "searchcursorcanvas";
+            searchCursorCvs.height = 748;
+            searchCursorCvs.width = 964;
+            searchCursorCvs.style.position = "absolute";
+            searchCursorCvs.style.top = "60px";
+            searchCursorCvs.style.left = cvs.style.left;
+            searchCursorCvs.style.zIndex = 20;
+            
+            var div = document.getElementById("canvii");
+            div.appendChild(cloudsCvs);
+            div.appendChild(searchCursorCvs);
+
+            privDrawSearchClouds(0, 0);
+        },
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
         drawSearchClouds: function (coords) {
-            var clouds = document.getElementById("cloudLayer");
-            ctx.drawImage(clouds, coords.x, coords.y);
+            privDrawSearchClouds(coords);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/

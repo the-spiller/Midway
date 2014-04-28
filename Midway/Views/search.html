@@ -134,7 +134,7 @@
         .cursorimg {
             cursor: none;
             position: absolute;
-            z-index: 20;
+            z-index: 10;
             display: none;
         }
         
@@ -159,16 +159,6 @@
             .airopbutton:active {
                 margin: 2px 0 0 2px;
             }
-
-        #canvasmsg {
-            display: none;
-            position: absolute;
-            z-index: 10;
-            top: 160px;
-            left: 700px;
-            color: red;
-            font: 600 2em Arial, sans-serif;
-        }
         </style>
     </head>
     <body>
@@ -182,10 +172,11 @@
                 <a id="return" href="#" title="Return to home page"><img src="/content/images/return.png" /></a>
             </div>
             
-            <div id="canvasmsg"></div>
-            <canvas id="searchcanvas">
-                Canvas not supported! Get thee a new browser, for God's sake!
-            </canvas>
+            <div id="canvii">
+                <canvas id="searchcanvas">
+                    Canvas not supported! Get thee a new browser, for God's sake!
+                </canvas>
+            </div>
 
             <div id="searchdiv" class="floatingdiv">
                 <div class="floathead"></div>

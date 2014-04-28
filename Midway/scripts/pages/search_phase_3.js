@@ -47,7 +47,7 @@ function loadPhaseTab() {
     // Air Operations
     opsHtml += "<div class=\"listheader\">Air Operations</div>";
     if (game.AircraftReadyState < 2) {
-        opsHtml += "<div style=\"padding: 8px;\">None of your aircraft are ready for operations.</div>";
+        opsHtml += "<div style=\"padding: 8px;\">Your aircraft are not ready for operations.</div>";
     } else {
         opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">" +
             "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>" +
@@ -123,6 +123,8 @@ function addAirOperation() {
             
         }
     });
-    
 }
+
+    
+
 

@@ -223,6 +223,7 @@
     <Content Include="Content\audio\boat-horn.mp3" />
     <Content Include="Content\audio\air-search.mp3" />
     <Content Include="Content\audio\ship-underway.mp3" />
+    <Content Include="Content\audio\sea-search.mp3" />
     <Content Include="Content\images\blueloader.gif" />
     <Content Include="Content\images\helpicon.png" />
     <Content Include="Content\images\pointssample.png" />
@@ -423,6 +424,7 @@
     <Content Include="Content\audio\boat-horn.ogg" />
     <Content Include="Content\audio\ship-underway.ogg" />
     <Content Include="Content\audio\air-search.ogg" />
+    <Content Include="Content\audio\sea-search.ogg" />
     <None Include="Properties\PublishProfiles\Files.pubxml" />
     <Content Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
     <Content Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />

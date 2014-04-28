@@ -26,7 +26,7 @@ function loadPhaseTab() {
                 searchDesc = "Drag and drop to search any area within " + game.SearchRange + " zones of any of your ships";
             }
             searchHtml += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
-                    " title=\"" + searchDesc + "\">" + 
+                    " title=\"" + searchDesc + "\" draggable=\"false\">" + 
                     "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"" + searchImg + "\" draggable=\"false\" />" +
                     "</div></li>";
         }
@@ -42,6 +42,7 @@ function searchItemMouseDown(e) {
     var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "null";
     if (panelId != "search") return;
 
+    e.preventDefault();
     dragMgr.dragging = false;
     dragMgr.source = panelId;
 
@@ -49,14 +50,19 @@ function searchItemMouseDown(e) {
     if (selSearch) {
         mouseDown = true;
         dragMgr.dragData = selSearch;
-        dragMgr.cursorImg = document.getElementById(selSearch.SearchType + "searchcursor");
+        var type = selSearch.SearchType;
+        dragMgr.cursorImg = document.getElementById(type + "searchcursor");
         dragMgr.cursorOffset = { x: -40, y: -40 },
         dragMgr.useSnapshot = false;
         dragMgr.snapshot = null;
         selectedArea = "";
-
-        setTimeout(beginControlsDrag, 150);
+        if (type == "air") {
+            if (sfxAirSearch) sfxSearch = sfxAirSearch;
+        } else {
+            if (sfxSeaSearch) sfxSearch = sfxSeaSearch;
+        }
     }
+    setTimeout(beginControlsDrag, 150);
 }
 
 /*-------------------------------------------------------------------*/
@@ -94,17 +100,12 @@ function withinSearchRange(coords) {
 /*-------------------------------------------------------------------*/
 
 function showSearching(canvasCoords) {
-    canvas.style.cursor = "none";
+    cvs.style.cursor = "none";
     var coords = addVectors(canvasCoords, dragMgr.cursorOffset);
     drawCursorImg(coords.x, coords.y);
 
     if (withinSearchRange(canvasCoords)) {
-        $("#canvasmsg").css("display", "none");
         selectArea(canvasCoords);
-    } else {
-        setTimeout(function() {
-            $("#canvasmsg").css("display", "block").text("Out of range!");
-        }, 100);
     }
 }
 
@@ -139,8 +140,7 @@ function scrollClouds() {
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function hideSearching() {
-    $("#canvasmsg").css("display", "none");
-    canvas.style.cursor = "auto";
+    cvs.style.cursor = "auto";
     dragMgr.dragging = false;
     dragMgr.source = "";
     if (dragMgr.snapshot) {
@@ -267,3 +267,4 @@ function alreadySearched(area) {
     }
     return false;
 }
+
