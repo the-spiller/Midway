@@ -50,26 +50,19 @@ function searchItemMouseDown(e) {
     if (selSearch) {
         mouseDown = true;
         dragMgr.dragData = selSearch;
-        var type = selSearch.SearchType;
-        dragMgr.cursorImg = document.getElementById(type + "searchcursor");
+        dragMgr.cursorImg = document.getElementById(selSearch.SearchType + "searchcursor");
         dragMgr.cursorOffset = { x: -40, y: -40 },
         dragMgr.useSnapshot = false;
         dragMgr.snapshot = null;
         selectedArea = "";
-        if (type == "air") {
+
+        if (selSearch.SearchType == "air") {
             if (sfxAirSearch) sfxSearch = sfxAirSearch;
         } else {
             if (sfxSeaSearch) sfxSearch = sfxSeaSearch;
         }
     }
     setTimeout(beginControlsDrag, 150);
-}
-
-/*-------------------------------------------------------------------*/
-/* Draw the search cursor at the input coordinates.                  */
-/*-------------------------------------------------------------------*/
-function drawCursorImg(x, y) {
-    dragMgr.snapshot = searchGrid.drawSearchCursor(dragMgr.snapshot, dragMgr.cursorImg, x, y);
 }
 
 /*-------------------------------------------------------------------*/
@@ -98,40 +91,36 @@ function withinSearchRange(coords) {
 }
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
-
-function showSearching(canvasCoords) {
-    cvs.style.cursor = "none";
-    var coords = addVectors(canvasCoords, dragMgr.cursorOffset);
-    drawCursorImg(coords.x, coords.y);
-
-    if (withinSearchRange(canvasCoords)) {
-        selectArea(canvasCoords);
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
 function scrollClouds() {
-    var cloudsTopLeft = { x: 0, y: 0 },
-        distVector = { x: side == "USN" ? 3 : -3, y: 0 },
+    var cloudsTopLeft,
+        velocity,
+        reset,
         lastTime = new Date().getTime(),
         elapsed;
 
-    searchGrid.drawMap(function () {
-        drawSightings();
-        drawShips();
-        searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
-        mapImg = searchGrid.grabImageData();
-        cloudsAnim();
-    });
+    if (side == "USN") {
+        cloudsTopLeft = { x: -964, y: 0 };
+        velocity = { x: 2, y: 0 };
+        reset = function () {
+            if (cloudsTopLeft.x > -1) cloudsTopLeft.x = -964;
+        };
+
+    } else {
+        cloudsTopLeft = { x: 0, y: 0 };
+        velocity = { x: -2, y: 0 };
+        reset = function () {
+            if (cloudsTopLeft.x < -964) cloudsTopLeft.x = 0;
+        };
+    }
+    cloudsAnim();
 
     function cloudsAnim() {
-        cloudsAnimHandle = window.requestAnimationFrame(cloudsAnim);
+        var hAnim = window.requestAnimationFrame(cloudsAnim);
         elapsed = new Date().getTime() - lastTime;
 
         if (elapsed >= 34) {
-            searchGrid.restoreImageData(mapImg, 0, 0);
-            cloudsTopLeft = addVectors(cloudsTopLeft, distVector);
+            cloudsTopLeft = addVectors(cloudsTopLeft, velocity);
+            reset();
             searchGrid.drawSearchClouds(cloudsTopLeft);
             lastTime = new Date().getTime();
         }
@@ -139,23 +128,35 @@ function scrollClouds() {
 }
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
+function showSearching(canvasCoords) {
+    var coords = addVectors(canvasCoords, dragMgr.cursorOffset);
+    
+    searchGrid.drawSearchCursor(coords.x, coords.y);
+
+    if (withinSearchRange(canvasCoords)) {
+        selectArea(canvasCoords);
+    } else {
+        deselectArea();
+    }
+}
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
 function hideSearching() {
-    cvs.style.cursor = "auto";
     dragMgr.dragging = false;
     dragMgr.source = "";
-    if (dragMgr.snapshot) {
-        searchGrid.restoreImageData(dragMgr.snapshot, 0, 0);
-    }
+    deselectArea();
+    searchGrid.clearSearchCursor();
 }
 
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function executeSearch(coords, zone, search, callback) {
     if (withinSearchRange(coords)) {
-        var area = zone.substr(0, 2);
-       
-        if (!alreadySearched(area)) {
-            search.Area = area;
+        selectArea(coords);
+        selectedArea = zone.substr(0, 2);
+        
+        if (!alreadySearched(selectedArea)) {
+            search.Area = selectedArea;
             ajaxPostSearch(search, function () {
                 $("#search-" + search.SearchNumber).remove().parent();
                 if (search.Markers && search.Markers.length) {
@@ -164,18 +165,18 @@ function executeSearch(coords, zone, search, callback) {
                         msg += "<p>" + search.Markers[i].Zone + " contains one or more of each of thse types:<br />" +
                             expandTypesFound(search.Markers[i].TypesFound) + "</p>";
                     }
-                    showAlert("Search " + area, msg, DLG_OK, "blue", callback);
+                    showAlert("Search " + selectedArea, msg, DLG_OK, "blue", callback);
 
                 } else {
-                    showAlert("Search " + area, "No sightings.", DLG_OK, "blue", callback);
+                    showAlert("Search " + selectedArea, "No sightings.", DLG_OK, "blue", callback);
                 }
             });
         } else {
-            showAlert("Search " + area, "You've already searched area " + area + " on this turn!", DLG_OK, "blue", callback);
+            showAlert("Search " + selectedArea, "You've already searched area " + area + " on this turn!", DLG_OK, "blue", callback);
         }
     } else {
         hideSearching();
-        if (callback) callback();
+        showAlert("Search", "Out of range.", DLG_OK, "red", callback);
     }
 }
 

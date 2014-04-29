@@ -25,7 +25,7 @@ $(document).on("mousedown", ".shipitem", function() {
     shipItemMouseDown();
 });
 
-$(cvs).on("mousedown", function (e) {
+$("#canvii").on("mousedown", function (e) {
     mouseDown = true;
     var zone = searchGrid.coordsToZone(windowToCanvas(cvs, e.clientX, e.clientY)),
         selShips = getSelectedShips("zone");
@@ -108,7 +108,7 @@ function isLegitDrop(coords) {
 /* "Sail" fleet marker to a new location on the map.                 */
 /*-------------------------------------------------------------------*/
 function sailShips(startZone, endZone) {
-    sfxSailing.play();
+    if (sfxSailing) sfxSailing.play();
     
     var startPos = searchGrid.zoneToTopLeftCoords(startZone),
         endPos = searchGrid.zoneToTopLeftCoords(endZone),
@@ -137,7 +137,7 @@ function sailShips(startZone, endZone) {
                 drawShips();
                 searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
                 showShipsInZone(selectedZone);
-                sfxSailing.fadeOut(1000);
+                if (sfxSailing) sfxSailing.fadeOut(SFX_FADEOUT_DURATION, function () { sfxSailing.stop(); });
             });
         } else {
             var thisX = startPos.x + ((elapsed / duration) * distX);

@@ -1,9 +1,12 @@
 ﻿var searchGrid = (function() {
     var zonesize = 36,
         mapmargin = 27,
+        gridHeight = 748,
+        gridWidth = 964,
         mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
         cvs = document.getElementById("searchcanvas"),
         ctx = cvs.getContext("2d"),
+        cloudsCvs, cloudsCtx, searchCursorCvs, searchCursorCtx,
         selRemoveZone = null,
         selRemoveArea = null,
         highlightRemoveZones = null,
@@ -108,11 +111,9 @@
             ctx.restore();
         },
         privDrawSearchClouds = function (coords) {
-            ctx.clearRect(0, 0, cvs.height, cvs.width);
-            var cloudsCvs = document.getElementById("cloudscanvas"),
-                cloudsCtx = cloudsCvs.getContext("2d"),
-                clouds = document.getElementById("cloudLayer");
-            cloudsCtx.clearRect(0, 0, cloudsCvs.height, cloudsCvs.width);
+            if (!cloudsCtx) return;
+            var clouds = document.getElementById("cloudLayer");
+            cloudsCtx.clearRect(0, 0, gridWidth, gridHeight);
             cloudsCtx.drawImage(clouds, coords.x, coords.y);
         };
 
@@ -176,10 +177,8 @@
         /* transparency.                                                     */
         /*-------------------------------------------------------------------*/
         drawMap: function (callback) {
-            var imgDir = "/content/images/search/",
-                mapImg = new Image();
-
-            mapImg.src = imgDir + "searchboard.png";
+            var mapImg = new Image();
+            mapImg.src = "/content/images/search/searchboard.png";
             mapImg.onload = function () {
                 cvs.height = mapImg.height;
                 cvs.width = mapImg.width;
@@ -305,29 +304,31 @@
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         addSearchCanvases: function() {
-            var cloudsCvs = document.createElement("canvas");
+            cloudsCvs = document.createElement("canvas");
             cloudsCvs.id = "cloudscanvas";
-            cloudsCvs.height = 748;
-            cloudsCvs.width = 964;
+            cloudsCvs.height = gridHeight;
+            cloudsCvs.width = gridWidth;
             cloudsCvs.style.position = "absolute";
             cloudsCvs.style.top = "60px";
             cloudsCvs.style.left = cvs.style.left;
             cloudsCvs.style.zIndex = 10;
 
-            var searchCursorCvs = document.createElement("canvas");
+            searchCursorCvs = document.createElement("canvas");
             searchCursorCvs.id = "searchcursorcanvas";
-            searchCursorCvs.height = 748;
-            searchCursorCvs.width = 964;
+            searchCursorCvs.height = gridHeight;
+            searchCursorCvs.width = gridWidth;
             searchCursorCvs.style.position = "absolute";
             searchCursorCvs.style.top = "60px";
             searchCursorCvs.style.left = cvs.style.left;
             searchCursorCvs.style.zIndex = 20;
-            
+           
             var div = document.getElementById("canvii");
             div.appendChild(cloudsCvs);
             div.appendChild(searchCursorCvs);
 
-            privDrawSearchClouds(0, 0);
+            cloudsCtx = cloudsCvs.getContext("2d");
+            searchCursorCtx = searchCursorCvs.getContext("2d");
+            //privDrawSearchClouds({ x: 0, y: 0 });
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -336,13 +337,16 @@
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        drawSearchCursor: function (restoreData, imageData, left, top) {
-            if (restoreData) {
-                ctx.putImageData(restoreData, 0, 0);
-            }
-            var ret = ctx.getImageData(0, 0, cvs.width, cvs.height);
-            ctx.drawImage(imageData, left, top);
-            return ret;
+        drawSearchCursor: function (left, top) {
+            if (!searchCursorCtx) return;
+            searchCursorCtx.clearRect(0, 0, gridWidth, gridHeight);
+            searchCursorCtx.drawImage(dragMgr.cursorImg, left, top);
+        },
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        clearSearchCursor: function() {
+            if (!searchCursorCtx) return;
+            searchCursorCtx.clearRect(0, 0, gridWidth, gridHeight);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/

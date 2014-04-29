@@ -28,8 +28,7 @@
     },
     soundInit = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: false },
     soundInitLoop = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: true },
-    sfxArrived, sfxSailing, sfxAirSearch, sfxSeaSearch, sfxSearch,
-    cloudsAnimHandle;
+    sfxArrived, sfxSailing, sfxAirSearch, sfxSeaSearch, sfxSearch;
 
 // Event handlers......................................................
 
@@ -59,7 +58,7 @@ $("#done").on("click", function() {
     }
 });
 
-$(cvs).on("click", function (e) {
+$('#canvii').on("click", function (e) {
     // make the zone the 'current' one
     selectZone(windowToCanvas(cvs, e.clientX, e.clientY));
 }).on("dblclick", function (e) {
@@ -76,7 +75,7 @@ $(cvs).on("click", function (e) {
     mouseDown = false;
     if (dragMgr.source == "search") {
         if (sfxSearch) {
-            sfxSearch.fadeOut(500);
+            sfxSearch.fadeOut(SFX_FADEOUT_DURATION);
             sfxSearch = null;
         }
         hideSearching();
@@ -97,7 +96,7 @@ $(document).on("click", ".tablistitem", function (e) {
     mouseDown = false;
     dragMgr.dragging = false;
     if (sfxSearch) {
-        sfxSearch.fadeOut(500);
+        sfxSearch.fadeOut(SFX_FADEOUT_DURATION);
         sfxSearch = null;
     }
 });
@@ -169,11 +168,13 @@ function selectZoneTab() {
 /* area.                                                             */
 /*-------------------------------------------------------------------*/
 function selectArea(coords) {
-    var topLeft = searchGrid.coordsToAreaTopLeftCoords(coords);
+    var topLeft = searchGrid.coordsToAreaTopLeftCoords(coords),
+        area = searchGrid.coordsToZone(coords).substr(0, 2);
     deselectArea();
     topLeft.x = topLeft.x - 3;
     topLeft.y = topLeft.y - 3;
     searchGrid.drawSelector(topLeft, 3);
+    selectedArea = area;
 }
 
 /*-------------------------------------------------------------------*/
@@ -184,6 +185,7 @@ function deselectArea() {
             oldTop = oldTopLeft.y - 3,
             oldLeft = oldTopLeft.x - 3;
         searchGrid.removeAreaSelector(oldLeft, oldTop);
+        selectedArea = "";
     }
 }
 
@@ -331,18 +333,36 @@ function getShipListItemHtml(ship) {
 /*-------------------------------------------------------------------*/
 function getSightedShipsHtml(searchMarker, searchTurn) {
     var otherside = side == "USN" ? "ijn" : "usn",
+        align = side == "USN" ? "left" : "right",
         turns = game.Turn - searchTurn,
         found = turns == 0 ? "this turn" : turns == 1 ? "a turn ago" : turns + " turns ago",
         html = "<table class=\"noselect\"><tr><td colspan=\"2\">Ship types sighted (" + found + ")</td></tr>",
         types = searchMarker.TypesFound.split(",");
 
     for (var i = 0; i < types.length; i++) {
-        html += "<tr><td class=\"sightedlabel\">" + types[i] + "</td><td class=\"sightedship\">" +
-            "<img src=\"" + imgDir + otherside + types[i] + ".png\" /></td></tr>";
+        html += "<tr><td class=\"sightedship\" style=\"text-align: " + align + ";\"><img src=\"" + imgDir + "ships/" + otherside + types[i] + ".png\" /></td>" +
+            "<td class=\"sightedlabel\">" + typeName(types[i]) + "</td></tr>";
     }
     return html + "</table>";
 }
 
+/*-------------------------------------------------------------------*/
+/* Return the unabbreviated form of the input ship type              */
+/* abbreviation.                                                     */
+/*-------------------------------------------------------------------*/
+function typeName(type) {
+    switch (type) {
+        case "BB":
+            return "Battleship";
+        case "CV":
+            return "Carrier";
+        case "CL":
+            return "Light Cruiser";
+        case "CVL":
+            return "Light Carrier";
+    }
+    return "Cruiser";
+}
 /*-------------------------------------------------------------------*/
 /* Display image indicating air readiness.                           */
 /*-------------------------------------------------------------------*/
@@ -449,12 +469,14 @@ function doShipSelection(shipItem, shiftPressed) {
 function beginControlsDrag() {
     if (mouseDown) {
         if (dragMgr.source == "search") {
-            if (sfxSearch) sfxSearch.fadeIn(500);
-            //scrollClouds();
+            if (sfxSearch) {
+                sfxSearch.fadeIn(SFX_FADEIN_DURATION);
+            }
         }
         dragMgr.dragging = true;
-        cvs.addEventListener("mousemove", canvasMouseMove, false);
-        cvs.addEventListener("touchmove", canvasMouseMove, false);
+        var canvii = document.getElementById("canvii");
+        canvii.addEventListener("mousemove", canvasMouseMove, false);
+        canvii.addEventListener("touchmove", canvasMouseMove, false);
     }
 }
 
@@ -497,8 +519,9 @@ function canvasMouseUp(e) {
     mouseDown = false;
     if (dragMgr.dragging) {
         dragMgr.dragging = false;
-        cvs.removeEventListener("touchmove", canvasMouseMove, false);
-        cvs.removeEventListener("mousemove", canvasMouseMove, false);
+        var canvii = document.getElementById("canvii");
+        canvii.removeEventListener("touchmove", canvasMouseMove, false);
+        canvii.removeEventListener("mousemove", canvasMouseMove, false);
         
         var coords = windowToCanvas(cvs, e.clientX, e.clientY),
             zone = searchGrid.coordsToZone(coords);
@@ -506,18 +529,17 @@ function canvasMouseUp(e) {
         if (dragMgr.source == "search") {
             hideSearching();
             if (sfxSearch) {
-                sfxSearch.fadeOut(500);
+                sfxSearch.fadeOut(SFX_FADEOUT_DURATION);
                 sfxSearch = null;
             }
-            selectArea(coords);
-            selectedArea = zone.substr(0, 2);
-            
             executeSearch(coords, zone, dragMgr.dragData, function () {
                 deselectArea();
                 drawSightings();
             });
         } else if (isLegitDrop(coords)) {
-            if (dragMgr.source == "arrivals" && sfxArrived) sfxArrived.play().fadeOut();
+            if (dragMgr.source == "arrivals" && sfxArrived) {
+                sfxArrived.play();
+            }
             var cost = 0;
 
             if (isNumber(dragMgr.source.substr(1, 1)))
@@ -633,6 +655,25 @@ function ajaxPutPhase(successCallback) {
     });
 }
 /*-------------------------------------------------------------------*/
+/* Load search map audio based on game phase                         */
+/*-------------------------------------------------------------------*/
+function loadSearchAudio() {
+    if (buzz.isSupported()) {
+        switch (game.PhaseId) {
+            case 1:
+                sfxArrived = new buzz.sound("/content/audio/bosun-attn", soundInit);
+                sfxSailing = new buzz.sound("/content/audio/ship-underway", soundInit);
+                break;
+            case 2:
+                sfxAirSearch = new buzz.sound("/content/audio/air-search", soundInitLoop);
+                sfxSeaSearch = new buzz.sound("/content/audio/sea-search", soundInitLoop);
+                break;
+            default:
+                break;
+        }
+    }
+}
+/*-------------------------------------------------------------------*/
 /* Callback for ajaxLoadPhase call. Set up tabs based on phase       */
 /* actions.                                                          */
 /*-------------------------------------------------------------------*/
@@ -675,7 +716,6 @@ function shipsLoaded() {
 
     ajaxLoadSearches(function () {
         $("#searchdiv").css("display", "block");
-        $("#searchcanvas").css("display", "block");
         
             searchGrid.drawMap(function () {
             drawShips();
@@ -774,30 +814,20 @@ function loadPage(callback) {
 // Initialize..........................................................
 
 $(document).ready(function () {
-    //init touchevents for drag-drop
-    if ('ontouchstart' in window || navigator.msMaxTouchPoints) {
-        document.addEventListener("touchstart", touchToMouseHandler, false);
-        document.addEventListener("touchend", touchToMouseHandler, false);
-        document.addEventListener("touchcancel", touchToMouseHandler, false);
-        document.addEventListener("touchenter", touchToMouseHandler, false);
-        document.addEventListener("touchleave", touchToMouseHandler, false);
-    }
+    ////init touchevents for drag-drop
+    //if ('ontouchstart' in window || navigator.msMaxTouchPoints) {
+    //    document.addEventListener("touchstart", touchToMouseHandler, false);
+    //    document.addEventListener("touchend", touchToMouseHandler, false);
+    //    document.addEventListener("touchcancel", touchToMouseHandler, false);
+    //    document.addEventListener("touchenter", touchToMouseHandler, false);
+    //    document.addEventListener("touchleave", touchToMouseHandler, false);
+    //}
     
     loadPlayerForPage(function() {
-        loadPage(function() {
-            if (buzz.isSupported()) {
-                switch (game.PhaseId) {
-                    case 1:
-                        sfxArrived = new buzz.sound("/content/audio/boat-horn", soundInit);
-                        sfxSailing = new buzz.sound("/content/audio/ship-underway", soundInit);
-                        break;
-                    case 2:
-                        sfxAirSearch = new buzz.sound("/content/audio/air-search", soundInitLoop);
-                        sfxSeaSearch = new buzz.sound("/content/audio/sea-search", soundInitLoop);
-                    default:
-                        break;
-                }
-            }
+        loadPage(function () {
+            loadSearchAudio();
+            if (game.PhaseId == 2) scrollClouds();
+            $("#canvii").css("visibility", "visible");
         });
     });
 });
