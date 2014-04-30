@@ -5,6 +5,7 @@
     selGameId = 0,
     abandonables = [],
     twoWeeks = 1000 * 60 * 60 * 24 * 14,
+    bgMusic,
     nicknames = FuzzySet();
         
 // Event handlers......................................................
@@ -16,7 +17,8 @@ $("#infolink").on("click", function() {
 $("#logofflink").on("click", function () {
     if (unsavedRegChanges()) return;
     eraseCookie(COOKIE_NAME);
-    location.replace("/index.html");
+    navigateTo(bgMusic, "/index.html");
+    //location.replace("/index.html");
 });
 
 $(".tablistitem").on("click", function (e) {
@@ -84,7 +86,7 @@ $("#playgame").on("click", function () {
     if (unsavedRegChanges()) return;
 
     createGame(function () {
-        location.href = "/views/search.html?gid=" + selGameId;
+        navigateTo(bgMusic, "/views/search.html?gid=" + selGameId);
     });
 });
         
@@ -235,17 +237,18 @@ function shallowCopyGame(game) {
     };
 }
         
-// Return the game with the highest ID value -- it's the newest
-function getNewestGameId() {
-    var maxId = 0,
-        games = window.player.Games;
-    
+// Return the Id of the newly-added game.
+function getAddedGameId(gameIdsBefore) {
+    var retId = 0,
+        games = player.Games;
+
     for (var i = 0; i < games.length; i++) {
-        if (games[i].GameId > maxId) {
-            maxId = games[i].GameId;
+        if ($.inArray(games[i].GameId, gameIdsBefore) == -1) {
+            retId = games[i].GameId;
+            break;
         }
     }
-    return maxId;
+    return retId;
 }
         
 function createGame(callback) {
@@ -255,7 +258,13 @@ function createGame(callback) {
         if ($("#oppnickname").val() && $("#oppnickname").val() != "First available")
             nickname = $("#oppnickname").val();
 
-        var shallowPlayer = shallowCopyPlayer();
+        // build array of player's existing game Ids so we can find an added one.
+        var gameIds = [];
+        for (var i = 0; i < player.Games.length; i++) {
+            gameIds.push(player.Games[i].GameId);
+        }
+        
+       var shallowPlayer = shallowCopyPlayer();
 
         var game = {
             GameId: 0,
@@ -279,7 +288,7 @@ function createGame(callback) {
         // do a player update to create the new game
         ajaxUpdatePlayer(shallowPlayer, function() {
             // set the new game Id
-            selGameId = getNewestGameId(); //highest game Id is newest
+            selGameId = getAddedGameId(gameIds);
             if (callback) callback();
         });
     } else {
@@ -495,7 +504,7 @@ function buildRecord() {
             if (recIndex == -1) {
                 recIndex = record.push([game.OpponentNickname, 0, 0, 0]) - 1;
             }
-            if (game.Draw == "Y") {     //incomplete, abandoned or retired from
+            if (game.Draw == "Y") {     //abandoned or retired from
                 record[recIndex][3]++;
             } else if (game.Points < game.OpponentPoints) {
                 record[recIndex][2]++;
@@ -517,6 +526,12 @@ function buildRecord() {
 // Init................................................................
 
 $(document).ready(function () {
+    bgMusic = new Howl({
+        urls: [AUDIO_DIR_MUSIC + "home.ogg", AUDIO_DIR_MUSIC + "home.mp3"],
+        autoplay: true,
+        loop: true
+    });
+    
     loadPlayerForPage(function() {
         $("#namespan").text(window.player.Nickname);
 

@@ -110,10 +110,11 @@
             ctx.stroke();
             ctx.restore();
         },
-        privDrawSearchClouds = function (coords) {
+        privDrawSearchClouds = function (opacity, coords) {
             if (!cloudsCtx) return;
             var clouds = document.getElementById("cloudLayer");
             cloudsCtx.clearRect(0, 0, gridWidth, gridHeight);
+            cloudsCtx.globalAlpha = opacity;
             cloudsCtx.drawImage(clouds, coords.x, coords.y);
         };
 
@@ -332,8 +333,8 @@
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        drawSearchClouds: function (coords) {
-            privDrawSearchClouds(coords);
+        drawSearchClouds: function (opacity, coords) {
+            privDrawSearchClouds(opacity, coords);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/

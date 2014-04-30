@@ -220,10 +220,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\audio\boat-horn.mp3" />
-    <Content Include="Content\audio\air-search.mp3" />
-    <Content Include="Content\audio\ship-underway.mp3" />
-    <Content Include="Content\audio\sea-search.mp3" />
+    <Content Include="Content\audio\music\home.mp3" />
+    <Content Include="Content\audio\music\logon.mp3" />
+    <Content Include="Content\audio\sfx\air-search.mp3" />
+    <Content Include="Content\audio\sfx\bosun-attn.mp3" />
+    <Content Include="Content\audio\sfx\ship-underway.mp3" />
     <Content Include="Content\images\blueloader.gif" />
     <Content Include="Content\images\helpicon.png" />
     <Content Include="Content\images\pointssample.png" />
@@ -245,9 +246,10 @@
     <Content Include="Scripts\pages\search_phase_1.js" />
     <Content Include="Scripts\pages\search_phase_2.js" />
     <Content Include="Scripts\pages\search_phase_3.js" />
+    <Content Include="Scripts\pages\search_phase_4.js" />
+    <Content Include="Scripts\vendor\howler.min.js" />
     <Content Include="Views\about.html" />
     <Content Include="App_Data\cm.sdf" />
-    <Content Include="Content\audio\teletype.mp3" />
     <Content Include="Content\images\bg-home.jpg" />
     <Content Include="Content\images\bg-logon.jpg" />
     <Content Include="Content\images\bg-register.jpg" />
@@ -365,7 +367,6 @@
     <Content Include="Content\themes\jquery-ui-1.10.3.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="Content\audio\teletype.ogg" />
     <Content Include="Content\fonts\fette___-webfont.eot" />
     <Content Include="Content\fonts\fette___-webfont.ttf" />
     <Content Include="Content\fonts\fette___-webfont.woff" />
@@ -383,7 +384,6 @@
     <Content Include="Scripts\pages\register.js" />
     <Content Include="Scripts\pages\search.js" />
     <Content Include="Scripts\utils.js" />
-    <Content Include="Scripts\vendor\buzz.js" />
     <Content Include="Scripts\vendor\fuzzyset.js" />
     <Content Include="Scripts\vendor\jquery-1.9.1.js" />
     <Content Include="Scripts\vendor\jquery-ui-1.10.3.js" />
@@ -421,10 +421,11 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\audio\boat-horn.ogg" />
-    <Content Include="Content\audio\ship-underway.ogg" />
-    <Content Include="Content\audio\air-search.ogg" />
-    <Content Include="Content\audio\sea-search.ogg" />
+    <Content Include="Content\audio\sfx\air-search.ogg" />
+    <Content Include="Content\audio\sfx\bosun-attn.ogg" />
+    <Content Include="Content\audio\sfx\ship-underway.ogg" />
+    <Content Include="Content\audio\music\logon.ogg" />
+    <Content Include="Content\audio\music\home.ogg" />
     <None Include="Properties\PublishProfiles\Files.pubxml" />
     <Content Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
     <Content Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />

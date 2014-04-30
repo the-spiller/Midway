@@ -48,18 +48,18 @@ function searchItemMouseDown(e) {
 
     var selSearch = getSearch(e.target);
     if (selSearch) {
-        mouseDown = true;
+        window.mouseDown = true;
         dragMgr.dragData = selSearch;
         dragMgr.cursorImg = document.getElementById(selSearch.SearchType + "searchcursor");
         dragMgr.cursorOffset = { x: -40, y: -40 },
         dragMgr.useSnapshot = false;
         dragMgr.snapshot = null;
-        selectedArea = "";
+        window.selectedArea = "";
 
         if (selSearch.SearchType == "air") {
             if (sfxAirSearch) sfxSearch = sfxAirSearch;
         } else {
-            if (sfxSeaSearch) sfxSearch = sfxSeaSearch;
+            if (sfxSailing) sfxSearch = sfxSailing;
         }
     }
     setTimeout(beginControlsDrag, 150);
@@ -92,7 +92,9 @@ function withinSearchRange(coords) {
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function scrollClouds() {
-    var cloudsTopLeft,
+    var fadeAlpha = 0,
+        fadeDelta = 0.05,
+        cloudsTopLeft,
         velocity,
         reset,
         lastTime = new Date().getTime(),
@@ -118,10 +120,11 @@ function scrollClouds() {
         var hAnim = window.requestAnimationFrame(cloudsAnim);
         elapsed = new Date().getTime() - lastTime;
 
-        if (elapsed >= 34) {
+        if (elapsed >= 34) {    //no faster than 30fps
+            if (fadeAlpha < 1) fadeAlpha += fadeDelta;
             cloudsTopLeft = addVectors(cloudsTopLeft, velocity);
             reset();
-            searchGrid.drawSearchClouds(cloudsTopLeft);
+            searchGrid.drawSearchClouds(fadeAlpha, cloudsTopLeft);
             lastTime = new Date().getTime();
         }
     }
@@ -142,6 +145,7 @@ function showSearching(canvasCoords) {
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function hideSearching() {
+    if (sfxSearch) sfxSearch.fade(sfxSearch.volume(), 0, 500);
     dragMgr.dragging = false;
     dragMgr.source = "";
     deselectArea();
@@ -153,7 +157,7 @@ function hideSearching() {
 function executeSearch(coords, zone, search, callback) {
     if (withinSearchRange(coords)) {
         selectArea(coords);
-        selectedArea = zone.substr(0, 2);
+        window.selectedArea = zone.substr(0, 2);
         
         if (!alreadySearched(selectedArea)) {
             search.Area = selectedArea;
@@ -172,7 +176,8 @@ function executeSearch(coords, zone, search, callback) {
                 }
             });
         } else {
-            showAlert("Search " + selectedArea, "You've already searched area " + area + " on this turn!", DLG_OK, "blue", callback);
+            showAlert("Search " + selectedArea, "You've already searched area " + selectedArea + " on this turn!",
+                DLG_OK, "blue", callback);
         }
     } else {
         hideSearching();
@@ -184,31 +189,10 @@ function executeSearch(coords, zone, search, callback) {
 /*-------------------------------------------------------------------*/
 function expandTypesFound(typesFound) {
     var types = typesFound.split(","),
-        expandedType, 
         expanded = "";
     
     for (var i = 0; i < types.length; i++) {
-        switch (types[i]) {
-            case "BB":
-                expandedType = "battleship";
-                break;
-            case "CV":
-                expandedType = "aircraft carrier";
-                break;
-            case "CVL":
-                expandedType = "light aircraft carrier";
-                break;
-            case "CA":
-                expandedType = "cruiser";
-                break;
-            case "CL":
-                expandedType = "light cruiser";
-                break;
-            default:
-                expandedType = "";
-                break;
-        }
-        expanded += expandedType + ", ";
+        expanded += typeName(types[i]).toLowerCase() + ", ";
     }
     return expanded.substr(0, expanded.length - 2);
 }

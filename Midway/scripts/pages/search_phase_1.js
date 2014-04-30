@@ -4,17 +4,17 @@
 $("#airreadiness").on("click", function () {
     if (game.AircraftReadyState == 0) {
         game.AircraftReadyState = 1;
-        dirty = true;
+        window.dirty = true;
     } else if (game.AircraftReadyState == 1) {
         game.AircraftReadyState = 0;
-        dirty = true;
+        window.dirty = true;
     } else {
         showAlert("Air Readiness",
             "Your aircraft are ready for operations. Are you sure you want to move them down to the hangar deck?",
             DLG_YESCANCEL, "blue", function(choice) {
                 if (choice == "Yes") {
                     game.AircraftReadyState = 0;
-                    dirty = true;
+                    window.dirty = true;
                 }
             });
     }
@@ -26,7 +26,7 @@ $(document).on("mousedown", ".shipitem", function() {
 });
 
 $("#canvii").on("mousedown", function (e) {
-    mouseDown = true;
+    window.mouseDown = true;
     var zone = searchGrid.coordsToZone(windowToCanvas(cvs, e.clientX, e.clientY)),
         selShips = getSelectedShips("zone");
 
@@ -70,7 +70,7 @@ function shipItemMouseDown() {
 
     var selShips = getSelectedShips(panelId);
     if (selShips.length > 0) {
-        mouseDown = true;
+        window.mouseDown = true;
         dragMgr.dragData = selShips;
         dragMgr.useSnapshot = true;
         dragMgr.cursorImg = document.getElementById("fleet");
@@ -122,7 +122,7 @@ function sailShips(startZone, endZone) {
     searchGrid.drawMap(function () {
         drawSightings();
         drawShips([startZone, endZone]);
-        mapImg = searchGrid.grabImageData();
+        window.mapImg = searchGrid.grabImageData();
         shipsAnim();
     });
 
@@ -137,7 +137,7 @@ function sailShips(startZone, endZone) {
                 drawShips();
                 searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
                 showShipsInZone(selectedZone);
-                if (sfxSailing) sfxSailing.fadeOut(SFX_FADEOUT_DURATION, function () { sfxSailing.stop(); });
+                if (sfxSailing) sfxSailing.fade(sfxSailing.volume(), 0, 500);
             });
         } else {
             var thisX = startPos.x + ((elapsed / duration) * distX);

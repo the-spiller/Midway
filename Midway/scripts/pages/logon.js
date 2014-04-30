@@ -1,5 +1,6 @@
 ﻿var badPwdCount = 0,
-    badPwdTries = 4;
+    badPwdTries = 4,
+    bgMusic;
 
 // Event handlers......................................................
 
@@ -25,11 +26,11 @@ $("#newpass").on("click", function () {
 });
 
 $("#register").on("click", function () {
-    location.href = "/views/register.html";
+    navigateTo(bgMusic, "/views/register.html");
 });
 
 $("#wat").on("click", function () {
-    location.href = "/views/about.html";
+    navigateTo(bgMusic, "/views/about.html");
 });
 
 // Functions...........................................................
@@ -75,7 +76,7 @@ function validateLogon() {
             } else {
                 createUpdateAuthCookie();
                 hideWait();
-                document.location.href = "/views/home.html";
+                navigateTo(bgMusic, "/views/home.html");
             }
         });
     }
@@ -194,6 +195,12 @@ $(document).ready(function () {
     if (!cookiesEnabled()) {
         showAlert("Sorry", "Your browser settings must allow cookies in order to play Midway.", DLG_OK, "red");
     }
+
+    bgMusic = new Howl({
+        urls: [AUDIO_DIR_MUSIC + "logon.ogg", AUDIO_DIR_MUSIC + "logon.mp3"],
+        autoplay: true,
+        loop: true
+    });
 
     $("#logondiv").draggable({
         handle: ".floathead",

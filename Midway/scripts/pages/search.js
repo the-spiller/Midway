@@ -28,7 +28,8 @@
     },
     soundInit = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: false },
     soundInitLoop = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: true },
-    sfxArrived, sfxSailing, sfxAirSearch, sfxSeaSearch, sfxSearch;
+    bgMusic, sfxArrived, sfxSailing, sfxAirSearch, sfxSearch,
+    audioLoaded = false;
 
 // Event handlers......................................................
 
@@ -53,7 +54,7 @@ $("#done").on("click", function() {
             return;
         }
         ajaxPutPhase(function () {
-            location.reload(true);
+            loadUp();
         });
     }
 });
@@ -74,10 +75,6 @@ $('#canvii').on("click", function (e) {
 }).on("mouseout", function () {
     mouseDown = false;
     if (dragMgr.source == "search") {
-        if (sfxSearch) {
-            sfxSearch.fadeOut(SFX_FADEOUT_DURATION);
-            sfxSearch = null;
-        }
         hideSearching();
     } else if (dragMgr.dragging) {
         dragMgr.dragging = false;
@@ -95,10 +92,7 @@ $(document).on("click", ".tablistitem", function (e) {
 }).on("click", ".searchitem", function() {
     mouseDown = false;
     dragMgr.dragging = false;
-    if (sfxSearch) {
-        sfxSearch.fadeOut(SFX_FADEOUT_DURATION);
-        sfxSearch = null;
-    }
+    hideSearching();
 });
 
 // Functions...........................................................
@@ -107,7 +101,7 @@ $(document).on("click", ".tablistitem", function (e) {
 /* Return to the home page.                                          */
 /*-------------------------------------------------------------------*/
 function goHome() {
-    location.replace("/views/home.html");
+    navigateTo(bgMusic, "/views/home.html");
 }
 
 /*-------------------------------------------------------------------*/
@@ -469,9 +463,7 @@ function doShipSelection(shipItem, shiftPressed) {
 function beginControlsDrag() {
     if (mouseDown) {
         if (dragMgr.source == "search") {
-            if (sfxSearch) {
-                sfxSearch.fadeIn(SFX_FADEIN_DURATION);
-            }
+            if (sfxSearch) sfxSearch.play().fade(0, 1, 500);
         }
         dragMgr.dragging = true;
         var canvii = document.getElementById("canvii");
@@ -528,11 +520,7 @@ function canvasMouseUp(e) {
         
         if (dragMgr.source == "search") {
             hideSearching();
-            if (sfxSearch) {
-                sfxSearch.fadeOut(SFX_FADEOUT_DURATION);
-                sfxSearch = null;
-            }
-            executeSearch(coords, zone, dragMgr.dragData, function () {
+            executeSearch(coords, zone, dragMgr.dragData, function() {
                 deselectArea();
                 drawSightings();
             });
@@ -658,21 +646,40 @@ function ajaxPutPhase(successCallback) {
 /* Load search map audio based on game phase                         */
 /*-------------------------------------------------------------------*/
 function loadSearchAudio() {
-    if (buzz.isSupported()) {
-        switch (game.PhaseId) {
-            case 1:
-                sfxArrived = new buzz.sound("/content/audio/bosun-attn", soundInit);
-                sfxSailing = new buzz.sound("/content/audio/ship-underway", soundInit);
-                break;
-            case 2:
-                sfxAirSearch = new buzz.sound("/content/audio/air-search", soundInitLoop);
-                sfxSeaSearch = new buzz.sound("/content/audio/sea-search", soundInitLoop);
-                break;
-            default:
-                break;
-        }
+    if (audioLoaded) return;
+
+    bgMusic = new Howl({
+        urls: [AUDIO_DIR_MUSIC + "search.ogg", AUDIO_DIR_MUSIC + "search.mp3"],
+        autoplay: true,
+        loop: true
+    });
+    
+    sfxSailing = new Howl({
+        urls: [AUDIO_DIR_SFX + "ship-underway.ogg", AUDIO_DIR_SFX + "ship-underway.mp3"],
+        autoplay: false,
+        loop: true
+    });
+
+    switch (game.PhaseId) {
+        case 1:
+            sfxArrived = new Howl({
+                urls: [AUDIO_DIR_SFX + "bosun-attn.ogg", AUDIO_DIR_SFX + "bosun-attn.mp3"],
+                autoplay: false
+            });
+            break;
+        case 2:
+            sfxAirSearch = new Howl({
+                urls: [AUDIO_DIR_SFX + "air-search.ogg", AUDIO_DIR_SFX + "air-search.mp3"],
+                autoplay: false,
+                loop: true
+            });
+            break;
+        default:
+            break;
     }
+    audioLoaded = true;
 }
+
 /*-------------------------------------------------------------------*/
 /* Callback for ajaxLoadPhase call. Set up tabs based on phase       */
 /* actions.                                                          */
@@ -811,6 +818,17 @@ function loadPage(callback) {
     });
 }
 
+function loadUp() {
+    loadPlayerForPage(function () {
+        loadPage(function () {
+            loadSearchAudio();
+            if (game.PhaseId == 2) scrollClouds();
+            $("#canvii").css("visibility", "visible");
+            dirty = false;
+        });
+    });
+}
+
 // Initialize..........................................................
 
 $(document).ready(function () {
@@ -822,12 +840,5 @@ $(document).ready(function () {
     //    document.addEventListener("touchenter", touchToMouseHandler, false);
     //    document.addEventListener("touchleave", touchToMouseHandler, false);
     //}
-    
-    loadPlayerForPage(function() {
-        loadPage(function () {
-            loadSearchAudio();
-            if (game.PhaseId == 2) scrollClouds();
-            $("#canvii").css("visibility", "visible");
-        });
-    });
+    loadUp();
 });

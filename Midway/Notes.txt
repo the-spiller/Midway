@@ -1,5 +1,3 @@
-﻿Occasional reload of last-loaded game when new game option selected (???)
-
-Arrival and movement sounds only work once in movement phase
+﻿Movement sounds (w/ fade) only works once in movement phase
 
 Try qTip2 for triggering tooltip display (they don't work on a touch screen)?

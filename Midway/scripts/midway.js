@@ -7,15 +7,25 @@ var player = undefined,
     DLG_OKCANCEL = 2,
     DLG_YESCANCEL = 3,
     DLG_YESNO = 4,
-    SFX_FADEIN_DURATION = 500,
-    SFX_FADEOUT_DURATION = 100,
+    AUDIO_DIR_SFX = "/content/audio/sfx/",
+    AUDIO_DIR_MUSIC = "/content/audio/music/",
     showingInfo = false,
-    IMG_WIDTH = 1387,
-    IMG_HEIGHT = 857,
+    BG_IMG_WIDTH = 1387,
+    BG_IMG_HEIGHT = 857,
     COOKIE_NAME = "mdyplayer",
     supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
 
 // Functions...................................................................
+
+function navigateTo(music, url) {
+    if (music) {
+        music.fade(music.volume(), 0, 1000, function () {
+            document.location.href = url;
+        });
+    } else {
+        document.location.href = url;
+    }
+}
 
 function showPhotoblurb() {
     showingInfo = !showingInfo;
