@@ -4,17 +4,17 @@
 $("#airreadiness").on("click", function () {
     if (game.AircraftReadyState == 0) {
         game.AircraftReadyState = 1;
-        window.dirty = true;
+        window.editsMade = true;
     } else if (game.AircraftReadyState == 1) {
         game.AircraftReadyState = 0;
-        window.dirty = true;
+        window.editsMade = true;
     } else {
         showAlert("Air Readiness",
             "Your aircraft are ready for operations. Are you sure you want to move them down to the hangar deck?",
             DLG_YESCANCEL, "blue", function(choice) {
                 if (choice == "Yes") {
                     game.AircraftReadyState = 0;
-                    window.dirty = true;
+                    window.editsMade = true;
                 }
             });
     }
@@ -108,8 +108,7 @@ function isLegitDrop(coords) {
 /* "Sail" fleet marker to a new location on the map.                 */
 /*-------------------------------------------------------------------*/
 function sailShips(startZone, endZone) {
-    if (sfxSailing) sfxSailing.play();
-    
+    if (sfxSailing) sfxSailing.play().fade(0, 1, 500);
     var startPos = searchGrid.zoneToTopLeftCoords(startZone),
         endPos = searchGrid.zoneToTopLeftCoords(endZone),
         distX = endPos.x - startPos.x,

@@ -6,7 +6,7 @@
     mapImg = null,
     captionColor = "usnblue",
     game = {},
-    dirty = false,
+    editsMade = false,
     mouseDown = false,
     side,
     phase = {},
@@ -34,14 +34,12 @@
 // Event handlers......................................................
 
 $("#return").on("click", function() {
-    if (dirty) {
+    if (editsMade) {
         showAlert("Return Home",
             "Are you sure you want to return to the home page without posting? Changes you've made will be lost.",
-            DLG_YESCANCEL, "blue", returnChoice);
-
-        function returnChoice(choice) {
-            if (choice == "Yes") goHome();
-        }
+            DLG_YESCANCEL, "blue", function (choice) {
+                if (choice == "Yes") goHome();
+            });
     } else {
         goHome();
     }
@@ -519,10 +517,11 @@ function canvasMouseUp(e) {
             zone = searchGrid.coordsToZone(coords);
         
         if (dragMgr.source == "search") {
-            hideSearching();
-            executeSearch(coords, zone, dragMgr.dragData, function() {
-                deselectArea();
-                drawSightings();
+            hideSearching(function() {
+                executeSearch(coords, zone, dragMgr.dragData, function () {
+                    deselectArea();
+                    drawSightings();
+                });
             });
         } else if (isLegitDrop(coords)) {
             if (dragMgr.source == "arrivals" && sfxArrived) {
@@ -545,7 +544,7 @@ function canvasMouseUp(e) {
                 //movement's done
                 sailShips(dragMgr.source, zone);
             }
-            window.dirty = true;
+            window.editsMade = true;
         }
     }
 }
@@ -634,7 +633,6 @@ function ajaxPutPhase(successCallback) {
         }),
         success: function(data) {
             window.player = JSON.parse(data);
-            //createUpdateAuthCookie();
             if (successCallback) successCallback();
         },
         error: function(xhr, status, errorThrown) {
@@ -660,23 +658,16 @@ function loadSearchAudio() {
         loop: true
     });
 
-    switch (game.PhaseId) {
-        case 1:
-            sfxArrived = new Howl({
-                urls: [AUDIO_DIR_SFX + "bosun-attn.ogg", AUDIO_DIR_SFX + "bosun-attn.mp3"],
-                autoplay: false
-            });
-            break;
-        case 2:
-            sfxAirSearch = new Howl({
-                urls: [AUDIO_DIR_SFX + "air-search.ogg", AUDIO_DIR_SFX + "air-search.mp3"],
-                autoplay: false,
-                loop: true
-            });
-            break;
-        default:
-            break;
-    }
+    sfxArrived = new Howl({
+        urls: [AUDIO_DIR_SFX + "bosun-attn.ogg", AUDIO_DIR_SFX + "bosun-attn.mp3"],
+        autoplay: false
+    });
+
+    sfxAirSearch = new Howl({
+        urls: [AUDIO_DIR_SFX + "air-search.ogg", AUDIO_DIR_SFX + "air-search.mp3"],
+        autoplay: false,
+        loop: true
+    });
     audioLoaded = true;
 }
 
@@ -824,7 +815,7 @@ function loadUp() {
             loadSearchAudio();
             if (game.PhaseId == 2) scrollClouds();
             $("#canvii").css("visibility", "visible");
-            dirty = false;
+            editsMade = false;
         });
     });
 }

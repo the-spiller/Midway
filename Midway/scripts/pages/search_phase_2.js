@@ -120,15 +120,29 @@ function scrollClouds() {
         var hAnim = window.requestAnimationFrame(cloudsAnim);
         elapsed = new Date().getTime() - lastTime;
 
-        if (elapsed >= 34) {    //no faster than 30fps
-            if (fadeAlpha < 1) fadeAlpha += fadeDelta;
+        if (elapsed >= 34) {
             cloudsTopLeft = addVectors(cloudsTopLeft, velocity);
             reset();
-            searchGrid.drawSearchClouds(fadeAlpha, cloudsTopLeft);
-            lastTime = new Date().getTime();
+            
+            if (game.PhaseId == 2) {
+                if (fadeAlpha < 1) fadeAlpha += fadeDelta;
+                searchGrid.drawSearchClouds(fadeAlpha, cloudsTopLeft);
+                lastTime = new Date().getTime();
+            } else if (game.PhaseId > 2) {
+                if (fadeAlpha > 0) {
+                    fadeAlpha -= fadeDelta;
+                    searchGrid.drawSearchClouds(fadeAlpha, cloudsTopLeft);
+                    lastTime = new Date().getTime();
+                } else {
+                    window.cancelAnimationFrame(hAnim);
+                    document.getElementById("canvii").removeChild(document.getElementById("cloudscanvas"));
+                    document.getElementById("canvii").removeChild(document.getElementById("searchcursorcanvas"));
+                }
+            }
         }
     }
 }
+
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function showSearching(canvasCoords) {
@@ -144,12 +158,21 @@ function showSearching(canvasCoords) {
 }
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
-function hideSearching() {
-    if (sfxSearch) sfxSearch.fade(sfxSearch.volume(), 0, 500);
-    dragMgr.dragging = false;
-    dragMgr.source = "";
-    deselectArea();
-    searchGrid.clearSearchCursor();
+function hideSearching(callback) {
+    var finishThis = function () {
+        if (sfxSearch) sfxSearch.stop();
+        dragMgr.dragging = false;
+        dragMgr.source = "";
+        deselectArea();
+        searchGrid.clearSearchCursor();
+        if (callback) callback();
+    };
+    
+    if (sfxSearch) {
+        sfxSearch.fade(sfxSearch.volume(), 0, 500, finishThis());
+    } else {
+        finishThis();
+    }
 }
 
 /*-------------------------------------------------------------------*/
@@ -180,7 +203,6 @@ function executeSearch(coords, zone, search, callback) {
                 DLG_OK, "blue", callback);
         }
     } else {
-        hideSearching();
         showAlert("Search", "Out of range.", DLG_OK, "red", callback);
     }
 }
