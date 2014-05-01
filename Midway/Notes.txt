@@ -1,3 +1,6 @@
-﻿mozilla: no search sfx (music ok)
+﻿Show ships that still have move pts.
+
+
+mozilla: no search sfx (music ok)
 
 Try qTip2 for triggering tooltip display (they don't work on a touch screen)?

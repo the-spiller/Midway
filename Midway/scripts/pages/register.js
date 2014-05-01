@@ -1,4 +1,6 @@
-﻿// Event handlers......................................................
+﻿var bgMusic;
+
+// Event handlers......................................................
 
 $("#return").on("click", function () {
     location.replace("/index.html");
@@ -79,7 +81,14 @@ function ajaxRegisterPlayer(successCallback) {
         
 // Init................................................................
 
-$(document).ready(function() {
+$(document).ready(function () {
+    bgMusic = new Howl({
+        urls: [AUDIO_DIR_MUSIC + "logon.ogg", AUDIO_DIR_MUSIC + "logon.mp3"],
+        autoplay: false,
+        loop: true
+    });
+    bgMusic.play().fade(0, 1, 1000);
+    
     $("#registerdiv").draggable({
         handle: ".floathead",
         containment: "#pagediv",

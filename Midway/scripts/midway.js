@@ -19,7 +19,7 @@ var player = undefined,
 
 function navigateTo(music, url) {
     if (music) {
-        music.fade(music.volume(), 0, 1000, function () {
+        music.fade(music.volume(), 0, 500, function() {
             document.location.href = url;
         });
     } else {
