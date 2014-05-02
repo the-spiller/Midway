@@ -18,6 +18,10 @@
             box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
         }
 
+        #audiolink {
+            margin-right: 5px;
+        }
+
         #logofflink {
             vertical-align: super;
             margin-right: 25px;
@@ -95,7 +99,12 @@
     <body>
         <div id="pagediv" class="noselect">
             <div id="linksdiv">
-                <div id="infolink" title="Photo info"><img id="photoInfo" src="/content/images/camera.png" /></div>
+                <div id="infolink" title="Photo info"><img src="/content/images/camera.png" /></div>
+                <div id="audiolink" title="Volume"><img src="/content/images/speaker.png" /></div>
+                <div id="volsliderdiv">
+                    <input type="range" id="volinput" min="0" max="100" step="1" value="50" />
+                    <p id="volvalue">50</p>
+                </div>
                 <a id="logofflink" href="#">Log Off</a>
             </div>
 

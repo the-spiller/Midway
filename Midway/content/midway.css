@@ -176,7 +176,7 @@ th {
     padding-top: 10px;
 }
 
-#infolink {
+#infolink, #audiolink {
 	cursor: pointer;
 	display: inline;
     margin-right: 5px;
@@ -399,3 +399,16 @@ th {
     .listitem img {
         padding: 3px 6px 0 5px;
     }
+
+/* Volume control slider ....................................................*/
+#volsliderdiv {
+    position: absolute;
+    display: none;
+    text-align: center;
+}
+#volinput {
+    -webkit-appearance: slider-vertical;
+    width: 20px;
+    height: 100px;
+}
+

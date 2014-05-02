@@ -4,10 +4,6 @@
 
 // Event handlers......................................................
 
-$("#infolink").on("click", function() {
-    showPhotoblurb();
-});
-
 $("#btngo").on("click", function(e) {
     e.preventDefault();
     validateLogon();
@@ -195,12 +191,6 @@ $(document).ready(function () {
     if (!cookiesEnabled()) {
         showAlert("Sorry", "Your browser settings must allow cookies in order to play Midway.", DLG_OK, "red");
     }
-
-    bgMusic = new Howl({
-        urls: [AUDIO_DIR_MUSIC + "logon.ogg", AUDIO_DIR_MUSIC + "logon.mp3"],
-        autoplay: true,
-        loop: true
-    });
 
     $("#logondiv").draggable({
         handle: ".floathead",

@@ -243,6 +243,7 @@
     <Content Include="Content\images\search\Ships\usncl.png" />
     <Content Include="Content\images\search\Ships\usncv.png" />
     <Content Include="Content\images\search\usn-sea-search.png" />
+    <Content Include="Content\images\speaker.png" />
     <Content Include="Notes.txt" />
     <Content Include="Scripts\pages\search_phase_1.js" />
     <Content Include="Scripts\pages\search_phase_2.js" />

@@ -6,10 +6,6 @@ $("#return").on("click", function () {
     location.replace("/index.html");
 });
 
-$("#infolink").on("click", function () {
-    showPhotoblurb();
-});
-
 $("#btngo").on("click", function () {
     if (!validEmail("email")) {
         showAlert(
@@ -82,13 +78,6 @@ function ajaxRegisterPlayer(successCallback) {
 // Init................................................................
 
 $(document).ready(function () {
-    bgMusic = new Howl({
-        urls: [AUDIO_DIR_MUSIC + "logon.ogg", AUDIO_DIR_MUSIC + "logon.mp3"],
-        autoplay: false,
-        loop: true
-    });
-    bgMusic.play().fade(0, 1, 1000);
-    
     $("#registerdiv").draggable({
         handle: ".floathead",
         containment: "#pagediv",

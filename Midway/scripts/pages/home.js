@@ -10,15 +10,14 @@
         
 // Event handlers......................................................
 
-$("#infolink").on("click", function() {
-    showPhotoblurb();
+$("#volinput").change(function() {
+    $("#volvalue").html(this.value);
 });
 
 $("#logofflink").on("click", function () {
     if (unsavedRegChanges()) return;
     eraseCookie(COOKIE_NAME);
     navigateTo(bgMusic, "/index.html");
-    //location.replace("/index.html");
 });
 
 $(".tablistitem").on("click", function (e) {

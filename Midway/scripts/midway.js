@@ -10,6 +10,7 @@ var player = undefined,
     AUDIO_DIR_SFX = "/content/audio/sfx/",
     AUDIO_DIR_MUSIC = "/content/audio/music/",
     showingInfo = false,
+    showingVol = false,
     BG_IMG_WIDTH = 1387,
     BG_IMG_HEIGHT = 857,
     COOKIE_NAME = "mdyplayer",
@@ -42,6 +43,21 @@ function getPhotoBlurbPosition() {
         pos.x = pos.x - 410;
         pos.y = pos.y - 18;
     }
+    return pos;
+}
+
+function showVolSlider() {
+    showingVol = !showingVol;
+    var coords = getVolSliderPosition(),
+        displayVal = showingVol ? "block" : "none";
+    
+    $("#volsliderdiv").css({ "top": coords.y + "px", "left": coords.x + "px", "display": displayVal });
+}
+
+function getVolSliderPosition() {
+    var pos = getElementTopLeft(document.getElementById("audiolink"));
+    pos.x += 10;
+    pos.y += 18;
     return pos;
 }
 
@@ -274,11 +290,13 @@ function findGameById(id, games) {
 
 // Global event handlers.......................................................
 
-$(".photoblurb").on("click", function () {
+$(document).on("click", "#infolink", function() {
+    showPhotoblurb();
+}).on("click", ".photoblurb", function() {
     $("#infolink").trigger("click");
-});
-
-$("#dlgoverlay").on("keyup", function (e) {
+}).on("click", "#audiolink", function () {
+    showVolSlider();
+}).on("keyup", "#dlgoverlay", function (e) {
     e.stopPropagation();
     if (e.keyCode == 13) {
         if ($("#dlgbtnok").length)
