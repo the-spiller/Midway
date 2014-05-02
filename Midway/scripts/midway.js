@@ -11,6 +11,7 @@ var player = undefined,
     AUDIO_DIR_MUSIC = "/content/audio/music/",
     showingInfo = false,
     showingVol = false,
+    vol = 50,
     BG_IMG_WIDTH = 1387,
     BG_IMG_HEIGHT = 857,
     COOKIE_NAME = "mdyplayer",
@@ -57,7 +58,7 @@ function showVolSlider() {
 function getVolSliderPosition() {
     var pos = getElementTopLeft(document.getElementById("audiolink"));
     pos.x += 10;
-    pos.y += 18;
+    pos.y += 24;
     return pos;
 }
 

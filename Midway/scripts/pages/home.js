@@ -525,10 +525,22 @@ function buildRecord() {
 // Init................................................................
 
 $(document).ready(function () {
+    $("#volinput").slider({
+        orientation: "vertical",
+        value: bgMusic ? 50 : 0,
+        slide: function (e, ui) {
+            $("#volvalue").html(ui.value);
+            if (bgMusic) bgMusic.volume(ui.value * 0.01);
+        }
+    });
+
+    $("#volvalue").html($("#volinput").slider("value"));
+    
+
     bgMusic = new Howl({
         urls: [AUDIO_DIR_MUSIC + "home.ogg", AUDIO_DIR_MUSIC + "home.mp3"],
-        autoplay: true,
-        loop: true
+        loop: true,
+        autoplay: true
     });
     
     loadPlayerForPage(function() {

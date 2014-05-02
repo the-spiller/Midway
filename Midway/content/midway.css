@@ -401,14 +401,18 @@ th {
     }
 
 /* Volume control slider ....................................................*/
+
 #volsliderdiv {
     position: absolute;
     display: none;
     text-align: center;
 }
 #volinput {
-    -webkit-appearance: slider-vertical;
-    width: 20px;
+    width: 5px;
     height: 100px;
+}
+
+#volvalue {
+	padding-top: 10px;
 }
 
