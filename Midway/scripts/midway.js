@@ -11,16 +11,16 @@ var player = undefined,
     AUDIO_DIR_MUSIC = "/content/audio/music/",
     showingInfo = false,
     showingVol = false,
-    vol = 50,
     BG_IMG_WIDTH = 1387,
     BG_IMG_HEIGHT = 857,
     COOKIE_NAME = "mdyplayer",
+    COOKIE_NAME_AUDIO = "audiovol",
     supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
 
 // Functions...................................................................
 
 function navigateTo(music, url) {
-    if (music) {
+    if (music && music.volume() > 0) {
         music.fade(music.volume(), 0, 500, function() {
             document.location.href = url;
         });
@@ -58,7 +58,7 @@ function showVolSlider() {
 function getVolSliderPosition() {
     var pos = getElementTopLeft(document.getElementById("audiolink"));
     pos.x += 10;
-    pos.y += 24;
+    pos.y += 18;
     return pos;
 }
 
@@ -153,7 +153,6 @@ function showAjaxError(xhr, status, errorThrown) {
         showAlert(xhr.status + " " + errorThrown, errText, DLG_OK, "red");
     }
 }
-
 function loadPlayerForPage(callback) {
     var cookie = readCookie(COOKIE_NAME);
     if (cookie) {

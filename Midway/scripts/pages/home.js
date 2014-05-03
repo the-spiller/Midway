@@ -5,7 +5,7 @@
     selGameId = 0,
     abandonables = [],
     twoWeeks = 1000 * 60 * 60 * 24 * 14,
-    bgMusic,
+    bgMusic, audioVol,
     nicknames = FuzzySet();
         
 // Event handlers......................................................
@@ -525,22 +525,25 @@ function buildRecord() {
 // Init................................................................
 
 $(document).ready(function () {
+    audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
+    
     $("#volinput").slider({
         orientation: "vertical",
-        value: bgMusic ? 50 : 0,
+        value: audioVol,
         slide: function (e, ui) {
-            $("#volvalue").html(ui.value);
-            if (bgMusic) bgMusic.volume(ui.value * 0.01);
+            audioVol = ui.value;
+            $("#volvalue").html(audioVol);
+            if (bgMusic) bgMusic.volume(audioVol * 0.01);
+            createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
         }
     });
-
     $("#volvalue").html($("#volinput").slider("value"));
-    
 
     bgMusic = new Howl({
         urls: [AUDIO_DIR_MUSIC + "home.ogg", AUDIO_DIR_MUSIC + "home.mp3"],
         loop: true,
-        autoplay: true
+        autoplay: true,
+        volume: audioVol * 0.01
     });
     
     loadPlayerForPage(function() {

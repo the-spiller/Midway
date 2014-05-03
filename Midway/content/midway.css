@@ -408,11 +408,25 @@ th {
     text-align: center;
 }
 #volinput {
-    width: 5px;
-    height: 100px;
+    width: 7px;
+    height: 120px;
+    background: none;
+    color: #000;
+    background-color: #000;
+    border: none;
 }
+    #volinput .ui-slider-handle {
+        background: none;
+        background-color: #000;
+        border: none;
+        height: 7px;
+        width: 20px;
+        margin-left: -1px;
+        margin-bottom: -3px;
+    }
 
 #volvalue {
-	padding-top: 10px;
+    margin: 5px 0 0 -5px;
+    font-weight: bold;
 }
 
