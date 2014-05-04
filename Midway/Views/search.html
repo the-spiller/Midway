@@ -5,10 +5,8 @@
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
         <style>
-        .noselect {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
+        table {
+            border-collapse: collapse;
         }
 
         #pagediv {
@@ -37,11 +35,6 @@
             background-color: #093a67;
         }
 
-        #return
-        {
-            left: 1330px;
-        }
-
         #canvii {
             visibility: hidden;
         }
@@ -50,6 +43,13 @@
 	        position: absolute;
 	        top: 60px;
         }
+
+        .noselect {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
         .shipitem {
             position: relative;
             cursor: pointer;
@@ -151,10 +151,6 @@
             vertical-align: top;
         }
 
-        table {
-            border-collapse: collapse;
-        }
-
         .airopbutton {
             cursor: pointer;
             position: relative;
@@ -173,7 +169,7 @@
                     <img id="readinessimg" src="/content/images/search/air-notready.png" />
                 </a>
                 <a id="done" href="#" title="End phase and post"><img src="/content/images/done.png" /></a>
-                                <div id="audiolink" title="Volume"><img src="/content/images/speaker.png" /></div>
+                <a id="audiolink" title="Volume"><img src="/content/images/speaker.png" /></a>
                 <div id="volsliderdiv">
                     <div id="volinput"></div>
                     <p id="volvalue">50</p>

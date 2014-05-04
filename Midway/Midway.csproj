@@ -221,7 +221,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\audio\music\home.mp3" />
-    <Content Include="Content\audio\music\logon.mp3" />
     <Content Include="Content\audio\music\search.mp3" />
     <Content Include="Content\audio\sfx\air-search.mp3" />
     <Content Include="Content\audio\sfx\bosun-attn.mp3" />
@@ -426,7 +425,6 @@
     <Content Include="Content\audio\sfx\air-search.ogg" />
     <Content Include="Content\audio\sfx\bosun-attn.ogg" />
     <Content Include="Content\audio\sfx\ship-underway.ogg" />
-    <Content Include="Content\audio\music\logon.ogg" />
     <Content Include="Content\audio\music\home.ogg" />
     <Content Include="Content\audio\music\search.ogg" />
     <None Include="Properties\PublishProfiles\Files.pubxml" />

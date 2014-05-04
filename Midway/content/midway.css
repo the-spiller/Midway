@@ -174,21 +174,21 @@ th {
     width: 100%;
     text-align: right;
     padding-top: 10px;
+    padding-right: 20px;
 }
 
 #infolink, #audiolink {
-	cursor: pointer;
-	display: inline;
-    margin-right: 5px;
+    cursor: pointer;
+	margin-right: 5px;
 }
 
 #return {
     cursor: pointer;
-    display: inline;
     margin-right: 20px;
 }
 
 #done {
+    cursor: pointer;
     opacity: 1.0;
     margin-right: 5px;
 }
@@ -199,6 +199,7 @@ th {
 
 #airreadiness
 {
+    cursor: pointer;
 	opacity: 1.0;
     margin-right: 20px;
 }
@@ -405,27 +406,30 @@ th {
 #volsliderdiv {
     position: absolute;
     display: none;
+    z-index: 5;
     text-align: center;
 }
 #volinput {
     width: 7px;
     height: 120px;
     background: none;
-    color: #000;
-    background-color: #000;
+    color: #808080;
+    background-color: #808080;
     border: none;
 }
     #volinput .ui-slider-handle {
-        background: none;
-        background-color: #000;
-        border: none;
+        cursor: pointer;
+        border: 1px solid #000;
+        color: #808080;
+        background-color: #808080;
         height: 7px;
         width: 20px;
-        margin-left: -1px;
+        margin-left: -2px;
         margin-bottom: -3px;
     }
 
 #volvalue {
+    color: #808080;
     margin: 5px 0 0 -5px;
     font-weight: bold;
 }

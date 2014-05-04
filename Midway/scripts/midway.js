@@ -20,10 +20,9 @@ var player = undefined,
 // Functions...................................................................
 
 function navigateTo(music, url) {
-    if (music && music.volume() > 0) {
-        music.fade(music.volume(), 0, 500, function() {
-            document.location.href = url;
-        });
+    if (music && (music.volume() > 0)) {
+        music.fade(music.volume(), 0, 1000);
+        setTimeout(function() { document.location.href = url; }, 1000);
     } else {
         document.location.href = url;
     }
@@ -41,8 +40,8 @@ function getPhotoBlurbPosition() {
     var pos = getElementTopLeft(document.getElementById("infolink"));
 
     if (currentPage != "logon") {
-        pos.x = pos.x - 410;
-        pos.y = pos.y - 18;
+        pos.x -= 410;
+        pos.y -= 6;
     }
     return pos;
 }
@@ -57,8 +56,8 @@ function showVolSlider() {
 
 function getVolSliderPosition() {
     var pos = getElementTopLeft(document.getElementById("audiolink"));
-    pos.x += 10;
-    pos.y += 18;
+    pos.x += 12;
+    pos.y += 30;
     return pos;
 }
 
@@ -310,4 +309,3 @@ $(document).on("click", "#infolink", function() {
             $("#dlgbtnno").trigger("click");
     }
 });
-

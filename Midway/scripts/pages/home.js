@@ -526,6 +526,7 @@ function buildRecord() {
 
 $(document).ready(function () {
     audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
+    var vol = audioVol * 0.01;
     
     $("#volinput").slider({
         orientation: "vertical",
@@ -533,7 +534,7 @@ $(document).ready(function () {
         slide: function (e, ui) {
             audioVol = ui.value;
             $("#volvalue").html(audioVol);
-            if (bgMusic) bgMusic.volume(audioVol * 0.01);
+            if (bgMusic) bgMusic.volume(vol);
             createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
         }
     });
@@ -542,9 +543,9 @@ $(document).ready(function () {
     bgMusic = new Howl({
         urls: [AUDIO_DIR_MUSIC + "home.ogg", AUDIO_DIR_MUSIC + "home.mp3"],
         loop: true,
-        autoplay: true,
-        volume: audioVol * 0.01
+        autoplay: false
     });
+    bgMusic.play().fade(0, vol, 1000);
     
     loadPlayerForPage(function() {
         $("#namespan").text(window.player.Nickname);

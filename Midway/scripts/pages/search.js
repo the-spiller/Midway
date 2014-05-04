@@ -29,7 +29,7 @@
     soundInit = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: false },
     soundInitLoop = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: true },
     bgMusic, sfxArrived, sfxSailing, sfxAirSearch, sfxSearch,
-    audioLoaded = false;
+    audioVol, audioLoaded = false;
 
 // Event handlers......................................................
 
@@ -640,33 +640,62 @@ function ajaxPutPhase(successCallback) {
         }
     });
 }
+
+/*-------------------------------------------------------------------*/
+/* Set the volume on all playing tracks in response to a change.     */
+/*-------------------------------------------------------------------*/
+function setVolume() {
+    var vol = audioVol * 0.01;
+    if (bgMusic) bgMusic.volume(vol * 0.75);
+    if (sfxSailing) sfxSailing.volume(vol);
+    if (sfxSearch) sfxSearch.volume(vol);
+}
 /*-------------------------------------------------------------------*/
 /* Load search map audio based on game phase                         */
 /*-------------------------------------------------------------------*/
-function loadSearchAudio() {
+function loadAudio() {
+    audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
+    var vol = audioVol * 0.01;
+    
+    $("#volinput").slider({
+        orientation: "vertical",
+        value: audioVol,
+        slide: function (e, ui) {
+            audioVol = ui.value;
+            $("#volvalue").html(audioVol);
+            setVolume();
+            createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
+        }
+    });
+    $("#volvalue").html($("#volinput").slider("value"));
+    
     if (audioLoaded) return;
 
     bgMusic = new Howl({
         urls: [AUDIO_DIR_MUSIC + "search.ogg", AUDIO_DIR_MUSIC + "search.mp3"],
         autoplay: true,
-        loop: true
+        loop: true,
+        volume: vol * 0.75
     });
     
     sfxSailing = new Howl({
         urls: [AUDIO_DIR_SFX + "ship-underway.ogg", AUDIO_DIR_SFX + "ship-underway.mp3"],
         autoplay: false,
-        loop: true
+        loop: true,
+        volume: vol
     });
 
     sfxArrived = new Howl({
         urls: [AUDIO_DIR_SFX + "bosun-attn.ogg", AUDIO_DIR_SFX + "bosun-attn.mp3"],
-        autoplay: false
+        autoplay: false,
+        volume: vol
     });
 
     sfxAirSearch = new Howl({
         urls: [AUDIO_DIR_SFX + "air-search.ogg", AUDIO_DIR_SFX + "air-search.mp3"],
         autoplay: false,
-        loop: true
+        loop: true,
+        volume: vol
     });
     audioLoaded = true;
 }
@@ -682,12 +711,11 @@ function setTabs() {
     
     for (var i = 0; i < phase.Actions.length; i++) {
         var act = phase.Actions[i];
-        if (game.Waiting == "N" || act.AvailWhenWaiting == "Y") {
-            tabHtml += "<li id=\"" + act.ActionKey.toLowerCase() + "tab\" class=\"tablistitem" + showFirst + "\" title=\"" +
-                act.Description + "\">" + act.ActionKey + "</li>";
-            panelHtml += "<div id=\"" + act.ActionKey.toLowerCase() + "\" class=\"tabpanel" + showFirst + "\"></div>";
-            showFirst = "";
-        }
+        tabHtml += "<li id=\"" + act.ActionKey.toLowerCase() + "tab\" class=\"tablistitem" + showFirst + "\" title=\"" +
+            act.Description + "\">" + act.ActionKey + "</li>";
+        panelHtml += "<div id=\"" + act.ActionKey.toLowerCase() + "\" class=\"tabpanel" + showFirst + "\"></div>";
+        showFirst = "";
+        
     }
     $("#tabs").html(tabHtml);
     $("#tabpanels").html(panelHtml);
@@ -812,7 +840,7 @@ function loadPage(callback) {
 function loadUp() {
     loadPlayerForPage(function () {
         loadPage(function () {
-            loadSearchAudio();
+            loadAudio();
             if (game.PhaseId == 2) scrollClouds();
             $("#canvii").css("visibility", "visible");
             editsMade = false;

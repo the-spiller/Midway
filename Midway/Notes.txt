@@ -1,6 +1,7 @@
 ﻿Show ships that still have move pts.
 
-
 mozilla: no search sfx (music ok)
+
+click on artwork on game selection on home page and selection is not done.
 
 Try qTip2 for triggering tooltip display (they don't work on a touch screen)?
