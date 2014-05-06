@@ -31,10 +31,6 @@
                     background-color: #093a67;
                 }
 
-            .tablistitem.tabshown {
-                background-color: #093a67;
-            }
-
             #canvii {
                 visibility: hidden;
             }
@@ -50,6 +46,10 @@
                 left: 10px;
                 font-weight: bold;
                 color: #ffd651;    
+            }
+
+            .tablistitem.tabshown {
+                background-color: #093a67;
             }
 
             .floathead {
@@ -112,11 +112,13 @@
 
             .airreadiness {
                 position: absolute;
-                cursor: pointer;
-                top: 14px;
+                top: 12px;
                 left: 318px;
                 z-index: 2;
             }
+                .airreadiness.clickme {
+                    cursor: pointer;
+                }
 
             .shiphits {
                 position: absolute;

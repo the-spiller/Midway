@@ -44,7 +44,7 @@ $("#return").on("click", function() {
     }
 });
 
-$("#done").on("click", function() {
+$("#done").on("click", function () {
     if (!$(this).hasClass("disable")) {
         if (game.PhaseId == 1 && !allArrivalsOnMap()) {
             showAlert("End Phase", "All arriving ships must be brought on to the map.", DLG_OK, "red");
@@ -108,35 +108,45 @@ function goHome() {
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
 function setAircraftState(airReadinessDiv) {
+    if (game.PhaseId != 1) return;
+    
     var idVals = airReadinessDiv.id.split("-"),
-        targetEntity;
+        targetEntity,
+        newTitle = "Not ready";
 
-    if (idVals(1) == "airbase") {
+    if (idVals[1] == "airbase") {
         for (var i = 0; i < ships.length; i++) {
-            if (ships[i].AirbaseId == idVals(2)) {
+            if (ships[i].AirbaseId == idVals[2]) {
                 targetEntity = ships[i];
                 break;
             }
         }
     } else {
-        targetEntity = getShipById(idVals(2));
+        targetEntity = getShipById(idVals[2]);
     }
 
     if (targetEntity) {
         switch (targetEntity.AircraftState) {
             case 1:
                 targetEntity.AircraftState = 0;
+                editsMade = true;
                 break;
             case 2:
-                //are you sure???
-                targetEntity.AircraftState = 0;
+                showAlert("Aircraft Are Ready", "Are you sure you want to stand down?", DLG_YESCANCEL, "blue", function(button) {
+                    if (button == "Yes") {
+                        targetEntity.AircraftState = 0;
+                        editsMade = true;
+                    }
+                });
                 break;
             default:
                 targetEntity.AircraftState = 1;
+                newTitle = "Readying";
+                editsMade = true;
                 break;
         }
-        
-        //load new image
+        //load new image and title string for tooltip
+        $(airReadinessDiv).attr("title", newTitle).html("<img src=\"/content/images/search/ready-" + targetEntity.AircraftState + ".png\" />");
     }
 }
 
@@ -328,7 +338,7 @@ function showOffMapShips() {
 /*-------------------------------------------------------------------*/
 function getShipListItemHtml(ship, showAvailMove) {
     var hitsDir = imgDir + "ships/hits/",
-        idPrefix, shipId, imgSuffix, availHits, readyImg, hits;
+        idPrefix, shipId, imgSuffix, availHits, readyClass, readyDesc, readyImg, hits;
 
     if (ship.ShipType == "BAS") {
         shipId = "airbase-" + ship.AirbaseId;
@@ -353,11 +363,14 @@ function getShipListItemHtml(ship, showAvailMove) {
     }
     
     if (ship.ShipType == "CV" || ship.ShipType == "CVL" || ship.ShipType == "BAS") {
+        readyDesc = ship.AircraftState == 0 ? "Not ready" : (ship.AircraftState == 1 ? "Readying" : "Ready");
+        readyClass = game.PhaseId == 1 ? " clickme" : "";
         readyImg = "<img src=\"/content/images/search/ready-" + ship.AircraftState + ".png\" />";
-        html += "<div class=\"numplanes torpedo\">" + ship.TSquadrons +
-            "</div><div class=\"numplanes fighter\">" + ship.FSquadrons +
-            "</div><div class=\"numplanes divebomber\">" + ship.DSquadrons +
-            "</div><div class=\"airreadiness\" id=\"ready-" + shipId + "\">" + readyImg + "</div>";
+        html += "<div class=\"numplanes torpedo\">" + ship.TSquadrons + "</div>" +
+            "<div class=\"numplanes fighter\">" + ship.FSquadrons + "</div>" +
+            "<div class=\"numplanes divebomber\">" + ship.DSquadrons + "</div>" +
+            "<div class=\"airreadiness" + readyClass + "\" title=\"" + readyDesc + "\" id=\"ready-" + shipId + "\">" +
+            readyImg + "</div>";
     }
     html += "<div class=\"shiphits green\"><img src=\"" + hitsDir + availHits + "-hitsgreen.png\"></div>";
 
@@ -469,7 +482,8 @@ function doShipSelection(shipItem, shiftPressed) {
 function beginControlsDrag() {
     if (mouseDown) {
         if (dragMgr.source == "search") {
-            if (sfxSearch) sfxSearch.play().fade(0, 1, 500);
+            if (audioVol > 0 && sfxSearch)
+                sfxSearch.play().fade(0, audioVol * 0.01, 500);
         }
         dragMgr.dragging = true;
         var canvii = document.getElementById("canvii");
@@ -672,8 +686,7 @@ function makeSuggestion() {
             case "zone":
                 if ($("#zone").find("div.shipitem").length > 0) {
                     if (game.PhaseId == 1) {
-                        suggest = "Select one or more ships (or double-click to select them all) and drag their map marker to move " +
-                            "them. Air readiness ...";
+                        suggest = "Select one or more ships and drag their map marker to move them. Air readiness ...";
                     }
                 } else {
                     suggest = "Select a zone on the map to see the ships and aircraft it contains.";
@@ -712,12 +725,12 @@ function loadAudio() {
         value: audioVol,
         slide: function (e, ui) {
             audioVol = ui.value;
-            $("#volvalue").html(audioVol + "%");
+            $("#volvalue").text(audioVol);
             setVolume(audioVol * 0.01);
             createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
         }
     });
-    $("#volvalue").html($("#volinput").slider("value") + "%");
+    $("#volvalue").text($("#volinput").slider("value"));
 
     bgMusic = new Howl({
         urls: [AUDIO_DIR_MUSIC + "search.ogg", AUDIO_DIR_MUSIC + "search.mp3"],
@@ -877,9 +890,7 @@ function loadPage(callback) {
     });
 }
 
-// Initialize..........................................................
-
-$(document).ready(function () {
+function loadUp() {
     loadPlayerForPage(function () {
         loadPage(function () {
             loadAudio();
@@ -889,4 +900,9 @@ $(document).ready(function () {
             makeSuggestion();
         });
     });
+}
+// Initialize..........................................................
+
+$(document).ready(function () {
+    loadUp();
 });

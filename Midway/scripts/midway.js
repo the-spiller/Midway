@@ -54,13 +54,17 @@ function showVolSlider() {
     $("#volsliderdiv").css({ "top": coords.y + "px", "left": coords.x + "px", "display": displayVal });
 }
 
+/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------*/
 function getVolSliderPosition() {
     var pos = getElementTopLeft(document.getElementById("audiolink"));
-    pos.x += 12;
+    pos.x -= 2;
     pos.y += 30;
     return pos;
 }
 
+/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------*/
 function getAlertPosition() {
     var left = Math.floor(($(window).width() / 2) - (DLG_WIDTH / 2));
     var top = Math.floor($(window).scrollTop() + $(window).height() / 2) - 150;  //150px above center

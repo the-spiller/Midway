@@ -11,7 +11,7 @@
 // Event handlers......................................................
 
 $("#volinput").change(function() {
-    $("#volvalue").html(this.value);
+    $("#volvalue").text(this.value);
 });
 
 $("#logofflink").on("click", function () {
@@ -532,12 +532,12 @@ $(document).ready(function () {
         value: audioVol,
         slide: function (e, ui) {
             audioVol = ui.value;
-            $("#volvalue").html(audioVol + "%");
+            $("#volvalue").text(audioVol);
             if (bgMusic) bgMusic.volume(audioVol * 0.01);
             createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
         }
     });
-    $("#volvalue").html($("#volinput").slider("value") + "%");
+    $("#volvalue").text($("#volinput").slider("value"));
 
     bgMusic = new Howl({
         urls: [AUDIO_DIR_MUSIC + "home.ogg", AUDIO_DIR_MUSIC + "home.mp3"],

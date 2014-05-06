@@ -64,6 +64,21 @@ function loadPhaseTab() {
 }
 
 /*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+function anyAircraftReady() {
+    var ship;
+    
+    for (var i = 0; i < window.ships.length; i++) {
+        ship = window.ships[i];
+        if (ship.ShipType == "CV" || ship.ShipType == "CVL" || ship.ShipType == "BAS") {
+            if (ship.AircraftState == 2)
+                return true;
+        }
+    }
+    return false;
+}
+
+/*-------------------------------------------------------------------*/
 /* Highlight the area of an opponent's search item.                  */
 /*-------------------------------------------------------------------*/
 function showOppSearchedArea(e) {

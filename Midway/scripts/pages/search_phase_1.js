@@ -1,15 +1,6 @@
 ﻿
 // Events and functions for Phase 1 (Search Map Move)
 
-$(document).on("click", "#selallarrivals", function () {
-    if (allArrivalsSelected("arrivals")) {
-        $("#arrivals").find("div.shipitem").removeClass("selected");
-    } else {
-        $("#arrivals").find("div.shipitem").addClass("selected");
-    }
-    window.lastShipSelected = $("#arrivals").last();
-});
-
 $(document).on("mousedown", ".shipitem", function() {
     shipItemMouseDown();
 });
@@ -45,9 +36,7 @@ function loadPhaseTab() {
             arrivals.push(ships[i]);
     }
     if (arrivals.length > 0) {
-        html = "<div style=\"width: 100%; margin: 5px 0 5px 0; text-align: right;\">" +
-            "<a id=\"selallarrivals\" class=\"longbutton flatbutton graybtn\">Select All</a>" +
-            "</div><ul>";
+        html = "<ul>";
         for (i = 0; i < arrivals.length; i++) {
             html += getShipListItemHtml(ships[i]);
         }
@@ -56,23 +45,6 @@ function loadPhaseTab() {
     $("#arrivals").html(html).addClass("tabshown");
     $("#arrivalstab").addClass("tabshown");
     makeSuggestion();
-}
-
-/*-------------------------------------------------------------------*/
-/* Return true if all ships on the arrivals tab are selected,        */
-/* otherwise false.                                                  */
-/*-------------------------------------------------------------------*/
-function allArrivalsSelected() {
-    var ret = true,
-        arr = $("#arrivals").find("div.shipitem");
-
-    for (var i = 0; i < arr.length; i++) {
-        if (!$(arr[i]).hasClass("selected")) {
-            ret = false;
-            break;
-        }
-    }
-    return ret;
 }
 
 /*-------------------------------------------------------------------*/
