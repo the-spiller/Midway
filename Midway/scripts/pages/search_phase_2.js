@@ -206,7 +206,7 @@ function executeSearch(coords, zone, search, callback) {
             });
         } else {
             showAlert("Search " + selectedArea, "You've already searched area " + selectedArea + " on this turn!",
-                DLG_OK, "blue", callback);
+                DLG_OK, "red", callback);
         }
     } else {
         showAlert("Search", "Out of range.", DLG_OK, "red", callback);

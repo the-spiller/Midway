@@ -56,11 +56,10 @@ namespace Midway.Models.Data
             return dtoPhase;
         }
 
-        public void AdvancePhase(int gameId, int playerId, string selectedZone, int airReadiness, int points)
+        public void AdvancePhase(int gameId, int playerId, string selectedZone, int points)
         {
             var dbPg = _context.PlayerGames.Single(p => p.GameId == gameId && p.PlayerId == playerId);
             dbPg.SelectedLocation = selectedZone;
-            dbPg.AircraftReadyState = airReadiness;
             dbPg.Points = points;
             IncrementPhase(dbPg);
 

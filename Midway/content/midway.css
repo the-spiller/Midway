@@ -197,17 +197,6 @@ th {
         cursor: default;
     }
 
-#airreadiness
-{
-    cursor: pointer;
-	opacity: 1.0;
-    margin-right: 20px;
-}
-	#airreadiness.disable {
-		opacity: 0.5;
-	    cursor: default;
-	}
-
 #buttons {
     display: inline-block;
     float: right;
@@ -413,15 +402,15 @@ th {
     width: 7px;
     height: 120px;
     background: none;
-    color: #808080;
-    background-color: #808080;
+    color: #606060;
+    background-color: #606060;
     border: none;
 }
     #volinput .ui-slider-handle {
         cursor: pointer;
         border: 1px solid #000;
-        color: #808080;
-        background-color: #808080;
+        color: #606060;
+        background-color: #606060;
         height: 7px;
         width: 20px;
         margin-left: -2px;
@@ -429,8 +418,8 @@ th {
     }
 
 #volvalue {
-    color: #808080;
-    margin: 5px 0 0 -5px;
+    color: #606060;
+    margin: 5px 0 0 -6px;
     font-weight: bold;
 }
 

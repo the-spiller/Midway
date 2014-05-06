@@ -7,9 +7,8 @@
         cvs = document.getElementById("searchcanvas"),
         ctx = cvs.getContext("2d"),
         cloudsCvs, cloudsCtx, searchCursorCvs, searchCursorCtx,
-        selRemoveZone = null,
-        selRemoveArea = null,
-        highlightRemoveZones = null,
+        selectedZoneRestoreData = null,
+        selectedAreaRestoreData = null,
         //functions called internally
         privZoneToTopLeftCoords = function(zone) {
             var col = 0,
@@ -198,37 +197,6 @@
             ctx.drawImage(sightingImg, topLeft.x, topLeft.y);
         },
         /*-------------------------------------------------------------------*/
-        /*  */
-        /*-------------------------------------------------------------------*/
-        putArrivalZonesHighlight: function (side) {
-            var topZone = side == "IJN" ? "A1A" : "I1B",
-                bottomZone = side == "IJN" ? "A7D" : "I7E",
-                topCoords = privZoneToTopLeftCoords(topZone),
-                bottomCoords = addVectors(privZoneToTopLeftCoords(bottomZone), { x: zonesize, y: zonesize }),
-                width = bottomCoords.x - topCoords.x,
-                height = bottomCoords.y - topCoords.y;
-
-            highlightRemoveZones = ctx.getImageData(topCoords.x, topCoords.y, width, height);
-            ctx.save();
-            ctx.globalAlpha = 0.2;
-            ctx.fillStyle = "#fff";
-            ctx.rect(topCoords.x, topCoords.y, width, height);
-            ctx.fill();
-            ctx.restore();
-        },
-        /*-------------------------------------------------------------------*/
-        /*  */
-        /*-------------------------------------------------------------------*/
-        removeArrivalZonesHighlight: function (side) {
-            if (!highlightRemoveZones) return;
-            
-            var topZone = side == "IJN" ? "A1A" : "I1B",
-                topCoords = privZoneToTopLeftCoords(topZone);
-            
-            ctx.putImageData(highlightRemoveZones, topCoords.x, topCoords.y);
-            highlightRemoveZones = null;
-        },
-        /*-------------------------------------------------------------------*/
         /* Grab preloaded fleet image and draw it at the input canvas        */
         /* coordinates (NOT converted to top left).                          */
         /*-------------------------------------------------------------------*/
@@ -247,21 +215,21 @@
                 savedData = ctx.getImageData(left, top, sideLength + 3, sideLength + 3);
             
             if (sizeInZones == 1)
-                selRemoveZone = savedData;
+                selectedZoneRestoreData = savedData;
             else
-                selRemoveArea = savedData;
+                selectedAreaRestoreData = savedData;
             
             privDrawSelBox(left, top, sideLength);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         removeZoneSelector: function (left, top) {
-            ctx.putImageData(selRemoveZone, left, top);
+            ctx.putImageData(selectedZoneRestoreData, left, top);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         removeAreaSelector: function (left, top) {
-            ctx.putImageData(selRemoveArea, left, top);
+            ctx.putImageData(selectedAreaRestoreData, left, top);
         },
         /*-------------------------------------------------------------------*/
         /* Draw movement direction band and destination zone indicator       */
@@ -275,7 +243,7 @@
             start.y += Math.floor(zonesize / 2);
             ctx.lineWidth = 2;
             ctx.lineCap = "round";
-            ctx.strokeStyle = "#ff0000";
+            ctx.strokeStyle = "#1b5b00";
             ctx.beginPath();
             ctx.moveTo(start.x, start.y);
             ctx.lineTo(endCoords.x, endCoords.y);

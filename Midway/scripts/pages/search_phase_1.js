@@ -1,24 +1,13 @@
 ﻿
 // Events and functions for Phase 1 (Search Map Move)
 
-$("#airreadiness").on("click", function () {
-    if (game.AircraftReadyState == 0) {
-        game.AircraftReadyState = 1;
-        window.editsMade = true;
-    } else if (game.AircraftReadyState == 1) {
-        game.AircraftReadyState = 0;
-        window.editsMade = true;
+$(document).on("click", "#selallarrivals", function () {
+    if (allArrivalsSelected("arrivals")) {
+        $("#arrivals").find("div.shipitem").removeClass("selected");
     } else {
-        showAlert("Air Readiness",
-            "Your aircraft are ready for operations. Are you sure you want to move them down to the hangar deck?",
-            DLG_YESCANCEL, "blue", function(choice) {
-                if (choice == "Yes") {
-                    game.AircraftReadyState = 0;
-                    window.editsMade = true;
-                }
-            });
+        $("#arrivals").find("div.shipitem").addClass("selected");
     }
-    showAirReadiness();
+    window.lastShipSelected = $("#arrivals").last();
 });
 
 $(document).on("mousedown", ".shipitem", function() {
@@ -44,25 +33,53 @@ $("#canvii").on("mousedown", function (e) {
 });
 
 /*-------------------------------------------------------------------*/
-/* Display on the Arrived tab any of the player's ships that have    */
-/* arrived this turn.                                                */
+/* Display on the Arrived tab the player's ships that have           */
+/* arrived this turn and are not yet on the map.                     */
 /*-------------------------------------------------------------------*/
 function loadPhaseTab() {
-    var html = "<ul>";
+    var arrivals = [],
+        html = "<div style=\"margin: 5px;\">No ships arrived this turn.</div>";
+    
     for (var i = 0; i < ships.length; i++) {
-        if (ships[i].Location == "ARR") {
+        if (ships[i].Location == "ARR")
+            arrivals.push(ships[i]);
+    }
+    if (arrivals.length > 0) {
+        html = "<div style=\"width: 100%; margin: 5px 0 5px 0; text-align: right;\">" +
+            "<a id=\"selallarrivals\" class=\"longbutton flatbutton graybtn\">Select All</a>" +
+            "</div><ul>";
+        for (i = 0; i < arrivals.length; i++) {
             html += getShipListItemHtml(ships[i]);
         }
+        html += "</ul>";
     }
-    $("#arrivals").html(html + "</ul>").addClass("tabshown");
+    $("#arrivals").html(html).addClass("tabshown");
     $("#arrivalstab").addClass("tabshown");
+    makeSuggestion();
+}
+
+/*-------------------------------------------------------------------*/
+/* Return true if all ships on the arrivals tab are selected,        */
+/* otherwise false.                                                  */
+/*-------------------------------------------------------------------*/
+function allArrivalsSelected() {
+    var ret = true,
+        arr = $("#arrivals").find("div.shipitem");
+
+    for (var i = 0; i < arr.length; i++) {
+        if (!$(arr[i]).hasClass("selected")) {
+            ret = false;
+            break;
+        }
+    }
+    return ret;
 }
 
 /*-------------------------------------------------------------------*/
 /* Initialize an arrivals drag operation.                            */
 /*-------------------------------------------------------------------*/
 function shipItemMouseDown() {
-    var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "null";
+    var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "";
     if (panelId != "arrivals") return;
 
     dragMgr.dragging = false;
@@ -108,7 +125,11 @@ function isLegitDrop(coords) {
 /* "Sail" fleet marker to a new location on the map.                 */
 /*-------------------------------------------------------------------*/
 function sailShips(startZone, endZone) {
-    if (sfxSailing) sfxSailing.play().fade(0, 1, 500);
+    if (startZone == endZone) return;
+    
+    if (sfxSailing && audioVol > 0)
+        sfxSailing.play().fade(0, audioVol * 0.01, 500);
+    
     var startPos = searchGrid.zoneToTopLeftCoords(startZone),
         endPos = searchGrid.zoneToTopLeftCoords(endZone),
         distX = endPos.x - startPos.x,
@@ -136,7 +157,11 @@ function sailShips(startZone, endZone) {
                 drawShips();
                 searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
                 showShipsInZone(selectedZone);
-                if (sfxSailing) sfxSailing.fade(sfxSailing.volume(), 0, 500);
+                if (sfxSailing) {
+                    sfxSailing.fade(sfxSailing.volume(), 0, 500, function() {
+                        sfxSailing.stop();
+                    });
+                }
             });
         } else {
             var thisX = startPos.x + ((elapsed / duration) * distX);

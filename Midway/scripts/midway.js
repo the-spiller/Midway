@@ -13,7 +13,7 @@ var player = undefined,
     showingVol = false,
     BG_IMG_WIDTH = 1387,
     BG_IMG_HEIGHT = 857,
-    COOKIE_NAME = "mdyplayer",
+    COOKIE_NAME_AUTH = "mdyplayer",
     COOKIE_NAME_AUDIO = "audiovol",
     supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
 
@@ -153,16 +153,18 @@ function showAjaxError(xhr, status, errorThrown) {
     }
 }
 function loadPlayerForPage(callback) {
-    var cookie = readCookie(COOKIE_NAME);
+    var cookie = readCookie(COOKIE_NAME_AUTH);
     if (cookie) {
         var playerId = cookie.substr(0, cookie.indexOf(":"));
         ajaxGetPlayer(playerId, function() {
             if (callback) callback();
         });
+    } else {
+        document.location.href = "/index.html";
     }
 }
 function createUpdateAuthCookie() {
-    createCookie(COOKIE_NAME, window.player.PlayerId + ":" + window.player.AuthKey, 1);
+    createCookie(COOKIE_NAME_AUTH, window.player.PlayerId + ":" + window.player.AuthKey, 1);
 }
 function ajaxGetPlayer(playerId, successCallback) {
     $.ajax({

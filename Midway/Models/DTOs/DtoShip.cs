@@ -19,6 +19,7 @@
         public int TSquadrons { get; set; }
         public int FSquadrons { get; set; }
         public int DSquadrons { get; set; }
+        public int AircraftState { get; set; }
         public int ArrivalTurn { get; set; }
         public int FortificationStrength { get; set; }
         public int OriginalFortificationStrength { get; set; }

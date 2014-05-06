@@ -228,9 +228,9 @@
     <Content Include="Content\images\blueloader.gif" />
     <Content Include="Content\images\helpicon.png" />
     <Content Include="Content\images\pointssample.png" />
-    <Content Include="Content\images\search\air-notready.png" />
-    <Content Include="Content\images\search\air-ready.png" />
-    <Content Include="Content\images\search\air-readying.png" />
+    <Content Include="Content\images\search\ready-0.png" />
+    <Content Include="Content\images\search\ready-2.png" />
+    <Content Include="Content\images\search\ready-1.png" />
     <Content Include="Content\images\search\cloud-layer.png" />
     <Content Include="Content\images\search\ijn-sea-search.png" />
     <Content Include="Content\images\search\Ships\ijnbb.png" />
@@ -430,6 +430,7 @@
     <None Include="Properties\PublishProfiles\Files.pubxml" />
     <Content Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
     <Content Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+    <None Include="Properties\PublishProfiles\FTP to Server.pubxml" />
   </ItemGroup>
   <ItemGroup>
     <AvailableItemName Include="ThirdPartyAssemblies">

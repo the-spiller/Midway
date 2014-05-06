@@ -16,7 +16,7 @@ $("#volinput").change(function() {
 
 $("#logofflink").on("click", function () {
     if (unsavedRegChanges()) return;
-    eraseCookie(COOKIE_NAME);
+    eraseCookie(COOKIE_NAME_AUTH);
     navigateTo(bgMusic, "/index.html");
 });
 
@@ -187,10 +187,10 @@ $("#cancelreg").on("click", function() {
         "record will be lost, you will no longer be able to log on, and none of this can be undone.</p><p>Are you sure that " +
         "this is what you want to do?";
     
-    showAlert("Cancel Registration", msg, DLG_YESNO, "red", function (resp) {
+    showAlert("Cancel Registration", msg, DLG_YESCANCEL, "red", function (resp) {
         if (resp == "Yes") {
             cancelRegistration(function () {
-                eraseCookie(COOKIE_NAME);
+                eraseCookie(COOKIE_NAME_AUTH);
                 location.replace("/index.html");
             });
         }
@@ -526,26 +526,25 @@ function buildRecord() {
 
 $(document).ready(function () {
     audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
-    var vol = audioVol * 0.01;
     
     $("#volinput").slider({
         orientation: "vertical",
         value: audioVol,
         slide: function (e, ui) {
             audioVol = ui.value;
-            $("#volvalue").html(audioVol);
-            if (bgMusic) bgMusic.volume(vol);
+            $("#volvalue").html(audioVol + "%");
+            if (bgMusic) bgMusic.volume(audioVol * 0.01);
             createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
         }
     });
-    $("#volvalue").html($("#volinput").slider("value"));
+    $("#volvalue").html($("#volinput").slider("value") + "%");
 
     bgMusic = new Howl({
         urls: [AUDIO_DIR_MUSIC + "home.ogg", AUDIO_DIR_MUSIC + "home.mp3"],
         loop: true,
         autoplay: false
     });
-    bgMusic.play().fade(0, vol, 1000);
+    bgMusic.play().fade(0, audioVol * 0.01, 1000);
     
     loadPlayerForPage(function() {
         $("#namespan").text(window.player.Nickname);

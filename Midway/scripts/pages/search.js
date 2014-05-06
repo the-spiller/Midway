@@ -16,7 +16,6 @@
     lastShipSelected = null,
     selectedZone = "",
     selectedArea = "",
-    arrivalZonesHighlighted = false,
     dragMgr = {
         dragging: false,
         source: "",
@@ -84,6 +83,7 @@ $('#canvii').on("click", function (e) {
 // Event handlers for dynamically-loaded elements
 $(document).on("click", ".tablistitem", function (e) {
     workTabs(e);
+    makeSuggestion();
 }).on("click", ".shipitem", function(e) {
     doShipSelection(this, (e.shiftKey));
     mouseDown = false;
@@ -91,6 +91,9 @@ $(document).on("click", ".tablistitem", function (e) {
     mouseDown = false;
     dragMgr.dragging = false;
     hideSearching();
+}).on("click", ".airreadiness", function (e) {
+    e.stopPropagation();
+    setAircraftState(this);
 });
 
 // Functions...........................................................
@@ -100,6 +103,41 @@ $(document).on("click", ".tablistitem", function (e) {
 /*-------------------------------------------------------------------*/
 function goHome() {
     navigateTo(bgMusic, "/views/home.html");
+}
+
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+function setAircraftState(airReadinessDiv) {
+    var idVals = airReadinessDiv.id.split("-"),
+        targetEntity;
+
+    if (idVals(1) == "airbase") {
+        for (var i = 0; i < ships.length; i++) {
+            if (ships[i].AirbaseId == idVals(2)) {
+                targetEntity = ships[i];
+                break;
+            }
+        }
+    } else {
+        targetEntity = getShipById(idVals(2));
+    }
+
+    if (targetEntity) {
+        switch (targetEntity.AircraftState) {
+            case 1:
+                targetEntity.AircraftState = 0;
+                break;
+            case 2:
+                //are you sure???
+                targetEntity.AircraftState = 0;
+                break;
+            default:
+                targetEntity.AircraftState = 1;
+                break;
+        }
+        
+        //load new image
+    }
 }
 
 /*-------------------------------------------------------------------*/
@@ -201,10 +239,10 @@ function loadShipZones() {
 function showShipsInZone() {
     if (!selectedZone) return;
 
-    var zone = selectedZone;
-    if (zone == "H5G") zone = "Midway";
-    var html = "<div style=\"margin: 5px; font-weight: bold;\">" + zone + "</div>",
+    var zone = selectedZone == "H5G" ? "Midway" : selectedZone,
+        html = "<div style=\"margin: 5px; font-weight: bold;\">" + zone + "</div>",
         i;
+    
     if (shipZones.length == 0) loadShipZones();
 
     // sightings
@@ -220,7 +258,7 @@ function showShipsInZone() {
     // airbases
     for (i = 0; i < ships.length; i++) {
         if (ships[i].Location == selectedZone && ships[i].ShipType == "BAS") {
-            html += getShipListItemHtml(ships[i]);
+            html += getShipListItemHtml(ships[i], false);
         }
     }
     // own ships
@@ -228,7 +266,7 @@ function showShipsInZone() {
     if ($.inArray(selectedZone, shipZones) != -1) {
         for (i = 0; i < ships.length; i++) {
             if (ships[i].Location == selectedZone && ships[i].ShipType != "BAS") {
-                html += getShipListItemHtml(ships[i]);
+                html += getShipListItemHtml(ships[i], (game.PhaseId == 1));
             }
         }
     }
@@ -252,7 +290,7 @@ function showShipsDue() {
                 html += "</ul><div class=\"listheader\">Due " +
                     dueDate + " (" + turns + " turns)</div><ul>";
             }
-            html += getShipListItemHtml(ships[i]);
+            html += getShipListItemHtml(ships[i], false);
         }
     }
     if (arrivalTurn == 0) // no ships due
@@ -273,7 +311,7 @@ function showOffMapShips() {
 
     for (var i = 0; i < ships.length; i++) {
         if (ships[i].Location == "OFF" || ships[i].Location == "SNK") {
-            html += getShipListItemHtml(ships[i]);
+            html += getShipListItemHtml(ships[i], false);
             gotOne = true;
         }
     }
@@ -288,9 +326,9 @@ function showOffMapShips() {
 /*-------------------------------------------------------------------*/
 /* Build up and return the HTML for a single ship list item.         */
 /*-------------------------------------------------------------------*/
-function getShipListItemHtml(ship) {
+function getShipListItemHtml(ship, showAvailMove) {
     var hitsDir = imgDir + "ships/hits/",
-        idPrefix, shipId, imgSuffix, availHits, hits;
+        idPrefix, shipId, imgSuffix, availHits, readyImg, hits;
 
     if (ship.ShipType == "BAS") {
         shipId = "airbase-" + ship.AirbaseId;
@@ -307,16 +345,26 @@ function getShipListItemHtml(ship) {
     var html = "<li><div id=\"" + shipId + "\" class=\"noselect shipitem\"><img src=\"" +
         ship.SearchImgPath + imgSuffix + "\"  draggable=\"false\"/>";
 
+    if (showAvailMove) {
+        if (ship.MovePoints > 0)
+            html += "<div class=\"availmove some\"></div>";
+        else
+            html += "<div class=\"availmove none\"></div>";
+    }
+    
     if (ship.ShipType == "CV" || ship.ShipType == "CVL" || ship.ShipType == "BAS") {
+        readyImg = "<img src=\"/content/images/search/ready-" + ship.AircraftState + ".png\" />";
         html += "<div class=\"numplanes torpedo\">" + ship.TSquadrons +
             "</div><div class=\"numplanes fighter\">" + ship.FSquadrons +
-            "</div><div class=\"numplanes divebomber\">" + ship.DSquadrons + "</div>";
+            "</div><div class=\"numplanes divebomber\">" + ship.DSquadrons +
+            "</div><div class=\"airreadiness\" id=\"ready-" + shipId + "\">" + readyImg + "</div>";
     }
     html += "<div class=\"shiphits green\"><img src=\"" + hitsDir + availHits + "-hitsgreen.png\"></div>";
 
     if (hits > 0) {
         html += "<div class=\"shiphits red\"><img src=\"" + hitsDir + hits + "-hitsred.png\"></div>";
     }
+    
     return html + "</div></li>";
 }
 
@@ -355,30 +403,6 @@ function typeName(type) {
     }
     return "Cruiser";
 }
-/*-------------------------------------------------------------------*/
-/* Display image indicating air readiness.                           */
-/*-------------------------------------------------------------------*/
-function showAirReadiness() {
-    var imgElement = document.getElementById("readinessimg"),
-        readyDesc;
-    
-    switch (game.AircraftReadyState) {
-    case 0:
-        imgElement.src = imgDir + "air-notready.png";
-        readyDesc = "not ready";
-        break;
-    case 1:
-        imgElement.src = imgDir + "air-readying.png";
-        readyDesc = "readying";
-        break;
-    default:
-        imgElement.src = imgDir + "air-ready.png";
-        readyDesc = "ready";
-        break;
-    }
-    if (game.PhaseId > 1)
-        $("#airreadiness").prop("title", "Aircraft " + readyDesc).addClass("disable");
-}
 
 /*-------------------------------------------------------------------*/
 /* Build and return a list of members of the ships[] array that      */
@@ -416,13 +440,8 @@ function getShipById(id) {
 /* toggles selected state; Shift-click selects or deselects a range. */
 /*-------------------------------------------------------------------*/
 function doShipSelection(shipItem, shiftPressed) {
-    
     if (!lastShipSelected) {
         $(shipItem).addClass("selected");
-        if (game.PhaseId == 1 && !arrivalZonesHighlighted) {
-            searchGrid.putArrivalZonesHighlight(side);
-            arrivalZonesHighlighted = true;
-        }
         lastShipSelected = shipItem;
         return;
     }
@@ -442,17 +461,6 @@ function doShipSelection(shipItem, shiftPressed) {
             $(shipItem).addClass("selected");
     }
     lastShipSelected = shipItem;
-    
-    if (game.PhaseId == 1) {
-        var arrivals = getSelectedShips("arrivals");
-        if (arrivals.length > 0 && !arrivalZonesHighlighted) {
-            searchGrid.putArrivalZonesHighlight(side);
-            arrivalZonesHighlighted = true;
-        } else if (arrivals.length == 0 && arrivalZonesHighlighted) {
-            searchGrid.removeArrivalZonesHighlight(side);
-            arrivalZonesHighlighted = false;
-        }
-    }
 }
 
 /*-------------------------------------------------------------------*/
@@ -626,7 +634,6 @@ function ajaxPutPhase(successCallback) {
             GameId: game.GameId,
             PlayerId: window.player.PlayerId,
             SelectedZone: selectedZone,
-            AirReadiness: game.AircraftReadyState,
             Points: game.Points,
             Ships: shipsToPass,
             Searches: searches
@@ -642,10 +649,51 @@ function ajaxPutPhase(successCallback) {
 }
 
 /*-------------------------------------------------------------------*/
+/* Set suggestion html text at the bottom of the screen based on     */
+/* game context.                                                     */
+/*-------------------------------------------------------------------*/
+function makeSuggestion() {
+    var suggest = "";
+    
+    if (game.Waiting == "Y") {
+        suggest = "No action can be taken until your opponent posts.";
+    } else {
+        var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "";
+        
+        switch (panelId) {
+            case "arrivals":
+                if ($("#arrivals").find("div.shipitem").length > 0) {
+                    suggest = "Select one or more of your arriving ships and drag them to any zone " +
+                        "on the near map edge. You'll be able to move them from there.";
+                } else {
+                    suggest = "Click on the zone tab to move ships and ready your aircraft.";
+                }
+                break;
+            case "zone":
+                if ($("#zone").find("div.shipitem").length > 0) {
+                    if (game.PhaseId == 1) {
+                        suggest = "Select one or more ships (or double-click to select them all) and drag their map marker to move " +
+                            "them. Air readiness ...";
+                    }
+                } else {
+                    suggest = "Select a zone on the map to see the ships and aircraft it contains.";
+                }
+                break;
+            case "search":
+                break;
+            case "airops":
+                break;
+            default:
+                break;
+        }
+    }
+    $("#suggest").html(suggest);
+}
+
+/*-------------------------------------------------------------------*/
 /* Set the volume on all playing tracks in response to a change.     */
 /*-------------------------------------------------------------------*/
-function setVolume() {
-    var vol = audioVol * 0.01;
+function setVolume(vol) {
     if (bgMusic) bgMusic.volume(vol * 0.75);
     if (sfxSailing) sfxSailing.volume(vol);
     if (sfxSearch) sfxSearch.volume(vol);
@@ -654,6 +702,8 @@ function setVolume() {
 /* Load search map audio based on game phase                         */
 /*-------------------------------------------------------------------*/
 function loadAudio() {
+    if (audioLoaded) return;
+    
     audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
     var vol = audioVol * 0.01;
     
@@ -662,14 +712,12 @@ function loadAudio() {
         value: audioVol,
         slide: function (e, ui) {
             audioVol = ui.value;
-            $("#volvalue").html(audioVol);
-            setVolume();
+            $("#volvalue").html(audioVol + "%");
+            setVolume(audioVol * 0.01);
             createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
         }
     });
-    $("#volvalue").html($("#volinput").slider("value"));
-    
-    if (audioLoaded) return;
+    $("#volvalue").html($("#volinput").slider("value") + "%");
 
     bgMusic = new Howl({
         urls: [AUDIO_DIR_MUSIC + "search.ogg", AUDIO_DIR_MUSIC + "search.mp3"],
@@ -733,17 +781,13 @@ function shipsLoaded() {
 
     var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
         " vs. " + (game.OpponentNickname || "?") + " - " + phase.Name +
-        "Phase <img class=\"helpicon\" src=\"/content/images/helpicon.png\" title=\"" + phase.Description + "\" /> " + wait;
+        " Phase <img class=\"helpicon\" src=\"/content/images/helpicon.png\" title=\"" + phase.Description + "\" /> " + wait;
     $("#gamedesc").addClass(captionColor).html("SEARCH MAP <img src=\"" + flagImg + "\" />" + gameStatus);
-
-    if (game.PhaseId == 1 && game.AircraftReadyState == 1)
-        game.AircraftReadyState = 2;
-    showAirReadiness();
 
     ajaxLoadSearches(function () {
         $("#searchdiv").css("display", "block");
         
-            searchGrid.drawMap(function () {
+        searchGrid.drawMap(function () {
             drawShips();
             drawSightings();
 
@@ -819,14 +863,10 @@ function loadPage(callback) {
         
         ajaxLoadPhase(function () {
             setTabs();
-            selectedZone = game.SelectedLocation;
+            selectedZone = game.SelectedLocation || "H5G";
 
             $("#searchcanvas").css("left", mapLeft + "px");        
-            $("#searchdiv").css("left", divLeft + "px").draggable({
-                handle: ".floathead",
-                containment: "#pagediv",
-                scroll: false
-            });
+            $("#searchdiv").css("left", divLeft + "px");
             if (game.PhaseId == 2)
                 searchGrid.addSearchCanvases();
             
@@ -837,27 +877,16 @@ function loadPage(callback) {
     });
 }
 
-function loadUp() {
+// Initialize..........................................................
+
+$(document).ready(function () {
     loadPlayerForPage(function () {
         loadPage(function () {
             loadAudio();
             if (game.PhaseId == 2) scrollClouds();
             $("#canvii").css("visibility", "visible");
             editsMade = false;
+            makeSuggestion();
         });
     });
-}
-
-// Initialize..........................................................
-
-$(document).ready(function () {
-    ////init touchevents for drag-drop
-    //if ('ontouchstart' in window || navigator.msMaxTouchPoints) {
-    //    document.addEventListener("touchstart", touchToMouseHandler, false);
-    //    document.addEventListener("touchend", touchToMouseHandler, false);
-    //    document.addEventListener("touchcancel", touchToMouseHandler, false);
-    //    document.addEventListener("touchenter", touchToMouseHandler, false);
-    //    document.addEventListener("touchleave", touchToMouseHandler, false);
-    //}
-    loadUp();
 });

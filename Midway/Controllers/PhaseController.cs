@@ -77,7 +77,6 @@ namespace Midway.Controllers
                     phaseData.GameId, 
                     phaseData.PlayerId, 
                     phaseData.SelectedZone, 
-                    phaseData.AirReadiness,
                     phaseData.Points);
 
 	            var dtoPlayer = new PlayerRepository(_uow).GetPlayerWithCurrentGame(phaseData.PlayerId, phaseData.GameId);

@@ -5,169 +5,200 @@
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
         <style>
-        table {
-            border-collapse: collapse;
-        }
+            table {
+                border-collapse: collapse;
+            }
 
-        #pagediv {
-            background-image: url(/content/images/search/bg-search.jpg);
-            background-repeat: no-repeat;
-        }
+            #pagediv {
+                background-image: url(/content/images/search/bg-search.jpg);
+                background-repeat: no-repeat;
+            }
 
-        #phase {
-            cursor: pointer;
-        }
+            #phase {
+                cursor: pointer;
+            }
 
-        #searchdiv {
-            display: none;
-            top: 60px;
-            width: 400px;
-            height: 739px;
-            opacity: 1.0;
-        }
-            #searchdiv .tabpanel {
-                height: 670px;
-                background: none;
+            #searchdiv {
+                display: none;
+                top: 60px;
+                width: 400px;
+                height: 739px;
+                opacity: 1.0;
+            }
+                #searchdiv .tabpanel {
+                    height: 670px;
+                    background: none;
+                    background-color: #093a67;
+                }
+
+            .tablistitem.tabshown {
                 background-color: #093a67;
             }
 
-        .tablistitem.tabshown {
-            background-color: #093a67;
-        }
-
-        #canvii {
-            visibility: hidden;
-        }
-
-        #searchcanvas {
-	        position: absolute;
-	        top: 60px;
-        }
-
-        .noselect {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        .shipitem {
-            position: relative;
-            cursor: pointer;
-	        padding: 4px;
-            margin-bottom: 4px;
-        }
-            .shipitem:hover {
-                background-color: #0a4173;
-            }
-            .shipitem.selected {
-                background-color: #08345c;
-	            padding: 5px 3px 3px 5px;
-		        box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
-
+            #canvii {
+                visibility: hidden;
             }
 
-        .numplanes {
-	        position: absolute;
-	        top: 29px;
-	        font-weight: 500;
-	        color: #fff;
-	        z-index: 5;
-            font-size: .85em;
-        }
-	        .numplanes.torpedo {
-		        left: 186px;
-	        }
-	        .numplanes.fighter {
-		        left: 237px;
-	        }
-	        .numplanes.divebomber {
-		        left: 292px;
-	        }
+            #searchcanvas {
+	            position: absolute;
+	            top: 60px;
+            }
 
-        .shiphits {
-            position: absolute;
-            left: 4px;
-            top: 35px;
-        }
-            .shiphits.green {
+            #suggest {
+                position: absolute;
+                top: 815px;
+                left: 10px;
+                font-weight: bold;
+                color: #ffd651;    
+            }
+
+            .floathead {
+                cursor: default;
+            }
+
+            .noselect {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+            }
+
+            .shipitem {
+                position: relative;
+	            padding: 4px;
+                margin-bottom: 4px;
+            }
+                .shipitem:hover {
+                    background-color: #0a4173;
+                }
+                .shipitem.selected {
+                    background-color: #08345c;
+	                padding: 5px 3px 3px 5px;
+		            box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
+
+                }
+
+            .availmove {
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                height: 10px;
+                width: 10px;
                 z-index: 2;
             }
-            .shiphits.red {
-                z-index: 3;
+                .availmove.some {
+                    background-image: url(/content/images/booblite-green.png);
+                }
+                .availmove.none {
+                      background-image: url(/content/images/booblite-red.png);
+                }
+
+            .numplanes {
+	            position: absolute;
+	            top: 29px;
+	            font-weight: 500;
+	            color: #fff;
+	            z-index: 5;
+                font-size: .85em;
             }
+	            .numplanes.torpedo {
+		            left: 186px;
+	            }
+	            .numplanes.fighter {
+		            left: 237px;
+	            }
+	            .numplanes.divebomber {
+		            left: 292px;
+	            }
+
+            .airreadiness {
+                position: absolute;
+                cursor: pointer;
+                top: 14px;
+                left: 318px;
+                z-index: 2;
+            }
+
+            .shiphits {
+                position: absolute;
+                left: 4px;
+                top: 35px;
+            }
+                .shiphits.green {
+                    z-index: 2;
+                }
+                .shiphits.red {
+                    z-index: 3;
+                }
                 
-        .listheader {
-	        margin: 10px 5px 5px 5px;
-	        background-color: #516580;
-	        padding: 4px;
-            font-weight: bold;
-        }
-        
-        .searchitem {
-            position: relative;
-            cursor: pointer;
-	        padding: 5px;
-            margin-bottom: 4px;
-        }
-            .searchitem:hover {
-                background-color: #0a4173;
+            .listheader {
+	            margin: 10px 5px 5px 5px;
+	            background-color: #516580;
+	            padding: 4px;
+                font-weight: bold;
             }
-
-        .oppsearchitem {
-            cursor: pointer;
-	        min-height: 42px;
-        }
-	        .oppsearchitem td {
-		        overflow: hidden;
-	        }
-            .oppsearchitem img {
+        
+            .searchitem {
                 position: relative;
-                margin: 0 -96px;
+                cursor: pointer;
+	            padding: 5px;
+                margin-bottom: 4px;
             }
-            .oppsearchitem:hover {
-                background-color: #0a4173;
-            }
+                .searchitem:hover {
+                    background-color: #0a4173;
+                }
 
-        .searchmarker {
-            position: absolute;
-            z-index: 5;
-            display: none; 
-        }
+            .oppsearchitem {
+                cursor: pointer;
+	            min-height: 42px;
+            }
+	            .oppsearchitem td {
+		            overflow: hidden;
+	            }
+                .oppsearchitem img {
+                    position: relative;
+                    margin: 0 -96px;
+                }
+                .oppsearchitem:hover {
+                    background-color: #0a4173;
+                }
+
+            .searchmarker {
+                position: absolute;
+                z-index: 5;
+                display: none; 
+            }
         
-        .cursorimg {
-            cursor: none;
-            position: absolute;
-            z-index: 10;
-            display: none;
-        }
-        
-        .sightedlabel {
-            font-size: .8em;
-            vertical-align: middle;
-        }
-
-        .sightedship {
-            padding: 5px;
-            vertical-align: top;
-        }
-
-        .airopbutton {
-            cursor: pointer;
-            position: relative;
-            margin: 1px;
-        }
-            .airopbutton:active {
-                margin: 2px 0 0 2px;
+            .cursorimg {
+                cursor: none;
+                position: absolute;
+                z-index: 10;
+                display: none;
             }
+        
+            .sightedlabel {
+                font-size: .8em;
+                vertical-align: middle;
+            }
+
+            .sightedship {
+                padding: 5px;
+                vertical-align: top;
+            }
+
+            .airopbutton {
+                cursor: pointer;
+                position: relative;
+                margin: 1px;
+            }
+                .airopbutton:active {
+                    margin: 2px 0 0 2px;
+                }
         </style>
     </head>
     <body>
         <div id="pagediv" class="noselect">
             <div id="gamedesc" class="pagecaption"></div>
             <div id="linksdiv">
-                <a id="airreadiness" href="#" title="Toggle aircraft readiness">
-                    <img id="readinessimg" src="/content/images/search/air-notready.png" />
-                </a>
                 <a id="done" href="#" title="End phase and post"><img src="/content/images/done.png" /></a>
                 <a id="audiolink" title="Volume"><img src="/content/images/speaker.png" /></a>
                 <div id="volsliderdiv">
@@ -190,6 +221,8 @@
                 </div>
                 <div id="tabpanels"></div>
             </div>
+            
+            <div id="suggest"></div>
 
             <div id="imagecache">
                 <img id="fleet" class="searchmarker" src="/content/images/search/usnfleet.png" />

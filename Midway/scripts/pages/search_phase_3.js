@@ -15,44 +15,50 @@ $(document).on("mouseenter", ".oppsearchitem", function (e) {
 /* Load the Air Ops tab with its control elements.                   */
 /*-------------------------------------------------------------------*/
 function loadPhaseTab() {
+    var opsHtml;
     // Opponent's searches
-    var opsHtml = "<div class=\"listheader\">Your opponent's searches</div>",
-        airPath = side == "USN" ? imgDir + "ijn-air-search.png" : imgDir + "usn-air-search.png",
-        seaPath = side == "USN" ? imgDir + "ijn-sea-search.png" : imgDir + "usn-sea-search.png";
-    if (oppSearches.length == 0) {
-        opsHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
+    if (game.Waiting == "Y") {
+        opsHtml = "<div style=\"margin: 5px 0 15px 5px;\">Waiting for opponent</div>";
     } else {
-        opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">";
-        for (var i = 0; i < oppSearches.length; i++) {
-            var searchImgSrc = airPath;
-            if (oppSearches[i].SearchType == "sea") {
-                searchImgSrc = seaPath;
-            }
-
-            var zones = "No ships sighted";
-            if (oppSearches[i].Markers.length) {
-                zones = "<span style=\"color: #ffd651;\">Ships sighted at ";
-                for (var j = 0; j < oppSearches[i].Markers.length; j++) {
-                    zones += oppSearches[i].Markers[j].Zone + ", ";
+        var airPath = side == "USN" ? imgDir + "ijn-air-search.png" : imgDir + "usn-air-search.png",
+            seaPath = side == "USN" ? imgDir + "ijn-sea-search.png" : imgDir + "usn-sea-search.png";
+        
+        opsHtml = "<div class=\"listheader\">Your opponent's searches</div>";
+        if (oppSearches.length == 0) {
+            opsHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
+        } else {
+            opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">";
+            for (var i = 0; i < oppSearches.length; i++) {
+                var searchImgSrc = airPath;
+                if (oppSearches[i].SearchType == "sea") {
+                    searchImgSrc = seaPath;
                 }
-                zones = zones.substr(0, zones.length - 2) + "</span>";
+
+                var zones = "No ships sighted";
+                if (oppSearches[i].Markers.length) {
+                    zones = "<span style=\"color: #ffd651;\">Ships sighted at ";
+                    for (var j = 0; j < oppSearches[i].Markers.length; j++) {
+                        zones += oppSearches[i].Markers[j].Zone + ", ";
+                    }
+                    zones = zones.substr(0, zones.length - 2) + "</span>";
+                }
+                opsHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 40%;\">" +
+                    "<img src=\"" + searchImgSrc + "\" /></td><td>Area " + oppSearches[i].Area +
+                    "<br />" + zones + "</td></tr>";
             }
-            opsHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 40%;\">" +
-                "<img src=\"" + searchImgSrc + "\" /></td><td>Area " + oppSearches[i].Area +
-                "<br />" + zones + "</td></tr>";
+            opsHtml += "</table>";
         }
-        opsHtml += "</table>";
-    }
-    
-    // Air Operations
-    opsHtml += "<div class=\"listheader\">Air Operations</div>";
-    if (game.AircraftReadyState < 2) {
-        opsHtml += "<div style=\"padding: 8px;\">Your aircraft are not ready for operations.</div>";
-    } else {
-        opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">" +
-            "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>" +
-            "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"Add an air operation\" src=\"" +
-            imgDir + "addicon.png\"></td></tr></table>";
+
+        // Air Operations
+        opsHtml += "<div class=\"listheader\">Air Operations</div>";
+        if (!anyAircraftReady()) {
+            opsHtml += "<div style=\"padding: 8px;\">Your aircraft are not ready for operations.</div>";
+        } else {
+            opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">" +
+                "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>" +
+                "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"Add an air operation\" src=\"" +
+                imgDir + "addicon.png\"></td></tr></table>";
+        }
     }
     $("#airops").html(opsHtml);
 }

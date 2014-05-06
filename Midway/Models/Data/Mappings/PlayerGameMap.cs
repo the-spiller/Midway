@@ -15,7 +15,6 @@ namespace Midway.Models.Data.Mappings
 			Property(p => p.Turn).IsRequired();
 			Property(p => p.SideId).IsRequired();
 			Property(p => p.PhaseId).IsRequired();
-		    Property(p => p.AircraftReadyState).IsRequired();
 			Property(p => p.Points);
             Property(p => p.MidwayInvadedTurn).IsRequired();
             Property(p => p.SelectedLocation).HasMaxLength(3);

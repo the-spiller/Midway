@@ -10,6 +10,7 @@
 		public int TSquadrons { get; set; }
 		public int FSquadrons { get; set; }
 		public int DSquadrons { get; set; }
+        public int AircraftState { get; set; }
 
 		public virtual PlayerGame PlayerGame { get; set; }
 		public virtual Ship Ship { get; set; }

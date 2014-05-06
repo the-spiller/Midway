@@ -41,6 +41,7 @@ namespace Midway.Models.Data
                     TSquadrons = s.TSquadrons,
                     FSquadrons = s.FSquadrons,
                     DSquadrons = s.DSquadrons,
+                    AircraftState = 0,
                     ArrivalTurn = s.ArrivalTurn
                 }).ToList();
 
@@ -65,6 +66,7 @@ namespace Midway.Models.Data
                     TSquadrons = a.TSquadrons,
                     FSquadrons = a.FSquadrons,
                     DSquadrons = a.DSquadrons,
+                    AircraftState = 0,
                     ArrivalTurn = 0
                 }).ToList());
 
@@ -106,6 +108,7 @@ namespace Midway.Models.Data
                     TSquadrons = dbShip.TSquadrons, 
                     FSquadrons = dbShip.FSquadrons, 
                     DSquadrons = dbShip.DSquadrons, 
+                    AircraftState = pg.PhaseId == 1 && dbShip.AircraftState == 1 ? 2 : dbShip.AircraftState,
                     ArrivalTurn = dbShip.Ship.ArrivalTurn
                 }).ToList();
 
@@ -135,6 +138,7 @@ namespace Midway.Models.Data
                     TSquadrons = s.TSquadrons,
                     FSquadrons = s.FSquadrons,
                     DSquadrons = s.DSquadrons,
+                    AircraftState = 0,
                     ArrivalTurn = s.ArrivalTurn
                 }).ToList());
              
@@ -165,6 +169,7 @@ namespace Midway.Models.Data
                         TSquadrons = a.TSquadrons,
                         FSquadrons = a.FSquadrons,
                         DSquadrons = a.DSquadrons,
+                        AircraftState = 0,
                         ArrivalTurn = 0
                     }).ToList());
             }
@@ -195,6 +200,7 @@ namespace Midway.Models.Data
                     TSquadrons = a.TSquadrons,
                     FSquadrons = a.FSquadrons,
                     DSquadrons = a.DSquadrons,
+                    AircraftState = a.AircraftState,
                     ArrivalTurn = 0
                 }).ToList());
             }
@@ -203,36 +209,37 @@ namespace Midway.Models.Data
         }
 
 		//...........................................................................
-		public void UpdateShips(int gameId, int playerId, IList<DtoShip> ships)
+		public void UpdateShips(int gameId, int playerId, IList<DtoShip> dtoShips)
 		{
 		    var phase = _context.PlayerGames.Single(p => p.GameId == gameId && p.PlayerId == playerId).PhaseId;
             if (phase > 1) return;
 
-			foreach (var ship in ships)
+			foreach (var dtoShip in dtoShips)
 			{
-				if (ship.AirbaseId > 0)
+				if (dtoShip.AirbaseId > 0)
 				{
 					 var dbAirbase = _context.PlayerGameAirbases
 						.SingleOrDefault(a => a.GameId == gameId && a.PlayerId == playerId 
-							&& a.AirbaseId == ship.AirbaseId);
+							&& a.AirbaseId == dtoShip.AirbaseId);
 					if (dbAirbase == null)
 					{
 						dbAirbase = new PlayerGameAirbase
 						{
 							GameId = gameId,
 							PlayerId = playerId,
-							AirbaseId = ship.AirbaseId
+							AirbaseId = dtoShip.AirbaseId
 						};
 
 						var airbase = _context.Airbases
 							.Include(b => b.Side)
-							.Single(b => b.AirbaseId == ship.AirbaseId);
-						if (ship.OwningSide == airbase.Side.ShortName)
+							.Single(b => b.AirbaseId == dtoShip.AirbaseId);
+						if (dtoShip.OwningSide == airbase.Side.ShortName)
 						{
 							dbAirbase.FortificationStrength = airbase.FortificationStrength;
 							dbAirbase.TSquadrons = airbase.TSquadrons;
 							dbAirbase.FSquadrons = airbase.FSquadrons;
 							dbAirbase.DSquadrons = airbase.DSquadrons;
+						    dbAirbase.AircraftState = 0;
 						}
 						else  //switched sides!
 						{
@@ -240,22 +247,24 @@ namespace Midway.Models.Data
 							dbAirbase.TSquadrons = 0;
 							dbAirbase.FSquadrons = 0;
 							dbAirbase.DSquadrons = 0;
+						    dbAirbase.AircraftState = 0;
 						}
 						_context.PlayerGameAirbases.Add(dbAirbase);
 					}
 					else
 					{
-						dbAirbase.FortificationStrength = ship.FortificationStrength;
-						dbAirbase.TSquadrons = ship.TSquadrons;
-						dbAirbase.FSquadrons = ship.FSquadrons;
-						dbAirbase.DSquadrons = ship.DSquadrons;
+						dbAirbase.FortificationStrength = dtoShip.FortificationStrength;
+						dbAirbase.TSquadrons = dtoShip.TSquadrons;
+						dbAirbase.FSquadrons = dtoShip.FSquadrons;
+						dbAirbase.DSquadrons = dtoShip.DSquadrons;
+					    dbAirbase.AircraftState = dtoShip.AircraftState;
 					}
 				}
 				else
 				{
 					var dbShip = _context.PlayerGameShips
 						.Include(s => s.Ship)
-						.SingleOrDefault(s => s.GameId == gameId && s.PlayerId == playerId && s.ShipId == ship.ShipId);
+						.SingleOrDefault(s => s.GameId == gameId && s.PlayerId == playerId && s.ShipId == dtoShip.ShipId);
 
 				    if (dbShip == null)
 				    {
@@ -263,15 +272,16 @@ namespace Midway.Models.Data
 				            {
 				                GameId = gameId,
 				                PlayerId = playerId,
-				                Ship = _context.Ships.Single(s => s.ShipId == ship.ShipId)
+				                Ship = _context.Ships.Single(s => s.ShipId == dtoShip.ShipId)
 				            });
 				    }
 
-				    dbShip.Location = ship.Location;
-					dbShip.Hits = ship.Hits;
-					dbShip.TSquadrons = ship.TSquadrons;
-					dbShip.FSquadrons = ship.FSquadrons;
-					dbShip.DSquadrons = ship.DSquadrons;
+				    dbShip.Location = dtoShip.Location;
+					dbShip.Hits = dtoShip.Hits;
+					dbShip.TSquadrons = dtoShip.TSquadrons;
+					dbShip.FSquadrons = dtoShip.FSquadrons;
+					dbShip.DSquadrons = dtoShip.DSquadrons;
+				    dbShip.AircraftState = dtoShip.AircraftState;
 				}
 
 			}

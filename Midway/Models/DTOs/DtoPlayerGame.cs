@@ -13,7 +13,6 @@ namespace Midway.Models.DTOs
 		public string TinyFlagUrl { get; set; }
 		public string LastPlayed { get; set; }	// Max of last played for both players
         public string DTimeNow { get; set; } // For time comparison
-        public int AircraftReadyState { get; set; }
 		public string CompletedDTime { get; set; }
 		public int Points { get; set; }	// My score
 		public string SelectedLocation { get; set; }

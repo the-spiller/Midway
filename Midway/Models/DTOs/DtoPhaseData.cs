@@ -7,7 +7,6 @@ namespace Midway.Models.DTOs
         public int GameId { get; set; }
         public int PlayerId { get; set; }
         public string SelectedZone { get; set; }
-        public int AirReadiness { get; set; }
         public int Points { get; set; }
 
         public IList<DtoShip> Ships { get; set; }
