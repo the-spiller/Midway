@@ -85,7 +85,7 @@ namespace Midway.Models.Data
 
             var dbShips = _context.PlayerGameShips
                               .Include(p => p.Ship)
-                              .Where(p => p.PlayerId == playerId && p.GameId == gameId)
+                              .Where(p => p.PlayerId == playerId && p.GameId == gameId && p.Location != "DUE")
                               .ToList();
 
             var dtoShips = dbShips.Select(dbShip => new DtoShip
@@ -138,7 +138,7 @@ namespace Midway.Models.Data
                     TSquadrons = s.TSquadrons,
                     FSquadrons = s.FSquadrons,
                     DSquadrons = s.DSquadrons,
-                    AircraftState = 0,
+                    AircraftState = s.ShipType == "CV" || s.ShipType == "CVL" ? GetDueAircraftState(s.ShipId) : 0,
                     ArrivalTurn = s.ArrivalTurn
                 }).ToList());
              
@@ -296,6 +296,13 @@ namespace Midway.Models.Data
                 return 2;
             }
             return 0;
+        }
+
+        //...........................................................................
+        private int GetDueAircraftState(int shipId)
+        {
+            var ship = _context.PlayerGameShips.SingleOrDefault(s => s.ShipId == shipId);
+            return ship == null ? 0 : ship.AircraftState;
         }
     }
 }

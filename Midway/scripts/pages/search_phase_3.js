@@ -52,11 +52,11 @@ function loadPhaseTab() {
         // Air Operations
         opsHtml += "<div class=\"listheader\">Air Operations</div>";
         if (!anyAircraftReady()) {
-            opsHtml += "<div style=\"padding: 8px;\">Your aircraft are not ready for operations.</div>";
+            opsHtml += "<div style=\"padding: 8px;\">You have no aircraft ready for operations.</div>";
         } else {
             opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">" +
                 "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>" +
-                "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"Add an air operation\" src=\"" +
+                "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"Add an operation\" src=\"" +
                 imgDir + "addicon.png\"></td></tr></table>";
         }
     }
@@ -82,7 +82,7 @@ function anyAircraftReady() {
 /* Highlight the area of an opponent's search item.                  */
 /*-------------------------------------------------------------------*/
 function showOppSearchedArea(e) {
-    mapImg = searchGrid.grabImageData();
+    window.mapImg = searchGrid.grabImageData();
     var area = $(e.target).text().substr(5, 2);
     if (area)
         searchGrid.drawOppSearchArea(area);

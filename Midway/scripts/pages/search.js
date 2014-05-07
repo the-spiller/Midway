@@ -636,7 +636,7 @@ function ajaxPutPhase(successCallback) {
     // parse out future arrivals
     var shipsToPass = [];
     for (var i = 0; i < ships.length; i++) {
-        if (ships[i].Location != "DUE")
+        if (ships[i].Location != "DUE" || (ships[i].ShipType == "CV" || ships[i].ShipType == "CVL"))
             shipsToPass.push(ships[i]);
     }
     $.ajax({
