@@ -70,6 +70,7 @@ namespace Midway.Models.Data
             return ReturnDtoPlayer(dtoPlayer);
         }
 
+        //.....................................................................
 		internal DtoPlayer GetPlayerWithCurrentGame(int playerId, int gameId)
 		{
 			var dtoPlayer = _context.Players.Select(p => new DtoPlayer
@@ -89,6 +90,7 @@ namespace Midway.Models.Data
 			return dtoPlayer;
 		}
 
+        //.....................................................................
         public void SendPassword(int playerId)
         {
             Player dbPlayer = GetDbPlayer(playerId);
@@ -336,6 +338,7 @@ namespace Midway.Models.Data
             return dtoPlayer;
         }
 
+        //.....................................................................
 		private IEnumerable<DtoPlayerGame> GetPlayerGames(int playerId, int gameId = 0)
 		{
 			IQueryable<PlayerGame> qry;
@@ -362,24 +365,38 @@ namespace Midway.Models.Data
 
 			foreach (var dbGame in dbGames)
 			{
-				var range = (dbGame.Side.ShortName == "USN" && dbGame.Airbases.Count > 0) ? 0 : 12;  //zero = range is whole map
+                var game = dbGame;
+
+                if (dbGame.PhaseIndeterminate == "Y")
+                {
+                    var phaseRepo = new PhaseRepository(_context);
+                    if (!phaseRepo.UnderAirAttack(dbGame))
+                        phaseRepo.AdvancePhase(gameId, playerId, dbGame.SelectedLocation, dbGame.Points);
+                    game = _context.PlayerGames
+                                   .Include(p => p.Phase)
+                                   .Include(p => p.Side)
+                                   .Include(p => p.Game)
+                                   .Include(p => p.Airbases).Single(p => p.PlayerId == playerId && p.GameId == gameId);
+                }
+
+				var range = (game.Side.ShortName == "USN" && game.Airbases.Count > 0) ? 0 : 12;  //zero = range is whole map
 
 				var dtoPlayerGame = new DtoPlayerGame
 				    {
-						GameId = dbGame.GameId,
-						SideId = dbGame.Side.SideId,
-                        PhaseId = dbGame.PhaseId,
-                        PhaseName = dbGame.Phase.Name,
-                        Turn = dbGame.Turn,
-                        CompletedDTime = dbGame.Game.CompletedDTime == null ? "" :
-                            dbGame.Game.CompletedDTime.Value.ToString("o"),
-						TinyFlagUrl = dbGame.Side.TinyFlagUrl,
-                        LastPlayed = dbGame.LastPlayed == null ? "" : dbGame.LastPlayed.Value.ToString("o"),
+						GameId = game.GameId,
+						SideId = game.Side.SideId,
+                        PhaseId = game.PhaseId,
+                        PhaseName = game.Phase.Name,
+                        Turn = game.Turn,
+                        CompletedDTime = game.Game.CompletedDTime == null ? "" :
+                            game.Game.CompletedDTime.Value.ToString("o"),
+						TinyFlagUrl = game.Side.TinyFlagUrl,
+                        LastPlayed = game.LastPlayed == null ? "" : game.LastPlayed.Value.ToString("o"),
                         DTimeNow = DateTime.Now.ToUniversalTime().ToString("o"),
-						Points = dbGame.Points,
-						SelectedLocation = dbGame.SelectedLocation,
-						SideShortName = dbGame.Side.ShortName,
-                        Draw = dbGame.Game.Draw,
+						Points = game.Points,
+						SelectedLocation = game.SelectedLocation,
+						SideShortName = game.Side.ShortName,
+                        Draw = game.Game.Draw,
                         Waiting = "N",
                         OppWaiting = "N",
 						SearchRange = range
@@ -398,14 +415,14 @@ namespace Midway.Models.Data
 
                     if (dbOpp.LastPlayed != null)
                     {
-                        if (dbGame.LastPlayed == null || dbOpp.LastPlayed > dbGame.LastPlayed) 
+                        if (game.LastPlayed == null || dbOpp.LastPlayed > game.LastPlayed) 
                             dtoPlayerGame.LastPlayed = dbOpp.LastPlayed.Value.ToString("o");
 				    }
-				    if (dtoPlayerGame.Turn > 1 || dtoPlayerGame.PhaseId > 1)
+				    if (dtoPlayerGame.PhaseId > 1)
 				    {
-                        if (dbGame.Turn > dbOpp.Turn || (dbGame.Turn == dbOpp.Turn && dbGame.PhaseId > dbOpp.PhaseId))
+                        if (game.Turn > dbOpp.Turn || (game.Turn == dbOpp.Turn && game.PhaseId > dbOpp.PhaseId))
                             dtoPlayerGame.Waiting = "Y";
-                        else if (dbOpp.Turn > dbGame.Turn || (dbOpp.Turn == dbGame.Turn && dbOpp.PhaseId > dbGame.PhaseId))
+                        else if (dbOpp.Turn > game.Turn || (dbOpp.Turn == game.Turn && dbOpp.PhaseId > game.PhaseId))
                             dtoPlayerGame.OppWaiting = "Y";
 				    }
 				}

@@ -138,7 +138,7 @@ namespace Midway.Models.Data
                     TSquadrons = s.TSquadrons,
                     FSquadrons = s.FSquadrons,
                     DSquadrons = s.DSquadrons,
-                    AircraftState = s.ShipType == "CV" || s.ShipType == "CVL" ? GetDueAircraftState(s.ShipId) : 0,
+                    AircraftState = s.ShipType == "CV" || s.ShipType == "CVL" ? GetDueAircraftState(playerId, gameId, s.ShipId) : 0,
                     ArrivalTurn = s.ArrivalTurn
                 }).ToList());
              
@@ -239,7 +239,7 @@ namespace Midway.Models.Data
 							dbAirbase.TSquadrons = airbase.TSquadrons;
 							dbAirbase.FSquadrons = airbase.FSquadrons;
 							dbAirbase.DSquadrons = airbase.DSquadrons;
-						    dbAirbase.AircraftState = 0;
+						    dbAirbase.AircraftState = dtoShip.AircraftState;
 						}
 						else  //switched sides!
 						{
@@ -299,9 +299,10 @@ namespace Midway.Models.Data
         }
 
         //...........................................................................
-        private int GetDueAircraftState(int shipId)
+        private int GetDueAircraftState(int playerId, int gameId, int shipId)
         {
-            var ship = _context.PlayerGameShips.SingleOrDefault(s => s.ShipId == shipId);
+            var ship = _context.PlayerGameShips
+                .SingleOrDefault(s => s.PlayerId == playerId && s.GameId == gameId && s.ShipId == shipId);
             return ship == null ? 0 : ship.AircraftState;
         }
     }

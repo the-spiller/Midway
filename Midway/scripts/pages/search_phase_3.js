@@ -15,19 +15,19 @@ $(document).on("mouseenter", ".oppsearchitem", function (e) {
 /* Load the Air Ops tab with its control elements.                   */
 /*-------------------------------------------------------------------*/
 function loadPhaseTab() {
-    var opsHtml;
+    var tabHtml = "<div style=\"margin: 5px 0 15px 5px;\">";
     // Opponent's searches
     if (game.Waiting == "Y") {
-        opsHtml = "<div style=\"margin: 5px 0 15px 5px;\">Waiting for opponent</div>";
+        tabHtml += "Waiting for opponent</div>";
     } else {
         var airPath = side == "USN" ? imgDir + "ijn-air-search.png" : imgDir + "usn-air-search.png",
             seaPath = side == "USN" ? imgDir + "ijn-sea-search.png" : imgDir + "usn-sea-search.png";
         
-        opsHtml = "<div class=\"listheader\">Your opponent's searches</div>";
+        tabHtml = "<div class=\"listheader\">Your opponent's searches</div>";
         if (oppSearches.length == 0) {
-            opsHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
+            tabHtml += "<div style=\"padding: 8px;\">Your opponent did not search.</div>";
         } else {
-            opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">";
+            tabHtml += "<table style=\"width: 97%; margin: 0 5px;\">";
             for (var i = 0; i < oppSearches.length; i++) {
                 var searchImgSrc = airPath;
                 if (oppSearches[i].SearchType == "sea") {
@@ -42,25 +42,25 @@ function loadPhaseTab() {
                     }
                     zones = zones.substr(0, zones.length - 2) + "</span>";
                 }
-                opsHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 40%;\">" +
+                tabHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 40%;\">" +
                     "<img src=\"" + searchImgSrc + "\" /></td><td>Area " + oppSearches[i].Area +
                     "<br />" + zones + "</td></tr>";
             }
-            opsHtml += "</table>";
+            tabHtml += "</table>";
         }
 
         // Air Operations
-        opsHtml += "<div class=\"listheader\">Air Operations</div>";
+        tabHtml += "<div class=\"listheader\">Air Operations</div>";
         if (!anyAircraftReady()) {
-            opsHtml += "<div style=\"padding: 8px;\">You have no aircraft ready for operations.</div>";
+            tabHtml += "<div style=\"padding: 8px;\">You have no aircraft ready for operations.</div>";
         } else {
-            opsHtml += "<table style=\"width: 97%; margin: 0 5px;\">" +
+            tabHtml += "<table style=\"width: 97%; margin: 0 5px;\">" +
                 "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>" +
                 "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"Add an operation\" src=\"" +
                 imgDir + "addicon.png\"></td></tr></table>";
         }
     }
-    $("#airops").html(opsHtml);
+    $("#airops").html(tabHtml);
 }
 
 /*-------------------------------------------------------------------*/

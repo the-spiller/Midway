@@ -13,7 +13,7 @@ namespace Midway.Models.Data.Mappings
 			this.Property(p => p.PhaseId).IsRequired();
 			this.Property(p => p.ActionKey).HasMaxLength(16).IsRequired();
 
-			this.Property(p => p.Order).IsRequired();
+			this.Property(p => p.Sequence).IsRequired();
             this.Property(p => p.AvailWhenWaiting).HasMaxLength(1).IsRequired();
 		}
 	}

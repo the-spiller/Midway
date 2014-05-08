@@ -9,16 +9,14 @@ $(document).on("mousedown", ".searchitem", function(e) {
 /* Load the Search tab with its control elements.                    */
 /*-------------------------------------------------------------------*/
 function loadPhaseTab() {
-    if (game.PhaseId != 2) return;
-
-    var searchHtml = "<div style=\"margin: 5px 0 15px 5px;\">";
+    var tabHtml = "<div style=\"margin: 5px 0 15px 5px;\">";
     if (game.Waiting == "Y") {
-        searchHtml += "Waiting for opponent</div>";
+        tabHtml += "Waiting for opponent</div>";
     } else {
         var searchDesc,
             searchImg = imgDir + side.toLowerCase() + "-air-search.png";
         
-        searchHtml += "Available searches</div><ul>";
+        tabHtml += "Available searches</div><ul>";
 
         for (var i = 0; i < searches.length; i++) {
             if (searches[i].Turn == game.Turn && !searches[i].Area) {
@@ -30,14 +28,14 @@ function loadPhaseTab() {
                 } else {
                     searchDesc = "Drag and drop to search any area within " + game.SearchRange + " zones of any of your ships";
                 }
-                searchHtml += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
+                tabHtml += "<li><div id=\"search-" + searches[i].SearchNumber + "\" class=\"noselect searchitem\"" +
                     " title=\"" + searchDesc + "\" draggable=\"false\">" +
                     "<img id=\"searchimg-" + searches[i].SearchNumber + "\" src=\"" + searchImg + "\" draggable=\"false\" />" +
                     "</div></li>";
             }
         }
     }
-    $("#search").html(searchHtml);
+    $("#search").html(tabHtml);
 }
 
 

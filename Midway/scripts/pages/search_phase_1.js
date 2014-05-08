@@ -3,6 +3,9 @@
 
 $(document).on("mousedown", ".shipitem", function() {
     shipItemMouseDown();
+}).on("click", ".airreadiness", function (e) {
+    e.stopPropagation();
+    setAircraftState(this);
 });
 
 $("#canvii").on("mousedown", function (e) {
@@ -169,7 +172,53 @@ function relocateShips(zone, movedShips, cost) {
     }
     loadShipZones();
 }
+/*-------------------------------------------------------------------*/
+/* Respond to click on air readiness button on ship or airbase list  */
+/* item.                                                             */
+/*-------------------------------------------------------------------*/
+function setAircraftState(airReadinessDiv) {
+    var idVals = airReadinessDiv.id.split("-"),
+        targetEntity,
+        newTitle = "Not ready";
 
+    if (idVals[1] == "airbase") {
+        for (var i = 0; i < ships.length; i++) {
+            if (ships[i].AirbaseId == idVals[2]) {
+                targetEntity = ships[i];
+                break;
+            }
+        }
+    } else {
+        targetEntity = getShipById(idVals[2]);
+    }
+
+    if (targetEntity) {
+        switch (targetEntity.AircraftState) {
+            case 1:
+                targetEntity.AircraftState = 0;
+                window.editsMade = true;
+                break;
+            case 2:
+                showAlert("Aircraft Are Ready", "Are you sure you want your aircraft to stand down?", DLG_YESCANCEL, "blue",
+                    function (button) {
+                        
+                    if (button == "Yes") {
+                        targetEntity.AircraftState = 0;
+                        window.editsMade = true;
+                    }
+                });
+                break;
+            default:
+                targetEntity.AircraftState = 1;
+                newTitle = "Readying";
+                window.editsMade = true;
+                break;
+        }
+        //load new image and title string for tooltip
+        $(airReadinessDiv).attr("title", newTitle).html("<img src=\"/content/images/search/ready-" + targetEntity.AircraftState +
+            ".png\" />");
+    }
+}
 /*-------------------------------------------------------------------*/
 /* Return true if all of this turn's arrivals have been brought on   */
 /* to the map.                                                       */

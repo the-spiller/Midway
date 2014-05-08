@@ -162,6 +162,8 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Models\DTOs\DtoAirOp.cs" />
+    <Compile Include="Models\DTOs\DtoAirOpAircraft.cs" />
     <Compile Include="Models\Services\AuthCacheEntry.cs" />
     <Compile Include="Models\Services\AuthHandler.cs" />
     <Compile Include="Controllers\PhaseController.cs" />

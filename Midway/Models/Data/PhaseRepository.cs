@@ -40,12 +40,12 @@ namespace Midway.Models.Data
                     Description = dbPhase.Description,
                     Actions = new List<DtoAction>()
                 };
-            foreach (var pa in dbPhase.PhaseActions.OrderBy(pa => pa.Order))
+            foreach (var pa in dbPhase.PhaseActions.OrderBy(pa => pa.Sequence))
             {
                 dtoPhase.Actions.Add(new DtoAction
                     {
                         ActionKey = pa.ActionKey,
-                        Order = pa.Order,
+                        Order = pa.Sequence,
                         AvailWhenWaiting = pa.AvailWhenWaiting,
                         Description = _context.Actions
                                               .Where(a => a.ActionKey == pa.ActionKey)
@@ -62,34 +62,65 @@ namespace Midway.Models.Data
             dbPg.SelectedLocation = selectedZone;
             dbPg.Points = points;
             IncrementPhase(dbPg);
-
-            var phase = _context.Phases.Single(p => p.PhaseId == dbPg.PhaseId);
-            while (phase.MightSkip == "Y")
+            
+            var dbOppPg = _context.PlayerGames.SingleOrDefault(p => p.GameId == gameId && p.PlayerId != playerId);
+            if (dbOppPg != null)
             {
-                switch (phase.PhaseId)
+                if (dbPg.PhaseId == 3)  //Air Ops
                 {
-                    case 4: //	Air Defense Setup
-                    case 6: //  Allocate and Resolve
-                        if (!UnderAirAttack(dbPg)) dbPg.PhaseId++;
-                        break;
-                    case 5: //	Air Attack Setup
-                    case 7: //	Air Attack Recovery
-                        if (!MakingAirAttacks(dbPg)) dbPg.PhaseId++;
-                        break;
-                    case 8: //	Surface Combat Setup
-                        break;
-                    default:
-                        break;
+                    if (dbOppPg.PhaseId)
+                    {
+                        // opponent has not posted AirOps
+                        dbPg.
+                    }
                 }
+                    //IncrementPhase(dbPg);
 
-                if (dbPg.PhaseId == phase.PhaseId) break;
-                phase = _context.Phases.Single(p => p.PhaseId == dbPg.PhaseId);
+                    // Get phase and opponent info to see if phase is skippable
+                    var phase = _context.Phases.Single(p => p.PhaseId == dbPg.PhaseId);
+
+                if (phase.MightSkip == "Y" &&
+                    (dbOppPg == null || dbOppPg.Turn < dbPg.Turn || dbOppPg.PhaseId < dbPg.PhaseId))
+                {
+                    dbPg.PhaseIndeterminate = "Y";
+                }
+                else
+                {
+                    dbPg.PhaseIndeterminate = "N";
+
+                    while (phase.MightSkip == "Y")
+                    {
+                        switch (phase.PhaseId)
+                        {
+                            case 4: //	Air Defense Setup
+                            case 6: //  Allocate and Resolve
+                                if (!UnderAirAttack(dbPg)) IncrementPhase(dbPg);
+                                break;
+                            case 5: //	Air Attack Setup
+                            case 7: //	Air Attack Recovery
+                                if (!MakingAirAttacks(dbPg)) IncrementPhase(dbPg);
+                                break;
+                            case 8: //	Surface Combat Setup
+                                if (!SurfaceCombat(dbPg))
+                                {
+                                    dbPg.Turn++;
+                                    dbPg.PhaseId = 1;
+                                }
+                                break;
+                        }
+                        // If we didn't change phase, we're done.
+                        if (dbPg.PhaseId == phase.PhaseId) break;
+
+                        // Get new phase to see if its skippable
+                        phase = _context.Phases.Single(p => p.PhaseId == dbPg.PhaseId);
+                    }
+                }
             }
-
             dbPg.LastPlayed = DateTime.Now.ToUniversalTime();
             _context.Save();
         }
 
+        //.....................................................................
         private void IncrementPhase(PlayerGame playerGame)
         {
             playerGame.PhaseId++;
@@ -100,16 +131,25 @@ namespace Midway.Models.Data
             }
         }
 
-        private bool UnderAirAttack(PlayerGame playerGame)
+        //.....................................................................
+        internal bool UnderAirAttack(PlayerGame playerGame)
         {
             return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId != playerGame.PlayerId
                                             && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
         }
 
+        //.....................................................................
         private bool MakingAirAttacks(PlayerGame playerGame)
         {
             return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId == playerGame.PlayerId
                                                && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
+        }
+
+        //.....................................................................
+        private bool SurfaceCombat(PlayerGame playerGame)
+        {
+            // If the players have ships in a single zone and one of them knows it via a search, return true;
+            return false;
         }
     }
 }

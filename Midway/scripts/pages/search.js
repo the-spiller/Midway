@@ -13,6 +13,7 @@
     ships = [],
     shipZones = [],
     searches = [],
+    airOps = [],
     lastShipSelected = null,
     selectedZone = "",
     selectedArea = "",
@@ -91,9 +92,6 @@ $(document).on("click", ".tablistitem", function (e) {
     mouseDown = false;
     dragMgr.dragging = false;
     hideSearching();
-}).on("click", ".airreadiness", function (e) {
-    e.stopPropagation();
-    setAircraftState(this);
 });
 
 // Functions...........................................................
@@ -103,51 +101,6 @@ $(document).on("click", ".tablistitem", function (e) {
 /*-------------------------------------------------------------------*/
 function goHome() {
     navigateTo(bgMusic, "/views/home.html");
-}
-
-/*-------------------------------------------------------------------*/
-/*-------------------------------------------------------------------*/
-function setAircraftState(airReadinessDiv) {
-    if (game.PhaseId != 1) return;
-    
-    var idVals = airReadinessDiv.id.split("-"),
-        targetEntity,
-        newTitle = "Not ready";
-
-    if (idVals[1] == "airbase") {
-        for (var i = 0; i < ships.length; i++) {
-            if (ships[i].AirbaseId == idVals[2]) {
-                targetEntity = ships[i];
-                break;
-            }
-        }
-    } else {
-        targetEntity = getShipById(idVals[2]);
-    }
-
-    if (targetEntity) {
-        switch (targetEntity.AircraftState) {
-            case 1:
-                targetEntity.AircraftState = 0;
-                editsMade = true;
-                break;
-            case 2:
-                showAlert("Aircraft Are Ready", "Are you sure you want to stand down?", DLG_YESCANCEL, "blue", function(button) {
-                    if (button == "Yes") {
-                        targetEntity.AircraftState = 0;
-                        editsMade = true;
-                    }
-                });
-                break;
-            default:
-                targetEntity.AircraftState = 1;
-                newTitle = "Readying";
-                editsMade = true;
-                break;
-        }
-        //load new image and title string for tooltip
-        $(airReadinessDiv).attr("title", newTitle).html("<img src=\"/content/images/search/ready-" + targetEntity.AircraftState + ".png\" />");
-    }
 }
 
 /*-------------------------------------------------------------------*/
@@ -632,13 +585,19 @@ function ajaxLoadSearches(successCallback) {
 /*-------------------------------------------------------------------*/
 /* Make ajax call to post phase data back to the server.             */
 /*-------------------------------------------------------------------*/
+
 function ajaxPutPhase(successCallback) {
-    // parse out future arrivals
     var shipsToPass = [];
-    for (var i = 0; i < ships.length; i++) {
-        if (ships[i].Location != "DUE" || (ships[i].ShipType == "CV" || ships[i].ShipType == "CVL"))
-            shipsToPass.push(ships[i]);
+
+    if (game.PhaseId == 1) {
+        // Ships can have their location changed, and carriers and airbases their aircraft ready state changed
+        // (airbases are included in the local 'ships' collection)
+        for (var i = 0; i < ships.length; i++) {
+            if (ships[i].Location != "DUE" || (ships[i].ShipType == "CV" || ships[i].ShipType == "CVL"))
+                shipsToPass.push(ships[i]);
+        }
     }
+
     $.ajax({
         url: "/api/phase",
         type: "PUT",
@@ -650,7 +609,8 @@ function ajaxPutPhase(successCallback) {
             SelectedZone: selectedZone,
             Points: game.Points,
             Ships: shipsToPass,
-            Searches: searches
+            Searches: searches,
+            AirOps: airOps
         }),
         success: function(data) {
             window.player = JSON.parse(data);
