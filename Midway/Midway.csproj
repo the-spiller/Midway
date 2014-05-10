@@ -249,7 +249,7 @@
     <Content Include="Scripts\pages\search_phase_1.js" />
     <Content Include="Scripts\pages\search_phase_2.js" />
     <Content Include="Scripts\pages\search_phase_3.js" />
-    <Content Include="Scripts\pages\search_phase_4.js" />
+    <Content Include="Scripts\pages\search_phase_5.js" />
     <Content Include="Scripts\vendor\howler.min.js" />
     <Content Include="Views\about.html" />
     <Content Include="App_Data\cm.sdf" />

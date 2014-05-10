@@ -222,17 +222,21 @@ function ajaxGetPlayers(successCallback) {
 }
 
 function ajaxLoadScript(script, successCallback) {
-    $.ajax({
-        url: script,
-        dataType: "script",
-        type: "GET",
-        success: function() {
-            if (successCallback) successCallback();
-        },
-        error: function(xhr, status, errorThrown) {
-            showAjaxError(xhr, status, errorThrown);
-        }
-    });
+    if (script) {
+        $.ajax({
+            url: script,
+            dataType: "script",
+            type: "GET",
+            success: function() {
+                if (successCallback) successCallback();
+            },
+            error: function(xhr, status, errorThrown) {
+                showAjaxError(xhr, status, errorThrown);
+            }
+        });
+    } else {
+        if (successCallback) successCallback();
+    }
 }
 
 function workTabs(e) {

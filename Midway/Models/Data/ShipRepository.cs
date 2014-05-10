@@ -88,28 +88,28 @@ namespace Midway.Models.Data
                               .Where(p => p.PlayerId == playerId && p.GameId == gameId && p.Location != "DUE")
                               .ToList();
 
-            var dtoShips = dbShips.Select(dbShip => new DtoShip
+            var dtoShips = dbShips.Select(s => new DtoShip
                 {
-                    ShipId = dbShip.ShipId, 
+                    ShipId = s.ShipId, 
                     OwningSide = sideName, 
-                    Location = dbShip.Location,
-                    Name = dbShip.Ship.Name, 
-                    ShipType = dbShip.Ship.ShipType, 
-                    SearchImgPath = dbShip.Ship.SearchImgPath, 
-                    BattleImgPath = dbShip.Ship.BattleImgPath, 
+                    Location = s.Location,
+                    Name = s.Ship.Name, 
+                    ShipType = s.Ship.ShipType, 
+                    SearchImgPath = s.Ship.SearchImgPath, 
+                    BattleImgPath = s.Ship.BattleImgPath, 
                     MovePoints = movePts, 
-                    HitsToSink = dbShip.Ship.HitsToSink, 
-                    Hits = dbShip.Hits, 
-                    ScreenStrength = dbShip.Ship.ScreenStrength, 
-                    SurfaceStrength = dbShip.Ship.SurfaceStrength,
+                    HitsToSink = s.Ship.HitsToSink, 
+                    Hits = s.Hits, 
+                    ScreenStrength = s.Ship.ScreenStrength, 
+                    SurfaceStrength = s.Ship.SurfaceStrength,
                     OriginalFortificationStrength = 0,
                     FortificationStrength = 0,
-                    AircraftCapacity = dbShip.Ship.AircraftCapacity, 
-                    TSquadrons = dbShip.TSquadrons, 
-                    FSquadrons = dbShip.FSquadrons, 
-                    DSquadrons = dbShip.DSquadrons, 
-                    AircraftState = pg.PhaseId == 1 && dbShip.AircraftState == 1 ? 2 : dbShip.AircraftState,
-                    ArrivalTurn = dbShip.Ship.ArrivalTurn
+                    AircraftCapacity = s.Ship.AircraftCapacity, 
+                    TSquadrons = s.TSquadrons, 
+                    FSquadrons = s.FSquadrons, 
+                    DSquadrons = s.DSquadrons, 
+                    AircraftState = pg.PhaseId == 1 && s.AircraftState == 1 ? 2 : s.AircraftState,
+                    ArrivalTurn = s.Ship.ArrivalTurn
                 }).ToList();
 
 
@@ -200,7 +200,7 @@ namespace Midway.Models.Data
                     TSquadrons = a.TSquadrons,
                     FSquadrons = a.FSquadrons,
                     DSquadrons = a.DSquadrons,
-                    AircraftState = a.AircraftState,
+                    AircraftState = pg.PhaseId == 1 && a.AircraftState == 1 ? 2 : a.AircraftState,
                     ArrivalTurn = 0
                 }).ToList());
             }

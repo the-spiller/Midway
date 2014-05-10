@@ -769,7 +769,7 @@ function shipsLoaded() {
                 searchGrid.drawSelector(coords, 1);
             }
             showShipsInZone(selectedZone);
-            loadPhaseTab();
+            if (game.PhaseId != 4) loadPhaseTab();
             showShipsDue();
             showOffMapShips();
         });
@@ -818,7 +818,11 @@ function touchToMouseHandler(event) {
 /*****************************************************************************/
 function loadPage(callback) {
     game = findGameById(getUrlParameter("gid"), window.player.Games);
-    var scriptPath = "/scripts/pages/search_phase_" + game.PhaseId.toString() + ".js";
+    
+    var scriptPath = "";
+    if (game.PhaseId != 4)
+        scriptPath = "/scripts/pages/search_phase_" + game.PhaseId.toString() + ".js";
+    
     ajaxLoadScript(scriptPath, function() {
         side = game.SideShortName;
 

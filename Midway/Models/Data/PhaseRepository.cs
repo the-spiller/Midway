@@ -62,60 +62,6 @@ namespace Midway.Models.Data
             dbPg.SelectedLocation = selectedZone;
             dbPg.Points = points;
             IncrementPhase(dbPg);
-            
-            var dbOppPg = _context.PlayerGames.SingleOrDefault(p => p.GameId == gameId && p.PlayerId != playerId);
-            if (dbOppPg != null)
-            {
-                if (dbPg.PhaseId == 3)  //Air Ops
-                {
-                    if (dbOppPg.PhaseId)
-                    {
-                        // opponent has not posted AirOps
-                        dbPg.
-                    }
-                }
-                    //IncrementPhase(dbPg);
-
-                    // Get phase and opponent info to see if phase is skippable
-                    var phase = _context.Phases.Single(p => p.PhaseId == dbPg.PhaseId);
-
-                if (phase.MightSkip == "Y" &&
-                    (dbOppPg == null || dbOppPg.Turn < dbPg.Turn || dbOppPg.PhaseId < dbPg.PhaseId))
-                {
-                    dbPg.PhaseIndeterminate = "Y";
-                }
-                else
-                {
-                    dbPg.PhaseIndeterminate = "N";
-
-                    while (phase.MightSkip == "Y")
-                    {
-                        switch (phase.PhaseId)
-                        {
-                            case 4: //	Air Defense Setup
-                            case 6: //  Allocate and Resolve
-                                if (!UnderAirAttack(dbPg)) IncrementPhase(dbPg);
-                                break;
-                            case 5: //	Air Attack Setup
-                            case 7: //	Air Attack Recovery
-                                if (!MakingAirAttacks(dbPg)) IncrementPhase(dbPg);
-                                break;
-                            case 8: //	Surface Combat Setup
-                                if (!SurfaceCombat(dbPg))
-                                {
-                                    dbPg.Turn++;
-                                    dbPg.PhaseId = 1;
-                                }
-                                break;
-                        }
-                        // If we didn't change phase, we're done.
-                        if (dbPg.PhaseId == phase.PhaseId) break;
-
-                        // Get new phase to see if its skippable
-                        phase = _context.Phases.Single(p => p.PhaseId == dbPg.PhaseId);
-                    }
-                }
-            }
             dbPg.LastPlayed = DateTime.Now.ToUniversalTime();
             _context.Save();
         }
@@ -129,27 +75,6 @@ namespace Midway.Models.Data
                 playerGame.PhaseId = 1;
                 playerGame.Turn++;
             }
-        }
-
-        //.....................................................................
-        internal bool UnderAirAttack(PlayerGame playerGame)
-        {
-            return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId != playerGame.PlayerId
-                                            && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
-        }
-
-        //.....................................................................
-        private bool MakingAirAttacks(PlayerGame playerGame)
-        {
-            return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId == playerGame.PlayerId
-                                               && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
-        }
-
-        //.....................................................................
-        private bool SurfaceCombat(PlayerGame playerGame)
-        {
-            // If the players have ships in a single zone and one of them knows it via a search, return true;
-            return false;
         }
     }
 }

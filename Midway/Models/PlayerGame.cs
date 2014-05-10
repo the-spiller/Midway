@@ -14,7 +14,6 @@ namespace Midway.Models
         public int Points { get; set; }
         public string SelectedLocation { get; set; }
         public int SurfaceCombatRound { get; set; }
-        public string PhaseIndeterminate { get; set; }
         public int MidwayInvadedTurn { get; set; }
 
         public virtual Game Game { get; set; }

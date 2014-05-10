@@ -19,7 +19,6 @@ namespace Midway.Models.Data.Mappings
             Property(p => p.MidwayInvadedTurn).IsRequired();
             Property(p => p.SelectedLocation).HasMaxLength(3);
 		    Property(p => p.SurfaceCombatRound).IsRequired();
-		    Property(p => p.PhaseIndeterminate).IsRequired().HasMaxLength(1);
 
 			HasMany(p => p.Airbases).WithRequired(i => i.PlayerGame).HasForeignKey(s => new { s.GameId, s.PlayerId });
 			HasMany(p => p.Ships).WithRequired(s => s.PlayerGame).HasForeignKey(s => new { s.GameId, s.PlayerId });

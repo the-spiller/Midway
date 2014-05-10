@@ -26,6 +26,7 @@ namespace Midway.Models.Data
             _context = context as MidwayContext;
         }
 
+        //.....................................................................
         public IList<DtoPlayer> GetPlayers()
         {
 	        return _context.Players.Select(p => new DtoPlayer
@@ -39,7 +40,7 @@ namespace Midway.Models.Data
 		        }).ToList();
         }
 
-        // No authorization req'd: called from login page.
+        //.....................................................................
 	    public DtoPlayer GetPlayer(string email)
 	    {
             var dtoPlayer = _context.Players.Select(p => new DtoPlayer
@@ -52,9 +53,10 @@ namespace Midway.Models.Data
 	                    Lockout = p.Lockout
 	                }).FirstOrDefault(p => p.Email.ToLower() == email.ToLower());
 
-	        return ReturnDtoPlayer(dtoPlayer);
+	        return ReturnDtoPlayer(dtoPlayer, false);
 	    }
 
+        //.....................................................................
         public DtoPlayer GetPlayer(int id)
         {
 			var dtoPlayer = _context.Players.Select(p => new DtoPlayer
@@ -71,26 +73,6 @@ namespace Midway.Models.Data
         }
 
         //.....................................................................
-		internal DtoPlayer GetPlayerWithCurrentGame(int playerId, int gameId)
-		{
-			var dtoPlayer = _context.Players.Select(p => new DtoPlayer
-			{
-				PlayerId = p.PlayerId,
-				Email = p.Email,
-				Password = p.Password,
-				Nickname = p.Nickname,
-				Admin = p.Admin,
-				Lockout = p.Lockout
-			}).FirstOrDefault(p => p.PlayerId == playerId);
-
-			if (dtoPlayer == null) return null;
-
-		    dtoPlayer.AuthKey = GetPlayerKey(dtoPlayer.PlayerId);
-			dtoPlayer.Games = GetPlayerGames(playerId, gameId);	//only one, actually
-			return dtoPlayer;
-		}
-
-        //.....................................................................
         public void SendPassword(int playerId)
         {
             Player dbPlayer = GetDbPlayer(playerId);
@@ -103,6 +85,7 @@ namespace Midway.Models.Data
             new Mailer().SendNewPwdMessage(dbPlayer.Email, dbPlayer.Nickname, dbPlayer.Password);
         }
 
+        //.....................................................................
         public void SetPlayerLockout(int playerId, long lockout)
         {
             Player dbPlayer = GetDbPlayer(playerId);
@@ -110,6 +93,7 @@ namespace Midway.Models.Data
             _context.Save();
         }
 
+        //.....................................................................
         public DtoPlayer UpdatePlayer(DtoPlayer dtoPlayer)
         {
 			var buildNew = false;
@@ -166,7 +150,6 @@ namespace Midway.Models.Data
 									    Points = 0,
 									    SelectedLocation = "",
 									    SurfaceCombatRound = 0,
-									    PhaseIndeterminate = "N",
 									    Turn = 1,
 									    PhaseId = 1,
 									    SideId = dtoPlayerGame.SideId,
@@ -201,7 +184,6 @@ namespace Midway.Models.Data
 								    Points = 0,
 								    SelectedLocation = "",
 								    SurfaceCombatRound = 0,
-								    PhaseIndeterminate = "N",
 								    Turn = 1,
 								    PhaseId = 1,
 								    SideId = dtoPlayerGame.SideId,
@@ -226,7 +208,6 @@ namespace Midway.Models.Data
 									    Points = 0,
 									    SelectedLocation = "",
 									    SurfaceCombatRound = 0,
-									    PhaseIndeterminate = "N",
 									    Turn = 1,
 									    PhaseId = 1,
 									    SideId = (dtoPlayerGame.SideId == 1) ? 2 : 1, //opposite
@@ -242,7 +223,7 @@ namespace Midway.Models.Data
 			return GetPlayer(dtoPlayer.PlayerId);
         }
 
-        // No authorization req'd: called to register new player.
+        //.....................................................................
         public DtoPlayer AddPlayer(DtoPlayer dtoPlayer)
         {
             var newPass = CreatePassword();
@@ -266,6 +247,7 @@ namespace Midway.Models.Data
             return dtoPlayer;
         }
 
+        //.....................................................................
         public void DeletePlayer(int playerId)
         {
             var player = _context.Players
@@ -307,6 +289,7 @@ namespace Midway.Models.Data
             _context.Save();
         }
 
+        //.....................................................................
         internal InsertStatus GetInsertStatus(DtoPlayer player)
 		{
 			if (_context.Players.Any(p => p.Email == player.Email))
@@ -318,6 +301,27 @@ namespace Midway.Models.Data
 			return InsertStatus.Ok;
 		}
 
+        //.....................................................................
+        internal DtoPlayer GetPlayerWithCurrentGame(int playerId, int gameId)
+        {
+            var dtoPlayer = _context.Players.Select(p => new DtoPlayer
+            {
+                PlayerId = p.PlayerId,
+                Email = p.Email,
+                Password = p.Password,
+                Nickname = p.Nickname,
+                Admin = p.Admin,
+                Lockout = p.Lockout
+            }).FirstOrDefault(p => p.PlayerId == playerId);
+
+            if (dtoPlayer == null) return null;
+
+            dtoPlayer.AuthKey = GetPlayerKey(dtoPlayer.PlayerId);
+            dtoPlayer.Games = GetPlayerGames(playerId, gameId);	//only one, actually
+            return dtoPlayer;
+        }
+
+        //.....................................................................
         private Player GetDbPlayer(int playerId)
         {
             var dbPlayer = _context.Players.FirstOrDefault(p => p.PlayerId == playerId);
@@ -325,6 +329,7 @@ namespace Midway.Models.Data
             return dbPlayer;
         }
 
+        //.....................................................................
         private DtoPlayer ReturnDtoPlayer(DtoPlayer dtoPlayer, bool loadGames = true)
         {
             if (dtoPlayer == null) return null;
@@ -341,6 +346,8 @@ namespace Midway.Models.Data
         //.....................................................................
 		private IEnumerable<DtoPlayerGame> GetPlayerGames(int playerId, int gameId = 0)
 		{
+            var dbDirty = false;
+
 			IQueryable<PlayerGame> qry;
 			if (gameId == 0)
 			{
@@ -365,79 +372,113 @@ namespace Midway.Models.Data
 
 			foreach (var dbGame in dbGames)
 			{
-                var game = dbGame;
+                dbDirty = false;
+                var searchRange = (dbGame.Side.ShortName == "IJN" || dbGame.Airbases.Count == 0) ? 12 : 0;  //zero = range is whole map
 
-                if (dbGame.PhaseIndeterminate == "Y")
-                {
-                    var phaseRepo = new PhaseRepository(_context);
-                    if (!phaseRepo.UnderAirAttack(dbGame))
-                        phaseRepo.AdvancePhase(gameId, playerId, dbGame.SelectedLocation, dbGame.Points);
-                    game = _context.PlayerGames
-                                   .Include(p => p.Phase)
-                                   .Include(p => p.Side)
-                                   .Include(p => p.Game)
-                                   .Include(p => p.Airbases).Single(p => p.PlayerId == playerId && p.GameId == gameId);
-                }
-
-				var range = (game.Side.ShortName == "USN" && game.Airbases.Count > 0) ? 0 : 12;  //zero = range is whole map
-
-				var dtoPlayerGame = new DtoPlayerGame
-				    {
-						GameId = game.GameId,
-						SideId = game.Side.SideId,
-                        PhaseId = game.PhaseId,
-                        PhaseName = game.Phase.Name,
-                        Turn = game.Turn,
-                        CompletedDTime = game.Game.CompletedDTime == null ? "" :
-                            game.Game.CompletedDTime.Value.ToString("o"),
-						TinyFlagUrl = game.Side.TinyFlagUrl,
-                        LastPlayed = game.LastPlayed == null ? "" : game.LastPlayed.Value.ToString("o"),
+                var dtoPlayerGame = new DtoPlayerGame
+                    {
+                        GameId = dbGame.GameId,
+                        SideId = dbGame.Side.SideId,
+                        PhaseId = dbGame.PhaseId,
+                        PhaseName = dbGame.Phase.Name,
+                        Turn = dbGame.Turn,
+                        CompletedDTime = dbGame.Game.CompletedDTime == null ? "" :
+                            dbGame.Game.CompletedDTime.Value.ToString("o"),
+                        TinyFlagUrl = dbGame.Side.TinyFlagUrl,
+                        LastPlayed = dbGame.LastPlayed == null ? "" : dbGame.LastPlayed.Value.ToString("o"),
                         DTimeNow = DateTime.Now.ToUniversalTime().ToString("o"),
-						Points = game.Points,
-						SelectedLocation = game.SelectedLocation,
-						SideShortName = game.Side.ShortName,
-                        Draw = game.Game.Draw,
+                        Points = dbGame.Points,
+                        SelectedLocation = dbGame.SelectedLocation,
+                        SideShortName = dbGame.Side.ShortName,
+                        Draw = dbGame.Game.Draw,
                         Waiting = "N",
                         OppWaiting = "N",
-						SearchRange = range
-					};
+                        SearchRange = searchRange
+                    };
 
-				// Opponent
-				var dbOpp = _context.PlayerGames
-					.Include(p => p.Player)
-					.FirstOrDefault(p => p.GameId == dtoPlayerGame.GameId && p.PlayerId != playerId);
+                // Opponent
+                var dbOpp = _context.PlayerGames
+                    .Include(p => p.Player)
+                    .SingleOrDefault(p => p.GameId == dbGame.GameId && p.PlayerId != playerId);
 
-				if (dbOpp != null)
-				{
-				    dtoPlayerGame.OpponentId = dbOpp.PlayerId;
-				    dtoPlayerGame.OpponentNickname = dbOpp.Player.Nickname;
-				    dtoPlayerGame.OpponentPoints = dbOpp.Points;
+			    if (dbOpp != null)
+			    {
+			        dtoPlayerGame.OpponentId = dbOpp.PlayerId;
+			        dtoPlayerGame.OpponentNickname = dbOpp.Player.Nickname;
+			        dtoPlayerGame.OpponentPoints = dbOpp.Points;
 
-                    if (dbOpp.LastPlayed != null)
-                    {
-                        if (game.LastPlayed == null || dbOpp.LastPlayed > game.LastPlayed) 
-                            dtoPlayerGame.LastPlayed = dbOpp.LastPlayed.Value.ToString("o");
-				    }
-				    if (dtoPlayerGame.PhaseId > 1)
-				    {
-                        if (game.Turn > dbOpp.Turn || (game.Turn == dbOpp.Turn && game.PhaseId > dbOpp.PhaseId))
+			        if (dbOpp.LastPlayed != null)
+			        {
+			            if (dbGame.LastPlayed == null || dbOpp.LastPlayed > dbGame.LastPlayed)
+			                dtoPlayerGame.LastPlayed = dbOpp.LastPlayed.Value.ToString("o");
+			        }
+
+			        if (dbGame.Game.CompletedDTime == null)
+			        {
+                        if (dbGame.PhaseId == 4)
+                        {
+                            // If opponent postd AirOps, we can move off of phase 4
+                            if (dbOpp.Turn > dbGame.Turn || dbOpp.PhaseId > 3)
+                            {
+                                if (UnderAirAttack(dbGame))
+                                {
+                                    dbGame.PhaseId = dtoPlayerGame.PhaseId = 5; // Air Defense Setup
+                                    dtoPlayerGame.Waiting = "N";
+                                    dbDirty = true;
+                                }
+                                else if (MakingAirAttacks(dbGame))
+                                {
+                                    dbGame.PhaseId = dtoPlayerGame.PhaseId = 6; // Air Attack Setup
+                                    dtoPlayerGame.Waiting = dbOpp.PhaseId > 5 ? "N" : "Y";
+                                    dbDirty = true;
+                                }
+                                else if (SurfaceCombat(dbGame))
+                                {
+                                    dbGame.PhaseId = dtoPlayerGame.PhaseId = 9; // Surface Combat Setup
+                                    dtoPlayerGame.Waiting = "N";
+                                    dbDirty = true;
+                                }
+                                else
+                                {
+                                    dbGame.Turn++;
+                                    dtoPlayerGame.Turn = dbGame.Turn;
+                                    dbGame.PhaseId = dtoPlayerGame.PhaseId = 1; // Search Board Move
+                                    dtoPlayerGame.Waiting = "N";
+                                    dbDirty = true;
+                                }
+                            }
+                            else
+                            {
+                                // Stuck on phase 4
+                                dtoPlayerGame.Waiting = "Y";
+                            }
+                        }
+                        else if (dbGame.PhaseId > 1 && 
+                            (dbGame.Turn > dbOpp.Turn || (dbGame.Turn == dbOpp.Turn && dbGame.PhaseId > dbOpp.PhaseId)))
+                        {
                             dtoPlayerGame.Waiting = "Y";
-                        else if (dbOpp.Turn > game.Turn || (dbOpp.Turn == game.Turn && dbOpp.PhaseId > game.PhaseId))
-                            dtoPlayerGame.OppWaiting = "Y";
-				    }
-				}
-				else
-				{
-				    dtoPlayerGame.OpponentId = 0;
-				    dtoPlayerGame.OpponentPoints = 0;
-				    dtoPlayerGame.Waiting = dtoPlayerGame.PhaseId > 1 ? "Y" : "N";
-				    dtoPlayerGame.OppWaiting = "N";
-				}
-				dtoPlayerGames.Add(dtoPlayerGame);
+                        }
+
+			            if (dbOpp.Turn > dbGame.Turn || (dbOpp.Turn == dbGame.Turn && dbOpp.PhaseId > dbGame.PhaseId))
+			                dtoPlayerGame.OppWaiting = "Y";
+			        }
+			    }
+                else
+                {
+                    // no opponent yet
+                    dtoPlayerGame.OpponentId = 0;
+                    dtoPlayerGame.OpponentPoints = 0;
+                    dtoPlayerGame.Waiting = dtoPlayerGame.PhaseId > 1 ? "Y" : "N";
+                    dtoPlayerGame.OppWaiting = "N";
+                }
+                dtoPlayerGames.Add(dtoPlayerGame);
 			}
-			return dtoPlayerGames;
+		    if (dbDirty) _context.Save();
+
+            return dtoPlayerGames;
 		}
 
+        //.....................................................................
         private string CreatePassword()
         {
             const string validChars = "abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ1234567890!$%*23456789";
@@ -449,6 +490,7 @@ namespace Midway.Models.Data
             return newPass;
         }
         
+        //.....................................................................
         private string RegisterPlayer(int id, string admin)
         {
             var token = Guid.NewGuid().ToString();
@@ -466,12 +508,34 @@ namespace Midway.Models.Data
             return token;
         }
 
+        //.....................................................................
         private string GetPlayerKey(int id)
         {
             var cache = MemoryCache.Default;
             var entry = (DtoPlayer)cache.Get(id.ToString(CultureInfo.InvariantCulture));
             if (entry == null) return string.Empty;
             return entry.AuthKey;
+        }
+
+        //.....................................................................
+        private bool UnderAirAttack(PlayerGame playerGame)
+        {
+            return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId != playerGame.PlayerId
+                                            && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
+        }
+
+        //.....................................................................
+        private bool MakingAirAttacks(PlayerGame playerGame)
+        {
+            return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId == playerGame.PlayerId
+                                               && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
+        }
+
+        //.....................................................................
+        private bool SurfaceCombat(PlayerGame playerGame)
+        {
+            // If the players have ships in a single zone and one of them knows it via a search, return true;
+            return false;
         }
     }
 }
