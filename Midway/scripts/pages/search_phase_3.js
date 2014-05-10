@@ -1,11 +1,18 @@
 ﻿
 // Events and functions for Phase 3 (Air Ops)
 
-var oppSearches = [];
+var oppSearches = [],
+    mouseOverSearchItem = false;
 
-$(document).on("mouseenter", ".oppsearchitem", function (e) {
-    showOppSearchedArea(e);
-}).on("mouseleave", ".oppsearchitem", function () {
+$(document).on("mouseover", ".oppsearchitem", function (e) {
+    mouseOverSearchItem = true;
+    showOppSearchedArea(e.target);
+}).on("mouseout", ".oppsearchitem", function() {
+    mouseOverSearchItem = false;
+    hideOppSearchedArea();
+}).on("mouseover", ".oppsearchimg", function(e) {
+    showOppSearchedArea(e.target.parentNode.parentNode);
+}).on("mouseout", ".oppsearchimg", function() {
     hideOppSearchedArea();
 }).on("click", "#airopadd", function () {
     addAirOperation();
@@ -34,7 +41,7 @@ function loadPhaseTab() {
                     searchImgSrc = seaPath;
                 }
 
-                var zones = "No ships sighted";
+                var zones = "";
                 if (oppSearches[i].Markers.length) {
                     zones = "<span style=\"color: #ffd651;\">Ships sighted at ";
                     for (var j = 0; j < oppSearches[i].Markers.length; j++) {
@@ -43,7 +50,7 @@ function loadPhaseTab() {
                     zones = zones.substr(0, zones.length - 2) + "</span>";
                 }
                 tabHtml += "<tr id=\"" + oppSearches[i].Area + "\" class=\"oppsearchitem\"><td style=\"width: 40%;\">" +
-                    "<img src=\"" + searchImgSrc + "\" /></td><td>Area " + oppSearches[i].Area +
+                    "<img class=\"oppsearchimg\" src=\"" + searchImgSrc + "\" /></td><td>Area " + oppSearches[i].Area +
                     "<br />" + zones + "</td></tr>";
             }
             tabHtml += "</table>";
@@ -81,19 +88,22 @@ function anyAircraftReady() {
 /*-------------------------------------------------------------------*/
 /* Highlight the area of an opponent's search item.                  */
 /*-------------------------------------------------------------------*/
-function showOppSearchedArea(e) {
-    window.mapImg = searchGrid.grabImageData();
-    var area = $(e.target).text().substr(5, 2);
-    if (area)
-        searchGrid.drawOppSearchArea(area);
+function showOppSearchedArea(target) {
+    if (!window.mapImg) {
+        window.mapImg = searchGrid.grabImageData();
+        var area = $(target).text().substr(5, 2);
+        if (area)
+            searchGrid.drawOppSearchArea(area);
+    }
 }
 
 /*-------------------------------------------------------------------*/
 /* Remove the highlight of an opponent's search item's area.         */
 /*-------------------------------------------------------------------*/
 function hideOppSearchedArea() {
-    if (mapImg) {
+    if (window.mapImg) {
         searchGrid.restoreImageData(mapImg, 0, 0);
+        window.mapImg = null;
     }
 }
 
@@ -138,6 +148,9 @@ function splitOffOpponentSearches() {
 /* table on AirOps tab.                                              */
 /*-------------------------------------------------------------------*/
 function addAirOperation() {
+    alert("Air Ops dialog goes here");
+    return;
+    
     captureAirOpInputs(function (resp) {
         hideDialog();
         if (resp == "OK") {

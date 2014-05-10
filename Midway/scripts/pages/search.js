@@ -109,7 +109,9 @@ function goHome() {
 function drawSightings() {
     for (var i = 0; i < searches.length; i++) {
         for (var j = 0; j < searches[i].Markers.length; j++) {
-            searchGrid.drawSightingMarker(searches[i].Markers[j].Zone);
+            var zone = searches[i].Markers[j].Zone;
+            var age = game.Turn - searches[i].Turn;
+            searchGrid.drawSightingMarker(zone, age);
         }
     }
 }
@@ -316,13 +318,13 @@ function getShipListItemHtml(ship, showAvailMove) {
     }
     
     if (ship.ShipType == "CV" || ship.ShipType == "CVL" || ship.ShipType == "BAS") {
-        readyDesc = ship.AircraftState == 0 ? "Not ready" : (ship.AircraftState == 1 ? "Readying" : "Ready");
+        readyDesc = ship.AircraftState == 0 ? "not ready" : (ship.AircraftState == 1 ? "readying" : "ready");
         readyClass = game.PhaseId == 1 ? " clickme" : "";
         readyImg = "<img src=\"/content/images/search/ready-" + ship.AircraftState + ".png\" />";
         html += "<div class=\"numplanes torpedo\">" + ship.TSquadrons + "</div>" +
             "<div class=\"numplanes fighter\">" + ship.FSquadrons + "</div>" +
             "<div class=\"numplanes divebomber\">" + ship.DSquadrons + "</div>" +
-            "<div class=\"airreadiness" + readyClass + "\" title=\"" + readyDesc + "\" id=\"ready-" + shipId + "\">" +
+            "<div class=\"airreadiness" + readyClass + "\" title=\"Aircraft " + readyDesc + "\" id=\"ready-" + shipId + "\">" +
             readyImg + "</div>";
     }
     html += "<div class=\"shiphits green\"><img src=\"" + hitsDir + availHits + "-hitsgreen.png\"></div>";
@@ -335,18 +337,21 @@ function getShipListItemHtml(ship, showAvailMove) {
 }
 
 /*-------------------------------------------------------------------*/
-/* Display on the Zone tab enemy ship types found in a zone.         */
+/* Build up and return the HTML for enemy ship types found per the   */
+/* input marker.                                                     */
 /*-------------------------------------------------------------------*/
 function getSightedShipsHtml(searchMarker, searchTurn) {
     var otherside = side == "USN" ? "ijn" : "usn",
         align = side == "USN" ? "left" : "right",
         turns = game.Turn - searchTurn,
-        found = turns == 0 ? "this turn" : turns == 1 ? "a turn ago" : turns + " turns ago",
-        html = "<table class=\"noselect\"><tr><td colspan=\"2\">Ship types sighted (" + found + ")</td></tr>",
+        found = turns == 0 ? "this turn" : turns == 1 ? "one turn ago" : turns + " turns ago",
+        html = "<table class=\"noselect\"><tr><td colspan=\"3\">Ship types sighted (" + found +
+            ")</td></tr>",
         types = searchMarker.TypesFound.split(",");
 
     for (var i = 0; i < types.length; i++) {
-        html += "<tr><td class=\"sightedship\" style=\"text-align: " + align + ";\"><img src=\"" + imgDir + "ships/" + otherside + types[i] + ".png\" /></td>" +
+        html += "<tr><td style=\"width: 20%;\"></td><td style=\"text-align: " + align + ";\" class=\"sightedship\">" +
+            "<img src=\"" + imgDir + "ships/" + otherside + types[i] + ".png\" /></td>" +
             "<td class=\"sightedlabel\">" + typeName(types[i]) + "</td></tr>";
     }
     return html + "</table>";
@@ -575,12 +580,27 @@ function ajaxLoadSearches(successCallback) {
         success: function(data) {
             searches = JSON.parse(data);
             if (game.PhaseId == 3) splitOffOpponentSearches();
+
+            logSearches();
+            
             if (successCallback) successCallback();
         },
         error: function(xhr, status, errorThrown) {
             showAjaxError(xhr, status, errorThrown);
         }
     });
+}
+
+function logSearches() {
+    for (var i = 0; i < searches.length; i++) {
+        console.log("Search game id " + searches[i].GameId +
+            ", player id " + searches[i].PlayerId +
+            ", turn " + searches[i].Turn +
+            ", number " + searches[i].SearchNumber +
+            ", type " + searches[i].SearchType +
+            ", area " + searches[i].Area +
+            ", " + searches[i].Markers.length + " markers");
+    }
 }
 /*-------------------------------------------------------------------*/
 /* Make ajax call to post phase data back to the server.             */
@@ -609,7 +629,6 @@ function ajaxPutPhase(successCallback) {
             SelectedZone: selectedZone,
             Points: game.Points,
             Ships: shipsToPass,
-            Searches: searches,
             AirOps: airOps
         }),
         success: function(data) {

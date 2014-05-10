@@ -7,7 +7,6 @@ using Midway.Models.DTOs;
 
 namespace Midway.Models.Data
 {
-	[Authorize]
     public class PhaseRepository
     {
         private readonly MidwayContext _context;

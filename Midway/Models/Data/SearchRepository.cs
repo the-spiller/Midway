@@ -20,61 +20,89 @@ namespace Midway.Models.Data
 
 		public IOrderedEnumerable<DtoSearch> GetSearches(int gameId, int playerId)
 		{
-			// Three parts: 1) searches from prior turns that still have marker records,
-			// 2) searches for/from the current turn (including as yet unused searches),
-            // and 3) opponent's searches this turn if game phase is Air Operations.
 			var pg = _context.PlayerGames
 				.Include(p => p.Side)
 				.SingleOrDefault(p => p.GameId == gameId && p.PlayerId == playerId);
 			if (pg == null)
-				throw new ArgumentException("Unable to find game having input game and player IDs.");
+				throw new ArgumentException("Unable to find PlayerGame having input game and player IDs.");
 
-			// Part One:
-		    var searches = new List<DtoSearch>();
-		    foreach (var s in _context.PlayerGameSearchMarkers
-				              .Include(p => p.PlayerGameSearch)
-				              .Where(p => p.GameId == gameId && p.PlayerId == playerId)
-							  .ToList())
+            // Housekeeping: if it's the first phase of a new turn, delete searches from prior turns that do not
+            // have a marked zone (e.g. were not successful).
+            if (pg.PhaseId == 1)
+            {
+                var dbDelSearches = _context.PlayerGameSearches
+                                         .Include(s => s.SearchMarkers)
+                                         .Where(
+                                             s =>
+                                             s.GameId == gameId && s.PlayerId == playerId 
+                                                && (s.Turn < pg.Turn && s.SearchMarkers.Count == 0)
+                                                || (pg.Turn - s.Turn > 4))
+                                         .ToList();
+
+                foreach (var dbSearch in dbDelSearches)
+                {
+                    while (dbSearch.SearchMarkers.Count > 0)
+                    {
+                        dbSearch.SearchMarkers.Remove(dbSearch.SearchMarkers[0]);
+                    }
+                    _context.PlayerGameSearches.Remove(dbSearch);
+                }
+                _context.Save();
+            }
+
+            // Three groups in the searches to be returned:
+            // 1) searches w/ markers from prior turns
+			// 2) new searches available for, and those executed in, the search phase in this turn
+            // 3) opponent's searches this turn if game phase is Air Operations.
+
+			// Get group 1.
+		    var dtoSearches = new List<DtoSearch>();
+		    var dbSearches = _context.PlayerGameSearches
+		                             .Include(s => s.SearchMarkers)
+		                             .Where(s => s.GameId == gameId && s.PlayerId == playerId)
+		                             .ToList();
+
+		    foreach (var dbSearch in dbSearches)
 		    {
-			    if (pg.PhaseId == 2 && s.Turn == pg.Turn) continue;
+		        if (pg.PhaseId == 2 && dbSearch.Turn == pg.Turn) continue;  //we'll get them w/ group 2
 
-			    var marker = new DtoSearchMarker
-				    {
-					    Zone = s.Zone,
-					    TypesFound = s.TypesFound
-				    };
-			    var search = searches.SingleOrDefault(e => e.Turn == s.Turn && e.SearchNumber == s.SearchNumber);
-			    if (search == null)
-			    {
-				    search = new DtoSearch
-					    {
-						    GameId = gameId,
-						    PlayerId = playerId,
-						    Turn = s.Turn,
-						    SearchNumber = s.SearchNumber,
-						    SearchType = s.PlayerGameSearch.SearchType,
-						    Area = s.PlayerGameSearch.Area,
-						    Markers = new List<DtoSearchMarker>()
-					    };
-				    searches.Add(search);
-			    }
-			    search.Markers.Add(marker);
+		        var dtoSearch = new DtoSearch
+		            {
+		                GameId = dbSearch.GameId,
+		                PlayerId = dbSearch.PlayerId,
+		                Turn = dbSearch.Turn,
+		                SearchNumber = dbSearch.SearchNumber,
+		                SearchType = dbSearch.SearchType,
+		                Area = dbSearch.Area,
+		                Markers = new List<DtoSearchMarker>()
+		            };
+
+		        foreach (var dbMarker in dbSearch.SearchMarkers)
+		        {
+		            dtoSearch.Markers.Add(new DtoSearchMarker
+		                {
+		                    Zone = dbMarker.Zone,
+		                    TypesFound = dbMarker.TypesFound
+		                });
+		        }
+		        dtoSearches.Add(dtoSearch);
 		    }
 
-			//Part Two:
-			if (pg.PhaseId == 2)	// add used/unused searches for this turn
+            //Get group 2: new searches available for the search phase in this turn
+			if (pg.PhaseId == 2)
 			{
 				// determine the number of searches available
-				var airSearchMax = pg.Side.ShortName == "USN" ? 4 : 3;
+				var airSearchMax = pg.Side.ShortName == "USN" ? 4 : 3;  // USN player always gets four, even after losing Midway
 				var seaSearchMax = _context.PlayerGameShips
 							.Where(s => s.GameId == gameId && s.PlayerId == playerId
-								&& ("1234567").Contains(s.Location.Substring(1, 1)))
+								&& ("1234567").Contains(s.Location.Substring(1, 1)))   // on the map
 					        .Select(s => s.Location)
 					        .Distinct()
 					        .Count();
 				var airSearchCount = 0;
 				var seaSearchCount = 0;
 				var searchNumber = 0;
+
 				foreach (var s in _context.PlayerGameSearches
 				                          .Include(p => p.SearchMarkers)
 				                          .Where(p => p.GameId == gameId && p.PlayerId == playerId && p.Turn == pg.Turn))
@@ -98,7 +126,7 @@ namespace Midway.Models.Data
 								TypesFound = m.TypesFound
 							});
 					}
-					searches.Add(search);
+					dtoSearches.Add(search);
 
 					if (s.SearchType == "air")
 						airSearchCount++;
@@ -109,7 +137,7 @@ namespace Midway.Models.Data
 				{
 					if (airSearchCount < airSearchMax)
 					{
-						searches.Add(new DtoSearch
+						dtoSearches.Add(new DtoSearch
 							{
 								GameId = gameId,
 								PlayerId = playerId,
@@ -123,7 +151,7 @@ namespace Midway.Models.Data
 					}
 					if (seaSearchCount < seaSearchMax)
 					{
-						searches.Add(new DtoSearch
+						dtoSearches.Add(new DtoSearch
 							{
 								GameId = gameId,
 								PlayerId = playerId,
@@ -168,10 +196,10 @@ namespace Midway.Models.Data
                             });
                         }
                     }
-                    searches.Add(search);
+                    dtoSearches.Add(search);
                 }
             }
-            return searches.OrderBy(s => s.Turn).ThenBy(s => s.PlayerId).ThenBy(s => s.SearchType).ThenBy(s => s.Area);
+            return dtoSearches.OrderBy(s => s.Turn).ThenBy(s => s.PlayerId).ThenBy(s => s.SearchType).ThenBy(s => s.Area);
 		    //return searches.OrderBy(s => new { s.Turn, s.PlayerId, s.SearchType, s.Area });
 		}
 
@@ -238,53 +266,6 @@ namespace Midway.Models.Data
 		    }
 		    _context.Save();
             return dtoSearch;
-		}
-
-		internal void RemoveSearchMarkers(int gameId, int playerId, IList<DtoSearch> searches)
-		{
-			if (searches == null || searches.Count == 0) return;
-
-		    int currentTurn =  _context.PlayerGames
-                .Where(p => p.GameId == gameId && p.PlayerId == playerId)
-                .Select(p => p.Turn)
-                .Single();
-
-            // Becuase users can delete search markers, remove search marker records without a corresponding marker
-            // in the input search.
-            foreach (var search in searches)
-            {
-                var dbMatch = _context.PlayerGameSearches
-                    .SingleOrDefault(p => p.GameId == search.GameId
-                        && p.PlayerId == search.PlayerId
-                        && p.Turn == search.Turn
-                        && p.Area == search.Area);
-
-                if (dbMatch != null)
-                {
-                    if (search.Markers != null && search.Markers.Count > 0)
-                    {
-                        IList<string> inputZones = search.Markers.Select(m => m.Zone).ToList();
-                        var noGood = dbMatch.SearchMarkers.Where(m => !inputZones.Contains(m.Zone)).ToList();
-
-                        while (noGood.Count > 0)
-                        {
-                            dbMatch.SearchMarkers.Remove(noGood[0]);
-                        }
-                    }
-                }
-            }
-
-            // Remove all searches from earlier turns that do not have markers
-		    var searchesToDelete = _context.PlayerGameSearches
-                .Include(p => p.SearchMarkers)
-		        .Where(p => p.Turn < currentTurn && p.SearchMarkers.Count == 0)
-                .ToList();
-
-            while (searchesToDelete.Count > 0)
-            {
-                _context.PlayerGameSearches.Remove(searchesToDelete[0]);
-            }
-		    _context.Save();
 		}
 	}
 }

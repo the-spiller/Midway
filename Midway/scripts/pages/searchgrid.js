@@ -190,11 +190,16 @@
         /* Grab preloaded sighting image and draw it at the input zone's     */
         /* canvas coordinates.                                               */
         /*-------------------------------------------------------------------*/
-        drawSightingMarker: function (zone) {
+        drawSightingMarker: function (zone, age) {
             var topLeft = privZoneToTopLeftCoords(zone),
                 sightingImg = document.getElementById("sighting");
             
+            ctx.save();
+            if (age > 0) {
+                ctx.globalAlpha = 1 - (age * 0.2);
+            }
             ctx.drawImage(sightingImg, topLeft.x, topLeft.y);
+            ctx.restore();
         },
         /*-------------------------------------------------------------------*/
         /* Grab preloaded fleet image and draw it at the input canvas        */

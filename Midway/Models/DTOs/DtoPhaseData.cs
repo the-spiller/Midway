@@ -10,7 +10,6 @@ namespace Midway.Models.DTOs
         public int Points { get; set; }
 
         public IList<DtoShip> Ships { get; set; }
-        public IList<DtoSearch> Searches { get; set; }
         public IList<DtoAirOp> AirOps { get; set; }
     }
 }
