@@ -250,10 +250,11 @@ function showShipsDue() {
         if (ships[i].Location == "DUE") {
             if (ships[i].ArrivalTurn != arrivalTurn) {
                 arrivalTurn = ships[i].ArrivalTurn;
-                var dueDate = militaryDateTimeStr(gameTimeFromTurn(arrivalTurn), false);
-                var turns = arrivalTurn - game.Turn;
+                var dueDate = militaryDateTimeStr(gameTimeFromTurn(arrivalTurn), false),
+                    turns = arrivalTurn - game.Turn,
+                    turnsText = turns > 1 ? " (" + turns + " turns)" : " (next turn)";
                 html += "</ul><div class=\"listheader\">Due " +
-                    dueDate + " (" + turns + " turns)</div><ul>";
+                    dueDate + turnsText + "</div><ul>";
             }
             html += getShipListItemHtml(ships[i], false);
         }
@@ -764,6 +765,7 @@ function setTabs() {
 /* Callback for ajaxLoadShips call. Set up the various ships display */
 /* elements, draw the search map and markers.                        */
 /*-------------------------------------------------------------------*/
+
 function shipsLoaded() {
     var wait = "";
     if (game.Waiting == "Y") {
@@ -772,8 +774,9 @@ function shipsLoaded() {
     }
 
     var gameStatus = "<span class=\"shrinkit\">" + militaryDateTimeStr(gameTimeFromTurn(game.Turn), true) +
-        " vs. " + (game.OpponentNickname || "?") + " - " + phase.Name +
-        " Phase <img class=\"helpicon\" src=\"/content/images/helpicon.png\" title=\"" + phase.Description + "\" /> " + wait;
+        " " + phase.Name + " Phase <img class=\"helpicon\" src=\"/content/images/helpicon.png\" title=\"" +
+        phase.Description + "\" /> vs. " + (game.OpponentNickname || "?") + wait;
+
     $("#gamedesc").addClass(captionColor).html("SEARCH MAP <img src=\"" + flagImg + "\" />" + gameStatus);
 
     ajaxLoadSearches(function () {
@@ -788,7 +791,21 @@ function shipsLoaded() {
                 searchGrid.drawSelector(coords, 1);
             }
             showShipsInZone(selectedZone);
-            if (game.PhaseId != 4) loadPhaseTab();
+            
+            switch (game.PhaseId) {
+                case 1:
+                    loadMovePhaseTab();
+                    break;
+                case 2:
+                    loadSearchPhaseTab();
+                    break;
+                case 3:
+                    loadAirOpsPhaseTab();
+                    break;
+                case 5:
+                    loadAirDefensePhaseTab();
+                    break;
+            }
             showShipsDue();
             showOffMapShips();
         });

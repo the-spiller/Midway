@@ -417,24 +417,27 @@ namespace Midway.Models.Data
 			        {
                         if (dbGame.PhaseId == 4)
                         {
-                            // If opponent postd AirOps, we can move off of phase 4
-                            if (dbOpp.Turn > dbGame.Turn || dbOpp.PhaseId > 3)
+                            // If opponent posted AirOps, we can move off of phase 4
+                            if (dbOpp.Turn > dbGame.Turn || (dbOpp.Turn == dbGame.Turn && dbOpp.PhaseId > 3))
                             {
                                 if (UnderAirAttack(dbGame))
                                 {
                                     dbGame.PhaseId = dtoPlayerGame.PhaseId = 5; // Air Defense Setup
+                                    dtoPlayerGame.PhaseName = GetPhaseName(5);
                                     dtoPlayerGame.Waiting = "N";
                                     dbDirty = true;
                                 }
                                 else if (MakingAirAttacks(dbGame))
                                 {
                                     dbGame.PhaseId = dtoPlayerGame.PhaseId = 6; // Air Attack Setup
+                                    dtoPlayerGame.PhaseName = GetPhaseName(6);
                                     dtoPlayerGame.Waiting = dbOpp.PhaseId > 5 ? "N" : "Y";
                                     dbDirty = true;
                                 }
                                 else if (SurfaceCombat(dbGame))
                                 {
                                     dbGame.PhaseId = dtoPlayerGame.PhaseId = 9; // Surface Combat Setup
+                                    dtoPlayerGame.PhaseName = GetPhaseName(9);
                                     dtoPlayerGame.Waiting = "N";
                                     dbDirty = true;
                                 }
@@ -443,6 +446,7 @@ namespace Midway.Models.Data
                                     dbGame.Turn++;
                                     dtoPlayerGame.Turn = dbGame.Turn;
                                     dbGame.PhaseId = dtoPlayerGame.PhaseId = 1; // Search Board Move
+                                    dtoPlayerGame.PhaseName = GetPhaseName(1);
                                     dtoPlayerGame.Waiting = "N";
                                     dbDirty = true;
                                 }
@@ -536,6 +540,12 @@ namespace Midway.Models.Data
         {
             // If the players have ships in a single zone and one of them knows it via a search, return true;
             return false;
+        }
+
+        //.....................................................................
+        private string GetPhaseName(int phaseId)
+        {
+            return _context.Phases.Single(p => p.PhaseId == phaseId).Name;
         }
     }
 }

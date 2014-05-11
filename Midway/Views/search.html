@@ -48,6 +48,14 @@
                 color: #ffd651;    
             }
 
+            #dlgairops {
+                display: none;
+                position: absolute;
+                text-align: left;
+                box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+                padding: 20px;
+            }
+
             .tablistitem.tabshown {
                 background-color: #093a67;
             }
@@ -236,9 +244,43 @@
 
         <div id="dlgoverlay">
             <div id="dlgcontent">
-                <div id="dlghead"></div>
+                <div id="dlghead" class="draghead"></div>
                 <div id="dlgbody"></div>
                 <div id="dlgbuttons"></div>
+            </div>
+            <div id="dlgairops" class="bluedlg">
+                <div id="airopshead" class="draghead"></div>
+                <table>
+                    <tr>
+                        <td>
+                            Zone:
+                        </td>
+                        <td>
+                            <input type="text" id="airopzone" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Mission:
+                        </td>
+                        <td>
+                            <select id="airopmission">
+                                <option value="attack">Attack</option>
+                                <option value="cap">Combat Air Patrol</option>
+                                <option value="relocate">Relocate</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            Aircraft:
+                        </td>
+                    </tr>
+                </table>
+                <div id="airopbuttons">
+                    <a class="flatbutton graybtn">OK</a>
+                    <a class="flatbutton graybtn">Cancel</a>
+                </div>
             </div>
         </div>
 

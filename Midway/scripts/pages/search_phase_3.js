@@ -21,7 +21,7 @@ $(document).on("mouseover", ".oppsearchitem", function (e) {
 /*-------------------------------------------------------------------*/
 /* Load the Air Ops tab with its control elements.                   */
 /*-------------------------------------------------------------------*/
-function loadPhaseTab() {
+function loadAirOpsPhaseTab() {
     var tabHtml = "<div style=\"margin: 5px 0 15px 5px;\">";
     // Opponent's searches
     if (game.Waiting == "Y") {
@@ -144,19 +144,30 @@ function splitOffOpponentSearches() {
 }
 
 /*-------------------------------------------------------------------*/
-/* Show air op dialog and capture data for new aip op. Display in    */
+/* Show air op dialog and capture data for new op. Display new op in */
 /* table on AirOps tab.                                              */
 /*-------------------------------------------------------------------*/
 function addAirOperation() {
-    alert("Air Ops dialog goes here");
-    return;
+    var buttonClicked;
     
-    captureAirOpInputs(function (resp) {
-        hideDialog();
-        if (resp == "OK") {
-            
-        }
+    $("#dlgairops .flatbutton").on("click", function (e) {
+        e.stopPropagation();
+        $("#dlgairops").css("display", "none");
+        $("#dlgoverlay").css("display", "none");
+        buttonClicked = e.target.innerHTML;
+
+        console.log(buttonClicked);
     });
+    
+    $("#airopzone").val(selectedZone);
+    $("#dlgairops").css("display", "block");
+    $("#dlgoverlay").css("display", "block").focus();
+    //captureAirOpInputs(function (resp) {
+    //    hideDialog();
+    //    if (resp == "OK") {
+            
+    //    }
+    //});
 }
 
     

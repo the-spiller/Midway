@@ -1,7 +1,7 @@
 ﻿
-// Events and functions for Phase 4 (Air Defense Setup)
+// Events and functions for Phase 5 (Air Defense Setup)
 
-function loadPhaseTab() {
+function loadAirDefensePhaseTab() {
     var tabHtml = "<div style=\"margin: 5px 0 15px 5px;\">";
     if (game.Waiting == "Y") {
         tabHtml += "Waiting for opponent</div>";

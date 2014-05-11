@@ -4,6 +4,7 @@
 $(document).on("mousedown", ".shipitem", function() {
     shipItemMouseDown();
 }).on("click", ".airreadiness", function (e) {
+    if (game.PhaseId != 1) return;
     e.stopPropagation();
     setAircraftState(this);
 });
@@ -30,7 +31,7 @@ $("#canvii").on("mousedown", function (e) {
 /* Display on the Arrived tab the player's ships that have           */
 /* arrived this turn and are not yet on the map.                     */
 /*-------------------------------------------------------------------*/
-function loadPhaseTab() {
+function loadMovePhaseTab() {
     var arrivals = [],
         html = "<div style=\"margin: 5px;\">No ships arrived this turn.</div>";
     

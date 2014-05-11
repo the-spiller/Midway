@@ -233,8 +233,8 @@ namespace Midway.Models.Data
 		    {
 		        // Add a marker for each zone in the searched area where ship(s) were found
 		        // (to both the DB and the DtoSearch we'll return).
-               search.SearchMarkers = new List<PlayerGameSearchMarker>();
-		       dtoSearch.Markers = new List<DtoSearchMarker>();
+		        search.SearchMarkers = new List<PlayerGameSearchMarker>();
+		        dtoSearch.Markers = new List<DtoSearchMarker>();
 
 		        // Build up ship type list strings for each location
 		        var zones = new Dictionary<string, string>();
@@ -250,7 +250,8 @@ namespace Midway.Models.Data
 		            }
 		        }
 
-                foreach (var zone in zones) {
+		        foreach (var zone in zones)
+		        {
 		            search.SearchMarkers.Add(new PlayerGameSearchMarker
 		                {
 		                    Zone = zone.Key,
@@ -263,6 +264,18 @@ namespace Midway.Models.Data
 		                    TypesFound = zone.Value
 		                });
 		        }
+		    }
+		    else
+		    {
+		        // No ships sighted, so if there are older markers in this area, get rid of them
+		        var oldMarkers = _context.PlayerGameSearchMarkers
+		                                 .Where(m => m.GameId == search.GameId && m.PlayerId == search.PlayerId
+                                                     && m.Turn < search.Turn && m.Zone.Substring(0, 2) == search.Area)
+		                                 .ToList();
+                foreach (var oldMarker in oldMarkers)
+                {
+                    _context.PlayerGameSearchMarkers.Remove(oldMarker);
+                }
 		    }
 		    _context.Save();
             return dtoSearch;
