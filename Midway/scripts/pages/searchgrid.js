@@ -142,7 +142,7 @@
             return privCoordsToTopLeftCoords(coords);
         },
         /*-------------------------------------------------------------------*/
-        /* Calculate and return the distance, in zones, between two zones.   */
+        /* Calculate and return the distance in zones between two zones.     */
         /*-------------------------------------------------------------------*/
         zoneDistance: function (zone1, zone2) {
             var zone1Coords = privZoneToTopLeftCoords(zone1),

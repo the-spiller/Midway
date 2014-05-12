@@ -559,8 +559,48 @@ $(document).ready(function () {
         buildRecord();
         buildGameList();
         getPlayers();
-
+       
         window.currentPage = "home";
+        
+        // SignalR.....................................................................
+        //$(function () {
+        //    ajaxLoadScript("/scripts/vendor/jquery.signalR-2.0.3.min.js", function () {
+        //        ajaxLoadScript("/signalr/hubs", function () {
+        //            // Reference the auto-generated proxy for the hub.  
+        //            var chat = $.connection.chatHub;
+
+        //            // Create a function that the hub can call back to display messages.
+        //            chat.client.addMessageToChat = function (sender, message) {
+        //                $("#chatstream").append("<li><strong>" + sender + ": </strong>" + message + "</li>");
+        //            };
+
+        //            // Start the connection.
+        //            console.log("connecting...");
+        //            $.connection.hub.start().done(function() {
+        //                console.log("connection started");
+                        
+        //                $("#chatdiv").css("display", "block").draggable({
+        //                    handle: "#chathead",
+        //                    containment: "#pagediv",
+        //                    scroll: false
+        //                });
+
+        //                $("#chatdiv .flatbutton").on("click", function () {
+        //                    var msg = $("#chatout").val();
+        //                    if (msg) {
+        //                        chat.server.broadcast(window.player.Nickname, msg);
+        //                        $("#chatout").val("").focus();
+        //                    }
+        //                });
+
+        //                $("#chatclose").on("click", function () {
+        //                    $.connection.hub.stop(connect);
+        //                    $("#chatdiv").css("display", "none");
+        //                });
+        //            });
+        //        });
+        //    });
+        //});
     });
 });
 

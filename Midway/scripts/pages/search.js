@@ -388,7 +388,6 @@ function getSelectedShips(tabId) {
     for (var i = 0; i < list.length; i++) {
         if (list[i].id.indexOf("airbase-") == -1) {
             id = list[i].id.substr(list[i].id.indexOf("-") + 1);
-            console.log(id);
             selShips.push(getShipById(id));
         }
     }
@@ -581,9 +580,6 @@ function ajaxLoadSearches(successCallback) {
         success: function(data) {
             searches = JSON.parse(data);
             if (game.PhaseId == 3) splitOffOpponentSearches();
-
-            logSearches();
-            
             if (successCallback) successCallback();
         },
         error: function(xhr, status, errorThrown) {
@@ -867,13 +863,14 @@ function loadPage(callback) {
             divLeft = 5;
             flagImg = "/content/images/ijn-med.png";
             captionColor = "ijnred";
+            
             var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + imgDir + "ijnfleet.png\" />" +
                 "<img id=\"sighting\" class=\"searchmarker\" src=\"" + imgDir + "usnsighting.png\" />" +
                 "<img id=\"airsearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-airsearchcursor.png\" />" +
                 "<img id=\"seasearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-seasearchcursor.png\" />";
             $("#imagecache").html(html);
         }
-        
+      
         ajaxLoadPhase(function () {
             setTabs();
             selectedZone = game.SelectedLocation || "H5G";

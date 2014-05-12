@@ -52,7 +52,26 @@
     <Reference Include="EntityFramework.SqlServerCompact">
       <HintPath>..\packages\EntityFramework.SqlServerCompact.6.1.0\lib\net40\EntityFramework.SqlServerCompact.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.1.4\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.1.4\lib\net40\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.1.4\lib\net40\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.1\lib\net40\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -110,9 +129,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.0\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.Helpers.dll</HintPath>
@@ -161,9 +177,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Models\DTOs\DtoAirOp.cs" />
     <Compile Include="Models\DTOs\DtoAirOpAircraft.cs" />
+    <Compile Include="Models\DTOs\DtoNotification.cs" />
     <Compile Include="Models\Services\AuthCacheEntry.cs" />
     <Compile Include="Models\Services\AuthHandler.cs" />
     <Compile Include="Controllers\PhaseController.cs" />
@@ -217,6 +235,8 @@
     <Compile Include="Models\PlayerGameSearchMarker.cs" />
     <Compile Include="Models\PlayerGameShip.cs" />
     <Compile Include="Models\Services\Mailer.cs" />
+    <Compile Include="Hubs\ChatHub.cs" />
+    <Compile Include="Models\Services\NotificationMessage.cs" />
     <Compile Include="Models\Ship.cs" />
     <Compile Include="Models\Side.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -230,6 +250,7 @@
     <Content Include="Content\images\blueloader.gif" />
     <Content Include="Content\images\helpicon.png" />
     <Content Include="Content\images\pointssample.png" />
+    <Content Include="Content\images\search\ijn-ops-planes.png" />
     <Content Include="Content\images\search\ready-0.png" />
     <Content Include="Content\images\search\ready-2.png" />
     <Content Include="Content\images\search\ready-1.png" />
@@ -243,9 +264,12 @@
     <Content Include="Content\images\search\Ships\usnca.png" />
     <Content Include="Content\images\search\Ships\usncl.png" />
     <Content Include="Content\images\search\Ships\usncv.png" />
+    <Content Include="Content\images\search\usn-ops-planes.png" />
     <Content Include="Content\images\search\usn-sea-search.png" />
     <Content Include="Content\images\speaker.png" />
     <Content Include="Notes.txt" />
+    <Content Include="Scripts\vendor\jquery.signalR-2.0.3.js" />
+    <Content Include="Scripts\vendor\jquery.signalR-2.0.3.min.js" />
     <Content Include="Scripts\pages\search_phase_1.js" />
     <Content Include="Scripts\pages\search_phase_2.js" />
     <Content Include="Scripts\pages\search_phase_3.js" />

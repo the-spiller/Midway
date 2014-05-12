@@ -40,10 +40,6 @@ input[type="text"], input[type="password"] {
     font: bold 1em Arial, sans-serif;
     padding: 2px;
     margin-right: 2px;
-    border-top: 1px solid #202020;
-    border-right: 1px solid #fff;
-    border-bottom: 1px solid #fff;
-	border-left: 1px solid #202020;
     background-color: rgba(128, 128, 128, 1.0);
     color: #000;
 }
@@ -68,13 +64,11 @@ th {
 }
 
 .floatingdiv {
-    text-align: left;
     position: absolute;
 	background-color: #000;
     opacity: 0.8;
     color: rgba(255, 255, 255, 1.0);
     padding: 5px;
-	font: 1em Arial, sans-serif;
 }
 
 .divlinks {
@@ -205,14 +199,62 @@ th {
     margin: 22px 15px 0 0;
 }
 
+/* Chat .....................................................................*/
+/*#chatdiv {
+    display: none;
+    position: absolute;
+    top: 200px;
+    left: 500px;
+    width: 360px;
+    padding: 10px;
+    background-color: #6c8dab;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+}
+    #chatdiv ul {
+        min-height: 200px;
+        width: 100%;
+        font: normal .85em Arial, sans-serif;
+        color: #000;
+        background-color: #6c8dab;
+    }
+    #chatdiv input {
+        color: #000;
+        background-color: #c6c6c6;
+        width: 77%;
+    }
+#chathead {
+    padding: 5px;
+    margin-bottom: 10px;
+	cursor: move;
+    font: bold 1em Arial, sans-serif;
+    background: linear-gradient(to right, #093a67, #093a67, #093a67, #6c8dab);
+    color: #c6c6c6;
+}
+#chatclose {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font: 700 1.5em Arial, sans-serif;
+    color: #093a67;
+    cursor: pointer;
+}
+#chatinput {
+    width: 100%;
+    display: inline;
+    margin: 10px 0 20px 0;
+}
+    #chatinput a {
+        margin: 0;
+    }*/
+
 /* Flat anchor button........................................................*/
 
 .flatbutton {
 	padding: 4px 10px 4px 10px;
-    margin-right: 5px;
+    margin-right: 10px;
 	font: 600 14px Arial, sans-serif;
 	display: inline-block;
-    min-width: 30px;
+    min-width: 40px;
 	text-align: center;
 	cursor: pointer;
 	color: #000;
@@ -284,39 +326,18 @@ th {
     background-color: #f9836b;
     color: #000;
 }
-/*#dlghead {
+#dlghead {
     display: block;
     font-weight: bold;
 	padding: 5px;
     margin-bottom: 10px;
 	cursor: move;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
 }
     #dlghead.bluedlghead {
         background: linear-gradient(to right, #093a67, #093a67, #093a67, #6c8dab);
         color: #c6c6c6;
     }
     #dlghead.reddlghead {
-        background: linear-gradient(to right, #CE391B, #CE391B, #CE391B, #f9836b);
-	    color: #ebebeb;
-    }*/
-.draghead {
-    display: block;
-    font-weight: bold;
-	padding: 5px;
-    margin-bottom: 10px;
-	cursor: move;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-    .draghead.bluedlghead {
-        background: linear-gradient(to right, #093a67, #093a67, #093a67, #6c8dab);
-        color: #c6c6c6;
-    }
-    .draghead.reddlghead {
         background: linear-gradient(to right, #CE391B, #CE391B, #CE391B, #f9836b);
 	    color: #ebebeb;
     }
