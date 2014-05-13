@@ -142,6 +142,10 @@ th {
     cursor: pointer;
 }
 
+.clickme {
+    cursor: pointer;
+}
+
 #pagediv {
 	width: 100%;
 	height: 100%;

@@ -397,10 +397,14 @@ function getSelectedShips(tabId) {
 /*-------------------------------------------------------------------*/
 /* Return the individual ships[] array element that has the input Id.*/
 /*-------------------------------------------------------------------*/
-function getShipById(id) {
+function getShipById(id, isAirbase) {
     for (var i = 0; i < ships.length; i++) {
-        if (ships[i].ShipId == id) {
-            return ships[i];
+        if (isAirbase) {
+            if (ships[i].AirbaseId == id)
+                return ships[i];
+        } else {
+            if (ships[i].ShipId == id) {
+                return ships[i];
         }
     }
     return null;
