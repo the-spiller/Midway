@@ -58,35 +58,38 @@
                 padding: 10px;
                 top: 150px;
                 left: 200px;
-                height: 400px;
                 width: 600px;
                 text-align: left;
                 color: #fff;
                 background-color: #2e2e2e;
                 box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
             }
+            #dlgairops table {
+                margin: 10px;
+                width: 100%;
+            }
+                #dlgairops input {
+                    width: 174px;
+                }
                 #dlgairops select {
-                    display: inline;
-                    width: 99%;
+                    width: 180px;
                     font: bold 1em Arial, sans-serif;
-                    padding: 2px;
-                    margin-right: 2px;
                     background-color: #808080;
                 }
             #airophead {
                 font-weight: bold;
                 cursor: move;
                 display: block;
+                color: #a0a0a0;
                 padding: 3px 5px;
                 margin-bottom: 10px;
                 width: 100%;
-                background: linear-gradient(to right, #808080, #808080, #808080, #2e2e2e);
             }
             #airopclose {
                 position: absolute;
                 top: 10px;
                 right: 10px;
-                color: #909090;
+                color: #a0a0a0;
                 font: 700 1.5em Arial, sans-serif;
                 cursor: pointer;
             }
@@ -96,28 +99,19 @@
                 cursor: move;
             }
             #airopbuttons {
-                position: absolute;
+                position: relative;
                 left: 20px;
-                bottom: 25px;
+                margin-bottom: 20px;
             }
             .missionplanes {
                 position: relative;
                 vertical-align: top;
             }
-            .missionplanes div {
-                position: absolute;
-                top: 28px;
-            }
-            .tsquads {
-                left: 40px;
-            }
-            .fsquads {
-                left: 103px;
-            }
-            .dsquads {
-                left: 166px;
-            }
-
+                .missionplanes div {
+                    position: absolute;
+                    top: 24px;
+                    left: 36px;
+                }
             .tablistitem.tabshown {
                 background-color: #093a67;
             }
@@ -312,8 +306,9 @@
                 <div id="airophead"></div>
                 <div id="airopclose">&times;</div>
                 <table>
-                    <tr><td>Target zone:</td><td><input type="text" id="airopzone" readonly="readonly" /></td></tr>
-                    <tr><td>Mission:</td><td><select id="airopmission"></select></td></tr>
+                    <tr><td class="right" style="width: 20%;">Target zone:</td>
+                        <td><input type="text" id="airopzone" readonly="readonly" /></td></tr>
+                    <tr><td class="right">Mission:</td><td><select id="airopmission"></select></td></tr>
                 </table>
                 <table id="airopplanes"></table>
                 <div id="airopbuttons">

@@ -248,27 +248,34 @@ function addAirOperation() {
     var buttonClicked,
         caption = "Add Air Operation",
         showSourceShips = function () {
-            $("#airopsources").html("");
             var sources = getAircraftSourceShips(selectedZone, $("#airopmission").val() == "cap");
             if (sources.length == 0) {
                 showAlert(caption, "No aircraft are available within range of the selected zone.", DLG_OK, "red");
                 return false;
             }
-            var html = 
-                "<tr><td>Mission aircraft:</td><td class=\"missionplanes\">" +
-                "<img src=\"" + imgDir + side + "-ops-planes.png\" />" +
-                "<div class=\"tsquads\">0</div><div class=\"fsquads\">0</div><div class=\"dsquads\">0</div></td></tr>" +
-                "<tr><td colspan=\"2\">Available aircraft</td></tr>";
+            var html = "<tr><td class=\"right\" style=\"width: 20%;\">Mission aircraft:</td>";
+            if ($("#airopmission").val() == "cap") {
+                html += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsf.png\" /><div id=\"missionf\">0</div>";
+            } else {
+                html += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opst.png\" /><div id=\"missiont\">0</div></td>" +
+                    "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsf.png\" /><div id=\"missionf\">0</div></td>" +
+                    "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsd.png\" /><div id=\"missiond\">0</div></td></tr>";
+            }
+            html += "<tr><td class=\"right\">Available aircraft</td><td colspan=\"3\"></td></tr>";
             
             for (var i = 0; i < sources.length; i++) {
                 var id = sources[i].ShipType + (sources[i].ShipType == "BAS" ? sources[i].AirbaseId : sources[i].ShipId) + "-avail";
-                html += "<tr><td>" + sources[i].Name + ":</td><td class=\"missionplanes\">" +
+                html += "<tr><td class=\"right\">" + sources[i].Name + ":</td>";
+                if ($("#airopmission").val() == "cap") {
+                    html += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsf.png\" />" +
+                        "<div id=\"" + id + "f\""
                     "<img src=\"" + imgDir + side + "-ops-planes.png\" />" +
-                    "<td id=\"" + id + "t\" class=\"tsquads\">" + sources[i].TSquadrons + "</td>" +
-                    "<td id=\"" + id + "f\" class=\"fsquads\">" + sources[i].FSquadrons + "</td>" +
-                    "<td id=\"" + id + "d\" class=\"dsquads\">" + sources[i].DSquadrons + "</td></td></tr>";
+                        "<div id=\"" + id + "t\" class=\"tsquads\">" + sources[i].TSquadrons + "</div>" +
+                        "<div id=\"" + id + "f\" class=\"fsquads\">" + sources[i].FSquadrons + "</div>" +
+                        "<div id=\"" + id + "d\" class=\"dsquads\">" + sources[i].DSquadrons + "</div></td></tr>";
+                }
             }
-            $("#airopplanes").append(html);
+            $("#airopplanes").html(html);
             return true;
         },
         closeOpDialog = function(e) {
@@ -277,7 +284,11 @@ function addAirOperation() {
             $("#dlgoverlay").css("display", "none");
         };
 
-    $("#airophead").html(caption);
+    var bg = "linear-gradient(to right, #093a67, #093a67, #093a67, #2e2e2e)";
+    if (side == "IJN")
+        bg = "linear-gradient(to right, #a01000, #a01000, #a01000, #2e2e2e)";
+    
+    $("#airophead").css("background", bg).html(caption);
     $("#airopzone").val(selectedZone);
     
     setDefaultOpMission(selectedZone);
