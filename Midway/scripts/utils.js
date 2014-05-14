@@ -25,6 +25,11 @@ function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+function textArithmetic(text, valueToAdd) {
+    var num = Number(text);
+    return (num + valueToAdd).toString();
+}
+
 function teletype(id, text, delay) {
     function typechar(chr) {
         if (chr == '◄' && document.getElementById(id).innerHTML >= 1) {

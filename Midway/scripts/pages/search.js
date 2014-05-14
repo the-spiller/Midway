@@ -403,7 +403,7 @@ function getShipById(id, isAirbase) {
             if (ships[i].AirbaseId == id)
                 return ships[i];
         } else {
-            if (ships[i].ShipId == id) {
+            if (ships[i].ShipId == id)
                 return ships[i];
         }
     }

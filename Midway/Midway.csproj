@@ -251,6 +251,9 @@
     <Content Include="Content\images\helpicon.png" />
     <Content Include="Content\images\pointssample.png" />
     <Content Include="Content\images\search\ijn-ops-planes.png" />
+    <Content Include="Content\images\search\ijnopsd.png" />
+    <Content Include="Content\images\search\ijnopsf.png" />
+    <Content Include="Content\images\search\ijnopst.png" />
     <Content Include="Content\images\search\ready-0.png" />
     <Content Include="Content\images\search\ready-2.png" />
     <Content Include="Content\images\search\ready-1.png" />
