@@ -4,7 +4,9 @@
 var oppSearches = [],
     mouseOverSearchItem = false,
     landingZones = [],
+    loadedLandingZones = false,
     AIROP_RANGE = 14,
+    availAircraft = [],
     airops = [];
 
 $(document).on("mouseover", ".oppsearchitem", function (e) {
@@ -21,6 +23,24 @@ $(document).on("mouseover", ".oppsearchitem", function (e) {
     addAirOperation();
 });
 
+/*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+function getAirOpsHtml() {
+    var title = "Add an operation targeting the currently selected zone.";
+    var html = "<table style=\"width: 97%; margin: 0 5px;\">" +
+        "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>";
+
+    for (var i = 0; i < airops.length; i++) {
+        html += "<tr><td>" + airops[i].Zone + "</td><td>" + airops[i].Mission + "</td><td></td><td>" +
+            "<img id=\"airopedit\" class=\"airopbutton\" title=\"Edit this mission\" src=\"" + imgDir + "editicon.png\">" +
+            "<img id=\airopdelete\" class=\"airopbutton\" title=\"Delete this mission\" src=\"" + imgDir + "delicon.png\"></td></tr>";
+    }
+
+    html += "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"" + title + "\" src=\"" +
+        imgDir + "addicon.png\"></td></tr></table>";
+    
+    return html;
+}
 /*-------------------------------------------------------------------*/
 /* Load the Air Ops tab with its control elements.                   */
 /*-------------------------------------------------------------------*/
@@ -64,11 +84,7 @@ function loadAirOpsPhaseTab() {
         if (!anyAircraftReady()) {
             tabHtml += "<div style=\"padding: 8px;\">You have no aircraft ready for operations.</div>";
         } else {
-            var title = "Add an operation targeting the currently selected zone.";
-            tabHtml += "<table style=\"width: 97%; margin: 0 5px;\">" +
-                "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>" +
-                "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"" + title + "\" src=\"" +
-                imgDir + "addicon.png\"></td></tr></table>";
+            tabHtml += "<div id=\"airopslist\" style=\"padding: 8px;\">" + getAirOpsHtml() + "</div>";
         }
     }
     $("#airops").html(tabHtml);
@@ -167,9 +183,9 @@ function inAirOpRange(startZone) {
 }
 
 /*-------------------------------------------------------------------*/
-/* Return 0 if the selected zone contains no known ship or airbase,  */
-/* 1 if it contains friendly ship(s), or 2 if it contains friendly   */
-/* carrier(s) or airbase.                                            */
+/* Return 0 if the selected zone contains no known ship or airbase   */
+/* or only those of the enemy; 1 if it contains friendly ship(s); 2  */
+/* if it contains friendly carrier(s) or airbase.                    */
 /*-------------------------------------------------------------------*/
 function getTargetStatus() {
     var status = 0;
@@ -203,10 +219,10 @@ function canHasAircraft(ship) {
 function getAircraftSourceShips(mission) {
     var sources = [];
     
-    for (var i = 0; i < window.ships.length; i++) {
-        var ship = window.ships[i];
+    for (var i = 0; i < availAircraft.length; i++) {
+        var ship = availAircraft[i];
         if (ship.AircraftState == 2 && inAirOpRange(ship.Location, selectedZone)) {
-            var aircraftCount = mission == "cap" ? ship.FSquadrons : ship.TSquadrons + ship.FSquadrons + ship.DSquadrons;
+            var aircraftCount = mission == "CAP" ? ship.FSquadrons : ship.TSquadrons + ship.FSquadrons + ship.DSquadrons;
             if (aircraftCount > 0) sources.push(ship);
         }
     }
@@ -214,71 +230,130 @@ function getAircraftSourceShips(mission) {
 }
 
 /*-------------------------------------------------------------------*/
-/* Load array of zones containing an aircraft carrier or an airbase. */
+/* Load array of zones containing an aircraft carrier or an airbase, */
+/* and while we're at, clone aircraft availability array from ships. */
 /*-------------------------------------------------------------------*/
 function loadLandingZones() {
     landingZones = [];
+    availAircraft = [];
+    
     for (var i = 0; i < window.ships.length; i++) {
         var ship = window.ships[i];
-        if (canHasAircraft(ship) && !$.inArray(ship.Location, landingZones)) {
-            landingZones.push(ship.Location);
+       
+        if (canHasAircraft(ship)) {
+            var avail = {
+                SourceId: ship.ShipType == "BAS" ? ship.AirbaseId : ship.ShipId,
+                SourceType: ship.ShipType,
+                Name: ship.Name,
+                Location: ship.Location,
+                AircraftState: ship.AircraftState,
+                TSquadrons: ship.TSquadrons,
+                FSquadrons: ship.FSquadrons,
+                DSquadrons: ship.DSquadrons
+            };
+
+            availAircraft.push(avail);
+            
+            if (!$.inArray(ship.Location, landingZones)) {
+                landingZones.push(ship.Location);
+            }
         }
     }
 }
 
 /*-------------------------------------------------------------------*/
-/* 
+/* Locate and return the aircraft availability row for the input Id. */
+/*-------------------------------------------------------------------*/
+function getAvailAircraftByShipId(shipId, isAirbase) {
+    for (var i = 0; i < availAircraft.length; i++) {
+        if (isAirbase) {
+            if (availAircraft[i].ShipType == "BAS" && availAircraft.ShipAirbaseId == shipId)
+                return availAircraft[i];
+        } else {
+            if (availAircraft[i].ShipId == shipId)
+                return availAircraft[i];
+        }
+    }
+}
+
+/*-------------------------------------------------------------------*/
+/* Determine and set the contents of the mission select list and its */
+/* selected item based on presence of friendlies in selectedZone.    */
 /*-------------------------------------------------------------------*/
 function setDefaultOpMission() {
-    $("#airopmission").html("<option value=\"attack\">Attack</option>");
+    $("#airopmission").html("<option value=\"Attack\">Attack</option>");
 
     var status = getTargetStatus(selectedZone);
     if (status > 0) {
-        $("#airopmission").append("<option value=\"cap\">Combat Air Patrol</option>");
-        if (status == 2) $("#airopmission").append("<option value=\"relocate\">Relocate</option>");
-        $("#airopmission").val("cap");
+        $("#airopmission").append("<option value=\"CAP\">Combat Air Patrol</option>");
+        if (status == 2) $("#airopmission").append("<option value=\"Relocate\">Relocate</option>");
+        $("#airopmission").val("Cap");
     } else {
-        $("#airopmission").val("attack");
+        $("#airopmission").val("Attack");
     }
 }
+
+function getAirOpSourceId(ship) {
+    return ship.ShipType + "-" + (ship.ShipType == "BAS" ? ship.AirbaseId : ship.ShipId) + "-avail";
+}
+
+/*-------------------------------------------------------------------*/
+/* Build and return the html for a row of aircraft on the air op     */
+/* dialog. If ship is null, the row is presumed to be for the planes */
+/* assigned to the mission and all counts will be zero. If isSource  */
+/* is true, the plane icons are presented as clickable. If mission   */
+/* == "cap" only fighters are included.                              */
+/*-------------------------------------------------------------------*/
+function getAirOpAircraftHtml(ship, isSource, mission) {
+    var html = "",
+        tdClass = isSource ? "missionplanes clickme" : "missionplanes";
+    
+    if (!ship) {
+        html += "<tr><td class=\"right\" style=\"width: 25%; font-weight: bold;\">Mission aircraft:</td>";
+        if (mission == "CAP") {
+            html += "<td class=\"" + tdClass + "\"><img src=\"" + imgDir + side + "opsf.png\" />" +
+                "<div id=\"missionf\">0</div></td><td colspan=\"3\"></td></tr>";
+        } else {
+            html += "<td class=\"" + tdClass + "\"><img src=\"" + imgDir + side + "opst.png\" /><div id=\"missiont\">0</div></td>" +
+                "<td class=\"" + tdClass + "\"><img src=\"" + imgDir + side + "opsf.png\" /><div id=\"missionf\">0</div></td>" +
+                "<td class=\"" + tdClass + "\"><img src=\"" + imgDir + side + "opsd.png\" /><div id=\"missiond\">0</div></td><td></td></tr>";
+        }
+    } else {
+        var id = getAirOpSourceId(ship);
+        html += "<tr><td class=\"right\">" + ship.Name + ":</td>";
+        if (mission == "CAP") {
+            html += "<td id=\"" + id + "f\" class=\"" + tdClass + "\"><img src=\"" + imgDir + side + "opsf.png\" />" +
+                "<div>" + ship.FSquadrons + "</div></td><td colspan=\"3\"></td></tr>";
+        } else {
+            html += "<td id=\"" + id + "t\" class=\"" + tdClass + "\"><img src=\"" + imgDir + side + "opst.png\" />" +
+                "<div>" + ship.TSquadrons + "</div></td>" +
+                "<td id=\"" + id + "f\" class=\"" + tdClass + "\"><img src=\"" + imgDir + side + "opsf.png\" />" +
+                "<div>" + ship.FSquadrons + "</div></td>" +
+                "<td id=\"" + id + "d\" class=\"" + tdClass + "\"><img src=\"" + imgDir + side + "opsd.png\" />" +
+                "<div>" + ship.DSquadrons + "</div></td><td></td></tr>";
+        }
+    }
+    return html;
+}
+
 /*-------------------------------------------------------------------*/
 /* Show air op dialog and capture data for new op. Display new op in */
 /* table on AirOps tab.                                              */
 /*-------------------------------------------------------------------*/
 function addAirOperation() {
-    var buttonClicked,
+    var sources = [],
         caption = "Add Air Operation",
         showSourceShips = function () {
-            var sources = getAircraftSourceShips($("#airopmission").val());
+            sources = getAircraftSourceShips($("#airopmission").val());
             if (sources.length == 0) {
                 showAlert(caption, "No aircraft are available within range of the selected zone.", DLG_OK, "red");
                 return false;
             }
-            var html = "<tr><td class=\"right\" style=\"width: 25%; font-weight: bold;\">Mission aircraft:</td>";
-            if ($("#airopmission").val() == "cap") {
-                html += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsf.png\" />" +
-                    "<div id=\"missionf\">0</div></td><td colspan=\"3\"></td></tr>";
-            } else {
-                html += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opst.png\" /><div id=\"missiont\">0</div></td>" +
-                    "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsf.png\" /><div id=\"missionf\">0</div></td>" +
-                    "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsd.png\" /><div id=\"missiond\">0</div></td><td></td></tr>";
-            }
+            var html = getAirOpAircraftHtml(null, false, $("#airopmission").val());
             html += "<tr><td class=\"right\" style=\"font-weight: bold\">Available aircraft</td><td colspan=\"4\"></td></tr>";
             
             for (var i = 0; i < sources.length; i++) {
-                var id = sources[i].ShipType + "-" + (sources[i].ShipType == "BAS" ? sources[i].AirbaseId : sources[i].ShipId) + "-avail";
-                html += "<tr><td class=\"right\">" + sources[i].Name + ":</td>";
-                if ($("#airopmission").val() == "cap") {
-                    html += "<td id=\"" + id + "f\" class=\"missionplanes clickme\"><img src=\"" + imgDir + side + "opsf.png\" />" +
-                        "<div>" + sources[i].FSquadrons + "</div></td><td colspan=\"3\"></td></tr>";
-                } else {
-                    html += "<td id=\"" + id + "t\" class=\"missionplanes clickme\"><img src=\"" + imgDir + side + "opst.png\" />" +
-                        "<div>" + sources[i].TSquadrons + "</div></td>" +
-                        "<td id=\"" + id + "f\" class=\"missionplanes clickme\"><img src=\"" + imgDir + side + "opsf.png\" />" +
-                        "<div>" + sources[i].FSquadrons + "</div></td>" +
-                        "<td id=\"" + id + "d\" class=\"missionplanes clickme\"><img src=\"" + imgDir + side + "opsd.png\" />" +
-                        "<div>" + sources[i].DSquadrons + "</div></td><td></td></tr>";
-                }
+                html += getAirOpAircraftHtml(sources[i], true, $("#airopmission").val());
             }
             $("#airopplanes").html(html);
             
@@ -295,8 +370,8 @@ function addAirOperation() {
                 shipType = planeTd.id.substr(0, dashPos),
                 shipAirbaseId = planeTd.id.substr(dashPos + 1, planeTd.id.indexOf("-", dashPos + 1) - (dashPos + 1)),
                 isAirbase = shipType == "BAS",
-                ship = getShipById(shipAirbaseId, isAirbase),
-                squads = planeType == "f" ? ship.FSquadrons : (planeType == "t" ? ship.TSquadrons : ship.DSquadrons);
+                avail = getAvailAircraftByShipId(shipAirbaseId, isAirbase),
+                squads = planeType == "f" ? avail.FSquadrons : (planeType == "t" ? avail.TSquadrons : avail.DSquadrons);
             
             if ($("#" + planeTd.id + " div").text() == "0") {
                 // remove planes from mission
@@ -314,9 +389,14 @@ function addAirOperation() {
             $("#dlgoverlay").css("display", "none");
         };
 
+    if (!loadedLandingZones) {
+        loadLandingZones();
+        loadedLandingZones = true;
+    }
+    
     var bg = "linear-gradient(to right, #093a67, #093a67, #093a67, #2e2e2e)";
     if (side == "IJN")
-        bg = "linear-gradient(to right, #a01000, #a01000, #a01000, #2e2e2e)";
+        bg = "linear-gradient(to right, #8f0000, #8f0000, #8f0000, #2e2e2e)";
     
     $("#airophead").css("background", bg).html(caption);
     $("#airopzone").val(selectedZone);
@@ -337,7 +417,37 @@ function addAirOperation() {
         });
         $("#dlgairops .flatbutton").on("click", function(e) {
             closeOpDialog(e);
-            buttonClicked = e.target.innerHTML;
+            if (e.target.innerHTML == "OK") {
+                // add the op to our collection and display it
+                var op = {
+                    Zone: selectedZone,
+                    Mission: $("#airopmission").val(),
+                    AirOpAircraft: []
+                };
+                for (var i = 0; i < sources.length; i++) {
+                    var sourceType = sources[i].ShipType,
+                        sourceId = sourceType == "BAS" ? sources[i].AirbaseId : sources[i].ShipId,
+                        selector = "#" + getAirOpSourceId(sources[i]),
+                        tsquads = sources[i].TSquadrons - Number($(selector + "t div").text()),
+                        fsquads = sources[i].FSquadrons - Number($(selector + "f div").text()),
+                        dsquads = sources[i].DSquadrons - Number($(selector + "d div").text());
+
+                    sources[i].TSqUadrons -= tsquads;
+                    sources[i].FSquadrons -= fsquads;
+                    sources[i].DSquadrons -= dsquads;
+                    
+                    var aircraft = {
+                        SourceId: sourceId,
+                        SourceType: sourceType,
+                        TSquadrons: tsquads,
+                        FSquadrons: fsquads,
+                        DSquadrons: dsquads
+                    };
+                    op.AirOpAircraft.push(aircraft);
+                }
+                airops.push(op);
+                $("#airopslist").html(getAirOpsHtml());
+            }
         });
         $("#airopmission").on("change", function() {
             showSourceShips();
@@ -346,10 +456,6 @@ function addAirOperation() {
         $("#dlgoverlay").css("display", "block").focus();
     }
 }
-
-$(document).ready(function() {
-    loadLandingZones();
-});
 
 
     
