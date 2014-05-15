@@ -794,13 +794,13 @@ function shipsLoaded() {
             
             switch (game.PhaseId) {
                 case 1:
-                    loadMovePhaseTab();
+                    loadMovePhase();
                     break;
                 case 2:
-                    loadSearchPhaseTab();
+                    loadSearchPhase();
                     break;
                 case 3:
-                    loadAirOpsPhaseTab();
+                    loadAirOpsPhase();
                     break;
                 case 5:
                     loadAirDefensePhaseTab();

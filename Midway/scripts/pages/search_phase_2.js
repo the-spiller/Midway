@@ -8,7 +8,7 @@ $(document).on("mousedown", ".searchitem", function(e) {
 /*-------------------------------------------------------------------*/
 /* Load the Search tab with its control elements.                    */
 /*-------------------------------------------------------------------*/
-function loadSearchPhaseTab() {
+function loadSearchPhase() {
     var tabHtml = "<div style=\"margin: 5px 0 15px 5px;\">";
     if (game.Waiting == "Y") {
         tabHtml += "Waiting for opponent</div>";
