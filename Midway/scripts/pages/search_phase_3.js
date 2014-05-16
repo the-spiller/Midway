@@ -3,10 +3,10 @@
 
 var oppSearches = [],
     mouseOverSearchItem = false,
-    landingZones = [],
+    airops = [],
     AIROP_RANGE = 14,
-    aircraftSources = [],
-    airops = [];
+    landingZones = [],
+    aircraftSources = [];
 
 $(document).on("mouseover", ".oppsearchitem", function (e) {
     mouseOverSearchItem = true;
@@ -22,26 +22,6 @@ $(document).on("mouseover", ".oppsearchitem", function (e) {
     addAirOperation();
 });
 
-/*---------------------------------------------------------------------------*/
-/* Write curent air ops out to their section on the AirOps tab               */
-/*---------------------------------------------------------------------------*/
-function getAirOpsHtml() {
-    var addTitle = "Add an operation targeting the currently selected zone.";
-    var html = "<table style=\"width: 100%;\">" +
-        "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>";
-
-    for (var i = 0; i < airops.length; i++) {
-        html += "<tr><td>" + airops[i].Zone + "</td><td>" + airops[i].Mission + "</td><td>" + airops[i].AircraftTotals + "</td>" +
-            "<td style=\"text-align: right;\">" +
-            "<img id=\"airopedit\" class=\"airopbutton\" title=\"Edit this mission\" src=\"" + imgDir + "editicon.png\">" +
-            "<img id=\airopdelete\" class=\"airopbutton\" title=\"Delete this mission\" src=\"" + imgDir + "delicon.png\"></td></tr>";
-    }
-
-    html += "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"" + addTitle + "\" src=\"" +
-        imgDir + "addicon.png\"></td></tr></table>";
-    
-    return html;
-}
 /*-------------------------------------------------------------------*/
 /* Load the Air Ops tab with its control elements.                   */
 /*-------------------------------------------------------------------*/
@@ -151,6 +131,27 @@ function splitOffOpponentSearches() {
     }
 }
 
+/*---------------------------------------------------------------------------*/
+/* Write curent air ops out to their section on the AirOps tab               */
+/*---------------------------------------------------------------------------*/
+function getAirOpsHtml() {
+    var addTitle = "Add an operation targeting the currently selected zone.";
+    var html = "<table style=\"width: 100%;\">" +
+        "<tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft<th>";
+
+    for (var i = 0; i < airops.length; i++) {
+        html += "<tr><td>" + airops[i].Zone + "</td><td>" + airops[i].Mission + "</td><td>" + airops[i].AircraftTotals + "</td>" +
+            "<td style=\"text-align: right;\">" +
+            "<img id=\"airopedit\" class=\"airopbutton\" title=\"Edit this mission\" src=\"" + imgDir + "editicon.png\">" +
+            "<img id=\airopdelete\" class=\"airopbutton\" title=\"Delete this mission\" src=\"" + imgDir + "delicon.png\"></td></tr>";
+    }
+
+    html += "<tr><td id=\"lastrow\" colspan=\"4\"><img id=\"airopadd\" class=\"airopbutton\" title=\"" + addTitle + "\" src=\"" +
+        imgDir + "addicon.png\"></td></tr></table>";
+
+    return html;
+}
+
 /*-------------------------------------------------------------------*/
 /* Return true if aircraft from startZone can reach the selected     */
 /* zone AND return to a friendly ship or airbase without exceeding   */
@@ -219,7 +220,7 @@ function getAircraftSourceShips(mission) {
 
 /*-------------------------------------------------------------------*/
 /* Load array of zones containing an aircraft carrier or an airbase, */
-/* and while we're at, clone aircraft availability array from ships. */
+/* cloning aircraft availability array from the ships array.         */
 /*-------------------------------------------------------------------*/
 function loadAircraftSources() {
     landingZones = [];
@@ -236,6 +237,7 @@ function loadAircraftSources() {
             if (ship.AircraftState == 2) {
                 var avail = {
                     SourceId: ship.ShipType == "BAS" ? ship.AirbaseId : ship.ShipId,
+                    ElementId: ship.ShipType + "-" + SourceId + "-avail",
                     SourceType: ship.ShipType,
                     Name: ship.Name,
                     Location: ship.Location,
@@ -251,8 +253,17 @@ function loadAircraftSources() {
     }
 }
 
+function parseSourceElementId(elementId, sourceType, sourceId, planeType) {
+    var dash1Pos = elementId.indexOf("-"),
+        dash2Pos = elementId.indexOf("-", dash1Pos + 1);
+    
+    planeType = elementId.substr(elementId.length - 1, 1);
+    sourceType = elementId.substr(0, dash1Pos);
+    sourceId = elementId.substr(dash1Pos + 1, dash2Pos - dash1Pos);
+}
+
 /*-------------------------------------------------------------------*/
-/* Locate and return the aircraft availability row for the input Id. */
+/* Locate and return the aircraft sources row for the input id.      */
 /*-------------------------------------------------------------------*/
 function getAircraftSourceById(sourceId, isAirbase) {
     for (var i = 0; i < aircraftSources.length; i++) {
