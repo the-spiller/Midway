@@ -63,15 +63,15 @@ function loadAirOpsPhase() {
         }
 
         // Air Operations
-        tabHtml += "<div class=\"listheader\">Air Operations</div><div style=\"padding: 8px;\">";
+        tabHtml += "<div class=\"listheader\">Air Operations</div><div id=\"airopslist\" style=\"padding: 8px;\">";
         if (aircraftSources.length == 0) {
-            tabHtml += "You have no aircraft ready for operations.</div>";
+            tabHtml += "You have no aircraft ready for operations.";
         } else {
-            tabHtml += "<table id=\"airopslist\" style=\"width: 100%;\"></table></div>";
+            tabHtml += getAirOpsHtml();
         }
+        tabHtml += "</div>";
     }
     $("#airops").html(tabHtml);
-    showAirOps();
 }
 
 /*-------------------------------------------------------------------*/
@@ -133,20 +133,23 @@ function splitOffOpponentSearches() {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Write curent air ops out to their section on the AirOps tab               */
+/* Build and return html table for the display of air ops.                   */
 /*---------------------------------------------------------------------------*/
-function showAirOps() {
+function getAirOpsHtml() {
     var addTitle = "Add an operation targeting the currently selected zone.",
-        opsHtml = "<tr><th><img id=\"airopadd\" class=\"airopbutton\" title=\"" + addTitle + "\" src=\"" + imgDir +
-            "addicon.png\" /></th><th>Zone</th><th>Mission</th><th>Aircraft</th></tr>";
+        opsHtml = "<table style=\"width: 100%\"><tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft</th></tr>";
 
     for (var i = 0; i < airops.length; i++) {
         var zone = airops[i].Zone == "H5G" ? "Midway" : airops[i].Zone;
-        opsHtml += "<tr><td><img id=\"airopedit\" class=\"airopbutton\" title=\"Edit this mission\" src=\"" + imgDir + "editicon.png\" />" +
-            "<img id=\airopdelete\" class=\"airopbutton\" title=\"Delete this mission\" src=\"" + imgDir + "delicon.png\" /></td><td>" +
-            zone + "</td><td>" + airops[i].Mission + "</td><td>" + airops[i].AircraftTotals + "</td></tr>";
+        opsHtml += "<tr><td>" + zone + "</td><td>" + airops[i].Mission + "</td><td>" + airops[i].AircraftTotals + "</td>" +
+            "<td class=\"right\">" +
+            "<img id=\"airopedit\" class=\"airopbutton\" title=\"Edit this mission\" src=\"" + imgDir + "editicon.png\" />" +
+            "<img id=\airopdelete\" class=\"airopbutton\" title=\"Delete this mission\" src=\"" + imgDir + "delicon.png\" />" +
+            "</td></tr>";
     }
-    $("#airopslist").html(opsHtml);
+    opsHtml += "<tr><td><img id=\"airopadd\" class=\"airopbutton\" title=\"" + addTitle + "\" src=\"" + imgDir + "addicon.png\" />" +
+            "</td></tr></table>";
+    return opsHtml;
 }
 
 /*-------------------------------------------------------------------*/
@@ -306,54 +309,47 @@ function getMissionOptions() {
     return (selectHtml != "");
 }
 
-/*---------------------------------------------------------------------------*/
-/* Build up and return the html element id string for a mission aircraft td. */
-/*---------------------------------------------------------------------------*/
-function getAirOpSourceId(source) {
-    return source.SourceType + "-" + source.SourceId + "-avail";
-}
-
 /*-------------------------------------------------------------------*/
 /* Build and return the html for a row of aircraft on the air op     */
 /* dialog. If source is null, the row is presumed to be for the      */
 /* planes assigned to the mission and all counts will be zero. If    */
-/* isSource is true, the ship names and plane icons are presented as */
+/* isSource is true, the ship name and plane icons are presented as  */
 /* clickable. If mission == "CAP" only fighters are included.        */
 /*-------------------------------------------------------------------*/
 function getAirOpAircraftHtml(source, mission) {
-    var htmlf,
-        html = "";
+    var fightersHtml,
+        rowHtml = "";
     
     if (!source) {
-        html += "<tr><td class=\"right\" style=\"width: 25%; font-weight: bold;\">Mission aircraft:</td>";
-        htmlf = "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsf.png\" />" +
-            "<div id=\"missionf\">0</div></td>";
+        rowHtml += "<tr><td class=\"right\" style=\"width: 25%; font-weight: bold;\">Mission aircraft:</td>";
+        fightersHtml = "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsf.png\" />" +
+            "<div id=\"missionf\" class=\"srcnumplanes\">0</div></td>";
         
         if (mission == "CAP") {
-            html += htmlf + "<td colspan=\"3\"></td></tr>";
+            rowHtml += fightersHtml + "<td colspan=\"3\"></td></tr>";
         } else {
-            html += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opst.png\" /><div id=\"missiont\">0</div></td>" +
-                htmlf +
-                "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsd.png\" /><div id=\"missiond\">0</div></td>" +
-                "<td></td></tr>";
+            rowHtml += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opst.png\" />" +
+                "<div id=\"missiont\" class=\"srcnumplanes\">0</div></td>" +
+                fightersHtml +
+                "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsd.png\" />" +
+                "<div id=\"missiond\" class=\"srcnumplanes\">0</div></td><td></td></tr>";
         }
     } else {
-        var id = getAirOpSourceId(source);
-        html += "<tr><td id=\"op" + source.SourceType + "-"  + source.SourceId + "\" class=\"shipname right\">" + source.Name + ":</td>";
-        htmlf = "<td id=\"" + id + "f\" class=\"missionplanes clickme\"><img src=\"" + imgDir + side + "opsf.png\" />" +
-                "<div>" + source.FSquadrons + "</div></td>";
+        rowHtml += "<tr><td id=\"op" + source.SourceType + "-"  + source.SourceId + "\" class=\"shipname right\">" + source.Name + ":</td>";
+        fightersHtml = "<td id=\"" + source.ElementId + "f\" class=\"missionplanes clickme\"><img src=\"" + imgDir + side + "opsf.png\" />" +
+                "<div class=\"srcnumplanes\">" + source.FSquadrons + "</div></td>";
         
         if (mission == "CAP")
         {
-            html += htmlf + "<td colspan=\"3\"></td></tr>";
+            rowHtml += fightersHtml + "<td colspan=\"3\"></td></tr>";
         } else {
-            html += "<td id=\"" + id + "t\" class=\"missionplanes clickme\"><img src=\"" + imgDir + side + "opst.png\" />" +
-                "<div>" + source.TSquadrons + "</div></td>" + htmlf +
-                "<td id=\"" + id + "d\" class=\"missionplanes clickme\"><img src=\"" + imgDir + side + "opsd.png\" />" +
-                "<div>" + source.DSquadrons + "</div></td><td></td></tr>";
+            rowHtml += "<td id=\"" + source.ElementId + "t\" class=\"missionplanes clickme\">" +
+                "<img src=\"" + imgDir + side + "opst.png\" /><div class=\srcnumplanes\">" + source.TSquadrons + "</div></td>" + fightersHtml +
+                "<td id=\"" + source.ElementId + "d\" class=\"missionplanes clickme\">" +
+                "<img src=\"" + imgDir + side + "opsd.png\" /><div class=\srcnumplanes\">" + source.DSquadrons + "</div></td><td></td></tr>";
         }
     }
-    return html;
+    return rowHtml;
 }
 
 /*-------------------------------------------------------------------*/
@@ -366,7 +362,8 @@ function addAirOperation() {
         showSourceShips = function () {
             sources = getAircraftSourceShips($("#airopmission").val());
             if (sources.length == 0) {
-                var msg = "No aircraft are available for a mission targeting the selected zone.";
+                var msg = "No aircraft are available for a mission targeting the selected zone." +
+                    "<p>Planes within range, if any, have all been allocated to other missions.</p>";
                 showAlert(caption, msg, DLG_OK, "red");
                 return false;
             }
@@ -379,7 +376,7 @@ function addAirOperation() {
             $("#airopplanes").html(html);
             
             $(".missionplanes").on("click", function (e) {
-                addPlaneToOp(e.target.parentNode);
+                addSquadronToOp(e.target.parentNode);
             });
 
             $(".shipname").on("click", function(e) {
@@ -388,9 +385,11 @@ function addAirOperation() {
             
             return true;
         },
-        addPlaneToOp = function (planeTd) {
+        addSquadronToOp = function (planeTd) {
             // Respond to a click on individual source aircraft by moving one squadron to the mission. If all planes of this
-            // type on this ship are already in the mission, bring them all back.
+            // type on this ship are already in the mission, bring them all back out.
+            if (planeTd.id == "") return;
+            
             var planeType = planeTd.id.substr(planeTd.id.length - 1, 1),
                 missionTdId = "#mission" + planeType,
                 dashPos1 = planeTd.id.indexOf("-"),
@@ -403,11 +402,11 @@ function addAirOperation() {
             if ($("#" + planeTd.id + " div").text() == "0") {
                 // remove planes from mission
                 $("#" + planeTd.id + " div").text(squads);
-                $(missionTdId).text(textArithmetic($(missionTdId).text(), -squads));
+                $(missionTdId).text(textAdd($(missionTdId).text(), -squads));
             } else {
                 // add one squad to the mission
-                $("#" + planeTd.id + " div").text(textArithmetic($("#" + planeTd.id + " div").text(), -1));
-                $(missionTdId).text(textArithmetic($(missionTdId).text(), 1));
+                $("#" + planeTd.id + " div").text(textAdd($("#" + planeTd.id + " div").text(), -1));
+                $(missionTdId).text(textAdd($(missionTdId).text(), 1));
             }
         },
         addShipLoadToOp = function (shipTd) {
@@ -415,7 +414,6 @@ function addAirOperation() {
             // alreay on the mission, bring them all back.
             var shipAirbaseId = shipTd.id.substr(shipTd.id.indexOf("-") + 1),
                 source = getAircraftSourceById(shipAirbaseId, shipTd.id.indexOf("opBAS") > -1),
-                planeTdId = getAirOpSourceId(source),
                 planeTypes = ["t", "f", "d"],
                 planeDivId,
                 planesLeft = 0,
@@ -424,7 +422,7 @@ function addAirOperation() {
             //Total up the ship's remaining aircraft
             for (i = 0; i < 3; i++) {
                 if ($("#airopmission").val() == "CAP" && planeTypes[i] != "f") continue;
-                planeDivId = "#" + planeTdId + planeTypes[i] + " div";
+                planeDivId = "#" + source.ElementId + planeTypes[i] + " div";
                 planesLeft += Number($(planeDivId).text());
             }
 
@@ -432,17 +430,17 @@ function addAirOperation() {
             for (i = 0; i < 3; i++) {
                 if ($("#airopmission").val() == "CAP" && planeTypes[i] != "f") continue;
                 
-                planeDivId = "#" + planeTdId + planeTypes[i] + " div";
+                planeDivId = "#" + source.ElementId + planeTypes[i] + " div";
                 if (planesLeft == 0) {
                     // bring 'em all back
                     var squads = planeTypes[i] == "t" ? source.TSquadrons : (planeTypes[i] == "f" ? source.FSquadrons : source.DSquadrons);
                     $(planeDivId).text(squads);
-                    $("#mission" + planeTypes[i]).text(textArithmetic($("#mission" + planeTypes[i]).text(), -squads));
+                    $("#mission" + planeTypes[i]).text(textAdd($("#mission" + planeTypes[i]).text(), -squads));
                 } else {
                     // send 'em all up
                     squads = Number($(planeDivId).text());
                     $(planeDivId).text("0");
-                    $("#mission" + planeTypes[i]).text(textArithmetic($("#mission" + planeTypes[i]).text(), squads));
+                    $("#mission" + planeTypes[i]).text(textAdd($("#mission" + planeTypes[i]).text(), squads));
                 }
             }
         },
@@ -493,11 +491,13 @@ function addAirOperation() {
                     for (var i = 0; i < sources.length; i++) {
                         var sourceType = sources[i].SourceType,
                             sourceId = sources[i].SourceId,
-                            selector = "#" + getAirOpSourceId(sources[i]),
+                            selector = "#" + sources[i].ElementId,
                             tSquadsTaken = $(selector + "t div").length ? sources[i].TSquadrons - Number($(selector + "t div").text()) : 0,
                             fSquadsTaken = $(selector + "f div").length ? sources[i].FSquadrons - Number($(selector + "f div").text()) : 0,
                             dSquadsTaken = $(selector + "d div").length ? sources[i].DSquadrons - Number($(selector + "d div").text()) : 0;
 
+                        if (tSquadsTaken + fSquadsTaken + dSquadsTaken == 0) return;
+                        
                         // remove these planes from those available
                         sources[i].TSquadrons -= tSquadsTaken;
                         sources[i].FSquadrons -= fSquadsTaken;
@@ -522,7 +522,8 @@ function addAirOperation() {
                     if (dtotal > 0) op.AircraftTotals += "  D" + dtotal;
 
                     airops.push(op);
-                    showAirOps();
+                    $("#airopslist").html(getAirOpsHtml());
+                    window.editsMade = true;
                 }
             });
             //go

@@ -25,7 +25,7 @@ function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-function textArithmetic(text, valueToAdd) {
+function textAdd(text, valueToAdd) {
     var num = Number(text);
     return (num + valueToAdd).toString();
 }
