@@ -13,7 +13,7 @@ namespace Midway.Models.Data.Mappings
             Property(a => a.AirOpId).IsRequired();
 			Property(a => a.GameId).IsRequired();
 			Property(a => a.PlayerId).IsRequired();
-            Property(a => a.Turn).IsRequired();
+		    Property(a => a.Turn).IsRequired();
 			Property(a => a.Zone).IsRequired();
             Property(a => a.Mission).IsRequired();
 

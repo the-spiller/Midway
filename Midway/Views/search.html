@@ -54,16 +54,16 @@
 
             #dlgairops {
                 display: none;
-                position: absolute;
-                padding: 10px;
+                background-color: #2d4347;
+                opacity: 1.0;
                 top: 150px;
                 left: 200px;
                 width: 600px;
-                text-align: left;
-                color: #fff;
-                background-color: #2e2e2e;
                 box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
             }
+                #dlgairops .floathead {
+                    background: linear-gradient(to right, #002026, #002026, #002026, #2d4347);
+                }
             #dlgairops table {
                 width: 100%;
                 margin: 10px;
@@ -73,63 +73,47 @@
                     font: bold 1em Arial, sans-serif;
                     background-color: #808080;
                 }
-            #airophead {
-                font-weight: bold;
-                cursor: move;
-                display: block;
-                color: #a0a0a0;
-                padding: 3px 5px;
-                margin-bottom: 10px;
-                width: 100%;
-            }
+            
             #airopclose {
                 position: absolute;
-                top: 10px;
+                top: 6px;
                 right: 10px;
-                color: #a0a0a0;
+                color: #fff;
                 font: 700 1.5em Arial, sans-serif;
                 cursor: pointer;
             }
-            #airopcaption {
-                font-weight: bold;
-                color: #000;
-                cursor: move;
-            }
             #airopbuttons {
                 position: relative;
-                left: 20px;
-                margin-bottom: 10px;
+                margin: 15px 0 15px 10px;
             }
             .shipname {
+                text-align: center;
                 cursor: pointer;
             }
                 .shipname:hover {
-                    background-color: #444444;
-               }
+                    background-color: #808080;
+                }
             .missionplanes {
                 position: relative;
                 width: 46px;
             }
                 .missionplanes div {
-                     position: absolute;
+                    position: absolute;
                     top: 25px;
-                    left: 36px;                    
+                    left: 36px; 
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;                   
                 }
                 .missionplanes.clickme:hover {
-                    background-color: #444444;
+                    background-color: #808080;
                 }
             .tablistitem.tabshown {
                 background-color: #093a67;
             }
 
-            .floathead {
+            #searchdiv .floathead {
                 cursor: default;
-            }
-
-            .noselect {
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
             }
 
             .shipitem {
@@ -144,7 +128,6 @@
                     background-color: #08345c;
 	                padding: 5px 3px 3px 5px;
 		            box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
-
                 }
 
             .availmove {
@@ -299,13 +282,13 @@
         </div>
 
         <div id="dlgoverlay">
-            <div id="dlgcontent">
+            <div id="dlgcontent" style="z-index: 2;">
                 <div id="dlghead"></div>
                 <div id="dlgbody"></div>
                 <div id="dlgbuttons"></div>
             </div>
-            <div id="dlgairops">
-                <div id="airophead"></div>
+            <div id="dlgairops" class="floatingdiv noselect">
+                <div class="floathead"></div>
                 <div id="airopclose">&times;</div>
                 <table>
                     <tr><td class="right" style="width: 25%;">Target zone:</td><td id="airopzone"></td></tr>
@@ -313,8 +296,8 @@
                 </table>
                 <table id="airopplanes"></table>
                 <div id="airopbuttons">
-                    <a class="flatbutton graybtn">OK</a>
-                    <a class="flatbutton graybtn">Cancel</a>
+                    <a id="airopOK" class="flatbutton graybtn">OK</a>
+                    <a id="airopCancel" class="flatbutton graybtn">Cancel</a>
                 </div>
             </div>
         </div>
