@@ -525,14 +525,14 @@ namespace Midway.Models.Data
         private bool UnderAirAttack(PlayerGame playerGame)
         {
             return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId != playerGame.PlayerId
-                                            && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
+                                            && a.Turn == playerGame.Turn && a.Mission == "Attack") > 0);
         }
 
         //.....................................................................
         private bool MakingAirAttacks(PlayerGame playerGame)
         {
             return (_context.AirOps.Count(a => a.GameId == playerGame.GameId && a.PlayerId == playerGame.PlayerId
-                                               && a.Turn == playerGame.Turn && a.Mission == "attack") > 0);
+                                               && a.Turn == playerGame.Turn && a.Mission == "Attack") > 0);
         }
 
         //.....................................................................

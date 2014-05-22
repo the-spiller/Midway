@@ -70,7 +70,8 @@ namespace Midway.Controllers
                 if (phaseData.Ships != null && phaseData.Ships.Count > 0)
                     new ShipRepository(_uow).UpdateShips(phaseData.GameId, phaseData.PlayerId, phaseData.Ships);
 
-                //if (phaseData.AirOps ! = null && phaseData.AirOps.Count > 0)
+                if (phaseData.AirOps != null && phaseData.AirOps.Count > 0)
+                    new AirOpRepository(_uow).SaveAirOps(phaseData.GameId, phaseData.PlayerId, phaseData.AirOps);
 
                 _phaseRepo.AdvancePhase(
                     phaseData.GameId, 

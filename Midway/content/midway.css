@@ -274,6 +274,12 @@ th {
     border-right: none;
 }
 
+.noselect {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
 .graybtn {
 	background-color: #808080;
 }
