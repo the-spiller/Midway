@@ -1,30 +1,28 @@
-﻿
-// Events and functions for Phase 1 (Search Map Move)
+﻿// Events and functions for Phase 1 (Search Map Move)
+var overHighlight = false;
 
-$(document).on("mousedown", ".shipitem", function() {
-    shipItemMouseDown();
-}).on("click", ".airreadiness", function (e) {
+$(document).on("click", ".airreadiness", function (e) {
     if (game.PhaseId != 1) return;
     e.stopPropagation();
     setAircraftState(this);
 });
 
-$("#canvii").on("mousedown", function (e) {
-    window.mouseDown = true;
-    var zone = searchGrid.coordsToZone(windowToCanvas(cvs, e.clientX, e.clientY)),
-        selShips = getSelectedShips("zone");
-
-    if (selShips.length > 0) {
-        dragMgr.dragging = false;
-        dragMgr.source = zone;
-        dragMgr.dragData = selShips;
-        dragMgr.cursorImg = null;
-        dragMgr.useSnapshot = true;
-        dragMgr.snapshot = null;
-
-        setTimeout(beginControlsDrag, 150);
+$("#canvii").on("mousemove", function (e) {
+    // show/hide the fleet marker cursor
+    if (game.PhaseId != 1 || window.zonesHighlighted.length == 0) return;
+    
+    var zone = searchGrid.coordsToZone(windowToCanvas(cvs, e.clientX, e.clientY));
+    if ($.inArray(zone, window.zonesHighlighted) > -1) {
+        if (!overHighlight) {
+            $("#fleetcursor").css("display", "block");
+            overHighlight = true;
+        }
+        var topLeft = searchGrid.coordsToTopLeftCoords(windowToCanvas(cvs, e.clientX, e.clientY));
+        $("#fleetcursor").css({ left: topLeft.x - 31, top: topLeft.y + 60 });
+    } else if (overHighlight) {
+        $("#fleetcursor").css("display", "none");
+        overHighlight = false;
     }
-    e.preventDefault();
 });
 
 /*-------------------------------------------------------------------*/
@@ -52,49 +50,42 @@ function loadMovePhase() {
 }
 
 /*-------------------------------------------------------------------*/
-/* Initialize an arrivals drag operation.                            */
+/* Highlight zones where arrivals may be placed or on-map ships may  */
+/* move.                                                             */
 /*-------------------------------------------------------------------*/
-function shipItemMouseDown() {
+function showMoveHighlight() {
     var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "";
-    if (panelId != "arrivals") return;
-
-    dragMgr.dragging = false;
-    dragMgr.source = panelId;
-
     var selShips = getSelectedShips(panelId);
     if (selShips.length > 0) {
-        window.mouseDown = true;
-        dragMgr.dragData = selShips;
-        dragMgr.useSnapshot = true;
-        dragMgr.cursorImg = document.getElementById("fleet");
-        dragMgr.snapshot = null;
-
-        setTimeout(beginControlsDrag, 150);
+        if (panelId == "arrivals") {
+            if (window.zonesHighlighted.length == 0) {
+                if (side == "USN") {
+                    window.zonesHighlighted = searchGrid.highlightZones("I1B", "I7E");
+                } else {
+                    window.zonesHighlighted = searchGrid.highlightZones("A1A", "A7D");
+                }
+            }
+        } else if (panelId == "zone") {
+            
+        }
+    } else if (window.zonesHighlighted.length > 0) {
+        searchGrid.removeHighlight();
+        $("#fleetcursor").css("display", "none");
+        window.zonesHighlighted = [];
     }
 }
 
 /*-------------------------------------------------------------------*/
-/* Reads dragging context to determine if drop location is           */
-/* legitimate. If so, return true, otherwise false.                  */
+/* Respond to zone selection (performed in search.js).               */
 /*-------------------------------------------------------------------*/
-function isLegitDrop(coords) {
-    var dropZone = searchGrid.coordsToZone(coords);
-    if (dropZone == dragMgr.source) return true;
+function zoneSelected() {
+    if (window.zonesHighlighted.length > 0) {
+        if ($.inArray(selectedZone, window.zonesHighlighted) > -1) {
+            alert("yep");
+            //selectZone(searchGrid.zoneToTopLeftCoords(selectedZone));
 
-    if (dragMgr.source == "arrivals") {
-        if (side == "USN") {
-            if (dropZone.substr(0, 1) == "I" && "BEH".indexOf(dropZone.substr(2, 1)) != -1)
-                return true;
-        } else {
-            if (dropZone.substr(0, 1) == "A" && "ADG".indexOf(dropZone.substr(2, 1)) != -1)
-                return true;
         }
-    } else if (isNumber(dragMgr.source.substr(1, 1))) {
-        var zones = searchGrid.zoneDistance(dragMgr.source, dropZone),
-            moves = getShipsMinMovePoints(dragMgr.source);
-        if (zones <= moves) return true;
     }
-    return false;
 }
 
 /*-------------------------------------------------------------------*/
@@ -231,3 +222,4 @@ function allArrivalsOnMap() {
     }
     return true;
 }
+

@@ -26,13 +26,12 @@ $("#btngo").on("click", function () {
             }
         );
     } else {
-        showWait("Registering ...");
         window.player = { Email: $("#email").val(), Nickname: $("#nickname").val() };
-        ajaxRegisterPlayer(function () {
+        ajaxRegisterPlayer(function() {
             showAlert("Registration Successful",
                 "You are now registered. Expect to receive a password in email that will allow you to " +
                     "log on.<br /><br />We hope you enjoy our game!",
-                DLG_OK, "blue", function () {
+                DLG_OK, "blue", function() {
                     location.replace("/index.html");
                 });
         });

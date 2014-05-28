@@ -68,15 +68,6 @@ function hasText(textElementId) {
     return true;
 }
 
-//function inArray(needle, haystack) {
-//    for (var x = 0; x < haystack.length; x++) {
-//        if (haystack[x] === needle) {
-//            return true;
-//        }
-//    }
-//    return false;
-//}
-
 // DateTime stuff..............................................................
 
 function militaryDateTimeStr(date, includeYear) {

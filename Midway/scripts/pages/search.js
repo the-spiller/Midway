@@ -1,13 +1,12 @@
-﻿var cvs = document.getElementById("searchcanvas"),
+﻿var cvs = document.getElementById("mapcanvas"),
     mapLeft = 5,
     divLeft = 974,
     imgDir = "/content/images/search/",
     flagImg = "/content/images/usn-med.png",
-    mapImg = null,
+    searchCursorImg = imgDir + "usn-airsearchcursor.png",
     captionColor = "usnblue",
     game = {},
     editsMade = false,
-    mouseDown = false,
     side,
     phase = {},
     ships = [],
@@ -17,15 +16,7 @@
     lastShipSelected = null,
     selectedZone = "",
     selectedArea = "",
-    dragMgr = {
-        dragging: false,
-        source: "",
-        dragData: null,
-        cursorImg: null,
-        cursorOffset: { x: 0, y: 0 },
-        useSnapshot: false,
-        snapshot: null
-    },
+    zonesHighlighted = [],
     soundInit = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: false },
     soundInitLoop = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: true },
     bgMusic, sfxArrived, sfxSailing, sfxAirSearch, sfxSearch,
@@ -60,7 +51,12 @@ $("#done").on("click", function () {
 $('#canvii').on("click", function (e) {
     // make the zone the 'current' one
     selectZone(windowToCanvas(cvs, e.clientX, e.clientY));
-}).on("dblclick", function (e) {
+    
+    // move ships?
+    if (game.PhaseId == 1) {
+        zoneSelected();
+    }
+}).on("dblclick", function(e) {
     // select all ships in the zone (if any)
     var coords = windowToCanvas(cvs, e.clientX, e.clientY),
         zone = searchGrid.coordsToZone(coords);
@@ -68,30 +64,18 @@ $('#canvii').on("click", function (e) {
         $("#zone").find("div.shipitem").addClass("selected");
     }
     selectZoneTab();
-}).on("mouseup", function (e) {
-    canvasMouseUp(e);
-}).on("mouseout", function () {
-    mouseDown = false;
-    if (dragMgr.source == "search") {
-        hideSearching();
-    } else if (dragMgr.dragging) {
-        dragMgr.dragging = false;
-        if (dragMgr.useSnapshot)
-            searchGrid.restoreImageData(dragMgr.snapshot, 0, 0);
-    }
 });
 
 // Event handlers for dynamically-loaded elements
 $(document).on("click", ".tablistitem", function (e) {
     workTabs(e);
+    if (game.PhaseId == 1) {
+        $(".shipitem").removeClass("selected");
+        showMoveHighlight();
+    }
     makeSuggestion();
 }).on("click", ".shipitem", function(e) {
     doShipSelection(this, (e.shiftKey));
-    mouseDown = false;
-}).on("click", ".searchitem", function() {
-    mouseDown = false;
-    dragMgr.dragging = false;
-    hideSearching();
 });
 
 // Functions...........................................................
@@ -418,119 +402,25 @@ function doShipSelection(shipItem, shiftPressed) {
     if (!lastShipSelected) {
         $(shipItem).addClass("selected");
         lastShipSelected = shipItem;
-        return;
-    }
-    if (shiftPressed) {
-        var start = $(".shipitem").index(shipItem);
-        var end = $(".shipitem").index(lastShipSelected);
-
-        if ($(lastShipSelected).hasClass("selected")) {
-            $(".shipitem").slice(Math.min(start, end), Math.max(start, end) + 1).addClass("selected");
-        } else {
-            $(".shipitem").slice(Math.min(start, end), Math.max(start, end) + 1).removeClass("selected");
-        }
     } else {
-        if ($(shipItem).hasClass("selected"))
-            $(shipItem).removeClass("selected");
-        else
-            $(shipItem).addClass("selected");
-    }
-    lastShipSelected = shipItem;
-}
+        if (shiftPressed) {
+            var start = $(".shipitem").index(shipItem);
+            var end = $(".shipitem").index(lastShipSelected);
 
-/*-------------------------------------------------------------------*/
-/* Called after a fast timer to ensure that we're actually dragging. */
-/*-------------------------------------------------------------------*/
-function beginControlsDrag() {
-    if (mouseDown) {
-        if (dragMgr.source == "search") {
-            if (audioVol > 0 && sfxSearch)
-                sfxSearch.play().fade(0, audioVol * 0.01, 500);
-        }
-        dragMgr.dragging = true;
-        var canvii = document.getElementById("canvii");
-        canvii.addEventListener("mousemove", canvasMouseMove, false);
-        canvii.addEventListener("touchmove", canvasMouseMove, false);
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/* Respond to mouse movement during drag. If drag is just starting,  */
-/* capture canvas image, otherwise restore canvas image captured at  */
-/* start of drag. Draw element being dragged at new mouse            */
-/* coordinates.                                                      */
-/*-------------------------------------------------------------------*/
-function canvasMouseMove(e) {
-    if (dragMgr.dragging) {
-        var canvasCoords = windowToCanvas(cvs, e.clientX, e.clientY);
-        if (dragMgr.source == "search") {
-            showSearching(canvasCoords);
-        } else {
-            if (dragMgr.useSnapshot) {
-                if (dragMgr.snapshot) {
-                    searchGrid.restoreImageData(dragMgr.snapshot, 0, 0);
-                } else {
-                    dragMgr.snapshot = searchGrid.grabImageData();
-                }
-            }
-            if (isLegitDrop(canvasCoords)) {
-                if (dragMgr.source == "arrivals") {
-                    var topLeft = searchGrid.coordsToTopLeftCoords(canvasCoords);
-                    searchGrid.drawShipsMarker(topLeft);
-                } else {
-                    // a zone -- movement
-                    searchGrid.drawMoveBand(dragMgr.source, canvasCoords);
-                }
-            }
-        }
-    }
-}
-
-/*-------------------------------------------------------------------*/
-/* Respond to a potiential drop event.                               */
-/*-------------------------------------------------------------------*/
-function canvasMouseUp(e) {
-    mouseDown = false;
-    if (dragMgr.dragging) {
-        dragMgr.dragging = false;
-        var canvii = document.getElementById("canvii");
-        canvii.removeEventListener("touchmove", canvasMouseMove, false);
-        canvii.removeEventListener("mousemove", canvasMouseMove, false);
-        
-        var coords = windowToCanvas(cvs, e.clientX, e.clientY),
-            zone = searchGrid.coordsToZone(coords);
-        
-        if (dragMgr.source == "search") {
-            hideSearching(function() {
-                executeSearch(coords, zone, dragMgr.dragData, function () {
-                    deselectArea();
-                    drawSightings();
-                });
-            });
-        } else if (isLegitDrop(coords)) {
-            if (dragMgr.source == "arrivals" && sfxArrived) {
-                sfxArrived.play();
-            }
-            var cost = 0;
-
-            if (isNumber(dragMgr.source.substr(1, 1)))
-                cost = searchGrid.zoneDistance(dragMgr.source, zone);
-
-            relocateShips(zone, dragMgr.dragData, cost);
-
-            if (dragMgr.source == "arrivals") {
-                $("#arrivals").find("div.shipitem").remove(".selected").parent();
-                selectZone(coords);
-                if ($("#arrivals").find("div.shipitem").length == 0) {
-                    $("#zonetab").trigger("click");
-                }
+            if ($(lastShipSelected).hasClass("selected")) {
+                $(".shipitem").slice(Math.min(start, end), Math.max(start, end) + 1).addClass("selected");
             } else {
-                //movement's done
-                sailShips(dragMgr.source, zone);
+                $(".shipitem").slice(Math.min(start, end), Math.max(start, end) + 1).removeClass("selected");
             }
-            window.editsMade = true;
+        } else {
+            if ($(shipItem).hasClass("selected"))
+                $(shipItem).removeClass("selected");
+            else
+                $(shipItem).addClass("selected");
         }
+        lastShipSelected = shipItem;
     }
+    if (game.PhaseId == 1) showMoveHighlight();
 }
 
 /*-------------------------------------------------------------------*/
@@ -542,7 +432,7 @@ function ajaxLoadPhase(successCallback) {
         type: "GET",
         accepts: "application/json",
         success: function(data) {
-            createUpdateAuthCookie();
+            createUpdateAuthCookie(); 
             phase = JSON.parse(data);
             if (successCallback) successCallback();
         },
@@ -592,21 +482,9 @@ function ajaxLoadSearches(successCallback) {
     });
 }
 
-function logSearches() {
-    for (var i = 0; i < searches.length; i++) {
-        console.log("Search game id " + searches[i].GameId +
-            ", player id " + searches[i].PlayerId +
-            ", turn " + searches[i].Turn +
-            ", number " + searches[i].SearchNumber +
-            ", type " + searches[i].SearchType +
-            ", area " + searches[i].Area +
-            ", " + searches[i].Markers.length + " markers");
-    }
-}
 /*-------------------------------------------------------------------*/
 /* Make ajax call to post phase data back to the server.             */
 /*-------------------------------------------------------------------*/
-
 function ajaxPutPhase(successCallback) {
     var shipsToPass = [];
 
@@ -691,6 +569,7 @@ function setVolume(vol) {
     if (sfxSailing) sfxSailing.volume(vol);
     if (sfxSearch) sfxSearch.volume(vol);
 }
+
 /*-------------------------------------------------------------------*/
 /* Load search map audio based on game phase                         */
 /*-------------------------------------------------------------------*/
@@ -813,43 +692,6 @@ function shipsLoaded() {
 }
 
 /*****************************************************************************/
-/* Touch event to mouse event translator called from touch events.           */
-/*****************************************************************************/
-function touchToMouseHandler(event) {
-    var touches = event.changedTouches,
-        first = touches[0],
-        type;
-
-    // figure which mouse event to use
-    switch (event.type) {
-        case "touchstart":
-            type = "mousedown";
-            break;
-        case "touchmove":
-            type = "mousemove";
-            break;
-        case "touchend":
-            type = "mouseup";
-            break;
-        case "touchenter":
-            type = "mouseenter";
-            break;
-        case "touchcancel":
-        case "touchleave":
-            type = "mouseleave";
-            break;
-        default:
-            return;
-    }
-
-    //create and fire mouse event
-    var mouseHandler = document.createEvent("MouseEvent");
-    mouseHandler.initMouseEvent(type, true, true, window, 1,
-        first.screenX, first.screenY, first.clientX, first.clientY,
-        false, false, false, false, 0, null);
-}
-
-/*****************************************************************************/
 /* Base page load function called at $(document).ready.                      */
 /*****************************************************************************/
 function loadPage(callback) {
@@ -866,6 +708,7 @@ function loadPage(callback) {
             mapLeft = 418;
             divLeft = 5;
             flagImg = "/content/images/ijn-med.png";
+            searchCursorImg = imgDir + "ijn-airsearchcursor.png";
             captionColor = "ijnred";
             
             var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + imgDir + "ijnfleet.png\" />" +
@@ -873,13 +716,15 @@ function loadPage(callback) {
                 "<img id=\"airsearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-airsearchcursor.png\" />" +
                 "<img id=\"seasearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-seasearchcursor.png\" />";
             $("#imagecache").html(html);
+            $("#fleetcursor").css("background", "url(/content/images/search/ijnfleet.png) no-repeat left top");
         }
       
         ajaxLoadPhase(function () {
             setTabs();
             selectedZone = game.SelectedLocation || "H5G";
 
-            $("#searchcanvas").css("left", mapLeft + "px");        
+            $("#mapcanvas").css("left", mapLeft + "px");
+            $("#iconscanvas").css("left", mapLeft + "px");
             $("#searchdiv").css("left", divLeft + "px");
             if (game.PhaseId == 2)
                 searchGrid.addSearchCanvases();

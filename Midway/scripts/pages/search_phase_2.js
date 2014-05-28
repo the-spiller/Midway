@@ -236,7 +236,7 @@ function ajaxPostSearch(search, successCallback) {
         data: JSON.stringify(search),
         success: function (data) {
             var retSearch = JSON.parse(data);
-            createUpdateAuthCookie();
+            createUpdateAuthCookie(); 
             if (retSearch.Markers) {
                 for (var i = 0; i < retSearch.Markers.length; i++) {
                     search.Markers.push({

@@ -4,16 +4,19 @@
         gridHeight = 748,
         gridWidth = 964,
         mapCols = ["A", "B", "C", "D", "E", "F", "G", "H", "I"],
-        cvs = document.getElementById("searchcanvas"),
-        ctx = cvs.getContext("2d"),
+        mapCvs = document.getElementById("mapcanvas"),
+        mapCtx = mapCvs.getContext("2d"),
+        iconsCvs = document.getElementById("iconscanvas"),
+        iconsCtx = iconsCvs.getContext("2d"),
         cloudsCvs, cloudsCtx, searchCursorCvs, searchCursorCtx,
         selectedZoneRestoreData = null,
         selectedAreaRestoreData = null,
+        highlightRestoreData = null,
         //functions called internally
         privZoneToTopLeftCoords = function(zone) {
             var col = 0,
                 areaSize = zonesize * 3;
-            
+
             for (var i = 0; i < mapCols.length; i++) {
                 if (zone.charAt(0) == mapCols[i]) {
                     col = (i * areaSize) + mapmargin;
@@ -95,28 +98,68 @@
                 zonesY = coords.y - mapmargin < 0 ? 0 : Math.floor((coords.y - mapmargin) / zonesize);
             return { x: (zonesX * zonesize) + mapmargin, y: (zonesY * zonesize) + mapmargin };
         },
-        privDrawSelBox = function(left, top, sideLength) {
-            ctx.save();
-            ctx.globalAlpha = 0.6;
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = "#ffd651";
-            ctx.beginPath();
-            ctx.moveTo(left + 2, top + 2);
-            ctx.lineTo(left + sideLength, top + 2);
-            ctx.lineTo(left + sideLength, top + sideLength);
-            ctx.lineTo(left + 2, top + sideLength);
-            ctx.closePath();
-            ctx.stroke();
-            ctx.restore();
+        privGetContextByIndex = function(idx) {
+            if (idx == 1) return iconsCtx;
+            if (idx == 2) return cloudsCtx;
+            if (idx == 3) return searchCursorCtx;
+            return mapCtx;
         },
-        privDrawSearchClouds = function (opacity, coords) {
+        nextZoneX = function (zone) {
+            var z = zone.charAt(2),
+                area = zone.substr(0, 2);
+            if (z == "A") return area + "B";
+            if (z == "B") return area + "C";
+            if (z == "D") return area + "E";
+            if (z == "E") return area + "F";
+            if (z == "G") return area + "H";
+            if (z == "H") return area + "I";
+
+            for (var i = 0; i < mapCols.length - 1; i++) {
+                if (area.charAt(0) == mapCols[i]) {
+                    area = mapCols[i + 1] + area.charAt(1);
+                    break;
+                }
+            }
+            if (z == "C") return area + "A";
+            if (z == "F") return area + "D";
+            return area + "G";
+        },
+        nextZoneY = function (zone) {
+            var z = zone.charAt(2),
+                area = zone.substr(0, 2);
+            if (z == "A") return area + "D";
+            if (z == "B") return area + "E";
+            if (z == "C") return area + "F";
+            if (z == "D") return area + "G";
+            if (z == "E") return area + "H";
+            if (z == "F") return area + "I";
+
+            area = area.charAt(0) + (Number(area.charAt(1)) + 1);
+            if (z == "G") return area + "A";
+            if (z == "H") return area + "B";
+            return area + "C";
+        },
+        privDrawSelBox = function(left, top, sideLength) {
+            mapCtx.save();
+            mapCtx.globalAlpha = 0.6;
+            mapCtx.lineWidth = 4;
+            mapCtx.strokeStyle = "#ffd651";
+            mapCtx.beginPath();
+            mapCtx.moveTo(left + 2, top + 2);
+            mapCtx.lineTo(left + sideLength, top + 2);
+            mapCtx.lineTo(left + sideLength, top + sideLength);
+            mapCtx.lineTo(left + 2, top + sideLength);
+            mapCtx.closePath();
+            mapCtx.stroke();
+            mapCtx.restore();
+        },
+        privDrawSearchClouds = function(opacity, coords) {
             if (!cloudsCtx) return;
             var clouds = document.getElementById("cloudLayer");
             cloudsCtx.clearRect(0, 0, gridWidth, gridHeight);
             cloudsCtx.globalAlpha = opacity;
             cloudsCtx.drawImage(clouds, coords.x, coords.y);
         };
-
     return {
         // read-only public props
         zoneSize: function () { return zonesize; },
@@ -168,8 +211,8 @@
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        clearCanvas: function () {
-            ctx.clearRect(0, 0, cvs.width, cvs.height);
+        clearMapCanvas: function () {
+            mapCtx.clearRect(0, 0, mapCvs.width, mapCvs.height);
         },
         /*-------------------------------------------------------------------*/
         /* Draw the search map semi-transparently and size the canvas to     */
@@ -180,9 +223,9 @@
             var mapImg = new Image();
             mapImg.src = "/content/images/search/searchboard.png";
             mapImg.onload = function () {
-                cvs.height = mapImg.height;
-                cvs.width = mapImg.width;
-                ctx.drawImage(mapImg, 0, 0);
+                mapCvs.height = mapImg.height;
+                mapCvs.width = mapImg.width;
+                mapCtx.drawImage(mapImg, 0, 0);
                 if (callback) callback();
             };
         },
@@ -194,30 +237,30 @@
             var topLeft = privZoneToTopLeftCoords(zone),
                 sightingImg = document.getElementById("sighting");
             
-            ctx.save();
+            iconsCtx.save();
             if (age > 0) {
-                ctx.globalAlpha = 1 - (age * 0.2);
+                iconsCtx.globalAlpha = 1 - (age * 0.2);
             }
-            ctx.drawImage(sightingImg, topLeft.x, topLeft.y);
-            ctx.restore();
+            iconsCtx.drawImage(sightingImg, topLeft.x, topLeft.y);
+            iconsCtx.restore();
         },
         /*-------------------------------------------------------------------*/
-        /* Grab preloaded fleet image and draw it at the input canvas        */
-        /* coordinates (NOT converted to top left).                          */
+        /* Grab preloaded fleet image and draw it at the input zone top left */
+        /* coordinates.                                                      */
         /*-------------------------------------------------------------------*/
         drawShipsMarker: function (coords) {
             var fleetImg = document.getElementById("fleet");
-            ctx.drawImage(fleetImg, coords.x - zonesize, coords.y);
+            iconsCtx.drawImage(fleetImg, coords.x - zonesize, coords.y);
         },
         /*-------------------------------------------------------------------*/
         /* Draw yellow square selected zone marker at the input canvas       */
-        /* top and left coordinates.                                         */
+        /* top left coordinates.                                             */
         /*-------------------------------------------------------------------*/
         drawSelector: function (topLeft, sizeInZones) {
             var top = topLeft.y,
                 left = topLeft.x,
                 sideLength = (sizeInZones * zonesize) + 5,
-                savedData = ctx.getImageData(left, top, sideLength + 3, sideLength + 3);
+                savedData = mapCtx.getImageData(left, top, sideLength + 3, sideLength + 3);
             
             if (sizeInZones == 1)
                 selectedZoneRestoreData = savedData;
@@ -229,50 +272,84 @@
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         removeZoneSelector: function (left, top) {
-            ctx.putImageData(selectedZoneRestoreData, left, top);
+            mapCtx.putImageData(selectedZoneRestoreData, left, top);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         removeAreaSelector: function (left, top) {
-            ctx.putImageData(selectedAreaRestoreData, left, top);
+            mapCtx.putImageData(selectedAreaRestoreData, left, top);
         },
         /*-------------------------------------------------------------------*/
-        /* Draw movement direction band and destination zone indicator       */
-        /* during ship movement dragging.                                    */
+        /* Highlight a range of map zones and return an array of those zones.*/
         /*-------------------------------------------------------------------*/
-        drawMoveBand: function (startZone, endCoords) {
-            var start = privZoneToTopLeftCoords(startZone),
-                topLeft = privCoordsToTopLeftCoords(endCoords);
+        highlightZones: function (topLeftZone, bottomRightZone) {
+            var topLeftCoords = privZoneToTopLeftCoords(topLeftZone),
+                bottomRightCoords = addVectors(privZoneToTopLeftCoords(bottomRightZone), { x: zonesize, y: zonesize }),
+                height = bottomRightCoords.y - topLeftCoords.y,
+                width = bottomRightCoords.x - topLeftCoords.x,
+                zonesY = Math.floor(height / zonesize),
+                zonesX = Math.floor(width / zonesize);
 
-            start.x += Math.floor(zonesize / 2);
-            start.y += Math.floor(zonesize / 2);
-            ctx.lineWidth = 2;
-            ctx.lineCap = "round";
-            ctx.strokeStyle = "#1b5b00";
-            ctx.beginPath();
-            ctx.moveTo(start.x, start.y);
-            ctx.lineTo(endCoords.x, endCoords.y);
-            ctx.moveTo(topLeft.x, topLeft.y);
-            ctx.lineTo(topLeft.x + zonesize, topLeft.y);
-            ctx.lineTo(topLeft.x + zonesize, topLeft.y + zonesize);
-            ctx.lineTo(topLeft.x, topLeft.y + zonesize);
-            ctx.closePath();
-            ctx.stroke();
+            highlightRestoreData = {
+                data: iconsCtx.getImageData(topLeftCoords.x, topLeftCoords.y, width, height),
+                top: topLeftCoords.y,
+                left: topLeftCoords.x
+            };
+            
+            iconsCtx.save();
+            iconsCtx.globalAlpha = 0.3;
+            iconsCtx.fillStyle = "#ffffff";
+            iconsCtx.beginPath();
+            iconsCtx.moveTo(topLeftCoords.x, topLeftCoords.y);
+            iconsCtx.lineTo(bottomRightCoords.x, topLeftCoords.y);
+            iconsCtx.lineTo(bottomRightCoords.x, bottomRightCoords.y);
+            iconsCtx.lineTo(topLeftCoords.x, bottomRightCoords.y);
+            iconsCtx.closePath();
+            iconsCtx.fill();
+            iconsCtx.restore();
+            
+            // build up array of zones to return
+            var zones = [topLeftZone],
+                zoneX = topLeftZone,
+                zoneY;
+            
+            for (var i = 0; i < zonesX; i++) {
+                if (i > 0) {
+                    zoneX = nextZoneX(zoneX);
+                    zones.push(zoneX);
+                }
+                zoneY = nextZoneY(zoneX);
+                zones.push(zoneY);
+                
+                for (var j = 1; j < zonesY; j++) {
+                    zoneY = nextZoneY(zoneY);
+                    zones.push(zoneY);
+                }
+            }
+            console.log(zones);
+            return zones;
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        grabImageData: function (left, top, width, height) {
+        removeHighlight: function () {
+            iconsCtx.putImageData(highlightRestoreData.data, highlightRestoreData.left, highlightRestoreData.top);
+        },
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        grabImageData: function (canvasIdx, left, top, width, height) {
+            var ctx = privGetContextByIndex(canvasIdx);
             if (!left) {
                 left = 0;
                 top = 0;
-                width = cvs.width;
-                height = cvs.height;
+                width = mapCvs.width;
+                height = mapCvs.height;
             }
             return ctx.getImageData(left, top, width, height);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        restoreImageData: function (data, left, top) {
+        restoreImageData: function (canvasIdx, data, left, top) {
+            var ctx = privGetContextByIndex(canvasIdx);
             ctx.putImageData(data, left, top);
         },
         /*-------------------------------------------------------------------*/
@@ -284,8 +361,8 @@
             cloudsCvs.width = gridWidth;
             cloudsCvs.style.position = "absolute";
             cloudsCvs.style.top = "60px";
-            cloudsCvs.style.left = cvs.style.left;
-            cloudsCvs.style.zIndex = 10;
+            cloudsCvs.style.left = mapCvs.style.left;
+            cloudsCvs.style.zIndex = 20;
 
             searchCursorCvs = document.createElement("canvas");
             searchCursorCvs.id = "searchcursorcanvas";
@@ -293,8 +370,8 @@
             searchCursorCvs.width = gridWidth;
             searchCursorCvs.style.position = "absolute";
             searchCursorCvs.style.top = "60px";
-            searchCursorCvs.style.left = cvs.style.left;
-            searchCursorCvs.style.zIndex = 20;
+            searchCursorCvs.style.left = mapCvs.style.left;
+            searchCursorCvs.style.zIndex = 30;
            
             var div = document.getElementById("canvii");
             div.appendChild(cloudsCvs);
@@ -302,7 +379,6 @@
 
             cloudsCtx = cloudsCvs.getContext("2d");
             searchCursorCtx = searchCursorCvs.getContext("2d");
-            //privDrawSearchClouds({ x: 0, y: 0 });
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
@@ -314,7 +390,7 @@
         drawSearchCursor: function (left, top) {
             if (!searchCursorCtx) return;
             searchCursorCtx.clearRect(0, 0, gridWidth, gridHeight);
-            searchCursorCtx.drawImage(dragMgr.cursorImg, left, top);
+            searchCursorCtx.drawImage(searchCursorImg, left, top);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/

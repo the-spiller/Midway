@@ -480,3 +480,16 @@ th {
     font-weight: bold;
 }
 
+/* Custom cursors ...........................................................*/
+#fleetcursor {
+    width: 108px;
+    height: 36px;
+    position: absolute;
+    background: url(/content/images/search/usnfleet.png) no-repeat left top;
+    display: none;
+    top: 0;
+    left: 0;
+    opacity: 0.6;
+    z-index: 999;
+}
+

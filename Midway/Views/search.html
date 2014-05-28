@@ -39,11 +39,16 @@
                 visibility: hidden;
             }
 
-            #searchcanvas {
+            #mapcanvas {
 	            position: absolute;
 	            top: 60px;
+                z-index: 1;
             }
-
+            #iconscanvas {
+                position: absolute;
+                top: 60px;
+                z-index: 10;
+            }
             #suggest {
                 position: absolute;
                 top: 815px;
@@ -257,9 +262,10 @@
             </div>
             
             <div id="canvii">
-                <canvas id="searchcanvas">
+                <canvas id="mapcanvas">
                     Canvas not supported! Get thee a new browser, for God's sake!
                 </canvas>
+                <canvas id="iconscanvas"></canvas>
             </div>
 
             <div id="searchdiv" class="floatingdiv">
@@ -271,6 +277,8 @@
             </div>
             
             <div id="suggest"></div>
+            
+            <div id="fleetcursor"></div>
 
             <div id="imagecache">
                 <img id="fleet" class="searchmarker" src="/content/images/search/usnfleet.png" />

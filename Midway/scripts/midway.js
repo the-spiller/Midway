@@ -124,7 +124,7 @@ function showAlert(title, message, buttons, color, callback) {
     $("#dlgoverlay").css("display", "block").focus();
 }
 
-function showWait(waitMsg) {
+function showWait(waitMsg, callback) {
     var topLeft = getAlertPosition(),
         waitHtml = "<img src=\"/content/images/blueloader.gif\" style=\"margin-right: 10px;\">" + waitMsg;
 
@@ -136,6 +136,7 @@ function showWait(waitMsg) {
     }).html(waitHtml);
 
     $("#dlgoverlay").css("display", "block");
+    if (callback) callback();
 }
 
 function hideWait() {
@@ -170,6 +171,7 @@ function loadPlayerForPage(callback) {
 function createUpdateAuthCookie() {
     createCookie(COOKIE_NAME_AUTH, window.player.PlayerId + ":" + window.player.AuthKey, 1);
 }
+
 function ajaxGetPlayer(playerId, successCallback) {
     $.ajax({
         url: "/api/player/" + playerId.toString(),
@@ -194,7 +196,7 @@ function ajaxUpdatePlayer(shallowPlayer, successCallback) {
         data: JSON.stringify(shallowPlayer),
         success: function (data) {
             window.player = JSON.parse(data);
-            createUpdateAuthCookie();
+            createUpdateAuthCookie(); 
             if (successCallback) successCallback();
         },
         error: function (xhr, status, errorThrown) {
@@ -212,7 +214,7 @@ function ajaxGetPlayers(successCallback) {
         accepts: "application/json",
         success: function(data) {
             playersList = JSON.parse(data);
-            createUpdateAuthCookie();
+            createUpdateAuthCookie(); 
             if (successCallback) successCallback(playersList);
         },
         error: function(xhr, status, errorThrown) {
