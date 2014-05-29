@@ -16,7 +16,6 @@
     lastShipSelected = null,
     selectedZone = "",
     selectedArea = "",
-    zonesHighlighted = [],
     soundInit = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: false },
     soundInitLoop = { formats: ["mp3", "ogg"], preload: true, autoplay: false, loop: true },
     bgMusic, sfxArrived, sfxSailing, sfxAirSearch, sfxSearch,
@@ -49,12 +48,9 @@ $("#done").on("click", function () {
 });
 
 $('#canvii').on("click", function (e) {
-    // make the zone the 'current' one
-    selectZone(windowToCanvas(cvs, e.clientX, e.clientY));
-    
-    // move ships?
-    if (game.PhaseId == 1) {
-        zoneSelected();
+    if (game.PhaseId != 1 || !checkMoveShips(e)) {
+        // make the zone the 'current' one
+        selectZone(windowToCanvas(cvs, e.clientX, e.clientY));
     }
 }).on("dblclick", function(e) {
     // select all ships in the zone (if any)
@@ -64,6 +60,7 @@ $('#canvii').on("click", function (e) {
         $("#zone").find("div.shipitem").addClass("selected");
     }
     selectZoneTab();
+    if (game.PhaseId == 1) showMoveHighlight();
 });
 
 // Event handlers for dynamically-loaded elements
@@ -72,6 +69,9 @@ $(document).on("click", ".tablistitem", function (e) {
     if (game.PhaseId == 1) {
         $(".shipitem").removeClass("selected");
         showMoveHighlight();
+    } else if (game.PhaseId == 2) {
+        $(".searchitem").removeClass("selected");
+        hideSearching();
     }
     makeSuggestion();
 }).on("click", ".shipitem", function(e) {
@@ -187,7 +187,6 @@ function loadShipZones() {
 /*-------------------------------------------------------------------*/
 function showShipsInZone() {
     if (!selectedZone) return;
-
     var zone = selectedZone == "H5G" ? "Midway" : selectedZone,
         html = "<div style=\"margin: 5px; font-weight: bold;\">" + zone + "</div>",
         i;
@@ -220,6 +219,7 @@ function showShipsInZone() {
         }
     }
     $("#zone").html(html + "</ul>");
+    if (game.PhaseId == 1) showMoveHighlight();
 }
 
 /*-------------------------------------------------------------------*/
@@ -296,10 +296,13 @@ function getShipListItemHtml(ship, showAvailMove) {
         ship.SearchImgPath + imgSuffix + "\"  draggable=\"false\"/>";
 
     if (showAvailMove) {
-        if (ship.MovePoints > 0)
-            html += "<div class=\"availmove some\"></div>";
-        else
+        if (ship.MovePoints > 0) {
+            var some = " some-usn";
+            if (side == "IJN") some = " some-ijn";
+            html += "<div class=\"availmove" + some + "\"></div>";
+        } else {
             html += "<div class=\"availmove none\"></div>";
+        }
     }
     
     if (ship.ShipType == "CV" || ship.ShipType == "CVL" || ship.ShipType == "BAS") {
@@ -535,8 +538,8 @@ function makeSuggestion() {
         switch (panelId) {
             case "arrivals":
                 if ($("#arrivals").find("div.shipitem").length > 0) {
-                    suggest = "Select one or more of your arriving ships and drag them to any zone " +
-                        "on the near map edge. You'll be able to move them from there.";
+                    suggest = "Select one or more of your arriving ships and click on a zone " +
+                        "on the near map edge to bring them in. You'll be able to move them from there.";
                 } else {
                     suggest = "Click on the zone tab to move ships and ready your aircraft.";
                 }
@@ -544,7 +547,7 @@ function makeSuggestion() {
             case "zone":
                 if ($("#zone").find("div.shipitem").length > 0) {
                     if (game.PhaseId == 1) {
-                        suggest = "Select one or more ships and drag their map marker to move them. Air readiness ...";
+                        suggest = "Select one or more ships and click on a highlighted zone to move them there.";
                     }
                 } else {
                     suggest = "Select a zone on the map to see the ships and aircraft it contains.";
@@ -712,9 +715,7 @@ function loadPage(callback) {
             captionColor = "ijnred";
             
             var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + imgDir + "ijnfleet.png\" />" +
-                "<img id=\"sighting\" class=\"searchmarker\" src=\"" + imgDir + "usnsighting.png\" />" +
-                "<img id=\"airsearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-airsearchcursor.png\" />" +
-                "<img id=\"seasearchcursor\" class=\"cursorimg\" src=\"" + imgDir + "ijn-seasearchcursor.png\" />";
+                "<img id=\"sighting\" class=\"searchmarker\" src=\"" + imgDir + "usnsighting.png\" />";
             $("#imagecache").html(html);
             $("#fleetcursor").css("background", "url(/content/images/search/ijnfleet.png) no-repeat left top");
         }
@@ -725,9 +726,10 @@ function loadPage(callback) {
 
             $("#mapcanvas").css("left", mapLeft + "px");
             $("#iconscanvas").css("left", mapLeft + "px");
+            $("#suggest").css("left", mapLeft + "px");
             $("#searchdiv").css("left", divLeft + "px");
             if (game.PhaseId == 2)
-                searchGrid.addSearchCanvases();
+                searchGrid.addCloudsCanvas();
             
             ajaxLoadShips(shipsLoaded);
         });
@@ -744,6 +746,7 @@ function loadUp() {
             $("#canvii").css("visibility", "visible");
             editsMade = false;
             makeSuggestion();
+            $("#suggest").css("visibility", "visible");
         });
     });
 }

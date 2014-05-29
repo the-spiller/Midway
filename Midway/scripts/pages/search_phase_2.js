@@ -1,9 +1,5 @@
-﻿
-// Events and functions for Phase 2 (Search)
-
-$(document).on("mousedown", ".searchitem", function(e) {
-    searchItemMouseDown(e);
-});
+﻿// Events and functions for Phase 2 (Search)
+var searching = false;
 
 /*-------------------------------------------------------------------*/
 /* Load the Search tab with its control elements.                    */
@@ -36,37 +32,6 @@ function loadSearchPhase() {
         }
     }
     $("#search").html(tabHtml);
-}
-
-
-/*-------------------------------------------------------------------*/
-/* Initialize a search drag operation.                               */
-/*-------------------------------------------------------------------*/
-function searchItemMouseDown(e) {
-    var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "null";
-    if (panelId != "search") return;
-
-    e.preventDefault();
-    dragMgr.dragging = false;
-    dragMgr.source = panelId;
-
-    var selSearch = getSearch(e.target);
-    if (selSearch) {
-        window.mouseDown = true;
-        dragMgr.dragData = selSearch;
-        dragMgr.cursorImg = document.getElementById(selSearch.SearchType + "searchcursor");
-        dragMgr.cursorOffset = { x: -40, y: -40 },
-        dragMgr.useSnapshot = false;
-        dragMgr.snapshot = null;
-        window.selectedArea = "";
-
-        if (selSearch.SearchType == "air") {
-            if (sfxAirSearch) sfxSearch = sfxAirSearch;
-        } else {
-            if (sfxSailing) sfxSearch = sfxSailing;
-        }
-    }
-    setTimeout(beginControlsDrag, 150);
 }
 
 /*-------------------------------------------------------------------*/
@@ -146,16 +111,23 @@ function scrollClouds() {
         }
     }
 }
-
 /*-------------------------------------------------------------------*/
 /*-------------------------------------------------------------------*/
-function showSearching(canvasCoords) {
-    var coords = addVectors(canvasCoords, dragMgr.cursorOffset);
-    
-    searchGrid.drawSearchCursor(coords.x, coords.y);
+function initSearch(searchType) {
+    $("#searchcursor").css({
+        background: "url(/content/images/search/" + side.toLowerCase() + "-" + searchType + "searchcursor.png) no-repeat left top",
+        display: "block"
+    });
+    searching = true; 
+}
+/*-------------------------------------------------------------------*/
+/*-------------------------------------------------------------------*/
+function showSearching(coords) {
+    var cursorCoords = { x: coords.x - 43, y: coords.y - 43 };
+    $("#searchcursor").css({ left: cursorCoords.x + "px", top: cursorCoords.y + "px" });
 
-    if (withinSearchRange(canvasCoords)) {
-        selectArea(canvasCoords);
+    if (withinSearchRange(coords)) {
+        selectArea(coords);
     } else {
         deselectArea();
     }
@@ -165,15 +137,14 @@ function showSearching(canvasCoords) {
 function hideSearching(callback) {
     var finishThis = function () {
         if (sfxSearch) sfxSearch.stop();
-        dragMgr.dragging = false;
-        dragMgr.source = "";
         deselectArea();
-        searchGrid.clearSearchCursor();
+        $("#searchcursor").css("display", "none");
+        searching = false;
         if (callback) callback();
     };
     
     if (sfxSearch) {
-        sfxSearch.fade(sfxSearch.volume(), 0, 500, finishThis());
+        sfxSearch.fade(sfxSearch.volume(), 0, 500, function () { finishThis(); });
     } else {
         finishThis();
     }

@@ -8,23 +8,17 @@
         mapCtx = mapCvs.getContext("2d"),
         iconsCvs = document.getElementById("iconscanvas"),
         iconsCtx = iconsCvs.getContext("2d"),
-        cloudsCvs, cloudsCtx, searchCursorCvs, searchCursorCtx,
+        cloudsCvs, cloudsCtx,
         selectedZoneRestoreData = null,
         selectedAreaRestoreData = null,
         highlightRestoreData = null,
         //functions called internally
         privZoneToTopLeftCoords = function(zone) {
-            var col = 0,
-                areaSize = zonesize * 3;
+            var areaSize = zonesize * 3,
+                col = (privGetMapColsIndex(zone.charAt(0)) * areaSize) + mapmargin;
 
-            for (var i = 0; i < mapCols.length; i++) {
-                if (zone.charAt(0) == mapCols[i]) {
-                    col = (i * areaSize) + mapmargin;
-                    break;
-                }
-            }
-            var row = ((Number(zone.substr(1, 1)) - 1) * areaSize) + mapmargin;
-            switch (zone.substr(2, 1)) {
+            var row = ((Number(zone.charAt(1)) - 1) * areaSize) + mapmargin;
+            switch (zone.charAt(2)) {
             case "B":
                 col += zonesize;
                 break;
@@ -56,6 +50,18 @@
             }
             return { x: col, y: row };
         },
+        privGetZoneLetter = function(innerRow, innerCol) {
+            var z = (innerRow * 10) + innerCol;
+            if (z == 0) return "A";
+            if (z == 1) return "B";
+            if (z == 2) return "C";
+            if (z == 10) return "D";
+            if (z == 11) return "E";
+            if (z == 12) return "F";
+            if (z == 20) return "G";
+            if (z == 21) return "H";
+            return "I";
+        },
         privCoordsToZone = function(coords) {
             var x = coords.x,
                 y = coords.y;
@@ -63,81 +69,60 @@
             if (x < 28 || x > 962 || y < 28 || y > 746)
                 return "";
 
-            var zoneRow = (y - mapmargin) / zonesize;
-            var row = Math.floor(zoneRow / 3 + 1).toString();
-            var areaRow = Math.floor(zoneRow % 3 + 1);
-
-            var zoneCol = (x - mapmargin) / zonesize;
-            var colRow = mapCols[Math.floor(zoneCol / 3)] + row;
-            var areaCol = Math.floor(zoneCol % 3 + 1);
-
-            var areaRowCol = areaRow * 10 + areaCol;
-            switch (areaRowCol) {
-            case 11:
-                return colRow + "A";
-            case 12:
-                return colRow + "B";
-            case 13:
-                return colRow + "C";
-            case 21:
-                return colRow + "D";
-            case 22:
-                return colRow + "E";
-            case 23:
-                return colRow + "F";
-            case 31:
-                return colRow + "G";
-            case 32:
-                return colRow + "H";
-            default:
-                return colRow + "I";
-            }
+            var zonesY = (y - mapmargin) / zonesize,
+                row = (Math.floor(zonesY / 3) + 1).toString(),
+                innerRow = Math.floor(zonesY % 3),
+                zonesX = (x - mapmargin) / zonesize,
+                col = mapCols[Math.floor(zonesX / 3)],
+                innerCol = Math.floor(zonesX % 3);
+            
+            return col + row + privGetZoneLetter(innerRow, innerCol);
         },
         privCoordsToTopLeftCoords = function(coords) {
             var zonesX = coords.x - mapmargin < 0 ? 0 : Math.floor((coords.x - mapmargin) / zonesize),
                 zonesY = coords.y - mapmargin < 0 ? 0 : Math.floor((coords.y - mapmargin) / zonesize);
             return { x: (zonesX * zonesize) + mapmargin, y: (zonesY * zonesize) + mapmargin };
         },
-        privGetContextByIndex = function(idx) {
+        privGetMapColsIndex = function(colLetter) {
+            for (var i = 0; i < mapCols.length; i++) {
+                if (colLetter == mapCols[i]) {
+                    return i;
+                }
+            }
+            return -1;
+        },
+        privGetRelativeZone = function (zone, vector) {
+            if (vector.x == 0 && vector.y == 0) return zone;
+            
+            //Convert zone designation to a count of zones in x and y directions
+            // and add vector values (also in zones).
+            var colIdx = privGetMapColsIndex(zone.charAt(0)),
+                zonesX = colIdx * 3,
+                zonesY = (Number(zone.charAt(1)) - 1) * 3,
+                z = zone.charAt(2),
+                zCol = "CFI".indexOf(z) > -1 ? 2 : "BEH".indexOf(z) > -1 ? 1 : 0,
+                zRow = "GHI".indexOf(z) > -1 ? 2 : "DEF".indexOf(z) > -1 ? 1 : 0;
+
+            zonesX = zonesX + zCol + vector.x;
+            zonesY = zonesY + zRow + vector.y;
+            
+            //Don't go off the map edge.
+            if (zonesX < 0) zonesX = 0; else if (zonesX > 25) zonesX = 25;
+            if (zonesY < 0) zonesY = 0; else if (zonesY > 19) zonesY = 19;
+
+            //Convert results back to a zone designation.
+            var col = mapCols[Math.floor(zonesX / 3)],
+                innerCol = Math.floor(zonesX % 3),
+                row = (Math.floor(zonesY / 3) + 1).toString(),
+                innerRow = Math.floor(zonesY % 3);
+            
+            return col + row + privGetZoneLetter(innerRow, innerCol);
+        },
+        privGetContextByIndex = function (idx) {
             if (idx == 1) return iconsCtx;
             if (idx == 2) return cloudsCtx;
             if (idx == 3) return searchCursorCtx;
             return mapCtx;
-        },
-        nextZoneX = function (zone) {
-            var z = zone.charAt(2),
-                area = zone.substr(0, 2);
-            if (z == "A") return area + "B";
-            if (z == "B") return area + "C";
-            if (z == "D") return area + "E";
-            if (z == "E") return area + "F";
-            if (z == "G") return area + "H";
-            if (z == "H") return area + "I";
-
-            for (var i = 0; i < mapCols.length - 1; i++) {
-                if (area.charAt(0) == mapCols[i]) {
-                    area = mapCols[i + 1] + area.charAt(1);
-                    break;
-                }
-            }
-            if (z == "C") return area + "A";
-            if (z == "F") return area + "D";
-            return area + "G";
-        },
-        nextZoneY = function (zone) {
-            var z = zone.charAt(2),
-                area = zone.substr(0, 2);
-            if (z == "A") return area + "D";
-            if (z == "B") return area + "E";
-            if (z == "C") return area + "F";
-            if (z == "D") return area + "G";
-            if (z == "E") return area + "H";
-            if (z == "F") return area + "I";
-
-            area = area.charAt(0) + (Number(area.charAt(1)) + 1);
-            if (z == "G") return area + "A";
-            if (z == "H") return area + "B";
-            return area + "C";
         },
         privDrawSelBox = function(left, top, sideLength) {
             mapCtx.save();
@@ -162,8 +147,8 @@
         };
     return {
         // read-only public props
-        zoneSize: function () { return zonesize; },
-        mapMargin: function () { return mapmargin; },
+        zoneSize: zonesize,
+        mapMargin: mapmargin,
         /*-------------------------------------------------------------------*/
         /* Convert input canvas coordinates to the name of the search map    */
         /* zone that contains them.                                          */
@@ -183,6 +168,9 @@
         /*-------------------------------------------------------------------*/
         coordsToTopLeftCoords: function (coords) {
             return privCoordsToTopLeftCoords(coords);
+        },
+        getRelativeZone: function(zone, vector) {
+            return privGetRelativeZone(zone, vector);
         },
         /*-------------------------------------------------------------------*/
         /* Calculate and return the distance in zones between two zones.     */
@@ -225,6 +213,8 @@
             mapImg.onload = function () {
                 mapCvs.height = mapImg.height;
                 mapCvs.width = mapImg.width;
+                iconsCvs.height = mapImg.height;
+                iconsCvs.width = mapImg.width;
                 mapCtx.drawImage(mapImg, 0, 0);
                 if (callback) callback();
             };
@@ -280,24 +270,23 @@
             mapCtx.putImageData(selectedAreaRestoreData, left, top);
         },
         /*-------------------------------------------------------------------*/
-        /* Highlight a range of map zones and return an array of those zones.*/
+        /* Highlight a rectangular range of map zones and return a list of   */
+        /* the included zones.                                               */
         /*-------------------------------------------------------------------*/
-        highlightZones: function (topLeftZone, bottomRightZone) {
+        highlightZones: function (topLeftZone, zonesWidth, zonesHeight) {
             var topLeftCoords = privZoneToTopLeftCoords(topLeftZone),
-                bottomRightCoords = addVectors(privZoneToTopLeftCoords(bottomRightZone), { x: zonesize, y: zonesize }),
-                height = bottomRightCoords.y - topLeftCoords.y,
-                width = bottomRightCoords.x - topLeftCoords.x,
-                zonesY = Math.floor(height / zonesize),
-                zonesX = Math.floor(width / zonesize);
+                width = zonesWidth * zonesize,
+                height = zonesHeight * zonesize,
+                bottomRightCoords = addVectors(topLeftCoords, { x: width, y: height });
 
             highlightRestoreData = {
                 data: iconsCtx.getImageData(topLeftCoords.x, topLeftCoords.y, width, height),
                 top: topLeftCoords.y,
                 left: topLeftCoords.x
             };
-            
+
             iconsCtx.save();
-            iconsCtx.globalAlpha = 0.3;
+            iconsCtx.globalAlpha = 0.2;
             iconsCtx.fillStyle = "#ffffff";
             iconsCtx.beginPath();
             iconsCtx.moveTo(topLeftCoords.x, topLeftCoords.y);
@@ -309,24 +298,13 @@
             iconsCtx.restore();
             
             // build up array of zones to return
-            var zones = [topLeftZone],
-                zoneX = topLeftZone,
-                zoneY;
-            
-            for (var i = 0; i < zonesX; i++) {
-                if (i > 0) {
-                    zoneX = nextZoneX(zoneX);
-                    zones.push(zoneX);
-                }
-                zoneY = nextZoneY(zoneX);
-                zones.push(zoneY);
-                
-                for (var j = 1; j < zonesY; j++) {
-                    zoneY = nextZoneY(zoneY);
-                    zones.push(zoneY);
+            var zones = [], zone;
+            for (var x = 0; x < zonesWidth; x++) {
+                for (var y = 0; y < zonesHeight; y++) {
+                    zone = privGetRelativeZone(topLeftZone, { x: x, y: y });
+                    zones.push(zone);
                 }
             }
-            console.log(zones);
             return zones;
         },
         /*-------------------------------------------------------------------*/
@@ -354,7 +332,7 @@
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        addSearchCanvases: function() {
+        addCloudsCanvas: function() {
             cloudsCvs = document.createElement("canvas");
             cloudsCvs.id = "cloudscanvas";
             cloudsCvs.height = gridHeight;
@@ -363,40 +341,16 @@
             cloudsCvs.style.top = "60px";
             cloudsCvs.style.left = mapCvs.style.left;
             cloudsCvs.style.zIndex = 20;
-
-            searchCursorCvs = document.createElement("canvas");
-            searchCursorCvs.id = "searchcursorcanvas";
-            searchCursorCvs.height = gridHeight;
-            searchCursorCvs.width = gridWidth;
-            searchCursorCvs.style.position = "absolute";
-            searchCursorCvs.style.top = "60px";
-            searchCursorCvs.style.left = mapCvs.style.left;
-            searchCursorCvs.style.zIndex = 30;
            
             var div = document.getElementById("canvii");
             div.appendChild(cloudsCvs);
-            div.appendChild(searchCursorCvs);
 
             cloudsCtx = cloudsCvs.getContext("2d");
-            searchCursorCtx = searchCursorCvs.getContext("2d");
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
         drawSearchClouds: function (opacity, coords) {
             privDrawSearchClouds(opacity, coords);
-        },
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        drawSearchCursor: function (left, top) {
-            if (!searchCursorCtx) return;
-            searchCursorCtx.clearRect(0, 0, gridWidth, gridHeight);
-            searchCursorCtx.drawImage(searchCursorImg, left, top);
-        },
-        /*-------------------------------------------------------------------*/
-        /*-------------------------------------------------------------------*/
-        clearSearchCursor: function() {
-            if (!searchCursorCtx) return;
-            searchCursorCtx.clearRect(0, 0, gridWidth, gridHeight);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/

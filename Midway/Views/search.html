@@ -26,15 +26,17 @@
                 display: none;
                 top: 60px;
                 width: 400px;
-                height: 739px;
+                height: 766px;
                 opacity: 1.0;
             }
                 #searchdiv .tabpanel {
-                    height: 670px;
+                    height: 697px;
                     background: none;
                     background-color: #093a67;
                 }
-
+                #searchdiv .floathead {
+                    cursor: default;
+                }
             #canvii {
                 visibility: hidden;
             }
@@ -50,13 +52,25 @@
                 z-index: 10;
             }
             #suggest {
+                visibility: hidden;
                 position: absolute;
-                top: 815px;
-                left: 10px;
-                font-weight: bold;
-                color: #ffd651;    
+                top: 812px;
+                padding: 4px;
+                width: 953px;
+                border: 1px solid #000;
+                background: linear-gradient(to right, #202020, #202020, #202020, #000);
+                color: #eaecee;
+                font-size: .85em;  
             }
-
+            #fleetcursor {
+                width: 108px;
+                height: 36px;
+                background: url(/content/images/search/usnfleet.png) no-repeat left top;
+            }
+            #searchcursor {
+                width: 86px;
+                height: 86px;
+            }
             #dlgairops {
                 display: none;
                 background-color: #2d4347;
@@ -116,11 +130,6 @@
             .tablistitem.tabshown {
                 background-color: #093a67;
             }
-
-            #searchdiv .floathead {
-                cursor: default;
-            }
-
             .shipitem {
                 position: relative;
 	            padding: 4px;
@@ -143,11 +152,14 @@
                 width: 10px;
                 z-index: 2;
             }
-                .availmove.some {
-                    background-image: url(/content/images/booblite-green.png);
+                .availmove.some-usn {
+                    background-image: url(/content/images/booblite-go-l.png);
+                }
+                .availmove.some-ijn {
+                    background-image: url(/content/images/booblite-go-r.png);
                 }
                 .availmove.none {
-                      background-image: url(/content/images/booblite-red.png);
+                      background-image: url(/content/images/booblite-stop.png);
                 }
 
             .numplanes {
@@ -202,7 +214,14 @@
                 .searchitem:hover {
                     background-color: #0a4173;
                 }
-
+            .cursordiv {
+                position: absolute;
+                display: none;
+                top: 0;
+                left: 0;
+                z-index: 999;
+                pointer-events: none;
+            }
             .oppsearchitem {
                 cursor: pointer;
 	            min-height: 42px;
@@ -263,7 +282,7 @@
             
             <div id="canvii">
                 <canvas id="mapcanvas">
-                    Canvas not supported! Get thee a new browser, for God's sake!
+                    Canvas not supported!? Are you kidding? Get thee a new browser, for God's sake!
                 </canvas>
                 <canvas id="iconscanvas"></canvas>
             </div>
@@ -278,13 +297,12 @@
             
             <div id="suggest"></div>
             
-            <div id="fleetcursor"></div>
+            <div id="fleetcursor" class="cursordiv"></div>
+            <div id ="searchcursor" class="cursordiv"></div>
 
             <div id="imagecache">
                 <img id="fleet" class="searchmarker" src="/content/images/search/usnfleet.png" />
                 <img id="sighting" class="searchmarker" src="/content/images/search/ijnsighting.png" />
-                <img id="airsearchcursor" class="cursorimg" src="/content/images/search/usn-airsearchcursor.png" />
-                <img id="seasearchcursor" class="cursorimg" src="/content/images/search/usn-seasearchcursor.png" />
             </div>
             <img id="cloudLayer" style="display: none; z-index: 10;" src="/content/images/search/cloud-layer.png" /> 
         </div>

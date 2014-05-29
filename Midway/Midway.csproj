@@ -250,6 +250,9 @@
     <Content Include="Content\audio\sfx\bosun-attn.mp3" />
     <Content Include="Content\audio\sfx\ship-underway.mp3" />
     <Content Include="Content\images\blueloader.gif" />
+    <Content Include="Content\images\booblite-go-l.png" />
+    <Content Include="Content\images\booblite-go-r.png" />
+    <Content Include="Content\images\booblite-stop.png" />
     <Content Include="Content\images\helpicon.png" />
     <Content Include="Content\images\pointssample.png" />
     <Content Include="Content\images\search\ijn-ops-planes.png" />
