@@ -96,8 +96,6 @@ namespace Midway.Models.Data
         //.....................................................................
         public DtoPlayer UpdatePlayer(DtoPlayer dtoPlayer)
         {
-			var buildNew = false;
-
             Player dbPlayer = GetDbPlayer(dtoPlayer.PlayerId);           
             dbPlayer.Email = dtoPlayer.Email;
             dbPlayer.Password = dtoPlayer.Password;
@@ -128,47 +126,47 @@ namespace Midway.Models.Data
 				    }
 				    else if (dbGame == null)
 				    {
-						// new game -- see if we can match it up to an existing one
-					    if (string.IsNullOrEmpty(dtoPlayerGame.OpponentNickname))
-					    {
-						    // anyone out there looking to be the opposition?
-					        var match = _context.PlayerGames
-					                            .Include(pg => pg.Game)
-					                            .OrderBy(pg => pg.Game.CreateDTime)
-					                            .FirstOrDefault(pg => pg.Game.CompletedDTime == null
-					                                                && pg.SideId != dtoPlayerGame.SideId
-					                                                && pg.PlayerId != dtoPlayer.PlayerId
-					                                                && pg.Game.PlayerGames.Count == 1);
+                        //New game -- try to match it up with an existing game that lacks an opponent.
+				        PlayerGame dbPg;
+                        var buildNew = true;
+					    var pgs = _context.PlayerGames
+					                        .Include(pg => pg.Game)
+					                        .OrderBy(pg => pg.Game.CreateDTime)
+					                        .Where(pg => pg.Game.CompletedDTime == null
+					                                            && pg.SideId != dtoPlayerGame.SideId
+					                                            && pg.PlayerId != dtoPlayer.PlayerId
+					                                            && pg.Game.PlayerGames.Count == 1)
+                                            .ToList();
 
-                            if (match != null)
-						    {
-							    var dbPg = new PlayerGame
-								    {
-									    PlayerId = dtoPlayer.PlayerId,
-									    GameId = match.GameId,
-									    LastPlayed = null,
-									    Points = 0,
-									    SelectedLocation = "",
-									    SurfaceCombatRound = 0,
-									    Turn = 1,
-									    PhaseId = 1,
-									    SideId = dtoPlayerGame.SideId,
-									    MidwayInvadedTurn = 0
-								    };
-							    match.Game.PlayerGames.Add(dbPg);
-						    }
-						    else
-						    {
-							    buildNew = true;
-						    }
-					    }
-					    else
-					    {
-							buildNew = true;
-					    }
+				        if (pgs.Count > 0)
+				        {
+				            PlayerGame oppositePg = string.IsNullOrEmpty(dtoPlayerGame.OpponentNickname)
+				                                        ? pgs.First()
+				                                        : pgs.FirstOrDefault(
+				                                            p => p.Player.Nickname == dtoPlayerGame.OpponentNickname);
+				            if (oppositePg != null)
+				            {
+				                dbPg = new PlayerGame
+				                    {
+				                        PlayerId = dtoPlayer.PlayerId,
+				                        GameId = oppositePg.GameId,
+				                        LastPlayed = null,
+				                        Points = 0,
+				                        SelectedLocation = "",
+				                        SurfaceCombatRound = 0,
+				                        Turn = 1,
+				                        PhaseId = 1,
+				                        SideId = dtoPlayerGame.SideId,
+				                        MidwayInvadedTurn = 0
+				                    };
+				                oppositePg.Game.PlayerGames.Add(dbPg);
 
-					    if (buildNew)
-					    {
+                                buildNew = false;
+				            }
+				        }
+				        if (buildNew) 
+                        {
+                            // Make a new game from scratch
 						    dbGame = new Game
 							    {
 								    CreateDTime = DateTime.Now.ToUniversalTime(),
@@ -177,7 +175,7 @@ namespace Midway.Models.Data
 							    };
 						    _context.Games.Add(dbGame);
 
-						    var dbPg = new PlayerGame
+						    dbPg = new PlayerGame
 							    {
 								    PlayerId = dtoPlayer.PlayerId,
 								    LastPlayed = null,

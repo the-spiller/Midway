@@ -121,7 +121,6 @@
         privGetContextByIndex = function (idx) {
             if (idx == 1) return iconsCtx;
             if (idx == 2) return cloudsCtx;
-            if (idx == 3) return searchCursorCtx;
             return mapCtx;
         },
         privDrawSelBox = function(left, top, sideLength) {
@@ -199,8 +198,9 @@
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        clearMapCanvas: function () {
-            mapCtx.clearRect(0, 0, mapCvs.width, mapCvs.height);
+        clearCanvas: function (canvasIdx) {
+            var ctx = privGetContextByIndex(canvasIdx);
+            ctx.clearRect(0, 0, mapCvs.width, mapCvs.height);
         },
         /*-------------------------------------------------------------------*/
         /* Draw the search map semi-transparently and size the canvas to     */
@@ -338,7 +338,7 @@
             cloudsCvs.height = gridHeight;
             cloudsCvs.width = gridWidth;
             cloudsCvs.style.position = "absolute";
-            cloudsCvs.style.top = "60px";
+            cloudsCvs.style.top = mapCvs.style.top;
             cloudsCvs.style.left = mapCvs.style.left;
             cloudsCvs.style.zIndex = 20;
            

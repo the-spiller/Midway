@@ -152,8 +152,7 @@ function showOppSearchedArea(target) {
     if (!window.mapImg) {
         window.mapImg = searchGrid.grabImageData();
         var area = $(target).text().substr(5, 2);
-        if (area)
-            searchGrid.drawOppSearchArea(area);
+        if (area) searchGrid.drawOppSearchArea(area);
     }
 }
 
@@ -162,7 +161,7 @@ function showOppSearchedArea(target) {
 /*-------------------------------------------------------------------*/
 function hideOppSearchedArea() {
     if (window.mapImg) {
-        searchGrid.restoreImageData(mapImg, 0, 0);
+        searchGrid.restoreImageData(0, mapImg, 0, 0);
         window.mapImg = null;
     }
 }

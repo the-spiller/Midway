@@ -92,7 +92,9 @@
             #editreg input[type="text"], #editreg input[type="password"] {
                 width: 300px;
             }
-
+            .gameselimage {
+                pointer-events: none;
+            }
             .longbutton {
                 width: 70px;
                 margin-top: 10px;
@@ -131,12 +133,12 @@
                 <div id="gameselect" class="tabpanel tabshown">
                     <div id="gamelist">
                         <ul>
-                            <li id="game-1" class="listitem"><img src="/content/images/usn.gif" />USN New Game</li>
-                            <li id="game-2" class="listitem"><img src="/content/images/ijn.gif" />IJN New Game</li>
+                            <li id="game-1" class="listitem"><img src="/content/images/usn.gif" class="gameselimage" />USN New Game</li>
+                            <li id="game-2" class="listitem"><img src="/content/images/ijn.gif" class="gameselimage" />IJN New Game</li>
                         </ul>
                     </div>
                     <div id="optopponent">
-                        Optional opponent nickname:
+                        Opponent (optional):
                         <input id="oppnickname" type="text" value="First available" />
                         <div id="oppselectdiv">
                             <select id="oppselect"></select>

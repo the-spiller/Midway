@@ -5,7 +5,8 @@
     selGameId = 0,
     abandonables = [],
     twoWeeks = 1000 * 60 * 60 * 24 * 14,
-    bgMusic, audioVol,
+    bgMusic,
+    audioVol,
     nicknames = FuzzySet();
         
 // Event handlers......................................................
@@ -399,13 +400,13 @@ function getGameListItem(game) {
         title, oppName, icon, waiting;
             
     if (game.Waiting == "Y") {
-        icon = "<img src=\"/content/images/booblite-red.png\" class=\"gameselimg\" />";
+        icon = "<img src=\"/content/images/booblite-red.png\" class=\"gameselimage\" />";
         waiting = " (waiting for opponent to post)";
     } else if (game.OppWaiting == "Y") {
-        icon = "<img src=\"/content/images/booblite!-green.png\" class=\"gameselimg\" />";
+        icon = "<img src=\"/content/images/booblite!-green.png\" class=\"gameselimage\" />";
         waiting = " (waiting for you to post)";
     } else {
-        icon = "<img src=\"/content/images/booblite-green.png\" class=\"gameselimg\" />";
+        icon = "<img src=\"/content/images/booblite-green.png\" class=\"gameselimage\" />";
         waiting = "";
     }
     if (game.OpponentNickname == null || game.OpponentNickname == "") {
@@ -428,7 +429,7 @@ function getGameListItem(game) {
             abandonables[game.GameId] = true;
         }
     }
-    var html = itemStart + title + "\"><img src=\"" + game.TinyFlagUrl + "\" class=\"gameselimg\" />" +
+    var html = itemStart + title + "\"><img src=\"" + game.TinyFlagUrl + "\" class=\"gameselimage\" />" +
         game.SideShortName + " vs. " + oppName + icon + "Turn " + game.Turn + " " + game.PhaseName + "</li>";
     return html;
 }
@@ -498,7 +499,7 @@ function buildRecord() {
     for (var i = 0; i < window.player.Games.length; i++) {
         var game = window.player.Games[i];
                 
-        if (game.CompletedDTime != "") {
+        if (game.CompletedDTime != "" && game.OpponentNickname) {
             recIndex = -1;
             for (var j = 0; j < record.length; j++) {
                 if (game.OpponentNickname == record[j][0]) {

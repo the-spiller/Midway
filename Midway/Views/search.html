@@ -43,24 +43,23 @@
 
             #mapcanvas {
 	            position: absolute;
-	            top: 60px;
+	            top: 85px;
                 z-index: 1;
             }
             #iconscanvas {
                 position: absolute;
-                top: 60px;
+                top: 85px;
                 z-index: 10;
             }
-            #suggest {
-                visibility: hidden;
+            #phasedescrip {
                 position: absolute;
-                top: 812px;
-                padding: 4px;
-                width: 953px;
-                border: 1px solid #000;
+                top: 58px;
+                width: 954px;
+                padding: 5px;
+                /*border: 5px solid #000;
                 background: linear-gradient(to right, #202020, #202020, #202020, #000);
-                color: #eaecee;
-                font-size: .85em;  
+                color: #eaecee;*/
+                  
             }
             #fleetcursor {
                 width: 108px;
@@ -207,12 +206,16 @@
         
             .searchitem {
                 position: relative;
-                cursor: pointer;
-	            padding: 5px;
+	            padding: 4px;
                 margin-bottom: 4px;
             }
                 .searchitem:hover {
                     background-color: #0a4173;
+                }
+                .searchitem.selected {
+                    background-color: #08345c;
+	                padding: 5px 3px 3px 5px;
+		            box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
                 }
             .cursordiv {
                 position: absolute;
@@ -279,7 +282,7 @@
                 </div>
                 <a id="return" href="#" title="Return to home page"><img src="/content/images/return.png" /></a>
             </div>
-            
+            <div id="phasedescrip"></div>
             <div id="canvii">
                 <canvas id="mapcanvas">
                     Canvas not supported!? Are you kidding? Get thee a new browser, for God's sake!
@@ -294,12 +297,8 @@
                 </div>
                 <div id="tabpanels"></div>
             </div>
-            
-            <div id="suggest"></div>
-            
             <div id="fleetcursor" class="cursordiv"></div>
             <div id ="searchcursor" class="cursordiv"></div>
-
             <div id="imagecache">
                 <img id="fleet" class="searchmarker" src="/content/images/search/usnfleet.png" />
                 <img id="sighting" class="searchmarker" src="/content/images/search/ijnsighting.png" />
@@ -327,7 +326,6 @@
                 </div>
             </div>
         </div>
-
         <script src="/scripts/vendor/jquery-1.9.1.js"></script>
         <script src="/scripts/vendor/jquery-ui-1.10.3.js"></script>
         <script src="/scripts/vendor/howler.min.js"></script>

@@ -19,8 +19,8 @@ $("#canvii").on("mousemove", function (e) {
             overHighlight = true;
         }
         var topLeft = searchGrid.zoneToTopLeftCoords(zone),
-            left = topLeft.x + (window.mapLeft - searchGrid.zoneSize),
-            top = topLeft.y + 60;
+            left = topLeft.x + window.mapLeft - searchGrid.zoneSize,
+            top = topLeft.y + window.mapTop;
         
         $("#fleetcursor").css({ left: left + "px", top: top + "px" });
     } else if (overHighlight) {
@@ -50,7 +50,6 @@ function loadMovePhase() {
     }
     $("#arrivals").html(html).addClass("tabshown");
     $("#arrivalstab").addClass("tabshown");
-    makeSuggestion();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -119,9 +118,8 @@ function checkMoveShips(clickEvent) {
 /*---------------------------------------------------------------------------*/
 function moveShips(coords) {
     var tabId = $("#tabpanels").find("div.tabshown").attr("id") || "",
-    selShips = getSelectedShips(tabId),
-    zone = searchGrid.coordsToZone(coords),
-    cost = 0;
+        selShips = getSelectedShips(tabId),
+        zone = searchGrid.coordsToZone(coords);
 
     searchGrid.removeHighlight();
     zonesHighlighted = [];
@@ -131,64 +129,74 @@ function moveShips(coords) {
         if (sfxArrived && audioVol > 0) sfxArrived.play();
         $("#" + tabId).find("div.shipitem.selected").remove();
         searchGrid.drawShipsMarker(searchGrid.zoneToTopLeftCoords(zone));
+        relocateShipsInData(zone, selShips, 0);
+        selectZone(coords);
+        selectZoneTab();
     } else {
-        cost = searchGrid.zoneDistance(selectedZone, zone);
-        sailShips(selectedZone, zone);
+        sailShips(selShips, zone);
     }
-    relocateShipsInData(zone, selShips, cost);
-    selectZone(coords);
-    selectZoneTab();
     window.editsMade = true;
 }
 /*---------------------------------------------------------------------------*/
 /* "Sail" fleet marker to a new location on the map.                         */
 /*---------------------------------------------------------------------------*/
-function sailShips(startZone, endZone) {
-    if (startZone == endZone) return;
+function sailShips(selectedShips, toZone) {
+    if (toZone == selectedZone) return;
     
     if (sfxSailing && audioVol > 0)
         sfxSailing.play().fade(0, audioVol * 0.01, 500);
-    
-    var startPos = searchGrid.zoneToTopLeftCoords(startZone),
-        endPos = searchGrid.zoneToTopLeftCoords(endZone),
-        distX = endPos.x - startPos.x,
-        distY = endPos.y - startPos.y,
+
+    var startCoords = searchGrid.zoneToTopLeftCoords(selectedZone),
+        endCoords = searchGrid.zoneToTopLeftCoords(toZone),
+        distX = endCoords.x - startCoords.x,
+        distY = endCoords.y - startCoords.y,
+        restoreLeft = Math.min(startCoords.x, endCoords.x) - searchGrid.zoneSize,
+        restoreTop = Math.min(startCoords.y, endCoords.y),
+        restoreWidth = Math.abs(distX) + (searchGrid.zoneSize * 3),
+        restoreHeight = Math.abs(distY) + searchGrid.zoneSize,
+        restoreData = null,
         startTime = new Date().getTime(),
         elapsed = 0,
         duration = 15 * Math.max(Math.abs(distX), Math.abs(distY)), // set animation duration based on distance to be covered
-        handle;
-
-    searchGrid.drawMap(function () {
-        drawSightings();
-        drawShips([startZone, endZone]);
-        window.mapImg = searchGrid.grabImageData();
-        shipsAnim();
-    });
-
+        animReqHandle;
+    
     function shipsAnim() {
-        handle = window.requestAnimationFrame(shipsAnim);
+        searchGrid.restoreImageData(1, restoreData, restoreLeft, restoreTop);
         elapsed = new Date().getTime() - startTime;
-
-        if (elapsed >= duration) {
-            window.cancelAnimationFrame(handle);
-            searchGrid.drawMap(function () {
-                drawSightings();
-                drawShips();
-                searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
-                showShipsInZone(selectedZone);
-                if (sfxSailing) {
-                    sfxSailing.fade(sfxSailing.volume(), 0, 500, function() {
-                        sfxSailing.stop();
-                    });
-                }
-            });
-        } else {
-            var thisX = startPos.x + ((elapsed / duration) * distX);
-            var thisY = startPos.y + ((elapsed / duration) * distY);
-            searchGrid.restoreImageData(1, mapImg, 0, 0);
+        if (elapsed < duration) {
+            restoreData = searchGrid.grabImageData(1, restoreLeft, restoreTop, restoreWidth, restoreHeight);
+            var thisX = startCoords.x + ((elapsed / duration) * distX),
+                thisY = startCoords.y + ((elapsed / duration) * distY);
             searchGrid.drawShipsMarker({ x: thisX, y: thisY });
+            animReqHandle = window.requestAnimationFrame(shipsAnim);
+        } else {
+            //done animating
+            if (sfxSailing) {
+                sfxSailing.fade(sfxSailing.volume(), 0, 500, function() {
+                    sfxSailing.stop();
+                });
+            }
+            var cost = searchGrid.zoneDistance(selectedZone, toZone);
+            relocateShipsInData(toZone, selectedShips, cost);
+            drawShips();
+            selectZone(endCoords);
         }
     }
+
+    var allShips = getShipsInZone(selectedZone),
+        leftBehind = allShips.length - selectedShips.length;
+    if (leftBehind == 0) {
+        //there will be no fleet marker in the zone we're moving from, so 
+        //clear the icons canvas and restore everything but the fleet we're moving
+        searchGrid.clearCanvas(1);
+        drawSightings();
+        drawShips([selectedZone]);
+    }
+    //grab a snapshot covering the area of the move
+    restoreData = searchGrid.grabImageData(1, restoreLeft, restoreTop, restoreWidth, restoreHeight);
+    
+    //begin the animation
+    shipsAnim();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -243,7 +251,8 @@ function setAircraftState(airReadinessDiv) {
                 window.editsMade = true;
                 break;
             case 2:
-                showAlert("Aircraft Are Ready", "Are you sure you want your aircraft to stand down?", DLG_YESCANCEL, "blue",
+                var msg = "Are you sure you want your aircraft to stand down?";
+                showAlert("Aircraft Are Ready", msg, DLG_YESCANCEL, "blue",
                     function (button) {
                         
                     if (button == "Yes") {

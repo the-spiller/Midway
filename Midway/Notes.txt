@@ -1,12 +1,11 @@
-﻿OUTSTANDING
------------
-
-- mozilla: air readiness buttons clickable in Search Phase! And dirty flag set, too. (Cursor appearance appropriate)
-
+﻿BUGS
+----
 - new game, select an opponent w/ game waiting for anyone to play your side: creates a new game instead of using opponent's existing one
 
-- plays of sfxSailing after first, fade out callback fails (sfx plays to end)
+FEATURES
+--------
+- air ops not possible on first turn for either side (no ready aircraft) so skip it!
 
-- click on artwork on home page game selector does not select game (but DOES make buttons appear)
+
 
 

@@ -55,7 +55,7 @@ namespace Midway.Models.Data
 			// 2) new searches available for, and those executed in, the search phase in this turn
             // 3) opponent's searches this turn if game phase is Air Operations.
 
-			// Get group 1.
+			// Get group 1:
 		    var dtoSearches = new List<DtoSearch>();
 		    var dbSearches = _context.PlayerGameSearches
 		                             .Include(s => s.SearchMarkers)
@@ -88,7 +88,7 @@ namespace Midway.Models.Data
 		        dtoSearches.Add(dtoSearch);
 		    }
 
-            //Get group 2: new searches available for the search phase in this turn
+            //Get group 2: new/used searches available for the search phase in this turn
 			if (pg.PhaseId == 2)
 			{
 				// determine the number of searches available
@@ -205,10 +205,6 @@ namespace Midway.Models.Data
 
 		public DtoSearch AddSearch(DtoSearch dtoSearch)
 		{
-             //var pg = _context.PlayerGames
-             //    .Include(p => p.Searches)
-             //   .FirstOrDefault(p => p.GameId == dtoSearch.GameId && p.PlayerId == dtoSearch.PlayerId);
-
             // Add the search to the DB
 			var search = new PlayerGameSearch
 				{
