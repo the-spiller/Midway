@@ -48,7 +48,7 @@ function loadSearchPhase() {
         for (var i = 0; i < searches.length; i++) {
             if (searches[i].Turn == game.Turn && !searches[i].Area) {
                 if (searches[i].SearchType == "sea") {
-                    searchDesc = "Select to search any area containing one of your ships";
+                    searchDesc = "Select to search an area containing at least one of your ships";
                     searchImg = imgDir + side.toLowerCase() + "-sea-search.png";
                 } else if (game.SearchRange == 0) { //Unlimited
                     searchDesc = "Select to search any area";
@@ -82,7 +82,6 @@ function scrollClouds() {
         reset = function () {
             if (cloudsTopLeft.x > -1) cloudsTopLeft.x = -964;
         };
-
     } else {
         cloudsTopLeft = { x: 0, y: 0 };
         velocity = { x: -2, y: 0 };
@@ -168,30 +167,35 @@ function checkSearching(clickEvent) {
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 function executeSearch(coords, callback) {
-    if (withinSearchRange(coords)) {
+    if (!withinSearchRange(coords)) {
+        showAlert("Search", "Out of range.", DLG_OK, "red", callback);
+    } else {
         selectArea(coords);
-        if (!alreadySearched(selectedArea)) {
+        if (alreadySearched(selectedArea)) {
+            showAlert("Search " + selectedArea, "You've already searched area " + selectedArea + " on this turn!",
+                DLG_OK, "red", callback);
+        } else {
             currentSearch.Area = selectedArea;
+            var airmanImg = "<img src=\"/content/images/search/" + side.toLowerCase() + "airman.png\" />",
+                msg = "<div style=\"float: left; margin-right: 15px;\">" + airmanImg + "</div><div style=\"float: left;\">";
             ajaxPostSearch(currentSearch, function () {
-            $("#search-" + currentSearch.SearchNumber).remove().parent();
+                $("#search-" + currentSearch.SearchNumber).remove().parent();
                 if (currentSearch.Markers && currentSearch.Markers.length) {
-                    var msg = "<p style=\"font-weight: bold;\">Enemy ships sighted!<p>";
+                    
+                    msg += "<p style=\"font-weight: bold;\">Enemy ships sighted!</p>";
                     for (var i = 0; i < currentSearch.Markers.length; i++) {
                         msg += "<p>" + currentSearch.Markers[i].Zone + " contains one or more of each of thse types:<br />" +
                             expandTypesFound(currentSearch.Markers[i].TypesFound) + "</p>";
                     }
+                    msg += "</div>";
                     showAlert("Search " + selectedArea, msg, DLG_OK, "blue", callback);
 
                 } else {
-                    showAlert("Search " + selectedArea, "No sightings.", DLG_OK, "blue", callback);
+                    msg += "<p>No sightings.</p></div>";
+                    showAlert("Search " + selectedArea, msg, DLG_OK, "blue", callback);
                 }
             });
-        } else {
-            showAlert("Search " + selectedArea, "You've already searched area " + selectedArea + " on this turn!",
-                DLG_OK, "red", callback);
         }
-    } else {
-        showAlert("Search", "Out of range.", DLG_OK, "red", callback);
     }
 }
 /*---------------------------------------------------------------------------*/

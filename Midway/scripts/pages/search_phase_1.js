@@ -126,7 +126,7 @@ function moveShips(coords) {
     $("#fleetcursor").css("display", "none");
     
     if (tabId == "arrivals") {
-        if (sfxArrived && audioVol > 0) sfxArrived.play();
+        if (sfxArrived && window.audioVol > 0) sfxArrived.play();
         $("#" + tabId).find("div.shipitem.selected").remove();
         searchGrid.drawShipsMarker(searchGrid.zoneToTopLeftCoords(zone));
         relocateShipsInData(zone, selShips, 0);
@@ -143,8 +143,8 @@ function moveShips(coords) {
 function sailShips(selectedShips, toZone) {
     if (toZone == selectedZone) return;
     
-    if (sfxSailing && audioVol > 0)
-        sfxSailing.play().fade(0, audioVol * 0.01, 500);
+    if (sfxSailing && window.audioVol > 0)
+        sfxSailing.play().fade(0, window.audioVol * 0.01, 500);
 
     var startCoords = searchGrid.zoneToTopLeftCoords(selectedZone),
         endCoords = searchGrid.zoneToTopLeftCoords(toZone),

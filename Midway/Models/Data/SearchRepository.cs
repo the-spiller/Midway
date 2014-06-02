@@ -27,16 +27,14 @@ namespace Midway.Models.Data
 				throw new ArgumentException("Unable to find PlayerGame having input game and player IDs.");
 
             // Housekeeping: if it's the first phase of a new turn, delete searches from prior turns that do not
-            // have a marked zone (e.g. were not successful).
+            // have a marker (e.g. were not successful) or are at least five turns old.
             if (pg.PhaseId == 1)
             {
                 var dbDelSearches = _context.PlayerGameSearches
                                          .Include(s => s.SearchMarkers)
-                                         .Where(
-                                             s =>
-                                             s.GameId == gameId && s.PlayerId == playerId 
-                                                && (s.Turn < pg.Turn && s.SearchMarkers.Count == 0)
-                                                || (pg.Turn - s.Turn > 4))
+                                         .Where(s => s.GameId == gameId 
+                                                && s.PlayerId == playerId 
+                                                && ((s.Turn < pg.Turn && s.SearchMarkers.Count == 0) || (pg.Turn - s.Turn > 4)))
                                          .ToList();
 
                 foreach (var dbSearch in dbDelSearches)

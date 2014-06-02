@@ -8,7 +8,8 @@
         mapCtx = mapCvs.getContext("2d"),
         iconsCvs = document.getElementById("iconscanvas"),
         iconsCtx = iconsCvs.getContext("2d"),
-        cloudsCvs, cloudsCtx,
+        cloudsCvs,
+        cloudsCtx,
         selectedZoneRestoreData = null,
         selectedAreaRestoreData = null,
         highlightRestoreData = null,
@@ -338,8 +339,8 @@
             cloudsCvs.height = gridHeight;
             cloudsCvs.width = gridWidth;
             cloudsCvs.style.position = "absolute";
-            cloudsCvs.style.top = mapCvs.style.top;
-            cloudsCvs.style.left = mapCvs.style.left;
+            cloudsCvs.style.top = window.mapTop + "px";
+            cloudsCvs.style.left = window.mapLeft + "px";
             cloudsCvs.style.zIndex = 20;
            
             var div = document.getElementById("canvii");

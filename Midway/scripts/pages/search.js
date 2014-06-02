@@ -24,7 +24,7 @@
     sfxArrived,
     sfxSailing,
     sfxAirSearch,
-    audioVol,
+    volSet = false,
     audioLoaded = false;
 
 // Event handlers......................................................
@@ -196,7 +196,9 @@ function loadShipZones() {
 function showShipsInZone() {
     if (!selectedZone) return;
     var zone = selectedZone == "H5G" ? "Midway" : selectedZone,
-        html = "<div style=\"margin: 5px; font-weight: bold;\">" + zone + "</div>",
+        shipsHtml = "<div style=\"margin: 5px; font-weight: bold;\">" + zone + "</div>",
+        dblclick = "<div style=\"margin: 5px;\">Double-click to select all</div>",
+        gotOwnShips = false,
         i;
     
     if (shipZones.length == 0) loadShipZones();
@@ -206,7 +208,7 @@ function showShipsInZone() {
         if (searches[i].Area == selectedZone.substr(0, 2) && searches[i].Markers.length) {
             for (var j = 0; j < searches[i].Markers.length; j++) {
                 if (searches[i].Markers[j].Zone == selectedZone) {
-                    html += getSightedShipsHtml(searches[i].Markers[j], searches[i].Turn);
+                    shipsHtml += getSightedShipsHtml(searches[i].Markers[j], searches[i].Turn);
                 }
             }
         }
@@ -214,19 +216,21 @@ function showShipsInZone() {
     // airbases
     for (i = 0; i < ships.length; i++) {
         if (ships[i].Location == selectedZone && ships[i].ShipType == "BAS") {
-            html += getShipListItemHtml(ships[i], false);
+            shipsHtml += getShipListItemHtml(ships[i], false);
         }
     }
     // own ships
-    html += "<ul>";
+    shipsHtml += "<ul>";
     if ($.inArray(selectedZone, shipZones) != -1) {
         for (i = 0; i < ships.length; i++) {
             if (ships[i].Location == selectedZone && ships[i].ShipType != "BAS") {
-                html += getShipListItemHtml(ships[i], (game.PhaseId == 1));
+                shipsHtml += getShipListItemHtml(ships[i], (game.PhaseId == 1));
+                gotOwnShips = true;
             }
         }
     }
-    $("#zone").html(html + "</ul>");
+    shipsHtml += gotOwnShips ? "</ul>" + dblclick : "</ul>";
+    $("#zone").html(shipsHtml);
     if (game.PhaseId == 1) showMoveHighlight();
 }
 
@@ -559,17 +563,17 @@ function setVolume(vol) {
 function loadAudio() {
     if (audioLoaded) return;
     
-    audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
-    var vol = audioVol * 0.01;
+    window.audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
+    var vol = window.audioVol * 0.01;
     
     $("#volinput").slider({
         orientation: "vertical",
-        value: audioVol,
+        value: window.audioVol,
         slide: function (e, ui) {
-            audioVol = ui.value;
-            $("#volvalue").text(audioVol);
-            setVolume(audioVol * 0.01);
-            createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
+            window.audioVol = ui.value;
+            $("#volvalue").text(window.audioVol);
+            setVolume(window.audioVol * 0.01);
+            createCookie(COOKIE_NAME_AUDIO, window.audioVol, 1000);
         }
     });
     $("#volvalue").text($("#volinput").slider("value"));

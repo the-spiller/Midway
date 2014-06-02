@@ -6,7 +6,6 @@
     abandonables = [],
     twoWeeks = 1000 * 60 * 60 * 24 * 14,
     bgMusic,
-    audioVol,
     nicknames = FuzzySet();
         
 // Event handlers......................................................
@@ -532,16 +531,16 @@ function buildRecord() {
 // Init................................................................
 
 $(document).ready(function () {
-    audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
+    window.audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
     
     $("#volinput").slider({
         orientation: "vertical",
-        value: audioVol,
+        value: window.audioVol,
         slide: function (e, ui) {
-            audioVol = ui.value;
-            $("#volvalue").text(audioVol);
-            if (bgMusic) bgMusic.volume(audioVol * 0.01);
-            createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
+            window.audioVol = ui.value;
+            $("#volvalue").text(window.audioVol);
+            if (bgMusic) bgMusic.volume(window.audioVol * 0.01);
+            createCookie(COOKIE_NAME_AUDIO, window.audioVol, 1000);
         }
     });
     $("#volvalue").text($("#volinput").slider("value"));
@@ -551,7 +550,7 @@ $(document).ready(function () {
         loop: true,
         autoplay: false
     });
-    bgMusic.play().fade(0, audioVol * 0.01, 1000);
+    bgMusic.play().fade(0, window.audioVol * 0.01, 1000);
     
     loadPlayerForPage(function() {
         $("#namespan").text(window.player.Nickname);
