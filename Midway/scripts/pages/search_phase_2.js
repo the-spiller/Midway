@@ -40,12 +40,12 @@ function loadSearchPhase() {
     if (game.Waiting == "Y") {
         tabHtml += "Waiting for opponent</div>";
     } else {
-        var searchDesc,
-            searchImg = imgDir + side.toLowerCase() + "-air-search.png";
-        
         tabHtml += "Available searches</div><ul>";
 
         for (var i = 0; i < searches.length; i++) {
+            var searchDesc,
+                searchImg = imgDir + side.toLowerCase() + "-air-search.png";
+            
             if (searches[i].Turn == game.Turn && !searches[i].Area) {
                 if (searches[i].SearchType == "sea") {
                     searchDesc = "Select to search an area containing at least one of your ships";
@@ -121,7 +121,7 @@ function scrollClouds() {
 /*---------------------------------------------------------------------------*/
 function getSearchByNumber(searchNumber) {
     for (var i = 0; i < searches.length; i++) {
-        if (searches[i].SearchNumber == searchNumber) {
+        if (searches[i].Turn == game.Turn && searches[i].SearchNumber == searchNumber) {
             return searches[i];
         }
     }
@@ -177,7 +177,7 @@ function executeSearch(coords, callback) {
         } else {
             currentSearch.Area = selectedArea;
             var airmanImg = "<img src=\"/content/images/search/" + side.toLowerCase() + "airman.png\" />",
-                msg = "<div style=\"float: left; margin-right: 15px;\">" + airmanImg + "</div><div style=\"float: left;\">";
+                msg = "<div style=\"float: left; margin: 0 15px 0 5px;\">" + airmanImg + "</div><div style=\"float: left;\">";
             ajaxPostSearch(currentSearch, function () {
                 $("#search-" + currentSearch.SearchNumber).remove().parent();
                 if (currentSearch.Markers && currentSearch.Markers.length) {

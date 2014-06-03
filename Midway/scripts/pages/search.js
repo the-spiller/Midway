@@ -492,7 +492,7 @@ function ajaxLoadShips(successCallback) {
 }
 
 /*-------------------------------------------------------------------*/
-/* Make ajax call to load player's search markers in this game.      */
+/* Make ajax call to load player's searches and their outcomes.      */
 /*-------------------------------------------------------------------*/
 function ajaxLoadSearches(successCallback) {
     $.ajax({
