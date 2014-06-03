@@ -15,7 +15,6 @@ var player = undefined,
     BG_IMG_HEIGHT = 857,
     COOKIE_NAME_AUTH = "mdyplayer",
     COOKIE_NAME_AUDIO = "audiovol",
-    audioVol,
     supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
 
 // Functions...................................................................

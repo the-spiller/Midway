@@ -102,10 +102,10 @@ namespace Midway.Models.Data
             dbPlayer.Nickname = dtoPlayer.Nickname;
 			dbPlayer.Admin = dtoPlayer.Admin;
 
-			// The only game data updated here is retirement/abandonment or the addition of new games.
-            // Anything else is handled in the phase controller.
 	        if (dtoPlayer.Games != null)
 	        {
+				// Game data updated here is retirement/abandonment or the addition of new games.
+				// Anything else is handled in the phase controller.
 			    foreach (var dtoPlayerGame in dtoPlayer.Games)
 			    {
 				    var dbGame = _context.Games
@@ -140,16 +140,16 @@ namespace Midway.Models.Data
 
 				        if (pgs.Count > 0)
 				        {
-				            PlayerGame oppositePg = string.IsNullOrEmpty(dtoPlayerGame.OpponentNickname)
-				                                        ? pgs.First()
-				                                        : pgs.FirstOrDefault(
-				                                            p => p.Player.Nickname == dtoPlayerGame.OpponentNickname);
-				            if (oppositePg != null)
+				            PlayerGame oppPg = string.IsNullOrEmpty(dtoPlayerGame.OpponentNickname)
+								? pgs.First()
+								: pgs.FirstOrDefault(p => p.Player.Nickname == dtoPlayerGame.OpponentNickname);
+
+				            if (oppPg != null)
 				            {
 				                dbPg = new PlayerGame
 				                    {
 				                        PlayerId = dtoPlayer.PlayerId,
-				                        GameId = oppositePg.GameId,
+				                        GameId = oppPg.GameId,
 				                        LastPlayed = null,
 				                        Points = 0,
 				                        SelectedLocation = "",
@@ -159,7 +159,7 @@ namespace Midway.Models.Data
 				                        SideId = dtoPlayerGame.SideId,
 				                        MidwayInvadedTurn = 0
 				                    };
-				                oppositePg.Game.PlayerGames.Add(dbPg);
+				                oppPg.Game.PlayerGames.Add(dbPg);
 
                                 buildNew = false;
 				            }
@@ -365,30 +365,30 @@ namespace Midway.Models.Data
 					.Include(p => p.Airbases)
 					.Where(p => p.PlayerId == playerId && p.GameId == gameId);
 			}
-			var dbGames = qry.ToList();
-			var dtoPlayerGames = new List<DtoPlayerGame>();
+			var dbPgs = qry.ToList();
+			var dtoPgs = new List<DtoPlayerGame>();
 
-			foreach (var dbGame in dbGames)
+			foreach (var dbPg in dbPgs)
 			{
                 dbDirty = false;
-                var searchRange = (dbGame.Side.ShortName == "IJN" || dbGame.Airbases.Count == 0) ? 12 : 0;  //zero = range is whole map
+                var searchRange = (dbPg.Side.ShortName == "IJN" || dbPg.Airbases.Count == 0) ? 12 : 0;  //zero = range is whole map
 
-                var dtoPlayerGame = new DtoPlayerGame
+                var dtoPg = new DtoPlayerGame
                     {
-                        GameId = dbGame.GameId,
-                        SideId = dbGame.Side.SideId,
-                        PhaseId = dbGame.PhaseId,
-                        PhaseName = dbGame.Phase.Name,
-                        Turn = dbGame.Turn,
-                        CompletedDTime = dbGame.Game.CompletedDTime == null ? "" :
-                            dbGame.Game.CompletedDTime.Value.ToString("o"),
-                        TinyFlagUrl = dbGame.Side.TinyFlagUrl,
-                        LastPlayed = dbGame.LastPlayed == null ? "" : dbGame.LastPlayed.Value.ToString("o"),
+                        GameId = dbPg.GameId,
+                        SideId = dbPg.Side.SideId,
+                        PhaseId = dbPg.PhaseId,
+                        PhaseName = dbPg.Phase.Name,
+                        Turn = dbPg.Turn,
+                        CompletedDTime = dbPg.Game.CompletedDTime == null ? "" :
+                            dbPg.Game.CompletedDTime.Value.ToString("o"),
+                        TinyFlagUrl = dbPg.Side.TinyFlagUrl,
+                        LastPlayed = dbPg.LastPlayed == null ? "" : dbPg.LastPlayed.Value.ToString("o"),
                         DTimeNow = DateTime.Now.ToUniversalTime().ToString("o"),
-                        Points = dbGame.Points,
-                        SelectedLocation = dbGame.SelectedLocation,
-                        SideShortName = dbGame.Side.ShortName,
-                        Draw = dbGame.Game.Draw,
+                        Points = dbPg.Points,
+                        SelectedLocation = dbPg.SelectedLocation,
+                        SideShortName = dbPg.Side.ShortName,
+                        Draw = dbPg.Game.Draw,
                         Waiting = "N",
                         OppWaiting = "N",
                         SearchRange = searchRange
@@ -397,87 +397,87 @@ namespace Midway.Models.Data
                 // Opponent
                 var dbOpp = _context.PlayerGames
                     .Include(p => p.Player)
-                    .SingleOrDefault(p => p.GameId == dbGame.GameId && p.PlayerId != playerId);
+                    .SingleOrDefault(p => p.GameId == dbPg.GameId && p.PlayerId != playerId);
 
 			    if (dbOpp != null)
 			    {
-			        dtoPlayerGame.OpponentId = dbOpp.PlayerId;
-			        dtoPlayerGame.OpponentNickname = dbOpp.Player.Nickname;
-			        dtoPlayerGame.OpponentPoints = dbOpp.Points;
+			        dtoPg.OpponentId = dbOpp.PlayerId;
+			        dtoPg.OpponentNickname = dbOpp.Player.Nickname;
+			        dtoPg.OpponentPoints = dbOpp.Points;
 
 			        if (dbOpp.LastPlayed != null)
 			        {
-			            if (dbGame.LastPlayed == null || dbOpp.LastPlayed > dbGame.LastPlayed)
-			                dtoPlayerGame.LastPlayed = dbOpp.LastPlayed.Value.ToString("o");
+			            if (dbPg.LastPlayed == null || dbOpp.LastPlayed > dbPg.LastPlayed)
+			                dtoPg.LastPlayed = dbOpp.LastPlayed.Value.ToString("o");
 			        }
 
-			        if (dbGame.Game.CompletedDTime == null)
+			        if (dbPg.Game.CompletedDTime == null)
 			        {
-                        if (dbGame.PhaseId == 4)
+                        if (dbPg.PhaseId == 4)
                         {
                             // If opponent posted AirOps, we can move off of phase 4
-                            if (dbOpp.Turn > dbGame.Turn || (dbOpp.Turn == dbGame.Turn && dbOpp.PhaseId > 3))
+                            if (dbOpp.Turn > dbPg.Turn || (dbOpp.Turn == dbPg.Turn && dbOpp.PhaseId > 3))
                             {
-                                if (UnderAirAttack(dbGame))
+                                if (UnderAirAttack(dbPg))
                                 {
-                                    dbGame.PhaseId = dtoPlayerGame.PhaseId = 5; // Air Defense Setup
-                                    dtoPlayerGame.PhaseName = GetPhaseName(5);
-                                    dtoPlayerGame.Waiting = "N";
+                                    dbPg.PhaseId = dtoPg.PhaseId = 5; // Air Defense Setup
+                                    dtoPg.PhaseName = GetPhaseName(5);
+                                    dtoPg.Waiting = "N";
                                     dbDirty = true;
                                 }
-                                else if (MakingAirAttacks(dbGame))
+                                else if (MakingAirAttacks(dbPg))
                                 {
-                                    dbGame.PhaseId = dtoPlayerGame.PhaseId = 6; // Air Attack Setup
-                                    dtoPlayerGame.PhaseName = GetPhaseName(6);
-                                    dtoPlayerGame.Waiting = dbOpp.PhaseId > 5 ? "N" : "Y";
+                                    dbPg.PhaseId = dtoPg.PhaseId = 6; // Air Attack Setup
+                                    dtoPg.PhaseName = GetPhaseName(6);
+                                    dtoPg.Waiting = dbOpp.PhaseId > 5 ? "N" : "Y";
                                     dbDirty = true;
                                 }
-                                else if (SurfaceCombat(dbGame))
+                                else if (SurfaceCombat(dbPg))
                                 {
-                                    dbGame.PhaseId = dtoPlayerGame.PhaseId = 9; // Surface Combat Setup
-                                    dtoPlayerGame.PhaseName = GetPhaseName(9);
-                                    dtoPlayerGame.Waiting = "N";
+                                    dbPg.PhaseId = dtoPg.PhaseId = 9; // Surface Combat Setup
+                                    dtoPg.PhaseName = GetPhaseName(9);
+                                    dtoPg.Waiting = "N";
                                     dbDirty = true;
                                 }
                                 else
                                 {
-                                    dbGame.Turn++;
-                                    dtoPlayerGame.Turn = dbGame.Turn;
-                                    dbGame.PhaseId = dtoPlayerGame.PhaseId = 1; // Search Board Move
-                                    dtoPlayerGame.PhaseName = GetPhaseName(1);
-                                    dtoPlayerGame.Waiting = "N";
+                                    dbPg.Turn++;
+                                    dtoPg.Turn = dbPg.Turn;
+                                    dbPg.PhaseId = dtoPg.PhaseId = 1; // Search Board Move
+                                    dtoPg.PhaseName = GetPhaseName(1);
+                                    dtoPg.Waiting = "N";
                                     dbDirty = true;
                                 }
                             }
                             else
                             {
                                 // Stuck on phase 4
-                                dtoPlayerGame.Waiting = "Y";
+                                dtoPg.Waiting = "Y";
                             }
                         }
-                        else if (dbGame.PhaseId > 1 && 
-                            (dbGame.Turn > dbOpp.Turn || (dbGame.Turn == dbOpp.Turn && dbGame.PhaseId > dbOpp.PhaseId)))
+                        else if (dbPg.PhaseId > 1 && 
+                            (dbPg.Turn > dbOpp.Turn || (dbPg.Turn == dbOpp.Turn && dbPg.PhaseId > dbOpp.PhaseId)))
                         {
-                            dtoPlayerGame.Waiting = "Y";
+                            dtoPg.Waiting = "Y";
                         }
 
-			            if (dbOpp.Turn > dbGame.Turn || (dbOpp.Turn == dbGame.Turn && dbOpp.PhaseId > dbGame.PhaseId))
-			                dtoPlayerGame.OppWaiting = "Y";
+			            if (dbOpp.Turn > dbPg.Turn || (dbOpp.Turn == dbPg.Turn && dbOpp.PhaseId > dbPg.PhaseId))
+			                dtoPg.OppWaiting = "Y";
 			        }
 			    }
                 else
                 {
                     // no opponent yet
-                    dtoPlayerGame.OpponentId = 0;
-                    dtoPlayerGame.OpponentPoints = 0;
-                    dtoPlayerGame.Waiting = dtoPlayerGame.PhaseId > 1 ? "Y" : "N";
-                    dtoPlayerGame.OppWaiting = "N";
+                    dtoPg.OpponentId = 0;
+                    dtoPg.OpponentPoints = 0;
+                    dtoPg.Waiting = dtoPg.PhaseId > 1 ? "Y" : "N";
+                    dtoPg.OppWaiting = "N";
                 }
-                dtoPlayerGames.Add(dtoPlayerGame);
+                dtoPgs.Add(dtoPg);
 			}
 		    if (dbDirty) _context.Save();
 
-            return dtoPlayerGames;
+            return dtoPgs;
 		}
 
         //.....................................................................

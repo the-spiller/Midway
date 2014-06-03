@@ -1,4 +1,7 @@
-﻿// Events and functions for Phase 1 (Search Map Move)
+﻿/*---------------------------------------------------------------------------*/
+/*--------- EVENTS/FUNCTIONS for phase 1 (Search Map Move) ------------------*/
+/*---------------------------------------------------------------------------*/
+
 var overHighlight = false,
     zonesHighlighted = [];
 
@@ -35,21 +38,26 @@ $("#canvii").on("mousemove", function (e) {
 /*---------------------------------------------------------------------------*/
 function loadMovePhase() {
     var arrivals = [],
-        html = "<div style=\"margin: 5px;\">No ships arrived this turn.</div>";
+        arrivalsHtml = "<div style=\"margin: 5px;\">No ships arrived this turn.</div>";
     
     for (var i = 0; i < ships.length; i++) {
         if (ships[i].Location == "ARR")
             arrivals.push(ships[i]);
     }
     if (arrivals.length > 0) {
-        html = "<ul>";
+        arrivalsHtml = "<ul>";
         for (i = 0; i < arrivals.length; i++) {
-            html += getShipListItemHtml(ships[i]);
+            arrivalsHtml += getShipListItemHtml(ships[i]);
         }
-        html += "</ul>";
+        arrivalsHtml += "</ul>";
+
+        $("#arrivals").html(arrivalsHtml).addClass("tabshown");
+        $("#arrivalstab").addClass("tabshown");
+    } else {
+        $("#arrivals").html(arrivalsHtml);
+        $("#zone").html(arrivalsHtml).addClass("tabshown");
+        $("#zone").addClass("tabshown");
     }
-    $("#arrivals").html(html).addClass("tabshown");
-    $("#arrivalstab").addClass("tabshown");
 }
 
 /*---------------------------------------------------------------------------*/

@@ -24,7 +24,7 @@
     sfxArrived,
     sfxSailing,
     sfxAirSearch,
-    volSet = false,
+    audioVol,
     audioLoaded = false;
 
 // Event handlers......................................................
@@ -564,16 +564,17 @@ function loadAudio() {
     if (audioLoaded) return;
     
     window.audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
-    var vol = window.audioVol * 0.01;
+    console.log("search page volume: " + audioVol);
+    var vol = audioVol * 0.01;
     
     $("#volinput").slider({
         orientation: "vertical",
-        value: window.audioVol,
+        value: audioVol,
         slide: function (e, ui) {
-            window.audioVol = ui.value;
-            $("#volvalue").text(window.audioVol);
-            setVolume(window.audioVol * 0.01);
-            createCookie(COOKIE_NAME_AUDIO, window.audioVol, 1000);
+            audioVol = ui.value;
+            $("#volvalue").text(audioVol);
+            setVolume(audioVol * 0.01);
+            createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
         }
     });
     $("#volvalue").text($("#volinput").slider("value"));

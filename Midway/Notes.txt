@@ -1,6 +1,6 @@
 ﻿BUGS
 ----
-- volume setting does not persist across pages
+- volume setting does not persist across pages (set on search page, number is correct on home page, but volume doesn't match)
 - 2nd player to arrive at next turn movement gets no move pts. and no aircraft readiness update even tho' display sez turn 2. Game data
   sez turn is one, phase is 4; wrap to next turn movement is calculated on load of game from db. First player in the game to arrive at next 
   turn movement works fine (done dynamically while playing? is that the diff?)

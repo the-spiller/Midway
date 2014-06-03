@@ -6,6 +6,7 @@
     abandonables = [],
     twoWeeks = 1000 * 60 * 60 * 24 * 14,
     bgMusic,
+    audioVol,
     nicknames = FuzzySet();
         
 // Event handlers......................................................
@@ -13,23 +14,19 @@
 $("#volinput").change(function() {
     $("#volvalue").text(this.value);
 });
-
 $("#logofflink").on("click", function () {
     if (unsavedRegChanges()) return;
     eraseCookie(COOKIE_NAME_AUTH);
     navigateTo(bgMusic, "/index.html");
 });
-
 $(".tablistitem").on("click", function (e) {
     workTabs(e);
 });
-
 $(document).on("mousedown", ".listitem", function (e) {
     selectGame(e.target);
 }).on("mousedown", ".gameselimg", function(e) {
     selectGame(e.target.parentNode);
 });
-   
 $("#quitgame").on("click", function() {
     var caption,
         msg = "Are you sure you want to abandon this game?",
@@ -69,7 +66,6 @@ $("#quitgame").on("click", function() {
         }
     });
 });
-
 $("#playgame").on("click", function () {
     if (selGameId == 0) return;
     if (unsavedRegChanges()) return;
@@ -78,7 +74,6 @@ $("#playgame").on("click", function () {
         navigateTo(bgMusic, "/views/search.html?gid=" + selGameId);
     });
 });
-        
 $("#oppnickname")
     .on("focus", function () {
         if (!oppCleared) {
@@ -131,7 +126,6 @@ $("#oppnickname")
             oppMatched = false;
         }
     });
-
 $("#oppselect")
     .on("keyup", function(e) {
         if ($("#dlgoverlay").css("display") == "block") return;
@@ -154,7 +148,6 @@ $("#oppselect")
             oppMatched = true;
         }
     });
-
 $(".regdata").on("input", function () {
     if (anyRegDataChanged()) {
         $("#canceledit").css("display", "inline-block");
@@ -162,16 +155,13 @@ $(".regdata").on("input", function () {
         $("#canceledit").css("display", "none");
     }
 });
-
 $("#canceledit").on("click", function() {
     loadRegFields();
     $(this).css("display", "none");
 });
-        
 $("#saveedit").on("click", function () {
     saveRegData();
 });
-
 $("#cancelreg").on("click", function() {
     var msg = "<p>If you cancel your Midway registration, all your unfinished games will be forefeited, your " +
         "record will be lost, you will no longer be able to log on, and none of this can be undone.</p><p>Are you sure that " +
@@ -186,7 +176,6 @@ $("#cancelreg").on("click", function() {
         }
     });
 });
-
 $("#editreg").on("keyup", function(e) {
     if (e.keyCode == 13 && $("#saveedit").css("display") == "inline-block")
         $("#saveedit").trigger("click");
@@ -531,16 +520,16 @@ function buildRecord() {
 // Init................................................................
 
 $(document).ready(function () {
-    window.audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
-    
+    audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
+    console.log("home page volume: " + audioVol);
     $("#volinput").slider({
         orientation: "vertical",
-        value: window.audioVol,
+        value: audioVol,
         slide: function (e, ui) {
-            window.audioVol = ui.value;
-            $("#volvalue").text(window.audioVol);
-            if (bgMusic) bgMusic.volume(window.audioVol * 0.01);
-            createCookie(COOKIE_NAME_AUDIO, window.audioVol, 1000);
+            audioVol = ui.value;
+            $("#volvalue").text(audioVol);
+            if (bgMusic) bgMusic.volume(audioVol * 0.01);
+            createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
         }
     });
     $("#volvalue").text($("#volinput").slider("value"));
@@ -550,7 +539,11 @@ $(document).ready(function () {
         loop: true,
         autoplay: false
     });
-    bgMusic.play().fade(0, window.audioVol * 0.01, 1000);
+    if (bgMusic) {
+        if (audioVol > 0) {
+            bgMusic.play().fade(0, audioVol * 0.01, 1000);
+        }
+    }
     
     loadPlayerForPage(function() {
         $("#namespan").text(window.player.Nickname);

@@ -388,7 +388,7 @@ function getMissionOptions() {
 /*---------------------------------------------------------------------------*/
 /* Build and return the html for a row of aircraft on the air op dialog. If  */
 /* source is null, the row is presumed to be for the  planes assigned to the */
-/* mission. If op is not null, it is a airOps[] element being edited  */
+/* mission. If op is not null, it is an airOps[] element being edited        */
 /* and its squadron counts are displayed for assigned planes. If source is   */
 /* not null, it is an aircraftSources[] element, op is ignored, and          */
 /* ship/airbase name and plane icons are presented as clickable. In either   */
