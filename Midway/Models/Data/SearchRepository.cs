@@ -27,16 +27,14 @@ namespace Midway.Models.Data
 				throw new ArgumentException("Unable to find PlayerGame having input game and player IDs.");
 
             // Housekeeping: if it's the first phase of a new turn, delete searches from prior turns that do not
-            // have a marked zone (e.g. were not successful).
+            // have a marker (e.g. were not successful) or are at least five turns old.
             if (pg.PhaseId == 1)
             {
                 var dbDelSearches = _context.PlayerGameSearches
                                          .Include(s => s.SearchMarkers)
-                                         .Where(
-                                             s =>
-                                             s.GameId == gameId && s.PlayerId == playerId 
-                                                && (s.Turn < pg.Turn && s.SearchMarkers.Count == 0)
-                                                || (pg.Turn - s.Turn > 4))
+                                         .Where(s => s.GameId == gameId 
+                                                && s.PlayerId == playerId 
+                                                && ((s.Turn < pg.Turn && s.SearchMarkers.Count == 0) || (pg.Turn - s.Turn > 4)))
                                          .ToList();
 
                 foreach (var dbSearch in dbDelSearches)
@@ -55,7 +53,7 @@ namespace Midway.Models.Data
 			// 2) new searches available for, and those executed in, the search phase in this turn
             // 3) opponent's searches this turn if game phase is Air Operations.
 
-			// Get group 1.
+			// Get group 1:
 		    var dtoSearches = new List<DtoSearch>();
 		    var dbSearches = _context.PlayerGameSearches
 		                             .Include(s => s.SearchMarkers)
@@ -88,7 +86,7 @@ namespace Midway.Models.Data
 		        dtoSearches.Add(dtoSearch);
 		    }
 
-            //Get group 2: new searches available for the search phase in this turn
+            //Get group 2: new/used searches available for the search phase in this turn
 			if (pg.PhaseId == 2)
 			{
 				// determine the number of searches available
@@ -205,10 +203,6 @@ namespace Midway.Models.Data
 
 		public DtoSearch AddSearch(DtoSearch dtoSearch)
 		{
-             //var pg = _context.PlayerGames
-             //    .Include(p => p.Searches)
-             //   .FirstOrDefault(p => p.GameId == dtoSearch.GameId && p.PlayerId == dtoSearch.PlayerId);
-
             // Add the search to the DB
 			var search = new PlayerGameSearch
 				{

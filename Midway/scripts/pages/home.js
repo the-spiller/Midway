@@ -5,7 +5,7 @@
     selGameId = 0,
     abandonables = [],
     twoWeeks = 1000 * 60 * 60 * 24 * 14,
-    bgMusic, audioVol,
+    bgMusic,
     nicknames = FuzzySet();
         
 // Event handlers......................................................
@@ -25,21 +25,11 @@ $(".tablistitem").on("click", function (e) {
 });
 
 $(document).on("mousedown", ".listitem", function (e) {
-    $(".listitem").removeClass("down");
-    $(e.target).addClass("down");
-    $("#playgame").css("display", "inline-block");
-    selGameId = Number(e.target.id.replace("game", ""));
-    if (selGameId < 0) {
-        $("#optopponent").slideDown();
-        $("#quitgame").css("display", "none");
-        setOppselectPos();
-    } else {
-        $("#optopponent").slideUp();
-        $("#quitgame").css("display", "inline-block")
-            .text(abandonables[selGameId] ? "Abandon" : "Retire");
-    }
+    selectGame(e.target);
+}).on("mousedown", ".gameselimg", function(e) {
+    selectGame(e.target.parentNode);
 });
-        
+   
 $("#quitgame").on("click", function() {
     var caption,
         msg = "Are you sure you want to abandon this game?",
@@ -206,6 +196,22 @@ $("#editreg").on("keyup", function(e) {
 
 // Functions...........................................................
         
+function selectGame(gameItem) {
+    $(".listitem").removeClass("down");
+    $(gameItem).addClass("down");
+    $("#playgame").css("display", "inline-block");
+    selGameId = Number(gameItem.id.replace("game", ""));
+    if (selGameId < 0) {
+        $("#optopponent").slideDown();
+        $("#quitgame").css("display", "none");
+        setOppselectPos();
+    } else {
+        $("#optopponent").slideUp();
+        $("#quitgame").css("display", "inline-block")
+            .text(abandonables[selGameId] ? "Abandon" : "Retire");
+    }
+}
+
 function shallowCopyPlayer() {
     return {
         playerId: window.player.PlayerId,
@@ -393,13 +399,13 @@ function getGameListItem(game) {
         title, oppName, icon, waiting;
             
     if (game.Waiting == "Y") {
-        icon = "<img src=\"/content/images/booblite-red.png\" />";
+        icon = "<img src=\"/content/images/booblite-red.png\" class=\"gameselimage\" />";
         waiting = " (waiting for opponent to post)";
     } else if (game.OppWaiting == "Y") {
-        icon = "<img src=\"/content/images/booblite!-green.png\" />";
+        icon = "<img src=\"/content/images/booblite!-green.png\" class=\"gameselimage\" />";
         waiting = " (waiting for you to post)";
     } else {
-        icon = "<img src=\"/content/images/booblite-green.png\" />";
+        icon = "<img src=\"/content/images/booblite-green.png\" class=\"gameselimage\" />";
         waiting = "";
     }
     if (game.OpponentNickname == null || game.OpponentNickname == "") {
@@ -422,7 +428,7 @@ function getGameListItem(game) {
             abandonables[game.GameId] = true;
         }
     }
-    var html = itemStart + title + "\"><img src=\"" + game.TinyFlagUrl + "\" />" +
+    var html = itemStart + title + "\"><img src=\"" + game.TinyFlagUrl + "\" class=\"gameselimage\" />" +
         game.SideShortName + " vs. " + oppName + icon + "Turn " + game.Turn + " " + game.PhaseName + "</li>";
     return html;
 }
@@ -492,7 +498,7 @@ function buildRecord() {
     for (var i = 0; i < window.player.Games.length; i++) {
         var game = window.player.Games[i];
                 
-        if (game.CompletedDTime != "") {
+        if (game.CompletedDTime != "" && game.OpponentNickname) {
             recIndex = -1;
             for (var j = 0; j < record.length; j++) {
                 if (game.OpponentNickname == record[j][0]) {
@@ -525,16 +531,16 @@ function buildRecord() {
 // Init................................................................
 
 $(document).ready(function () {
-    audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
+    window.audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
     
     $("#volinput").slider({
         orientation: "vertical",
-        value: audioVol,
+        value: window.audioVol,
         slide: function (e, ui) {
-            audioVol = ui.value;
-            $("#volvalue").text(audioVol);
-            if (bgMusic) bgMusic.volume(audioVol * 0.01);
-            createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
+            window.audioVol = ui.value;
+            $("#volvalue").text(window.audioVol);
+            if (bgMusic) bgMusic.volume(window.audioVol * 0.01);
+            createCookie(COOKIE_NAME_AUDIO, window.audioVol, 1000);
         }
     });
     $("#volvalue").text($("#volinput").slider("value"));
@@ -544,7 +550,7 @@ $(document).ready(function () {
         loop: true,
         autoplay: false
     });
-    bgMusic.play().fade(0, audioVol * 0.01, 1000);
+    bgMusic.play().fade(0, window.audioVol * 0.01, 1000);
     
     loadPlayerForPage(function() {
         $("#namespan").text(window.player.Nickname);
@@ -561,46 +567,6 @@ $(document).ready(function () {
         getPlayers();
        
         window.currentPage = "home";
-        
-        // SignalR.....................................................................
-        //$(function () {
-        //    ajaxLoadScript("/scripts/vendor/jquery.signalR-2.0.3.min.js", function () {
-        //        ajaxLoadScript("/signalr/hubs", function () {
-        //            // Reference the auto-generated proxy for the hub.  
-        //            var chat = $.connection.chatHub;
-
-        //            // Create a function that the hub can call back to display messages.
-        //            chat.client.addMessageToChat = function (sender, message) {
-        //                $("#chatstream").append("<li><strong>" + sender + ": </strong>" + message + "</li>");
-        //            };
-
-        //            // Start the connection.
-        //            console.log("connecting...");
-        //            $.connection.hub.start().done(function() {
-        //                console.log("connection started");
-                        
-        //                $("#chatdiv").css("display", "block").draggable({
-        //                    handle: "#chathead",
-        //                    containment: "#pagediv",
-        //                    scroll: false
-        //                });
-
-        //                $("#chatdiv .flatbutton").on("click", function () {
-        //                    var msg = $("#chatout").val();
-        //                    if (msg) {
-        //                        chat.server.broadcast(window.player.Nickname, msg);
-        //                        $("#chatout").val("").focus();
-        //                    }
-        //                });
-
-        //                $("#chatclose").on("click", function () {
-        //                    $.connection.hub.stop(connect);
-        //                    $("#chatdiv").css("display", "none");
-        //                });
-        //            });
-        //        });
-        //    });
-        //});
     });
 });
 

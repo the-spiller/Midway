@@ -1,12 +1,14 @@
-﻿OUTSTANDING
------------
+﻿BUGS
+----
+- volume setting does not persist across pages
+- 2nd player to arrive at next turn movement gets no move pts. and no aircraft readiness update even tho' display sez turn 2. Game data
+  sez turn is one, phase is 4; wrap to next turn movement is calculated on load of game from db. First player in the game to arrive at next 
+  turn movement works fine (done dynamically while playing? is that the diff?)
 
-- mozilla: air readiness buttons clickable in Search Phase! And dirty flag set, too. (Cursor appearance appropriate)
+FEATURES
+--------
+- air ops not possible on first turn for either side (no ready aircraft) so skip it!
 
-- new game, select an opponent w/ game waiting for anyone to play your side: creates a new game instead of using opponent's existing one
 
-- plays of sfxSailing after first, fade out callback fails (sfx plays to end)
-
-- click on artwork on home page game selector does not select game (but DOES make buttons appear)
 
 

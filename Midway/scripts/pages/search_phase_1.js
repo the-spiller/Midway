@@ -1,36 +1,38 @@
-﻿
-// Events and functions for Phase 1 (Search Map Move)
+﻿// Events and functions for Phase 1 (Search Map Move)
+var overHighlight = false,
+    zonesHighlighted = [];
 
-$(document).on("mousedown", ".shipitem", function() {
-    shipItemMouseDown();
-}).on("click", ".airreadiness", function (e) {
+$(document).on("click", ".airreadiness", function (e) {
     if (game.PhaseId != 1) return;
     e.stopPropagation();
     setAircraftState(this);
 });
 
-$("#canvii").on("mousedown", function (e) {
-    window.mouseDown = true;
-    var zone = searchGrid.coordsToZone(windowToCanvas(cvs, e.clientX, e.clientY)),
-        selShips = getSelectedShips("zone");
-
-    if (selShips.length > 0) {
-        dragMgr.dragging = false;
-        dragMgr.source = zone;
-        dragMgr.dragData = selShips;
-        dragMgr.cursorImg = null;
-        dragMgr.useSnapshot = true;
-        dragMgr.snapshot = null;
-
-        setTimeout(beginControlsDrag, 150);
+$("#canvii").on("mousemove", function (e) {
+    // show/hide the fleet marker cursor
+    if (game.PhaseId != 1 || zonesHighlighted.length == 0) return;
+    
+    var zone = searchGrid.coordsToZone(windowToCanvas(window.cvs, e.clientX, e.clientY));
+    if ($.inArray(zone, zonesHighlighted) > -1) {
+        if (!overHighlight) {
+            $("#fleetcursor").css("display", "block");
+            overHighlight = true;
+        }
+        var topLeft = searchGrid.zoneToTopLeftCoords(zone),
+            left = topLeft.x + window.mapLeft - searchGrid.zoneSize,
+            top = topLeft.y + window.mapTop;
+        
+        $("#fleetcursor").css({ left: left + "px", top: top + "px" });
+    } else if (overHighlight) {
+        $("#fleetcursor").css("display", "none");
+        overHighlight = false;
     }
-    e.preventDefault();
 });
 
-/*-------------------------------------------------------------------*/
-/* Display on the Arrived tab the player's ships that have           */
-/* arrived this turn and are not yet on the map.                     */
-/*-------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+/* Display on the Arrived tab the player's ships that have arrived this turn */
+/* and are not yet on the map.                                               */
+/*---------------------------------------------------------------------------*/
 function loadMovePhase() {
     var arrivals = [],
         html = "<div style=\"margin: 5px;\">No ships arrived this turn.</div>";
@@ -48,111 +50,161 @@ function loadMovePhase() {
     }
     $("#arrivals").html(html).addClass("tabshown");
     $("#arrivalstab").addClass("tabshown");
-    makeSuggestion();
 }
 
-/*-------------------------------------------------------------------*/
-/* Initialize an arrivals drag operation.                            */
-/*-------------------------------------------------------------------*/
-function shipItemMouseDown() {
+/*---------------------------------------------------------------------------*/
+/* In reponse to ship selection, highlight zones where arrivals may be       */
+/* placed or on-map ships may move.                                          */
+/*---------------------------------------------------------------------------*/
+function showMoveHighlight() {
     var panelId = $("#tabpanels").find("div.tabshown").attr("id") || "";
-    if (panelId != "arrivals") return;
-
-    dragMgr.dragging = false;
-    dragMgr.source = panelId;
-
     var selShips = getSelectedShips(panelId);
     if (selShips.length > 0) {
-        window.mouseDown = true;
-        dragMgr.dragData = selShips;
-        dragMgr.useSnapshot = true;
-        dragMgr.cursorImg = document.getElementById("fleet");
-        dragMgr.snapshot = null;
+        if (zonesHighlighted.length == 0) {
+            if (panelId == "arrivals") {
+                // show where arrivals may be placed
+                if (side == "USN") {
+                    zonesHighlighted = searchGrid.highlightZones("I1B", 1, 20);
+                } else {
+                    zonesHighlighted = searchGrid.highlightZones("A1A", 1, 20);
+                }
+            } else if (panelId == "zone") {
+                // show square area in which ships may move
+                var range = getShipsMinMovePoints(selectedZone);
+                if (range == 0) return;
 
-        setTimeout(beginControlsDrag, 150);
+                var hlWidth = (range * 2) + 1,
+                    hlHeight = (range * 2) + 1,
+                    edgeZoneX = searchGrid.getRelativeZone(selectedZone, { x: -range, y: 0 }),
+                    edgeZoneY = searchGrid.getRelativeZone(selectedZone, { x: 0, y: -range }),
+                    edgeRangeX = searchGrid.zoneDistance(selectedZone, edgeZoneX),
+                    edgeRangeY = searchGrid.zoneDistance(selectedZone, edgeZoneY),
+                    topLeftZone = searchGrid.getRelativeZone(selectedZone, { x: -range, y: -range });
+
+                if (edgeRangeX < range) hlWidth = edgeRangeX + range + 1;
+                if (edgeRangeY < range) hlHeight = edgeRangeY + range + 1;
+                
+                zonesHighlighted = searchGrid.highlightZones(topLeftZone, hlWidth, hlHeight);
+            }
+        }
+    } else if (zonesHighlighted.length > 0) {
+        searchGrid.removeHighlight();
+        $("#fleetcursor").css("display", "none");
+        zonesHighlighted = [];
     }
 }
 
-/*-------------------------------------------------------------------*/
-/* Reads dragging context to determine if drop location is           */
-/* legitimate. If so, return true, otherwise false.                  */
-/*-------------------------------------------------------------------*/
-function isLegitDrop(coords) {
-    var dropZone = searchGrid.coordsToZone(coords);
-    if (dropZone == dragMgr.source) return true;
-
-    if (dragMgr.source == "arrivals") {
-        if (side == "USN") {
-            if (dropZone.substr(0, 1) == "I" && "BEH".indexOf(dropZone.substr(2, 1)) != -1)
-                return true;
-        } else {
-            if (dropZone.substr(0, 1) == "A" && "ADG".indexOf(dropZone.substr(2, 1)) != -1)
-                return true;
-        }
-    } else if (isNumber(dragMgr.source.substr(1, 1))) {
-        var zones = searchGrid.zoneDistance(dragMgr.source, dropZone),
-            moves = getShipsMinMovePoints(dragMgr.source);
-        if (zones <= moves) return true;
+/*---------------------------------------------------------------------------*/
+/* Called from canvii div click event in search.js. Check to see if the      */
+/* clicked zone is within a move highlight area. If so, excute move and      */
+/* return true. If not, return false.                                        */
+/*---------------------------------------------------------------------------*/
+function checkMoveShips(clickEvent) {
+    if (zonesHighlighted.length == 0) return false;
+    
+    var coords = windowToCanvas(window.cvs, clickEvent.clientX, clickEvent.clientY),
+        zone = searchGrid.coordsToZone(coords);
+    
+    if ($.inArray(zone, zonesHighlighted) > -1) {
+        moveShips(coords);
+        return true;
     }
     return false;
 }
 
-/*-------------------------------------------------------------------*/
-/* "Sail" fleet marker to a new location on the map.                 */
-/*-------------------------------------------------------------------*/
-function sailShips(startZone, endZone) {
-    if (startZone == endZone) return;
+/*---------------------------------------------------------------------------*/
+/* Respond to click event within move highlight and move selected ships to   */
+/* the clicked-on zone.                                                      */
+/*---------------------------------------------------------------------------*/
+function moveShips(coords) {
+    var tabId = $("#tabpanels").find("div.tabshown").attr("id") || "",
+        selShips = getSelectedShips(tabId),
+        zone = searchGrid.coordsToZone(coords);
+
+    searchGrid.removeHighlight();
+    zonesHighlighted = [];
+    $("#fleetcursor").css("display", "none");
     
-    if (sfxSailing && audioVol > 0)
-        sfxSailing.play().fade(0, audioVol * 0.01, 500);
+    if (tabId == "arrivals") {
+        if (sfxArrived && window.audioVol > 0) sfxArrived.play();
+        $("#" + tabId).find("div.shipitem.selected").remove();
+        searchGrid.drawShipsMarker(searchGrid.zoneToTopLeftCoords(zone));
+        relocateShipsInData(zone, selShips, 0);
+        selectZone(coords);
+        selectZoneTab();
+    } else {
+        sailShips(selShips, zone);
+    }
+    window.editsMade = true;
+}
+/*---------------------------------------------------------------------------*/
+/* "Sail" fleet marker to a new location on the map.                         */
+/*---------------------------------------------------------------------------*/
+function sailShips(selectedShips, toZone) {
+    if (toZone == selectedZone) return;
     
-    var startPos = searchGrid.zoneToTopLeftCoords(startZone),
-        endPos = searchGrid.zoneToTopLeftCoords(endZone),
-        distX = endPos.x - startPos.x,
-        distY = endPos.y - startPos.y,
+    if (sfxSailing && window.audioVol > 0)
+        sfxSailing.play().fade(0, window.audioVol * 0.01, 500);
+
+    var startCoords = searchGrid.zoneToTopLeftCoords(selectedZone),
+        endCoords = searchGrid.zoneToTopLeftCoords(toZone),
+        distX = endCoords.x - startCoords.x,
+        distY = endCoords.y - startCoords.y,
+        restoreLeft = Math.min(startCoords.x, endCoords.x) - searchGrid.zoneSize,
+        restoreTop = Math.min(startCoords.y, endCoords.y),
+        restoreWidth = Math.abs(distX) + (searchGrid.zoneSize * 3),
+        restoreHeight = Math.abs(distY) + searchGrid.zoneSize,
+        restoreData = null,
         startTime = new Date().getTime(),
         elapsed = 0,
         duration = 15 * Math.max(Math.abs(distX), Math.abs(distY)), // set animation duration based on distance to be covered
-        handle;
-
-    searchGrid.drawMap(function () {
-        drawSightings();
-        drawShips([startZone, endZone]);
-        window.mapImg = searchGrid.grabImageData();
-        shipsAnim();
-    });
-
+        animReqHandle;
+    
     function shipsAnim() {
-        handle = window.requestAnimationFrame(shipsAnim);
+        searchGrid.restoreImageData(1, restoreData, restoreLeft, restoreTop);
         elapsed = new Date().getTime() - startTime;
-
-        if (elapsed >= duration) {
-            window.cancelAnimationFrame(handle);
-            searchGrid.drawMap(function () {
-                drawSightings();
-                drawShips();
-                searchGrid.drawSelector(addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 }), 1);
-                showShipsInZone(selectedZone);
-                if (sfxSailing) {
-                    sfxSailing.fade(sfxSailing.volume(), 0, 500, function() {
-                        sfxSailing.stop();
-                    });
-                }
-            });
-        } else {
-            var thisX = startPos.x + ((elapsed / duration) * distX);
-            var thisY = startPos.y + ((elapsed / duration) * distY);
-            searchGrid.restoreImageData(mapImg, 0, 0);
+        if (elapsed < duration) {
+            restoreData = searchGrid.grabImageData(1, restoreLeft, restoreTop, restoreWidth, restoreHeight);
+            var thisX = startCoords.x + ((elapsed / duration) * distX),
+                thisY = startCoords.y + ((elapsed / duration) * distY);
             searchGrid.drawShipsMarker({ x: thisX, y: thisY });
+            animReqHandle = window.requestAnimationFrame(shipsAnim);
+        } else {
+            //done animating
+            if (sfxSailing) {
+                sfxSailing.fade(sfxSailing.volume(), 0, 500, function() {
+                    sfxSailing.stop();
+                });
+            }
+            var cost = searchGrid.zoneDistance(selectedZone, toZone);
+            relocateShipsInData(toZone, selectedShips, cost);
+            drawShips();
+            selectZone(endCoords);
         }
     }
+
+    var allShips = getShipsInZone(selectedZone),
+        leftBehind = allShips.length - selectedShips.length;
+    if (leftBehind == 0) {
+        //there will be no fleet marker in the zone we're moving from, so 
+        //clear the icons canvas and restore everything but the fleet we're moving
+        searchGrid.clearCanvas(1);
+        drawSightings();
+        drawShips([selectedZone]);
+    }
+    //grab a snapshot covering the area of the move
+    restoreData = searchGrid.grabImageData(1, restoreLeft, restoreTop, restoreWidth, restoreHeight);
+    
+    //begin the animation
+    shipsAnim();
 }
 
-/*-------------------------------------------------------------------*/
-/* Find and return the minimum available movement points among ships */
-/* in the input zone.
-/*-------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+/* Find and return the minimum available movement points among ships in the  */
+/* input zone.                                                               */
+/*---------------------------------------------------------------------------*/
 function getShipsMinMovePoints(zone) {
+    if (game.PhaseId != 1) return 0;
     var min = 999;
     for (var i = 0; i < ships.length; i++) {
         if (ships[i].Location == zone && ships[i].ShipType != "BAS") {
@@ -162,21 +214,20 @@ function getShipsMinMovePoints(zone) {
     return min == 999 ? 0 : min;
 }
 
-/*-------------------------------------------------------------------*/
-/* Mark ships data with a new location and reload the shipZones[]    */
-/* array to reflect the change.                                      */
-/*-------------------------------------------------------------------*/
-function relocateShips(zone, movedShips, cost) {
+/*---------------------------------------------------------------------------*/
+/* Mark ships data with a new location and reload the shipZones[] array to   */
+/* reflect the change.                                                       */
+/*---------------------------------------------------------------------------*/
+function relocateShipsInData(zone, movedShips, cost) {
     for (var i = 0; i < movedShips.length; i++) {
         movedShips[i].MovePoints -= cost;
         movedShips[i].Location = zone;
     }
     loadShipZones();
 }
-/*-------------------------------------------------------------------*/
-/* Respond to click on air readiness button on ship or airbase list  */
-/* item.                                                             */
-/*-------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+/* Respond to click on air readiness button on a ship or airbase list item.  */
+/*---------------------------------------------------------------------------*/
 function setAircraftState(airReadinessDiv) {
     var idVals = airReadinessDiv.id.split("-"),
         targetEntity,
@@ -200,7 +251,8 @@ function setAircraftState(airReadinessDiv) {
                 window.editsMade = true;
                 break;
             case 2:
-                showAlert("Aircraft Are Ready", "Are you sure you want your aircraft to stand down?", DLG_YESCANCEL, "blue",
+                var msg = "Your aircraft are ready for operations. Are you sure you want them to stand down?";
+                showAlert("Aircraft Ready", msg, DLG_YESCANCEL, "blue",
                     function (button) {
                         
                     if (button == "Yes") {
@@ -220,10 +272,9 @@ function setAircraftState(airReadinessDiv) {
             ".png\" />");
     }
 }
-/*-------------------------------------------------------------------*/
-/* Return true if all of this turn's arrivals have been brought on   */
-/* to the map.                                                       */
-/*-------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
+/* Return true if all of this turn's arrivals have been brought onto the map.*/
+/*---------------------------------------------------------------------------*/
 function allArrivalsOnMap() {
     for (var i = 0; i < ships.length; i++) {
         if (ships[i].Location == "ARR")
@@ -231,3 +282,4 @@ function allArrivalsOnMap() {
     }
     return true;
 }
+

@@ -5,66 +5,66 @@
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
         <style>
-        #pagediv {
-            background-image: url(/content/images/bg-home.jpg);
-            background-repeat: no-repeat;
-        }
-
-        #homediv {
-            font-size: 1em;
-            top: 205px;
-            left: 70px;
-            width: 675px;
-            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
-        }
-
-        #audiolink {
-            margin-right: 5px;
-        }
-
-        #logofflink {
-            vertical-align: central;
-            margin-right: 25px;
-            color: #000;
-            font: 600 1.2em Arial, sans-serif;
-        }
-            #logofflink:hover, #logofflink:active {
-                text-decoration: underline;
-            }
-            #logofflink:active {
-                text-decoration: underline;
-                text-decoration-color: #ff2b00;
-                color: #ff2b00;
+            #pagediv {
+                background-image: url(/content/images/bg-home.jpg);
+                background-repeat: no-repeat;
             }
 
-        #optopponent {
-	        margin: 10px 0 10px 0;
-	        display: none;
-            width: 98%;
-        }
-	        #optopponent input {
-	            margin: 5px 0 5px 5px;
-	            width: 250px;
-	            vertical-align: middle;
-	        }
-            #optopponent a {
-                vertical-align: middle;
-                width: 50px;
+            #homediv {
+                font-size: 1em;
+                top: 205px;
+                left: 70px;
+                width: 675px;
+                box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
             }
+
+            #audiolink {
+                margin-right: 5px;
+            }
+
+            #logofflink {
+                vertical-align: central;
+                margin-right: 25px;
+                color: #000;
+                font: 600 1.2em Arial, sans-serif;
+            }
+                #logofflink:hover, #logofflink:active {
+                    text-decoration: underline;
+                }
+                #logofflink:active {
+                    text-decoration: underline;
+                    text-decoration-color: #ff2b00;
+                    color: #ff2b00;
+                }
+
+            #optopponent {
+	            margin: 10px 0 10px 0;
+	            display: none;
+                width: 98%;
+            }
+	            #optopponent input {
+	                margin: 5px 0 5px 5px;
+	                width: 250px;
+	                vertical-align: middle;
+	            }
+                #optopponent a {
+                    vertical-align: middle;
+                    width: 50px;
+                }
             
-        #recordtable {
-            margin: 20px;
-            width: 90%;
-            border-collapse: collapse;
-        }
-            #recordtable td.name {
-                width: 33%;
+            #recordtable {
+                margin: 20px;
+                width: 90%;
+                border-collapse: collapse;
             }
-            #recordtable td.number {
-                width: 19%;
-                border-right: 1px solid #fff;
-                text-align: right;
-            }
+                #recordtable td.name {
+                    width: 33%;
+                }
+                #recordtable td.number {
+                    width: 19%;
+                    border-right: 1px solid #fff;
+                    text-align: right;
+                }
 
             #playgame, #quitgame, #btncancel {
                 display: none;
@@ -92,7 +92,9 @@
             #editreg input[type="text"], #editreg input[type="password"] {
                 width: 300px;
             }
-
+            .gameselimage {
+                pointer-events: none;
+            }
             .longbutton {
                 width: 70px;
                 margin-top: 10px;
@@ -131,12 +133,12 @@
                 <div id="gameselect" class="tabpanel tabshown">
                     <div id="gamelist">
                         <ul>
-                            <li id="game-1" class="listitem"><img src="/content/images/usn.gif" />USN New Game</li>
-                            <li id="game-2" class="listitem"><img src="/content/images/ijn.gif" />IJN New Game</li>
+                            <li id="game-1" class="listitem"><img src="/content/images/usn.gif" class="gameselimage" />USN New Game</li>
+                            <li id="game-2" class="listitem"><img src="/content/images/ijn.gif" class="gameselimage" />IJN New Game</li>
                         </ul>
                     </div>
                     <div id="optopponent">
-                        Optional opponent nickname:
+                        Opponent (optional):
                         <input id="oppnickname" type="text" value="First available" />
                         <div id="oppselectdiv">
                             <select id="oppselect"></select>
