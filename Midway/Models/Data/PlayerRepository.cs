@@ -474,9 +474,8 @@ namespace Midway.Models.Data
                     dtoPg.OppWaiting = "N";
                 }
                 dtoPgs.Add(dtoPg);
+				if (dbDirty) _context.Save();
 			}
-		    if (dbDirty) _context.Save();
-
             return dtoPgs;
 		}
 

@@ -241,11 +241,21 @@ function ajaxLoadScript(script, successCallback) {
     }
 }
 
+/*---------------------------------------------------------------------------*/
+/* Respond to a cllick on a tab -- make the selected tab current and update  */
+/* its display.
+/*---------------------------------------------------------------------------*/
 function workTabs(e) {
-    $(".tablistitem, .tabpanel").removeClass("tabshown");
     var clickedId = e.target.id;
-    $("#" + clickedId).addClass("tabshown");
-    $("#" + clickedId.replace("tab", "")).addClass("tabshown");
+    if (!$("#" + clickedId).hasClass("tabshown")) {
+        $(".tablistitem, .tabpanel").removeClass("tabshown");
+        $("#" + clickedId).addClass("tabshown");
+        $("#" + clickedId.replace("tab", "")).addClass("tabshown");
+        
+        if (clickedId == "zonetab") {
+            showShipsInZone(selectedZone);
+        }
+    }
 }
 
 function gameTimeFromTurn(turn) {
