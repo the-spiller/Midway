@@ -31,11 +31,12 @@ $(document).on("mouseover", ".oppsearchitem", function(e) {
             deleteAirOperation();
         }
     }
-}).on("click", ".missionplanes", function(e) {
+}).on("click", ".updowna", function(e) {
     addSquadronToOp(e.target.parentNode);
-}).on("click", ".shipname", function(e) {
+}).on("click", ".updownas", function(e) {
     addShiploadToOp(e.target);
 });
+
 // events for static (in the original html) elements
 $("#airopmission").on("change", function () {
     if (editingOpIdx == -1) {
@@ -401,6 +402,20 @@ function getAirOpAircraftHtml(source, op, isCap) {
         fightersHtml,
         rowHtml = "";
     
+    function airTypeHtml(type, interactive, squads) {
+        var ret;
+        if (interactive)
+            ret = "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "ops" + type + ".png\" />" +
+                "<div id=\"" + source.ElementId + "-num\" class=\"srcnumplanes\">" + source.FSquadrons + "</div></td>" +
+                "<td class=\"updown\"><a href=\"#\" id=\"" + source.ElementId + "-" + type + "\" class=\"updowna\">" +
+                "<img src=\"" + imgDir + "updown.png\" /></a></td>";
+        else
+            ret = "<td colspan=\"2\" class=\"missionplanes\"><img src=\"" + imgDir + side +
+            "ops" + type + ".png\" /><div id=\"mission" + type + "\" class=\"srcnumplanes\">" + squads + "</div></td>";
+
+        return ret;
+    }
+    
     if (!source) {
         if (op) {
             //show totals for each aircraft type on the mmission
@@ -410,34 +425,24 @@ function getAirOpAircraftHtml(source, op, isCap) {
                 dsquads += op.AirOpSources[i].DSquadrons;
             }
         }
-        rowHtml += "<tr><td class=\"right\" style=\"width: 25%; font-weight: bold;\">Mission aircraft:</td>";
-        fightersHtml = "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsf.png\" class=\"noselect\" />" +
-            "<div id=\"missionf\" class=\"srcnumplanes\">" + fsquads + "</div></td>";
+        rowHtml += "<tr><td colspan=\"2\" class=\"right\" style=\"width: 25%; font-weight: bold;\">Mission aircraft:</td>";
+        fightersHtml = airTypeHtml("f", false, fsquads);
         
-        if (isCap) {
-            rowHtml += fightersHtml + "<td colspan=\"3\"></td></tr>";
-        } else {
-            rowHtml += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opst.png\" class=\"noselect\" />" +
-                "<div id=\"missiont\" class=\"srcnumplanes\">" + tsquads + "</div></td>" +
-                fightersHtml +
-                "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "opsd.png\" class=\"noselect\" />" +
-                "<div id=\"missiond\" class=\"srcnumplanes\">" + dsquads + "</div></td><td></td></tr>";
-        }
+        if (isCap) 
+            rowHtml += fightersHtml + "<td colspan=\"5\"></td></tr>";
+        else 
+            rowHtml += airTypeHtml("t", false, tsquads) + fightersHtml + airTypeHtml("d", false, dsquads) + "<td></td></tr>";
     } else {
-        rowHtml += "<tr><td id=\"" + source.SourceType + "-"  + source.SourceId + "\" class=\"shipname\">" + source.Name + "</td>";
-        fightersHtml = "<td id=\"" + source.ElementId + "-f\" class=\"missionplanes clickme\">" +
-            "<img src=\"" + imgDir + side + "opsf.png\" class=\"noselect\" /><div class=\"srcnumplanes\">" + source.FSquadrons + "</div></td>";
+        rowHtml += "<tr><td class=\"shipname\">" + source.Name + "</td>" +
+            "<td class=\"updown\"><a href=\"#\" id=\"" + source.SourceType + "-" + source.SourceId + "\" class=\"updownas\">" +
+            "<img src=\"" + imgDir + "updown.png\" /></a></td>";
+        fightersHtml = airTypeHtml("f", true);
         
         if (isCap)
         {
-            rowHtml += fightersHtml + "<td colspan=\"3\"></td></tr>";
+            rowHtml += fightersHtml + "<td colspan=\"5\"></td></tr>";
         } else {
-            rowHtml += "<td id=\"" + source.ElementId + "-t\" class=\"missionplanes clickme\">" +
-                "<img src=\"" + imgDir + side + "opst.png\" class=\"noselect\" /><div class=\srcnumplanes\">" + source.TSquadrons + "</div></td>"
-                + fightersHtml +
-                "<td id=\"" + source.ElementId + "-d\" class=\"missionplanes clickme\">" +
-                "<img src=\"" + imgDir + side + "opsd.png\" class=\"noselect\" /><div class=\srcnumplanes\">" + source.DSquadrons + "</div></td>" +
-                "<td></td></tr>";
+            rowHtml += airTypeHtml("t", true) + fightersHtml + airTypeHtml("d", true) + "<td></td></tr>";
         }
     }
     return rowHtml;
@@ -451,7 +456,8 @@ function showAirOpSources() {
         op = editingOpIdx == -1 ? null : airOps[editingOpIdx],
         dlgHtml = getAirOpAircraftHtml(null, op, isCap);
     
-    dlgHtml += "<tr><td class=\"right\" style=\"font-weight: bold\">Available aircraft</td><td colspan=\"4\"></td></tr>";
+    dlgHtml += "<tr><td colspan=\"2\" class=\"right\" style=\"font-weight: bold\">Available aircraft</td>" +
+        "<td colspan=\"4\"></td></tr>";
     
     for (var i = 0; i < opSources.length; i++) {
         dlgHtml += getAirOpAircraftHtml(opSources[i], null, isCap);
@@ -465,14 +471,14 @@ function showAirOpSources() {
 /* the mission, bring them all back out. Format of planeTd.id is             */
 /* <type>-<id>-<plane type>, e.g. 'CV-1-f'                                   */
 /*---------------------------------------------------------------------------*/
-function addSquadronToOp(planeTd) {
-    if (planeTd.id == "") return;
+function addSquadronToOp(clickedAnchor) {
+    if (clickedAnchor.id == "") return;
     
-    var planeIdParts = planeTd.id.split("-"),
+    var planeIdParts = clickedAnchor.id.split("-"),
         missionTdId = "#mission" + planeIdParts[2],
         source = getAircraftSourceById(planeIdParts[1], planeIdParts[0] == "BAS"),
         squads = planeIdParts[2] == "f" ? source.FSquadrons : (planeIdParts[2] == "t" ? source.TSquadrons : source.DSquadrons),
-        selector = "#" + planeTd.id + " div";
+        selector = "#" + clickedAnchor.id + "-num";
 
     if ($(selector).text() == "0") {
         // back out of the mission all squads of this type from this ship

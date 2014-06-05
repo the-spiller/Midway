@@ -72,7 +72,7 @@
             }
             #dlgairops {
                 display: none;
-                background-color: #2d4347;
+                background-color: #093a67;
                 opacity: 1.0;
                 top: 150px;
                 left: 200px;
@@ -80,7 +80,7 @@
                 box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
             }
                 #dlgairops .floathead {
-                    background: linear-gradient(to right, #002026, #002026, #002026, #2d4347);
+                    background: linear-gradient(to right, #002026, #002026, #002026, #093a67);
                 }
             #dlgairops table {
                 width: 100%;
@@ -104,16 +104,25 @@
                 position: relative;
                 margin: 15px 0 15px 10px;
             }
-            .shipname {
-                text-align: center;
-                cursor: pointer;
+            .updown {
+                width: 30px;
             }
-                .shipname:hover {
-                    background-color: #808080;
+            .updowna {
+                
+            }
+                .updowna:hover {
+                    background-color: #0a4173;
                 }
+                .updowna:active {
+                    background-color: #08345c;
+                }
+            .shipname {
+                text-align: right;
+                vertical-align: middle;
+            }
             .missionplanes {
                 position: relative;
-                width: 46px;
+                width: 44px;
             }
                 .missionplanes div {
                     position: absolute;
@@ -122,9 +131,6 @@
                     -webkit-user-select: none;
                     -moz-user-select: none;
                     -ms-user-select: none;                   
-                }
-                .missionplanes.clickme:hover {
-                    background-color: #808080;
                 }
             .tablistitem.tabshown {
                 background-color: #093a67;
