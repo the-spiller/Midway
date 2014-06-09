@@ -255,7 +255,6 @@
     <Content Include="Content\images\booblite-stop.png" />
     <Content Include="Content\images\helpicon.png" />
     <Content Include="Content\images\pointssample.png" />
-    <Content Include="Content\images\search\ijn-ops-planes.png" />
     <Content Include="Content\images\search\ijnairman.png" />
     <Content Include="Content\images\search\ijnopsd.png" />
     <Content Include="Content\images\search\ijnopsf.png" />
@@ -273,9 +272,12 @@
     <Content Include="Content\images\search\Ships\usnca.png" />
     <Content Include="Content\images\search\Ships\usncl.png" />
     <Content Include="Content\images\search\Ships\usncv.png" />
-    <Content Include="Content\images\search\usn-ops-planes.png" />
+    <Content Include="Content\images\search\updown.png" />
     <Content Include="Content\images\search\usn-sea-search.png" />
     <Content Include="Content\images\search\usnairman.png" />
+    <Content Include="Content\images\search\usnopsd.png" />
+    <Content Include="Content\images\search\usnopsf.png" />
+    <Content Include="Content\images\search\usnopst.png" />
     <Content Include="Content\images\speaker.png" />
     <Content Include="Notes.txt" />
     <Content Include="Scripts\vendor\jquery.signalR-2.0.3.js" />

@@ -5,7 +5,8 @@ var oppSearches = [],
     landingZones = [],
     editingOpIdx = -1,
     aircraftSources = [],
-    opSources = [];
+    planeTypes = ["T", "F", "D"],
+    newOp = {};
 
 // events for dynamically-created elements
 $(document).on("mouseover", ".oppsearchitem", function(e) {
@@ -32,15 +33,15 @@ $(document).on("mouseover", ".oppsearchitem", function(e) {
         }
     }
 }).on("click", ".updowna", function(e) {
-    addSquadronToOp(e.target.parentNode);
+    addSquadronToOp(e);
 }).on("click", ".updownas", function(e) {
-    addShiploadToOp(e.target);
+    addShiploadToOp(e);
 });
 
 // events for static (in the original html) elements
 $("#airopmission").on("change", function () {
     if (editingOpIdx == -1) {
-        findSourcesForNewOp();
+        getNewOp();
         showAirOpSources();
     } 
 });
@@ -207,7 +208,7 @@ function splitOffOpponentSearches() {
 /* Build and return html table for the display of air ops.                   */
 /*---------------------------------------------------------------------------*/
 function getAirOpsHtml() {
-    var addTitle = "Add an operation targeting the currently selected zone.",
+    var addTitle = "Add an operation targeting the selected zone.",
         opsHtml = "<table style=\"width: 100%\"><tr><th>Zone</th><th>Mission</th><th colspan=\"2\">Aircraft</th></tr>";
 
     for (var i = 0; i < airOps.length; i++) {
@@ -303,6 +304,20 @@ function getAircraftSourceById(sourceId, isAirbase) {
     }
     return null;
 }
+/*---------------------------------------------------------------------------*/
+/* Locate and return the air operation sources element for the input id.     */
+/*---------------------------------------------------------------------------*/
+function getAirOpSourceById(sourceId, isAirbase) {
+    var op = editingOpIdx == -1 ? newOp : airOps[editingOpIdx];
+    
+    for (var i = 0; i < op.AirOpSources.length; i++) {
+        if (op.AirOpSources[i].SourceId == sourceId) {
+            if (op.AirOpSources[i].SourceType == "BAS" && isAirbase) return op.AirOpSources[i];
+            if (op.AirOpSources[i].SourceType != "BAS" && !isAirbase) return op.AirOpSources[i];
+        }
+    }
+    return null;
+}
 
 /*---------------------------------------------------------------------------*/
 /* Return HTML string for mission option based on input mission type.        */
@@ -316,6 +331,7 @@ function getMissionOptionHtml(mission) {
         case "Relocate":
             return "<option value=\"Relocate\" title=\"Move aircraft to a friendly ship or airbase in the selected zone\">Relocate</option>";
     }
+    return "";
 }
 /*---------------------------------------------------------------------------*/
 /* Determine and set the contents of the mission select list and its         */
@@ -387,64 +403,63 @@ function getMissionOptions() {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Build and return the html for a row of aircraft on the air op dialog. If  */
-/* source is null, the row is presumed to be for the  planes assigned to the */
-/* mission. If op is not null, it is an airOps[] element being edited        */
-/* and its squadron counts are displayed for assigned planes. If source is   */
-/* not null, it is an aircraftSources[] element, op is ignored, and          */
-/* ship/airbase name and plane icons are presented as clickable. In either   */
-/* case, if isCap is true, only fighters are presented.                      */
+/* Build and return the html for the mission row of aircraft on the air op   */
+/* dialog. If the mission being edited is CAP, only fighters are included.   */
 /*---------------------------------------------------------------------------*/
-function getAirOpAircraftHtml(source, op, isCap) {
-    var tsquads = 0,
-        fsquads= 0,
+function getAirOpMissionRowHtml() {
+    var op = editingOpIdx == -1 ? newOp : airOps[editingOpIdx],
+        isCap = (op.Mission == "CAP"),
+        tsquads = 0,
+        fsquads = 0,
         dsquads = 0,
-        fightersHtml,
-        rowHtml = "";
+        rowHtml = "<tr><td colspan=\"2\" class=\"right\" style=\"width: 25%; font-weight: bold;\">Mission aircraft:</td>",
+        i;
     
-    function airTypeHtml(type, interactive, squads) {
-        var ret;
-        if (interactive)
-            ret = "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "ops" + type + ".png\" />" +
-                "<div id=\"" + source.ElementId + "-num\" class=\"srcnumplanes\">" + source.FSquadrons + "</div></td>" +
-                "<td class=\"updown\"><a href=\"#\" id=\"" + source.ElementId + "-" + type + "\" class=\"updowna\">" +
-                "<img src=\"" + imgDir + "updown.png\" /></a></td>";
-        else
-            ret = "<td colspan=\"2\" class=\"missionplanes\"><img src=\"" + imgDir + side +
-            "ops" + type + ".png\" /><div id=\"mission" + type + "\" class=\"srcnumplanes\">" + squads + "</div></td>";
+    //get totals for each aircraft type on the mmission
+    for (i = 0; i < op.AirOpSources.length; i++) {
+        tsquads += op.AirOpSources[i].TSquadrons;
+        fsquads += op.AirOpSources[i].FSquadrons;
+        dsquads += op.AirOpSources[i].DSquadrons;
+    }
 
-        return ret;
+    for (i = 0; i < planeTypes.length; i++) {
+        if (isCap && planeTypes[i] != "F") continue;
+        var squads = planeTypes[i] == "T" ? tsquads : planeTypes[i] == "F" ? fsquads : dsquads;
+        rowHtml += "<td colspan=\"2\" class=\"missionplanes\"><img src=\"" + imgDir + side +
+            "ops" + planeTypes[i] + ".png\" /><div id=\"mission" + planeTypes[i] + "\" class=\"srcnumplanes\">" + squads + "</div></td>";
     }
+    if (isCap)
+        return rowHtml + "<td colspan=\"5\"></td></tr>";
+    else
+        return rowHtml + "<td></td></tr>";
+}
+
+/*---------------------------------------------------------------------------*/
+/* Build and return the html for a source row of aircraft on the air op      */
+/* dialog. If isCap is true, only fighters are presented.                    */
+/*---------------------------------------------------------------------------*/
+function getAirOpSourceRowHtml(opSource) {
+    var op = editingOpIdx == -1 ? newOp : airOps[editingOpIdx],
+        isCap = (op.Mission == "CAP"),
+        source = getAircraftSourceById(opSource.SourceId, opSource.SourceType == "BAS"),
+        rowHtml = "<tr><td class=\"shipname\">" + source.Name + "</td><td class=\"updown\"><a href=\"#\" class=\"updownas\">" +
+            "<img src=\"" + imgDir + "updown.png\" id=\"" + source.ElementId + "\" /></a></td>",
+        i;
+
     
-    if (!source) {
-        if (op) {
-            //show totals for each aircraft type on the mmission
-            for (var i = 0; i < op.AirOpSources.length; i++) {
-                tsquads += op.AirOpSources[i].TSquadrons;
-                fsquads += op.AirOpSources[i].FSquadrons;
-                dsquads += op.AirOpSources[i].DSquadrons;
-            }
-        }
-        rowHtml += "<tr><td colspan=\"2\" class=\"right\" style=\"width: 25%; font-weight: bold;\">Mission aircraft:</td>";
-        fightersHtml = airTypeHtml("f", false, fsquads);
-        
-        if (isCap) 
-            rowHtml += fightersHtml + "<td colspan=\"5\"></td></tr>";
-        else 
-            rowHtml += airTypeHtml("t", false, tsquads) + fightersHtml + airTypeHtml("d", false, dsquads) + "<td></td></tr>";
-    } else {
-        rowHtml += "<tr><td class=\"shipname\">" + source.Name + "</td>" +
-            "<td class=\"updown\"><a href=\"#\" id=\"" + source.SourceType + "-" + source.SourceId + "\" class=\"updownas\">" +
-            "<img src=\"" + imgDir + "updown.png\" /></a></td>";
-        fightersHtml = airTypeHtml("f", true);
-        
-        if (isCap)
-        {
-            rowHtml += fightersHtml + "<td colspan=\"5\"></td></tr>";
-        } else {
-            rowHtml += airTypeHtml("t", true) + fightersHtml + airTypeHtml("d", true) + "<td></td></tr>";
-        }
+    for (i = 0; i < planeTypes.length; i++) {
+        if (isCap && planeTypes[i] != "F") continue;
+        var availSquads = planeTypes[i] == "T" ? source.TSquadrons : planeTypes[i] == "F" ? source.FSquadrons : source.DSquadrons;
+        rowHtml += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "ops" + planeTypes[i] + ".png\" />" +
+                "<div id=\"" + source.ElementId + "-" + planeTypes[i] + "-num\" class=\"srcnumplanes\">" + availSquads + "</div></td>" +
+                "<td class=\"updown\"><a href=\"#\" class=\"updowna\">" +
+                "<img src=\"" + imgDir + "updown.png\" id=\"" + source.ElementId + "-" + planeTypes[i] + "\" /></a></td>";
     }
+    if (isCap)
+        rowHtml += "<td colspan=\"5\"></td></tr>";
+    else 
+        rowHtml += "<td></td></tr>";
+        
     return rowHtml;
 }
 
@@ -452,81 +467,129 @@ function getAirOpAircraftHtml(source, op, isCap) {
 /* Display air operation aircraft and sources on the air operations dialog.  */
 /*---------------------------------------------------------------------------*/
 function showAirOpSources() {
-    var isCap = $("#airopmission").val() == "CAP",
-        op = editingOpIdx == -1 ? null : airOps[editingOpIdx],
-        dlgHtml = getAirOpAircraftHtml(null, op, isCap);
+    var op = editingOpIdx == -1 ? newOp : airOps[editingOpIdx],
+        dlgHtml = getAirOpMissionRowHtml() +
+            "<tr><td colspan=\"2\" class=\"right\" style=\"font-weight: bold\">Available aircraft</td><td colspan=\"4\"></td></tr>";
     
-    dlgHtml += "<tr><td colspan=\"2\" class=\"right\" style=\"font-weight: bold\">Available aircraft</td>" +
-        "<td colspan=\"4\"></td></tr>";
-    
-    for (var i = 0; i < opSources.length; i++) {
-        dlgHtml += getAirOpAircraftHtml(opSources[i], null, isCap);
+    for (var i = 0; i < op.AirOpSources.length; i++) {
+        dlgHtml += getAirOpSourceRowHtml(op.AirOpSources[i]);
     }
     $("#airopplanes").html(dlgHtml);
 }
 
 /*---------------------------------------------------------------------------*/
 /* Respond to a click on individual source aircraft by moving one squadron   */
-/* to the mission. If all planes of this type on this ship are already in    */
-/* the mission, bring them all back out. Format of planeTd.id is             */
-/* <type>-<id>-<plane type>, e.g. 'CV-1-f'                                   */
+/* to or from the mission. Format of event.target.id is                      */
+/* <type>-<id>-<plane type>, e.g. 'CV-1-f'.                                  */
 /*---------------------------------------------------------------------------*/
-function addSquadronToOp(clickedAnchor) {
-    if (clickedAnchor.id == "") return;
-    
-    var planeIdParts = clickedAnchor.id.split("-"),
-        missionTdId = "#mission" + planeIdParts[2],
-        source = getAircraftSourceById(planeIdParts[1], planeIdParts[0] == "BAS"),
-        squads = planeIdParts[2] == "f" ? source.FSquadrons : (planeIdParts[2] == "t" ? source.TSquadrons : source.DSquadrons),
-        selector = "#" + clickedAnchor.id + "-num";
+function addSquadronToOp(event) {
+    if (event.target.id == "") return;
 
-    if ($(selector).text() == "0") {
-        // back out of the mission all squads of this type from this ship
-        $(selector).text(squads);
-        $(missionTdId).text(textAdd($(missionTdId).text(), -squads));
-    } else {
-        // add one squad to the mission
-        $(selector).text(textAdd($(selector).text(), -1));
-        $(missionTdId).text(textAdd($(missionTdId).text(), 1));
+    var planeIdParts = event.target.id.split("-"),
+        missionTdSelector = "#mission" + planeIdParts[2],
+        numDivSelector = "#" + event.target.id + "-num",
+        source = getAircraftSourceById(planeIdParts[1], planeIdParts[0] == "BAS"),
+        opSource = getAirOpSourceById(planeIdParts[1], planeIdParts[0] == "BAS"),
+        offset = $(event.target).offset(),
+        availSquads = source.TSquadrons,
+        takenSquads = opSource.TSquadrons,
+        adding = ((event.clientY - offset.top) < (event.target.offsetHeight / 2)),
+        squadsToAdd = 0;
+    
+    if (planeIdParts[2] == "F") {
+        availSquads = source.FSquadrons;
+        takenSquads = opSource.FSquadrons;
+    } else if (planeIdParts[2] == "D") {
+        availSquads = source.DSquadrons;
+        takenSquads = opSource.DSquadrons;
     }
+    
+    if (adding) {
+        // add one squad to the mission
+        if (availSquads > 0) {
+            squadsToAdd = 1;
+            availSquads--;
+            takenSquads++;
+        }
+    } else {
+        //remove one squadron
+        if (takenSquads > 0) {
+            squadsToAdd = -1;
+            availSquads++;
+            takenSquads--;
+        }
+    }
+    if (planeIdParts[2] == "T") {
+        source.TSquadrons = availSquads;
+        opSource.TSquadrons = takenSquads;
+    } else if (planeIdParts[2] == "F") {
+        source.FSquadrons = availSquads;
+        opSource.FSquadrons = takenSquads;
+    } else {
+        source.DSquadrons = availSquads;
+        opSource.DSquadrons = takenSquads;
+    }
+    $(numDivSelector).text(availSquads.toString());
+    $(missionTdSelector).text(textAdd($(missionTdSelector).text(), squadsToAdd));
 }
 
 /*---------------------------------------------------------------------------*/
 /* Respond to a click on a source ship by moving all its aircraft to the     */
 /* mmission. If all aircraft are already on the mission, bring them all back.*/
-/* Format of shipTd.id is <type>-<id>, e.g. 'CV-1'                           */
+/* Format of event.target.id is <type>-<id>, e.g. 'CV-1'                     */
 /*---------------------------------------------------------------------------*/
-function addShiploadToOp(shipTd) {
-    var shipIdParts = shipTd.id.split("-"),
+function addShiploadToOp(event) {
+    if (event.target.id == "") return;
+    
+    var shipIdParts = event.target.id.split("-"),
         source = getAircraftSourceById(shipIdParts[1], shipIdParts[0] == "BAS"),
-        planeTypes = ["t", "f", "d"],
-        selector,
-        planesLeft = 0,
-        i;
+        opSource = getAirOpSourceById(shipIdParts[1], shipIdParts[0] == "BAS"),
+        offset = $(event.target).offset(),
+        adding = ((event.clientY - offset.top) < (event.target.offsetHeight / 2)),
+        availSquads,
+        squadsToAdd;
 
-    //Total up the ship's remaining aircraft
-    for (i = 0; i < 3; i++) {
-        if ($("#airopmission").val() == "CAP" && planeTypes[i] != "f") continue;
-        selector = "#" + source.ElementId + "-" + planeTypes[i] + " div";
-        planesLeft += Number($(selector).text());
-    }
+    //Add/remove all ship's aircraft
+    for (var i = 0; i < 3; i++) {
+        if ($("#airopmission").val() == "CAP" && planeTypes[i] != "F") continue;
 
-    //Move all ship's aircraft based on result of above
-    for (i = 0; i < 3; i++) {
-        if ($("#airopmission").val() == "CAP" && planeTypes[i] != "f") continue;
+        var numDivSelector = "#" + source.ElementId + "-" + planeTypes[i] + "-num",
+            numTdSelector = "#mission" + planeTypes[i];
 
-        selector = "#" + source.ElementId + "-" + planeTypes[i] + " div";
-        if (planesLeft == 0) {
-            // bring 'em all back
-            var squads = planeTypes[i] == "t" ? source.TSquadrons : (planeTypes[i] == "f" ? source.FSquadrons : source.DSquadrons);
-            $(selector).text(squads);
-            $("#mission" + planeTypes[i]).text(textAdd($("#mission" + planeTypes[i]).text(), -squads));
+        if (adding) {
+            if (planeTypes[i] == "T") {
+                squadsToAdd = source.TSquadrons;
+                opSource.TSquadrons += source.TSquadrons;
+                availSquads = source.TSquadrons = 0;
+            } else if (planeTypes[i] == "F") {
+                squadsToAdd = source.FSquadrons;
+                opSource.FSquadrons += source.FSquadrons;
+                availSquads = source.FSquadrons = 0;
+            } else {
+                squadsToAdd = source.DSquadrons;
+                opSource.DSquadrons += source.DSquadrons;
+                availSquads = source.DSquadrons = 0;
+            }
         } else {
-            // send 'em all up
-            squads = Number($(selector).text());
-            $(selector).text("0");
-            $("#mission" + planeTypes[i]).text(textAdd($("#mission" + planeTypes[i]).text(), squads));
+            if (planeTypes[i] == "T") {
+                squadsToAdd = -opSource.TSquadrons;
+                source.TSquadrons += opSource.TSquadrons;
+                availSquads = source.TSquadrons;
+                opSource.TSquadrons = 0;
+            } else if (planeTypes[i] == "F") {
+                squadsToAdd = -opSource.FSquadrons;
+                source.FSquadrons += opSource.FSquadrons;
+                availSquads = source.FSquadrons;
+                opSource.FSquadrons = 0;
+            } else {
+                squadsToAdd = -opSource.DSquadrons;
+                source.DSquadrons += opSource.DSquadrons;
+                availSquads = source.DSquadrons;
+                opSource.DSquadrons = 0;
+            }
         }
+        $(numDivSelector).text(availSquads.toString());
+        $(numTdSelector).text(textAdd($(numTdSelector).text(), squadsToAdd));
     }
 }
 
@@ -540,12 +603,19 @@ function closeOpDialog(e) {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Build  the array of sources for an air op based on mission type and       */
-/* message the player if there are none.                                     */
+/* Build up new air op and its sources based on mission type. If there are   */
+/* no sources with aircraft, message the player.                             */
 /*---------------------------------------------------------------------------*/
-function findSourcesForNewOp () {
-    opSources = getNewMissionAircraftSources($("#airopmission").val());
-    if (opSources.length == 0) {
+function getNewOp() {
+    newOp = {
+            Turn: game.Turn,
+            Zone: selectedZone,
+            Mission: $("#airopmission").val(),
+            AircraftTotals: "",
+            AirOpSources: []
+    };
+    var aircraftSources = getNewMissionAircraftSources($("#airopmission").val());
+    if (aircraftSources.length == 0) {
         var msg = "No aircraft are available for a mission targeting the selected zone.<br /><br />";
         if (airOps.length > 0)
             msg += "Planes within range, if any, have all been allocated to other missions.";
@@ -554,6 +624,17 @@ function findSourcesForNewOp () {
 
         showAlert("No Aircraft Available", msg, DLG_OK, "red");
         return false;
+    }
+    // construct AirOpSources array from source ships
+    for (var i = 0; i < aircraftSources.length; i++) {
+        var opSource = {
+            SourceType: aircraftSources[i].SourceType,
+            SourceId: aircraftSources[i].SourceId,
+            TSquadrons: 0,
+            FSquadrons: 0,
+            DSquadrons: 0
+        };
+        newOp.AirOpSources.push(opSource);
     }
     return true;
 }
@@ -564,36 +645,16 @@ function findSourcesForNewOp () {
 /* the AirOps tab if the player clicks "OK".                                 */
 /*---------------------------------------------------------------------------*/
 function addEditAirOperation() {
-    var op = editingOpIdx > -1 ? airOps[editingOpIdx] : null,
-        i;
-    
     // set up the dialog elements
-    if (editingOpIdx > -1) {    //editing an op
-        selectZone(searchGrid.zoneToTopLeftCoords(op.Zone));
-        $("#airopmission").html(getMissionOptionHtml(op.Mission));
-        
-        // load sources
-        opSources = [];
-        for (i = 0; i < op.AirOpSources.length; i++) {
-            var source = getAircraftSourceById(op.AirOpSources[i].SourceId, op.AirOpSources[i].SourceType == "BAS");
-            opSources.push(source);
-        }
+    $("#airopzone").text(selectedZone);
+    if (editingOpIdx > -1) {    //editing an existing op
+        selectZone(searchGrid.zoneToTopLeftCoords(airOps[i].Zone));
+        $("#airopmission").html(getMissionOptionHtml(airOps[i].Mission));
     } else {    //new op
         if (!getMissionOptions()) return;
-        if (!findSourcesForNewOp()) return;
+        if (!getNewOp()) return;
     }
-    $("#airopzone").text(selectedZone);
     showAirOpSources();
-    
-    // if we're editing, now that everything's loaded into the display
-    // put op planes back into their sources (as it was before being saved)
-    if (editingOpIdx > -1) {
-        for (i = 0; i < op.AirOpSources.length; i++) {
-            opSources[i].TSquadrons += op.AirOpSources[i].TSquadrons;
-            opSources[i].FSquadrons += op.AirOpSources[i].FSquadrons;
-            opSources[i].DSquadrons += op.AirOpSources[i].DSquadrons;
-        }
-    }
     
     $("#dlgairops").css("display", "block")
         .draggable({
@@ -607,63 +668,28 @@ function addEditAirOperation() {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Scrape data from air op dialog and use it to modify an existing op or     */
-/* create a new one. Display the result on the AirOps tab.                   */
+/* Calculate aircraft totals for the edited op and display the result on the */
+/* AirOps tab.                                                               */
 /*---------------------------------------------------------------------------*/
 function saveAirOperation() {
-    var op,
+    var op = editingOpIdx == -1 ? newOp : airOps[editingOpIdx],
         ttotal = 0,
         ftotal = 0,
         dtotal = 0;
 
-    if (editingOpIdx > -1) {
-        op = airOps[editingOpIdx];
-        op.AircraftTotals = "";
-        op.AirOpSources = [];
-    } else {
-        op = {
-            Turn: game.Turn,
-            Zone: selectedZone,
-            Mission: $("#airopmission").val(),
-            AircraftTotals: "",
-            AirOpSources: []
-        };
+    op.AircraftTotals = "";
+
+    for (var i = 0; i < op.AirOpSources.length; i++) {
+        ttotal += op.AirOpSources[i].TSquadrons;
+        ftotal += op.AirOpSources[i].FSquadrons;
+        dtotal += op.AirOpSources[i].DSquadrons;
     }
     
-    for (var i = 0; i < opSources.length; i++) {
-        var tselector = "#" + opSources[i].ElementId + "-t div",
-            fselector = "#" + opSources[i].ElementId + "-f div",
-            dselector = "#" + opSources[i].ElementId + "-d div",
-            tSquadsTaken = $(tselector).length > 0 ? opSources[i].TSquadrons - Number($(tselector).text()) : 0,
-            fSquadsTaken = $(fselector).length > 0 ? opSources[i].FSquadrons - Number($(fselector).text()) : 0,
-            dSquadsTaken = $(dselector).length > 0 ? opSources[i].DSquadrons - Number($(dselector).text()) : 0;
-
-        if (tSquadsTaken + fSquadsTaken + dSquadsTaken == 0) {
-            if (editingOpIdx > -1) {
-                deleteAirOperation();
-            }
-            return;
-        }
-        
-        // remove these planes from those available
-        opSources[i].TSquadrons -= tSquadsTaken;
-        opSources[i].FSquadrons -= fSquadsTaken;
-        opSources[i].DSquadrons -= dSquadsTaken;
-
-        // keep running total of squads of each aircraft type in the mission
-        ttotal += tSquadsTaken;
-        ftotal += fSquadsTaken;
-        dtotal += dSquadsTaken;
-
-        var opSource = {
-            SourceId: opSources[i].SourceId,
-            SourceType: opSources[i].SourceType,
-            TSquadrons: tSquadsTaken,
-            FSquadrons: fSquadsTaken,
-            DSquadrons: dSquadsTaken
-        };
-        op.AirOpSources.push(opSource);
+    if (ttotal + ftotal + dtotal == 0) {
+        if (editingOpIdx > -1) deleteAirOperation();
+        return;
     }
+    
     if (ttotal > 0) op.AircraftTotals += "  T" + ttotal;
     if (ftotal > 0) op.AircraftTotals += "  F" + ftotal;
     if (dtotal > 0) op.AircraftTotals += "  D" + dtotal;
@@ -674,22 +700,26 @@ function saveAirOperation() {
 }
 
 /*---------------------------------------------------------------------------*/
-/* Delete the air operation element indicated by its index into              */
-/* airOps[] and redraw the air operations list on the AirOps tab.     */
+/* Delete the air operation element in airOps[] indicated by editingOpIdx    */
+/* and redraw the air operations list on the AirOps tab.                     */
 /*---------------------------------------------------------------------------*/
 function deleteAirOperation() {
     showAlert("Delete Air Operation", "Are you sure you want to delete this mission?", DLG_YESNO, "blue", function (btnText) {
         if (btnText == "Yes") {
-            //Restore the aircraft used in the chosen operation to their source ships/airbase
-            for (var i = 0; i < airOps[editingOpIdx].AirOpSources.length; i++) {
-                var opSource = airOps[editingOpIdx].AirOpSources[i],
-                    source = getAircraftSourceById(opSource.SourceId, opSource.SourceType == "BAS");
-                source.TSquadrons += opSource.TSquadrons;
-                source.FSquadrons += opSource.FSquadrons;
-                source.DSquadrons += opSource.DSquadrons;
+            //restore aircraft in the op to their sources
+            var op = editingOpIdx == -1 ? newOp : airOps[editingOpIdx];
+            for (var i = 0; i < op.AirOpSources.length; i++) {
+                var aircraftSource = getAircraftSourceById(op.AirOpSources[i].SourceId, op.AirOpSources[i].SourceType == "BAS");
+                aircraftSource.TSquadrons += op.AirOpSources[i].TSquadrons;
+                aircraftSource.FSquadrons += op.AirOpSources[i].FSquadrons;
+                aircraftSource.DSquadrons += op.AirOpSources[i].DSquadrons;
             }
-            airOps.splice(editingOpIdx, 1);
-            $("#airopslist").html(getAirOpsHtml());
+            
+            //delete the mission from the airOps array and redisplay
+            if (editingOpIdx > -1) {
+                airOps.splice(editingOpIdx, 1);
+                $("#airopslist").html(getAirOpsHtml());
+            }
             window.editsMade = true;
         }
     });

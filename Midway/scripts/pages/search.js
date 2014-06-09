@@ -702,6 +702,7 @@ function loadPage(callback) {
                 "<img id=\"sighting\" class=\"searchmarker\" src=\"" + imgDir + "usnsighting.png\" />";
             $("#imagecache").html(html);
             $("#fleetcursor").css("background", "url(/content/images/search/ijnfleet.png) no-repeat left top");
+            $("#dlgairops").css("background-color", "#610000");
         }
       
         ajaxLoadPhase(function () {

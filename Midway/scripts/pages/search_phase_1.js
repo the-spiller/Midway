@@ -276,8 +276,9 @@ function setAircraftState(airReadinessDiv) {
                 break;
         }
         //load new image and title string for tooltip
-        $(airReadinessDiv).attr("title", newTitle).html("<img src=\"/content/images/search/ready-" + targetEntity.AircraftState +
-            ".png\" />");
+        $(airReadinessDiv)
+            .attr("title", newTitle)
+            .html("<img src=\"/content/images/search/ready-" + targetEntity.AircraftState + ".png\" />");
     }
 }
 /*---------------------------------------------------------------------------*/
