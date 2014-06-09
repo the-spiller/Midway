@@ -8,7 +8,6 @@ function loadAirDefensePhaseTab() {
     } else {
         // List zones under attack 
         // Respond to click my moving to Battle Board w/ all ships in that zone
-        makeSuggestion();
     }
     $("#airdefense").html(tabHtml);
 }

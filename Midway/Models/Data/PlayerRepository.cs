@@ -344,8 +344,6 @@ namespace Midway.Models.Data
         //.....................................................................
 		private IEnumerable<DtoPlayerGame> GetPlayerGames(int playerId, int gameId = 0)
 		{
-            var dbDirty = false;
-
 			IQueryable<PlayerGame> qry;
 			if (gameId == 0)
 			{
@@ -370,7 +368,7 @@ namespace Midway.Models.Data
 
 			foreach (var dbPg in dbPgs)
 			{
-                dbDirty = false;
+                var dbDirty = false;
                 var searchRange = (dbPg.Side.ShortName == "IJN" || dbPg.Airbases.Count == 0) ? 12 : 0;  //zero = range is whole map
 
                 var dtoPg = new DtoPlayerGame
@@ -413,7 +411,12 @@ namespace Midway.Models.Data
 
 			        if (dbPg.Game.CompletedDTime == null)
 			        {
-                        if (dbPg.PhaseId == 4)
+						if (dbPg.PhaseId == 2 && IsNight(dbPg.Turn))
+						{
+							AdvanceToSurfaceCombat(dbPg, dtoPg);
+							dbDirty = true;
+						}
+                        else if (dbPg.PhaseId == 4)
                         {
                             // If opponent posted AirOps, we can move off of phase 4
                             if (dbOpp.Turn > dbPg.Turn || (dbOpp.Turn == dbPg.Turn && dbOpp.PhaseId > 3))
@@ -427,26 +430,15 @@ namespace Midway.Models.Data
                                 }
                                 else if (MakingAirAttacks(dbPg))
                                 {
-                                    dbPg.PhaseId = dtoPg.PhaseId = 6; // Air Attack Setup
-                                    dtoPg.PhaseName = GetPhaseName(6);
-                                    dtoPg.Waiting = dbOpp.PhaseId > 5 ? "N" : "Y";
-                                    dbDirty = true;
-                                }
-                                else if (SurfaceCombat(dbPg))
-                                {
-                                    dbPg.PhaseId = dtoPg.PhaseId = 9; // Surface Combat Setup
-                                    dtoPg.PhaseName = GetPhaseName(9);
-                                    dtoPg.Waiting = "N";
-                                    dbDirty = true;
+	                                dbPg.PhaseId = dtoPg.PhaseId = 6; // Air Attack Setup
+	                                dtoPg.PhaseName = GetPhaseName(6);
+	                                dtoPg.Waiting = dbOpp.PhaseId > 5 ? "N" : "Y";
+	                                dbDirty = true;
                                 }
                                 else
                                 {
-                                    dbPg.Turn++;
-                                    dtoPg.Turn = dbPg.Turn;
-                                    dbPg.PhaseId = dtoPg.PhaseId = 1; // Search Board Move
-                                    dtoPg.PhaseName = GetPhaseName(1);
-                                    dtoPg.Waiting = "N";
-                                    dbDirty = true;
+	                                AdvanceToSurfaceCombat(dbPg, dtoPg);
+									dbDirty = true;
                                 }
                             }
                             else
@@ -478,7 +470,40 @@ namespace Midway.Models.Data
 			}
             return dtoPgs;
 		}
-
+		//.....................................................................
+		private bool IsNight(int turn)
+		{
+			switch (turn)
+			{
+				case 8:
+				case 9:
+				case 17:
+				case 18:
+				case 26:
+				case 27:
+					return true;
+				default:
+					return false;
+			}
+		}
+		//.....................................................................
+		private void AdvanceToSurfaceCombat(PlayerGame pg, DtoPlayerGame dtoPg)
+		{
+			if (SurfaceCombat(pg))
+			{
+				pg.PhaseId = dtoPg.PhaseId = 9; // Surface Combat Setup
+				dtoPg.PhaseName = GetPhaseName(9);
+				dtoPg.Waiting = "N";
+			}
+			else
+			{
+				pg.Turn++;
+				dtoPg.Turn = pg.Turn;
+				pg.PhaseId = dtoPg.PhaseId = 1; // Search Board Move
+				dtoPg.PhaseName = GetPhaseName(1);
+				dtoPg.Waiting = "N";
+			}
+		}
         //.....................................................................
         private string CreatePassword()
         {

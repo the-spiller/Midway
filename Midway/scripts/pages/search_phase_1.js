@@ -41,13 +41,14 @@ function loadMovePhase() {
         arrivalsHtml = "<div style=\"margin: 5px;\">No ships arrived this turn.</div>";
     
     for (var i = 0; i < ships.length; i++) {
+        console.log(ships[i].Name + ": " + ships[i].Location);
         if (ships[i].Location == "ARR")
             arrivals.push(ships[i]);
     }
     if (arrivals.length > 0) {
         arrivalsHtml = "<ul>";
         for (i = 0; i < arrivals.length; i++) {
-            arrivalsHtml += getShipListItemHtml(ships[i]);
+            arrivalsHtml += getShipListItemHtml(arrivals[i]);
         }
         arrivalsHtml += "</ul>";
 

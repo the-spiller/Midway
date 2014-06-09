@@ -335,7 +335,6 @@ function getShipListItemHtml(ship, showAvailMove) {
     
     return html + "</div></li>";
 }
-
 /*-------------------------------------------------------------------*/
 /* Build up and return the HTML for enemy ship types found per the   */
 /* input marker.                                                     */
@@ -356,10 +355,8 @@ function getSightedShipsHtml(searchMarker, searchTurn) {
     }
     return html + "</table>";
 }
-
-/*-------------------------------------------------------------------*/
-/* Return the unabbreviated form of the input ship type              */
-/* abbreviation.                                                     */
+/*---------------------------------------------------------------------------*/
+/* Return the unabbreviated form of the input ship type.             */
 /*-------------------------------------------------------------------*/
 function typeName(type) {
     switch (type) {
@@ -374,11 +371,17 @@ function typeName(type) {
     }
     return "Cruiser";
 }
-
 /*---------------------------------------------------------------------------*/
-/* Build and return a list of members of the ships[] array that      */
-/* correspond to the selections on the Arrivals or Zone tabs.        */
-/*-------------------------------------------------------------------*/
+/* Determine if the current turn is nighttime.                               */
+/*---------------------------------------------------------------------------*/
+function isNight() {
+    var hour = gameTimeFromTurn(game.Turn).getHours();
+    return (hour == 19 || hour == 0);
+}
+/*---------------------------------------------------------------------------*/
+/* Build and return a list of members of the ships[] array that correspond   */
+/* to the selections on the Arrivals or Zone tabs.                           */
+/*---------------------------------------------------------------------------*/
 function getSelectedShips(tabId) {
     var selShips = [],
         list = $("#" + tabId).find("div.shipitem.selected"),
@@ -701,10 +704,12 @@ function loadPage(callback) {
             var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + imgDir + "ijnfleet.png\" />" +
                 "<img id=\"sighting\" class=\"searchmarker\" src=\"" + imgDir + "usnsighting.png\" />";
             $("#imagecache").html(html);
-            $("#fleetcursor").css("background", "url(/content/images/search/ijnfleet.png) no-repeat left top");
+            $("#fleetcursor").css("background", "url(" + imgDir + "ijnfleet.png) no-repeat left top");
             $("#dlgairops").css("background-color", "#610000");
         }
-      
+        if (isNight())
+            $("#pagediv").css("background-image", "url(" + imgDir + "bg-searchnight.jpg)");
+        
         ajaxLoadPhase(function () {
             setTabs();
             selectedZone = game.SelectedLocation || "H5G";

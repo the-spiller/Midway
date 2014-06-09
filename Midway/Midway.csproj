@@ -255,6 +255,7 @@
     <Content Include="Content\images\booblite-stop.png" />
     <Content Include="Content\images\helpicon.png" />
     <Content Include="Content\images\pointssample.png" />
+    <Content Include="Content\images\search\bg-searchnight.jpg" />
     <Content Include="Content\images\search\ijnairman.png" />
     <Content Include="Content\images\search\ijnopsd.png" />
     <Content Include="Content\images\search\ijnopsf.png" />

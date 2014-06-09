@@ -36,7 +36,7 @@ namespace Midway.Models.Data
                         Zone = dbOp.Zone,
                         Mission = dbOp.Mission,
                         AircraftTotals = "",
-                        AirOpsSources = new List<DtoAirOpSource>()
+                        AirOpSources = new List<DtoAirOpSource>()
                     };
 
                 foreach (var dbSource in dbOp.AirOpsAircraft)
@@ -45,7 +45,7 @@ namespace Midway.Models.Data
                     totals[1] += dbSource.FSquadrons;
                     totals[2] += dbSource.DSquadrons;
 
-                    op.AirOpsSources.Add(new DtoAirOpSource
+                    op.AirOpSources.Add(new DtoAirOpSource
                         {
                             SourceId = dbSource.SourceId,
                             SourceType = dbSource.SourceType,
@@ -77,7 +77,7 @@ namespace Midway.Models.Data
                     };
                 _context.AirOps.Add(dbOp);
 
-                foreach (var source in op.AirOpsSources)
+                foreach (var source in op.AirOpSources)
                 {
                         _context.AirOpAircraftSets.Add(new AirOpAircraft
                         {

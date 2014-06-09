@@ -123,7 +123,7 @@ function loadAircraftSources() {
         var ship = ships[i];
 
         if (canHasAircraft(ship)) {
-            if (!$.inArray(ship.Location, landingZones)) {
+            if ($.inArray(ship.Location, landingZones) == -1) {
                 landingZones.push(ship.Location);
             }
 
@@ -138,7 +138,8 @@ function loadAircraftSources() {
                     AircraftState: ship.AircraftState,
                     TSquadrons: ship.TSquadrons,
                     FSquadrons: ship.FSquadrons,
-                    DSquadrons: ship.DSquadrons
+                    DSquadrons: ship.DSquadrons,
+                    RangeCode: 0
                 };
 
                 aircraftSources.push(avail);
@@ -227,10 +228,9 @@ function getAirOpsHtml() {
 }
 
 /*-------------------------------------------------------------------*/
-/* Return true if aircraft from startZone can reach the selected     */
-/* zone AND return to a friendly ship or airbase without exceeding   */
-/* 14 zones of travel. Suicide missions are not permitted (at least  */
-/* not on purpose; recovering ship/airbase capacity is ignored here).*/
+/* Return true if aircraft from startZone can reach the currently    */
+/* selected zone return to a friendly ship or airbase. Ship/airbase  */
+/* capacity is ignored here.                                         */
 /*-------------------------------------------------------------------*/
 function inAirOpRange(startZone) {
     var zonesOut = searchGrid.zoneDistance(startZone, selectedZone);
@@ -239,7 +239,7 @@ function inAirOpRange(startZone) {
     } else {
         for (var i = 0; i < landingZones.length; i++) {
             var zonesBack = searchGrid.zoneDistance(selectedZone, landingZones[i]);
-            if (zonesOut + zonesBack <= AIROP_RANGE) return true;    // able to return here
+            if (zonesOut + zonesBack <= AIROP_RANGE) return true;   //able to land somewhere else
         }
         return false;
     }
@@ -283,10 +283,11 @@ function getNewMissionAircraftSources(mission) {
     var sources = [];
     
     for (var i = 0; i < aircraftSources.length; i++) {
-        var ship = aircraftSources[i];
-        if (inAirOpRange(ship.Location, selectedZone)) {
-            var aircraftCount = mission == "CAP" ? ship.FSquadrons : ship.TSquadrons + ship.FSquadrons + ship.DSquadrons;
-            if (aircraftCount > 0) sources.push(ship);
+        var source = aircraftSources[i];
+        
+        if (inAirOpRange(source.Location)) {
+            var aircraftCount = mission == "CAP" ? source.FSquadrons : source.TSquadrons + source.FSquadrons + source.DSquadrons;
+            if (aircraftCount > 0) sources.push(source);
         }
     }
     return sources;
@@ -372,7 +373,7 @@ function getMissionOptions() {
         //Check to see that there are fighters available for the mission.
         var fsquads = 0;
         for (i = 0; i < aircraftSources.length; i++) {
-            if (inAirOpRange(aircraftSources[i].Location, selectedZone)) {
+            if (inAirOpRange(aircraftSources[i].Location)) {
                 fsquads += aircraftSources[i].FSquadrons;
             }
         }
@@ -442,11 +443,13 @@ function getAirOpSourceRowHtml(opSource) {
     var op = editingOpIdx == -1 ? newOp : airOps[editingOpIdx],
         isCap = (op.Mission == "CAP"),
         source = getAircraftSourceById(opSource.SourceId, opSource.SourceType == "BAS"),
-        rowHtml = "<tr><td class=\"shipname\">" + source.Name + "</td><td class=\"updown\"><a href=\"#\" class=\"updownas\">" +
+        qualifier = (searchGrid.zoneDistance(source.Location, selectedZone) > AIROP_RANGE / 2) ?
+            "<br /><span style=\"font-size: .65em;\">(cannot return)</span>" : "",
+        rowHtml = "<tr><td class=\"shipname\">" + source.Name + qualifier +
+            "</td><td class=\"updown\"><a href=\"#\" class=\"updownas\">" +
             "<img src=\"" + imgDir + "updown.png\" id=\"" + source.ElementId + "\" /></a></td>",
         i;
 
-    
     for (i = 0; i < planeTypes.length; i++) {
         if (isCap && planeTypes[i] != "F") continue;
         var availSquads = planeTypes[i] == "T" ? source.TSquadrons : planeTypes[i] == "F" ? source.FSquadrons : source.DSquadrons;
@@ -459,7 +462,7 @@ function getAirOpSourceRowHtml(opSource) {
         rowHtml += "<td colspan=\"5\"></td></tr>";
     else 
         rowHtml += "<td></td></tr>";
-        
+    
     return rowHtml;
 }
 
@@ -648,8 +651,8 @@ function addEditAirOperation() {
     // set up the dialog elements
     $("#airopzone").text(selectedZone);
     if (editingOpIdx > -1) {    //editing an existing op
-        selectZone(searchGrid.zoneToTopLeftCoords(airOps[i].Zone));
-        $("#airopmission").html(getMissionOptionHtml(airOps[i].Mission));
+        selectZone(searchGrid.zoneToTopLeftCoords(airOps[editingOpIdx].Zone));
+        $("#airopmission").html(getMissionOptionHtml(airOps[editingOpIdx].Mission));
     } else {    //new op
         if (!getMissionOptions()) return;
         if (!getNewOp()) return;

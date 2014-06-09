@@ -10,6 +10,6 @@ namespace Midway.Models.DTOs
         public string Mission { get; set; }
         public string AircraftTotals { get; set; }
 
-        public IList<DtoAirOpSource> AirOpsSources { get; set; }
+        public IList<DtoAirOpSource> AirOpSources { get; set; }
     }
 }

@@ -176,6 +176,7 @@
         /* Calculate and return the distance in zones between two zones.     */
         /*-------------------------------------------------------------------*/
         zoneDistance: function (zone1, zone2) {
+            if (zone1 == zone2) return 0;
             var zone1Coords = privZoneToTopLeftCoords(zone1),
                 zone2Coords = privZoneToTopLeftCoords(zone2),
                 zone1Adj = {
