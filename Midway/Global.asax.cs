@@ -5,7 +5,7 @@ using System.Web.Routing;
 using System.Web.Helpers;
 using System.Configuration;
 using Midway.App_Start;
-using Midway.Models.Services;
+using Midway.Model.Services;
 
 namespace Midway
 {

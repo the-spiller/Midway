@@ -706,6 +706,7 @@ function loadPage(callback) {
             $("#imagecache").html(html);
             $("#fleetcursor").css("background", "url(" + imgDir + "ijnfleet.png) no-repeat left top");
             $("#dlgairops").css("background-color", "#610000");
+            $("#opsimage").attr("src", imgDir + "ijnopspic.jpg");
         }
         if (isNight())
             $("#pagediv").css("background-image", "url(" + imgDir + "bg-searchnight.jpg)");

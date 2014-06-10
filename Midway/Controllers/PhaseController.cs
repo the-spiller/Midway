@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Web.Http;
 using Midway.Helpers;
 using Newtonsoft.Json;
-using Midway.Models.DTOs;
-using Midway.Models.Data;
+using Midway.Model.DTOs;
+using Midway.Model.Data;
 
 namespace Midway.Controllers
 {

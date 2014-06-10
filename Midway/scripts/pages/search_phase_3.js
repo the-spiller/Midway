@@ -112,7 +112,7 @@ function loadAirOpsPhase() {
 
 /*---------------------------------------------------------------------------*/
 /* Once and done at the load of this page: load array of zones containing an */
-/* aircraft carrier or an airbase, copying data for aircraft availability    */
+/* aircraft carrier or an airbase and copy data for aircraft availability    */
 /* array aircraftSources[] from the ships array.                             */
 /*---------------------------------------------------------------------------*/
 function loadAircraftSources() {

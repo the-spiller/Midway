@@ -73,14 +73,12 @@
                 opacity: 1.0;
                 top: 150px;
                 left: 200px;
-                width: 600px;
                 box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
             }
                 #dlgairops .floathead {
                     background: linear-gradient(to right, #808080,  #808080,  #808080, #000);
                 }
             #dlgairops table {
-                width: 100%;
                 margin: 10px;
             }
                 #dlgairops select {
@@ -309,11 +307,14 @@
             <div id="dlgairops" class="floatingdiv noselect">
                 <div class="floathead"></div>
                 <div id="airopclose">&times;</div>
-                <table>
-                    <tr><td class="right" style="width: 25%;">Target zone:</td><td id="airopzone"></td></tr>
-                    <tr><td class="right">Mission:</td><td><select id="airopmission"></select></td></tr>
-                </table>
-                <table id="airopplanes"></table>
+                <div style="float: left;">
+                    <table>
+                        <tr><td class="right" style="width: 25%;">Target zone:</td><td id="airopzone"></td></tr>
+                        <tr><td class="right">Mission:</td><td><select id="airopmission"></select></td></tr>
+                    </table>
+                    <table id="airopplanes"></table>
+                </div>
+                <img id="opsimage" style="float: left;" src="/content/images/search/usnopspic.jpg" />
                 <div id="airopbuttons">
                     <a id="airopOK" class="flatbutton graybtn">OK</a>
                     <a id="airopCancel" class="flatbutton graybtn">Cancel</a>

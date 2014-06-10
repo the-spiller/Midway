@@ -2,10 +2,10 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Midway.Models.DTOs;
+using Midway.Model.DTOs;
 using Newtonsoft.Json;
 using Midway.Helpers;
-using Midway.Models.Data;
+using Midway.Model.Data;
 
 namespace Midway.Controllers
 {
