@@ -413,7 +413,7 @@ function getAirOpMissionRowHtml() {
         tsquads = 0,
         fsquads = 0,
         dsquads = 0,
-        rowHtml = "<tr><td colspan=\"2\" class=\"right\" style=\"width: 25%; font-weight: bold;\">Mission aircraft:</td>",
+        rowHtml = "<tr><td colspan=\"2\" class=\"right\" style=\"font-weight: bold;\">Mission aircraft:</td>",
         i;
     
     //get totals for each aircraft type on the mmission
@@ -430,9 +430,9 @@ function getAirOpMissionRowHtml() {
             "ops" + planeTypes[i] + ".png\" /><div id=\"mission" + planeTypes[i] + "\" class=\"srcnumplanes\">" + squads + "</div></td>";
     }
     if (isCap)
-        return rowHtml + "<td colspan=\"5\"></td></tr>";
+        return rowHtml + "<td colspan=\"4\"></td></tr>";
     else
-        return rowHtml + "<td></td></tr>";
+        return rowHtml + "</tr>";
 }
 
 /*---------------------------------------------------------------------------*/
@@ -459,9 +459,9 @@ function getAirOpSourceRowHtml(opSource) {
                 "<img src=\"" + imgDir + "updown.png\" id=\"" + source.ElementId + "-" + planeTypes[i] + "\" /></a></td>";
     }
     if (isCap)
-        rowHtml += "<td colspan=\"5\"></td></tr>";
+        rowHtml += "<td colspan=\"4\"></td></tr>";
     else 
-        rowHtml += "<td></td></tr>";
+        rowHtml += "</tr>";
     
     return rowHtml;
 }
@@ -472,7 +472,7 @@ function getAirOpSourceRowHtml(opSource) {
 function showAirOpSources() {
     var op = editingOpIdx == -1 ? newOp : airOps[editingOpIdx],
         dlgHtml = getAirOpMissionRowHtml() +
-            "<tr><td colspan=\"2\" class=\"right\" style=\"font-weight: bold\">Available aircraft</td><td colspan=\"4\"></td></tr>";
+            "<tr><td colspan=\"2\" class=\"right\" style=\"font-weight: bold\">Available aircraft:</td><td colspan=\"6\"></td></tr>";
     
     for (var i = 0; i < op.AirOpSources.length; i++) {
         dlgHtml += getAirOpSourceRowHtml(op.AirOpSources[i]);

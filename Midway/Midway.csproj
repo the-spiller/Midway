@@ -237,8 +237,6 @@
     <Compile Include="Model\PlayerGameSearchMarker.cs" />
     <Compile Include="Model\PlayerGameShip.cs" />
     <Compile Include="Model\Services\Mailer.cs" />
-    <Compile Include="Hubs\ChatHub.cs" />
-    <Compile Include="Model\Services\NotificationMessage.cs" />
     <Compile Include="Model\Ship.cs" />
     <Compile Include="Model\Side.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -279,6 +277,7 @@
     <Content Include="Content\images\search\usnairman.png" />
     <Content Include="Content\images\search\usnopsd.png" />
     <Content Include="Content\images\search\usnopsf.png" />
+    <Content Include="Content\images\search\usnopspic.jpg" />
     <Content Include="Content\images\search\usnopst.png" />
     <Content Include="Content\images\speaker.png" />
     <Content Include="Notes.txt" />

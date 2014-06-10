@@ -10,7 +10,7 @@ namespace Midway.Model.Data.Mappings
 
 			HasKey(a => a.AirOpId);
 
-            Property(a => a.AirOpId).IsRequired();
+            Property(a => a.AirOpId).IsRequired().HasDatabaseGeneratedOption();
 			Property(a => a.GameId).IsRequired();
 			Property(a => a.PlayerId).IsRequired();
 		    Property(a => a.Turn).IsRequired();

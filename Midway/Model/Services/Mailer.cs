@@ -5,7 +5,7 @@ using System.Web.Helpers;
 
 namespace Midway.Model.Services
 {
-    public class Message
+    public class EmailMessage
     {
         public IList<string> RecipientAddresses { get; set; }
         public string Subject { get; set; }
@@ -17,7 +17,7 @@ namespace Midway.Model.Services
         private const string BRBR = "<br /><br />";
         private const string SIG = "<span style=\"font-style: bold;\">Midway Site Administrators</span>";
 
-        public void Send(Message message)
+        public void Send(EmailMessage message)
         {
             if (ConfigurationManager.AppSettings["actuallySendEmail"] != "true") return;
 
@@ -43,7 +43,7 @@ namespace Midway.Model.Services
             msgBody.AppendFormat("&ldquo;Your Registration&rdquo; tab.{0}", BRBR);
             msgBody.Append(SIG + "</div>");
 
-            var msg = new Message
+            var msg = new EmailMessage
                 {
                     RecipientAddresses = recips,
                     Subject = "Midway Administrator's Message",
@@ -65,7 +65,7 @@ namespace Midway.Model.Services
 	        msgBody.AppendFormat("Thanks, and we hope you enjoy the game.{0}", BRBR);
 	        msgBody.Append(SIG + "</div>");
 
-	        var msg = new Message
+	        var msg = new EmailMessage
 			    {
 				    RecipientAddresses = recips,
 				    Subject = "Midway Administrator's Message",

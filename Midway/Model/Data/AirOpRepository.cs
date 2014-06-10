@@ -79,15 +79,19 @@ namespace Midway.Model.Data
 
                 foreach (var source in op.AirOpSources)
                 {
-                        _context.AirOpAircraftSets.Add(new AirOpAircraft
-                        {
-                            AirOpId = dbOp.AirOpId,
-                            SourceId = source.SourceId,
-                            SourceType = source.SourceType,
-                            TSquadrons=source.TSquadrons,
-                            FSquadrons = source.FSquadrons,
-                            DSquadrons = source.DSquadrons
-                        });
+	                var tot = source.TSquadrons + source.FSquadrons + source.DSquadrons;
+	                if (tot > 0)
+	                {
+		                _context.AirOpAircraftSets.Add(new AirOpAircraft
+			                {
+				                AirOpId = dbOp.AirOpId,
+				                SourceId = source.SourceId,
+				                SourceType = source.SourceType,
+				                TSquadrons = source.TSquadrons,
+				                FSquadrons = source.FSquadrons,
+				                DSquadrons = source.DSquadrons
+			                });
+	                }
                 }
             }
             _context.Save();
