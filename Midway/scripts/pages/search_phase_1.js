@@ -52,15 +52,10 @@ function loadMovePhase() {
         }
         arrivalsHtml += "</ul>";
 
-        $("#arrivalstab").css("text-decoration", "none");
         $("#arrivals").html(arrivalsHtml).addClass("tabshown");
         $("#arrivalstab").css("color", "#fff").addClass("tabshown");
     } else {
-<<<<<<< HEAD
         $("#arrivalstab").css("color", "#808080");
-=======
-        $("#arrivalstab").css("text-decoration", "line-through");
->>>>>>> 8256616448817ef4bc9236bf2cd62502175d9302
         $("#arrivals").html(arrivalsHtml);
         selectZoneTab();
     }

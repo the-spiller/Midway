@@ -255,18 +255,11 @@ function showShipsDue() {
             html += getShipListItemHtml(ships[i], false);
         }
     }
-    if (arrivalTurn == 0) { // no ships due
-<<<<<<< HEAD
+    if (arrivalTurn == 0) {  // no ships due
         $("#duetab").css("color", "#808080");
         html = "<div style=\"margin: 5px;\">No future arrivals</div>";
     } else {
         $("#duetab").css("color", "#fff");
-=======
-        $("#duetab").css("text-decoration", "line-through");
-        html = "<div style=\"margin: 5px;\">No future arrivals</div>";
-    } else {
-        $("#duetab").css("text-decoration", "none");
->>>>>>> 8256616448817ef4bc9236bf2cd62502175d9302
         html += "</ul>";
     }
     $("#due").html(html);
@@ -287,20 +280,12 @@ function showOffMapShips() {
         }
     }
     if (!gotOne) { // no ships off map
-<<<<<<< HEAD
         $("#offtab").css("color", "#808080");
         html = "<div style=\"margin: 5px;\">No ships off map</div>";
     } else {
         $("#offtab").css("color", "#fff");
-=======
-        $("#offtab").css("text-decoration", "line-through");
-        html = "<div style=\"margin: 5px;\">No ships off map</div>";
-    } else {
-        $("#offtab").css("text-decoration", "none");
->>>>>>> 8256616448817ef4bc9236bf2cd62502175d9302
         html += "</ul>";
     }
-
     $("#off").html(html);
 }
 
