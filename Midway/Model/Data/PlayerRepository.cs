@@ -311,7 +311,7 @@ namespace Midway.Model.Data
                 Admin = p.Admin,
                 Lockout = p.Lockout
             }).FirstOrDefault(p => p.PlayerId == playerId);
-
+			
             if (dtoPlayer == null) return null;
 
             dtoPlayer.AuthKey = GetPlayerKey(dtoPlayer.PlayerId);
@@ -416,7 +416,7 @@ namespace Midway.Model.Data
 							AdvanceToSurfaceCombat(dbPg, dtoPg);
 							dbDirty = true;
 						}
-                        else if (dbPg.PhaseId == 4)
+                        else if (dbPg.PhaseId == 4)		//Possible Air Defense
                         {
                             // If opponent posted AirOps, we can move off of phase 4
                             if (dbOpp.Turn > dbPg.Turn || (dbOpp.Turn == dbPg.Turn && dbOpp.PhaseId > 3))
@@ -447,6 +447,10 @@ namespace Midway.Model.Data
                                 dtoPg.Waiting = "Y";
                             }
                         }
+						else if (dbPg.PhaseId == 5) //Air Defense
+						{
+							dtoPg.Waiting = "N";
+						}
                         else if (dbPg.PhaseId > 1 && 
                             (dbPg.Turn > dbOpp.Turn || (dbPg.Turn == dbOpp.Turn && dbPg.PhaseId > dbOpp.PhaseId)))
                         {
