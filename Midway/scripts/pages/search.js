@@ -255,11 +255,13 @@ function showShipsDue() {
             html += getShipListItemHtml(ships[i], false);
         }
     }
-    if (arrivalTurn == 0) // no ships due
+    if (arrivalTurn == 0) { // no ships due
+        $("#duetab").css("color", "#808080");
         html = "<div style=\"margin: 5px;\">No future arrivals</div>";
-    else
+    } else {
+        $("#duetab").css("color", "#fff");
         html += "</ul>";
-
+    }
     $("#due").html(html);
 }
 
@@ -277,10 +279,13 @@ function showOffMapShips() {
             gotOne = true;
         }
     }
-    if (!gotOne)    // no ships off map
+    if (!gotOne) { // no ships off map
+        $("#offtab").css("color", "#808080");
         html = "<div style=\"margin: 5px;\">No ships off map</div>";
-    else
+    } else {
+        $("#offtab").css("color", "#fff");
         html += "</ul>";
+    }
 
     $("#off").html(html);
 }
@@ -343,9 +348,9 @@ function getSightedShipsHtml(searchMarker, searchTurn) {
     var otherside = side == "USN" ? "ijn" : "usn",
         align = side == "USN" ? "left" : "right",
         turns = game.Turn - searchTurn,
-        found = turns == 0 ? "this turn" : turns == 1 ? "one turn ago" : turns + " turns ago",
-        html = "<table class=\"noselect\"><tr><td colspan=\"3\">Ship types sighted (" + found +
-            ")</td></tr>",
+        found = turns == 0 ? "this turn" : turns == 1 ? "last turn" : turns + " turns ago",
+        html = "<table class=\"noselect\"><tr><td colspan=\"3\">Ship types sighted " + found +
+            "</td></tr>",
         types = searchMarker.TypesFound.split(",");
 
     for (var i = 0; i < types.length; i++) {
@@ -660,21 +665,12 @@ function shipsLoaded() {
                 searchGrid.drawSelector(coords, 1);
             }
             showShipsInZone(selectedZone);
-            
-            switch (game.PhaseId) {
-                case 1:
-                    loadMovePhase();
-                    break;
-                case 2:
-                    loadSearchPhase();
-                    break;
-                case 3:
-                    loadAirOpsPhase();
-                    break;
-                case 5:
-                    loadAirDefensePhaseTab();
-                    break;
-            }
+
+            if (game.PhaseId == 1) loadMovePhase();
+            else if (game.PhaseId == 2) loadSearchPhase();
+            else if (game.PhaseId == 3) loadAirOpsPhase();
+            else if (game.PhaseId == 5) loadAirDefensePhase();
+
             showShipsDue();
             showOffMapShips();
         });

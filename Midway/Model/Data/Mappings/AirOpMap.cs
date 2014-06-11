@@ -1,4 +1,5 @@
-﻿using System.Data.Entity.ModelConfiguration;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.ModelConfiguration;
 
 namespace Midway.Model.Data.Mappings
 {
@@ -10,14 +11,14 @@ namespace Midway.Model.Data.Mappings
 
 			HasKey(a => a.AirOpId);
 
-            Property(a => a.AirOpId).IsRequired().HasDatabaseGeneratedOption();
+		    Property(a => a.AirOpId).IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
 			Property(a => a.GameId).IsRequired();
 			Property(a => a.PlayerId).IsRequired();
 		    Property(a => a.Turn).IsRequired();
 			Property(a => a.Zone).IsRequired();
             Property(a => a.Mission).IsRequired();
 
-            HasMany(a => a.AirOpsAircraft).WithRequired(o => o.AirOp).HasForeignKey(o => o.AirOpId);
+            HasMany(a => a.AirOpAircraftSet).WithRequired(o => o.AirOp).HasForeignKey(o => o.AirOpId);
 		}
     }
 }

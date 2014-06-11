@@ -47,17 +47,17 @@ function loadMovePhase() {
     }
     if (arrivals.length > 0) {
         arrivalsHtml = "<ul>";
-        for (i = 0; i < arrivals.length; i++) {
+        for (i = 0; i < arrivals.length; i++) { 
             arrivalsHtml += getShipListItemHtml(arrivals[i]);
         }
         arrivalsHtml += "</ul>";
 
         $("#arrivals").html(arrivalsHtml).addClass("tabshown");
-        $("#arrivalstab").addClass("tabshown");
+        $("#arrivalstab").css("color", "#fff").addClass("tabshown");
     } else {
+        $("#arrivalstab").css("color", "#808080");
         $("#arrivals").html(arrivalsHtml);
-        $("#zone").html(arrivalsHtml).addClass("tabshown");
-        $("#zone").addClass("tabshown");
+        selectZoneTab();
     }
 }
 

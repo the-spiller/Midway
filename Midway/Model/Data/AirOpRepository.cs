@@ -20,7 +20,7 @@ namespace Midway.Model.Data
         public IList<DtoAirOp> GetAirOps(int playerId, int gameId)
         {
             var dbOps = _context.AirOps
-                              .Include(a => a.AirOpsAircraft)
+                              .Include(a => a.AirOpAircraftSet)
                               .Where(a => a.PlayerId == playerId && a.GameId == gameId)
                               .ToList();
 
@@ -39,7 +39,7 @@ namespace Midway.Model.Data
                         AirOpSources = new List<DtoAirOpSource>()
                     };
 
-                foreach (var dbSource in dbOp.AirOpsAircraft)
+                foreach (var dbSource in dbOp.AirOpAircraftSet)
                 {
                     totals[0] += dbSource.TSquadrons;
                     totals[1] += dbSource.FSquadrons;
@@ -73,18 +73,16 @@ namespace Midway.Model.Data
                         Turn = op.Turn,
                         Zone = op.Zone,
                         Mission = op.Mission,
-                        AirOpsAircraft = new List<AirOpAircraft>()
+                        AirOpAircraftSet = new List<AirOpAircraft>()
                     };
-                _context.AirOps.Add(dbOp);
 
                 foreach (var source in op.AirOpSources)
                 {
 	                var tot = source.TSquadrons + source.FSquadrons + source.DSquadrons;
 	                if (tot > 0)
 	                {
-		                _context.AirOpAircraftSets.Add(new AirOpAircraft
+		                dbOp.AirOpAircraftSet.Add(new AirOpAircraft
 			                {
-				                AirOpId = dbOp.AirOpId,
 				                SourceId = source.SourceId,
 				                SourceType = source.SourceType,
 				                TSquadrons = source.TSquadrons,
@@ -93,6 +91,7 @@ namespace Midway.Model.Data
 			                });
 	                }
                 }
+                _context.AirOps.Add(dbOp);
             }
             _context.Save();
         }
