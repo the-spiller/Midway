@@ -91,7 +91,10 @@
                 cursor: pointer;
             }
             #airopbuttons {
-                margin: 15px 0 15px 10px;
+                position: absolute;
+                margin-top: 15px;
+                left: 10px;
+                bottom: 15px;
             }
             .updown {
                 width: 30px;
@@ -297,12 +300,12 @@
                         <tr><td class="right">Mission:</td><td><select id="airopmission"></select></td></tr>
                     </table>
                     <table id="airopplanes"></table>
-                    <div id="airopbuttons">
-                        <a id="airopOK" class="flatbutton graybtn">OK</a>
-                        <a id="airopCancel" class="flatbutton graybtn">Cancel</a>
-                    </div>
                 </div>
                 <img id="opsimage" src="/content/images/search/usnopspic.jpg" />
+                <div id="airopbuttons">
+                    <a id="airopOK" class="flatbutton graybtn">OK</a>
+                    <a id="airopCancel" class="flatbutton graybtn">Cancel</a>
+                </div>
             </div>
         </div>
         <script src="/scripts/vendor/jquery-1.9.1.js"></script>

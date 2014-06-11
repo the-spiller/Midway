@@ -100,7 +100,7 @@ function scrollClouds() {
             reset();
 
             if (game.PhaseId == 2) {
-                if (fadeAlpha < 1) fadeAlpha += fadeDelta;
+                if (fadeAlpha < .85) fadeAlpha += fadeDelta;
                 searchGrid.drawSearchClouds(fadeAlpha, cloudsTopLeft);
                 lastTime = new Date().getTime();
             } else if (game.PhaseId > 2) {

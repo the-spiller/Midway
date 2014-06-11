@@ -12,6 +12,6 @@ namespace Midway.Model
         public string Mission { get; set; }
 
         public virtual PlayerGame PlayerGame { get; set; }
-        public virtual IList<AirOpAircraft> AirOpsAircraft { get; set; }
+        public virtual IList<AirOpAircraft> AirOpAircraftSet { get; set; }
     }
 }

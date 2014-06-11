@@ -52,12 +52,13 @@ function loadMovePhase() {
         }
         arrivalsHtml += "</ul>";
 
+        $("#arrivalstab").css("text-decoration", "none");
         $("#arrivals").html(arrivalsHtml).addClass("tabshown");
         $("#arrivalstab").addClass("tabshown");
     } else {
+        $("#arrivalstab").css("text-decoration", "line-through");
         $("#arrivals").html(arrivalsHtml);
-        $("#zone").html(arrivalsHtml).addClass("tabshown");
-        $("#zone").addClass("tabshown");
+        selectZoneTab();
     }
 }
 
