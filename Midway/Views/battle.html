@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Midway Battle</title>
+        <link rel="stylesheet" href="/content/midway.css" />
+        <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
+        <style>
+            #pagediv {
+                background-image: url(/content/images/battle/bg-battle.jpg);
+                background-repeat: no-repeat;
+            }
+            #battlediv {
+                display: none;
+                top: 60px;
+                width: 400px;
+                height: 766px;
+                opacity: 1.0;
+            }
+            #battlediv .tabpanel {
+                height: 697px;
+                background: none;
+                background-color: #093a67;
+            }
+            #battlediv .floathead {
+                cursor: default;
+            }
+            #canvii {
+                visibility: hidden;
+            }
+            #mapcanvas {
+                position: absolute;
+                top: 85px;
+                z-index: 1;
+            }
+            #iconscanvas {
+                position: absolute;
+                top: 85px;
+                z-index: 10;
+            }
+            #phasedescrip {
+                position: absolute;
+                top: 58px;
+                width: 954px;
+                padding: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="pagediv" class="noselect">
+            <div id="gamedesc" class="pagecaption"></div>
+            <div id="linksdiv">
+                <a id="done" href="#" title="End phase and post"><img src="/content/images/done.png" /></a>
+                <a id="audiolink" title="Volume"><img src="/content/images/speaker.png" /></a>
+                <div id="volsliderdiv">
+                    <div id="volinput"></div>
+                    <p id="volvalue">50</p>
+                </div>
+                <a id="return" href="#" title="Return to search map"><img src="/content/images/return.png" /></a>
+            </div>
+            <div id="phasedescrip"></div>
+            <div id="canvii">
+                <canvas id="mapcanvas">
+                    Canvas not supported!? Are you kidding? Get thee a new browser, for God's sake!
+                </canvas>
+                <canvas id="iconscanvas"></canvas>
+            </div>
+
+            <div id="battlediv" class="floatingdiv">
+                <div class="floathead"></div>
+                <div id="battletabs" class="tablist">
+                    <ul id="tabs"></ul>
+                </div>
+                <div id="tabpanels"></div>
+            </div>
+        </div>
+
+        <div id="dlgoverlay">
+            <div id="dlgcontent" style="z-index: 2;">
+                <div id="dlghead"></div>
+                <div id="dlgbody"></div>
+                <div id="dlgbuttons"></div>
+            </div>
+        </div>
+        <script src="/scripts/vendor/jquery-1.9.1.js"></script>
+        <script src="/scripts/vendor/jquery-ui-1.10.3.js"></script>
+        <script src="/scripts/vendor/howler.min.js"></script>
+        <script src="/scripts/utils.js"></script>
+        <script src="/scripts/midway.js"></script>
+        <script src="/scripts/battle.js"></script>
+    </body>
+</html>

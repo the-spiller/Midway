@@ -288,6 +288,7 @@
     <Content Include="Content\images\search\usnopst.png" />
     <Content Include="Content\images\speaker.png" />
     <Content Include="Notes.txt" />
+    <Content Include="Scripts\pages\battle.js" />
     <Content Include="Scripts\vendor\jquery.signalR-2.0.3.js" />
     <Content Include="Scripts\vendor\jquery.signalR-2.0.3.min.js" />
     <Content Include="Scripts\pages\search_phase_1.js" />
@@ -420,6 +421,7 @@
     <Content Include="Content\fonts\teletype1945-1985-webfont.eot" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.ttf" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.woff" />
+    <Content Include="Views\battle.html" />
     <Content Include="Views\home.html" />
     <Content Include="index.html" />
     <Content Include="Views\register.html" />

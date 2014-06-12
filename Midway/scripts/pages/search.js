@@ -618,7 +618,6 @@ function loadAudio() {
     });
     audioLoaded = true;
 }
-
 /*-------------------------------------------------------------------*/
 /* Callback for ajaxLoadPhase call. Set up tabs based on phase       */
 /* actions.                                                          */
@@ -679,7 +678,6 @@ function shipsLoaded() {
         });
     });
 }
-
 /*****************************************************************************/
 /* Base page load function called at $(document).ready.                      */
 /*****************************************************************************/
