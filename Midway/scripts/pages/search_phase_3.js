@@ -69,8 +69,8 @@ function loadAirOpsPhase() {
     if (game.Waiting == "Y") {
         tabHtml += "Waiting for opponent</div>";
     } else {
-        var airPath = side == "USN" ? imgDir + "ijn-air-search.png" : imgDir + "usn-air-search.png",
-            seaPath = side == "USN" ? imgDir + "ijn-sea-search.png" : imgDir + "usn-sea-search.png";
+        var airPath = side == "USN" ? searchDir + "ijn-air-search.png" : searchDir + "usn-air-search.png",
+            seaPath = side == "USN" ? searchDir + "ijn-sea-search.png" : searchDir + "usn-sea-search.png";
         
         tabHtml = "<div class=\"listheader\">Your opponent's searches</div>";
         if (oppSearches.length == 0) {
@@ -218,11 +218,11 @@ function getAirOpsHtml() {
             delId = "airopdelete-" + i;
         opsHtml += "<tr><td>" + zone + "</td><td>" + airOps[i].Mission + "</td><td>" + airOps[i].AircraftTotals + "</td>" +
             "<td class=\"right\">" +
-            "<img id=\"" + editId + "\" class=\"airopbutton\" title=\"Edit this mission\" src=\"" + imgDir + "editicon.png\" />" +
-            "<img id=\"" + delId + "\" class=\"airopbutton\" title=\"Delete this mission\" src=\"" + imgDir + "delicon.png\" />" +
+            "<img id=\"" + editId + "\" class=\"airopbutton\" title=\"Edit this mission\" src=\"" + searchDir + "editicon.png\" />" +
+            "<img id=\"" + delId + "\" class=\"airopbutton\" title=\"Delete this mission\" src=\"" + searchDir + "delicon.png\" />" +
             "</td></tr>";
     }
-    opsHtml += "<tr><td><img id=\"airopadd\" class=\"airopbutton\" title=\"" + addTitle + "\" src=\"" + imgDir + "addicon.png\" />" +
+    opsHtml += "<tr><td><img id=\"airopadd\" class=\"airopbutton\" title=\"" + addTitle + "\" src=\"" + searchDir + "addicon.png\" />" +
             "</td></tr></table>";
     return opsHtml;
 }
@@ -425,9 +425,11 @@ function getAirOpMissionRowHtml() {
 
     for (i = 0; i < planeTypes.length; i++) {
         if (isCap && planeTypes[i] != "F") continue;
-        var squads = planeTypes[i] == "T" ? tsquads : planeTypes[i] == "F" ? fsquads : dsquads;
-        rowHtml += "<td colspan=\"2\" class=\"missionplanes\"><img src=\"" + imgDir + side +
-            "ops" + planeTypes[i] + ".png\" /><div id=\"mission" + planeTypes[i] + "\" class=\"srcnumplanes\">" + squads + "</div></td>";
+        var squads = planeTypes[i] == "T" ? tsquads : planeTypes[i] == "F" ? fsquads : dsquads,
+            imgPath = searchDir + side + "ops" + planeTypes[i] + ".png";
+        
+        rowHtml += "<td colspan=\"2\" class=\"missionplanes\"><img src=\"" + imgPath + "\" />" +
+            "<div id=\"mission" + planeTypes[i] + "\" class=\"srcnumplanes\">" + squads + "</div></td>";
     }
     if (isCap)
         return rowHtml + "<td colspan=\"4\"></td></tr>";
@@ -447,16 +449,17 @@ function getAirOpSourceRowHtml(opSource) {
             "<br /><span style=\"font-size: .65em;\">(cannot return)</span>" : "",
         rowHtml = "<tr><td class=\"shipname\">" + source.Name + qualifier +
             "</td><td class=\"updown\"><a href=\"#\" class=\"updownas\">" +
-            "<img src=\"" + imgDir + "updown.png\" id=\"" + source.ElementId + "\" /></a></td>",
+            "<img src=\"" + searchDir + "updown.png\" id=\"" + source.ElementId + "\" /></a></td>",
         i;
 
     for (i = 0; i < planeTypes.length; i++) {
         if (isCap && planeTypes[i] != "F") continue;
-        var availSquads = planeTypes[i] == "T" ? source.TSquadrons : planeTypes[i] == "F" ? source.FSquadrons : source.DSquadrons;
-        rowHtml += "<td class=\"missionplanes\"><img src=\"" + imgDir + side + "ops" + planeTypes[i] + ".png\" />" +
+        var availSquads = planeTypes[i] == "T" ? source.TSquadrons : planeTypes[i] == "F" ? source.FSquadrons : source.DSquadrons,
+            imgPath = searchDir + side + "ops" + planeTypes[i] + ".png";
+        rowHtml += "<td class=\"missionplanes\"><img src=\"" + imgPath + "\" />" +
                 "<div id=\"" + source.ElementId + "-" + planeTypes[i] + "-num\" class=\"srcnumplanes\">" + availSquads + "</div></td>" +
                 "<td class=\"updown\"><a href=\"#\" class=\"updowna\">" +
-                "<img src=\"" + imgDir + "updown.png\" id=\"" + source.ElementId + "-" + planeTypes[i] + "\" /></a></td>";
+                "<img src=\"" + searchDir + "updown.png\" id=\"" + source.ElementId + "-" + planeTypes[i] + "\" /></a></td>";
     }
     if (isCap)
         rowHtml += "<td colspan=\"4\"></td></tr>";

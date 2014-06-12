@@ -24,8 +24,7 @@ namespace Midway.Model.Data.Mappings
 			Property(s => s.TSquadrons);
 			Property(s => s.FSquadrons);
 			Property(s => s.DSquadrons);
-			Property(s => s.SearchImgPath).HasMaxLength(256);
-			Property(s => s.BattleImgPath).HasMaxLength(256);			
+			Property(s => s.ImagePath).HasMaxLength(256);
 
 			HasMany(s => s.PlayerGameShips).WithRequired(p => p.Ship).HasForeignKey(p => p.ShipId);
 		}

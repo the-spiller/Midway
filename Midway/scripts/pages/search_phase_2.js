@@ -44,12 +44,12 @@ function loadSearchPhase() {
 
         for (var i = 0; i < searches.length; i++) {
             var searchDesc,
-                searchImg = imgDir + side.toLowerCase() + "-air-search.png";
+                searchImg = searchDir + side.toLowerCase() + "-air-search.png";
             
             if (searches[i].Turn == game.Turn && !searches[i].Area) {
                 if (searches[i].SearchType == "sea") {
                     searchDesc = "Select to search an area containing at least one of your ships";
-                    searchImg = imgDir + side.toLowerCase() + "-sea-search.png";
+                    searchImg = searchDir + side.toLowerCase() + "-sea-search.png";
                 } else if (game.SearchRange == 0) { //Unlimited
                     searchDesc = "Select to search any area";
                 } else {

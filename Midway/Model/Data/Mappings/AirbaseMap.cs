@@ -19,8 +19,7 @@ namespace Midway.Model.Data.Mappings
 			this.Property(i => i.FSquadrons);
 			this.Property(i => i.DSquadrons);
 			this.Property(i => i.Location).IsRequired();
-            this.Property(i => i.SearchImgPath).HasMaxLength(256);
-            this.Property(i => i.BattleImgPath).HasMaxLength(256);
+            this.Property(i => i.ImagePath).HasMaxLength(256);
 
 			this.HasMany(i => i.PlayerGameAirbases).WithRequired(p => p.Airbase).HasForeignKey(p => p.AirbaseId);
 		}

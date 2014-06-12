@@ -14,8 +14,7 @@ namespace Midway.Model
 		public int TSquadrons { get; set; }
 		public int FSquadrons { get; set; }
 		public int DSquadrons { get; set; }
-        public string SearchImgPath { get; set; }
-        public string BattleImgPath { get; set; }
+        public string ImagePath { get; set; }
 
 		public virtual Side Side { get; set; }
 		public virtual IList<PlayerGameAirbase> PlayerGameAirbases { get; set; }

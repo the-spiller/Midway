@@ -2,9 +2,10 @@
     mapLeft = 5,
     mapTop = 85,
     divLeft = 974,
-    imgDir = "/content/images/search/",
+    searchDir = "/content/images/search/",
+    shipsDir = "/content/images/ships/",
     flagImg = "/content/images/usn-med.png",
-    searchCursorImg = imgDir + "usn-airsearchcursor.png",
+    searchCursorImg = searchDir + "usn-airsearchcursor.png",
     captionColor = "usnblue",
     game = {},
     editsMade = false,
@@ -197,12 +198,24 @@ function showShipsInZone() {
     if (!selectedZone) return;
     var zone = selectedZone == "H5G" ? "Midway" : selectedZone,
         shipsHtml = "<div style=\"margin: 5px; font-weight: bold;\">" + zone + "</div>",
-        dblclick = "<div style=\"margin: 5px;\">Double-click to select all</div>",
+        dblclick = "<div style=\"margin: 5px; font-size: .85em;\">Double-click to select all</div>",
         gotOwnShips = false,
         i;
     
     if (shipZones.length == 0) loadShipZones();
 
+    // airbases
+    var gotOne = false;
+    for (i = 0; i < ships.length; i++) {
+        if (ships[i].Location == selectedZone && ships[i].ShipType == "BAS") {
+            shipsHtml += getShipListItemHtml(ships[i], false);
+            gotOne = true;
+        }
+    }
+    if (zone == "Midway" && !gotOne) {
+        shipsHtml += "<li><div id=\"midway\" class=\"shipitem\"><img src=\"/content/images/midway.png\" draggable=\"false\"/></div></li>";
+    }
+    
     // sightings
     for (i = 0; i < searches.length; i++) {
         if (searches[i].Area == selectedZone.substr(0, 2) && searches[i].Markers.length) {
@@ -211,12 +224,6 @@ function showShipsInZone() {
                     shipsHtml += getSightedShipsHtml(searches[i].Markers[j], searches[i].Turn);
                 }
             }
-        }
-    }
-    // airbases
-    for (i = 0; i < ships.length; i++) {
-        if (ships[i].Location == selectedZone && ships[i].ShipType == "BAS") {
-            shipsHtml += getShipListItemHtml(ships[i], false);
         }
     }
     // own ships
@@ -293,23 +300,20 @@ function showOffMapShips() {
 /* Build up and return the HTML for a single ship list item.         */
 /*-------------------------------------------------------------------*/
 function getShipListItemHtml(ship, showAvailMove) {
-    var hitsDir = imgDir + "ships/hits/",
-        idPrefix, shipId, imgSuffix, availHits, readyClass, readyDesc, readyImg, hits;
+    var hitsDir = shipsDir + "hits/",
+        idPrefix, shipId, availHits, readyClass, readyDesc, readyImg, hits;
 
     if (ship.ShipType == "BAS") {
         shipId = "airbase-" + ship.AirbaseId;
-        imgSuffix = ".png";
         availHits = ship.OriginalFortificationStrength;
         hits = ship.OriginalFortificationStrength - ship.FortificationStrength;
     } else {
         idPrefix = ship.Location == "ARR" ? "arrship-" : (ship.Location == "DUE" ? "dueship-" : "ship-");
         shipId = idPrefix + ship.ShipId;
-        imgSuffix = "";
         availHits = ship.HitsToSink;
         hits = ship.Hits;
     }
-    var html = "<li><div id=\"" + shipId + "\" class=\"shipitem\"><img src=\"" +
-        ship.SearchImgPath + imgSuffix + "\"  draggable=\"false\"/>";
+    var html = "<li><div id=\"" + shipId + "\" class=\"shipitem\"><img src=\"" + ship.ImagePath + "\"  draggable=\"false\"/>";
 
     if (showAvailMove) {
         if (ship.MovePoints > 0) {
@@ -354,7 +358,7 @@ function getSightedShipsHtml(searchMarker, searchTurn) {
 
     for (var i = 0; i < types.length; i++) {
         html += "<tr><td style=\"width: 20%;\"></td><td style=\"text-align: " + align + ";\" class=\"sightedship\">" +
-            "<img src=\"" + imgDir + "ships/" + otherside + types[i] + ".png\" /></td>" +
+            "<img src=\"" + shipsDir + otherside + types[i] + ".png\" /></td>" +
             "<td class=\"sightedlabel\">" + typeName(types[i]) + "</td></tr>";
     }
     return html + "</table>";
@@ -693,18 +697,18 @@ function loadPage(callback) {
             mapLeft = 418;
             divLeft = 5;
             flagImg = "/content/images/ijn-med.png";
-            searchCursorImg = imgDir + "ijn-airsearchcursor.png";
+            searchCursorImg = searchDir + "ijn-airsearchcursor.png";
             captionColor = "ijnred";
             
-            var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + imgDir + "ijnfleet.png\" />" +
-                "<img id=\"sighting\" class=\"searchmarker\" src=\"" + imgDir + "usnsighting.png\" />";
+            var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + searchDir + "ijnfleet.png\" />" +
+                "<img id=\"sighting\" class=\"searchmarker\" src=\"" + searchDir + "usnsighting.png\" />";
             $("#imagecache").html(html);
-            $("#fleetcursor").css("background", "url(" + imgDir + "ijnfleet.png) no-repeat left top");
+            $("#fleetcursor").css("background", "url(" + searchDir + "ijnfleet.png) no-repeat left top");
             $("#dlgairops").css("background-color", "#610000");
-            $("#opsimage").attr("src", imgDir + "ijnopspic.jpg");
+            $("#opsimage").attr("src", searchDir + "ijnopspic.jpg");
         }
         if (isNight())
-            $("#pagediv").css("background-image", "url(" + imgDir + "bg-searchnight.jpg)");
+            $("#pagediv").css("background-image", "url(" + searchDir + "bg-searchnight.jpg)");
         
         ajaxLoadPhase(function () {
             setTabs();

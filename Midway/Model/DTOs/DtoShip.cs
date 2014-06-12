@@ -8,8 +8,7 @@
         public string Location { get; set; }
         public string Name { get; set; }
         public string ShipType { get; set; }
-        public string SearchImgPath { get; set; }
-        public string BattleImgPath { get; set; }
+        public string ImagePath { get; set; }
         public int MovePoints { get; set; }
         public int HitsToSink { get; set; }
         public int Hits { get; set; }
