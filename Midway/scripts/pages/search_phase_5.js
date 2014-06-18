@@ -1,12 +1,17 @@
 ﻿
 // Events and functions for Phase 5 (Air Defense Setup)
-var attacks = [];
-var defenseSetups = [];    //parallel array of flags indicating battle map air defense setup completed
+var attacks = [],
+    defenseSetups = [], //parallel array of flags indicating battle map air defense setup completed
+    showingAttacks = false;
 
 $(document).on("mousedown", ".attackitem", function (e) {
+    showingAttacks = true;
     showAttackSources(e.target.id);
-}).on("mouseup", ".attackitem", function () {
-    searchGrid.hideAttacksFrom();
+}).on("mouseup mouseout", ".attackitem", function () {
+    if (showingAttacks) {
+        showingAttacks = false;
+        searchGrid.hideAttacksFrom();
+    }
 }).on("mousedown mouseup", ".gobattle", function(e) {
     e.stopPropagation();
 }).on("click", ".gobattle", function (e) {
@@ -49,6 +54,7 @@ function showAttackSources(elementId) {
 }
 
 /*---------------------------------------------------------------------------*/
+/* Get html for one attack item in the Air Defense tab list                  */
 /*---------------------------------------------------------------------------*/
 function getAttackItemHtml(attack) {
     var atkHtml = "<div class=\"attackitem\" id=\"zone" + attack.Zone + "\">" +
@@ -115,7 +121,7 @@ function allSetupsDone() {
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 function goToBattleMap(zone) {
-    alert(zone);
+    navigateTo(bgMusic, "/views/battle.html?gid=" + game.GameId + "&zone=" + zone);
 }
 
 $(document).ready(function () {

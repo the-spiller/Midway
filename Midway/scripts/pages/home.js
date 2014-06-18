@@ -1,4 +1,5 @@
-﻿var oppCleared = false,
+﻿
+var oppCleared = false,
     oppMatched = false,
     gamesPrepend,
     recordAppend,
