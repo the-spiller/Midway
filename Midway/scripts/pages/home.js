@@ -43,7 +43,7 @@ $("#quitgame").on("click", function() {
         msg = msg.replace("abandon", "retire from") +
             " It will go into your record as a loss (and a win for your opponent).";
     }
-    showAlert(caption, msg, DLG_YESCANCEL, "blue", function(button) {
+    showAlert(caption, msg, DLG_YESNO, "blue", function(button) {
         if (button == "Yes") {
             var shallowPlayer = shallowCopyPlayer();
             shallowPlayer.Games.push(shallowCopyGame(selGame));
@@ -167,7 +167,7 @@ $("#cancelreg").on("click", function() {
         "record will be lost, you will no longer be able to log on, and none of this can be undone.</p><p>Are you sure that " +
         "this is what you want to do?";
     
-    showAlert("Cancel Registration", msg, DLG_YESCANCEL, "red", function (resp) {
+    showAlert("Cancel Registration", msg, DLG_YESNO, "red", function (resp) {
         if (resp == "Yes") {
             cancelRegistration(function () {
                 eraseCookie(COOKIE_NAME_AUTH);

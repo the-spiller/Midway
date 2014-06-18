@@ -24,7 +24,7 @@ namespace Midway.Controllers
             _repo = new AirOpRepository(uow);
         }
 
-        // GET api/ship?playerId=x&gameId=y
+        // GET api/airop?playerId=x&gameId=y
         public HttpResponseMessage GetAirOpsForPlayerGame(int playerId, int gameId)
         {
             try

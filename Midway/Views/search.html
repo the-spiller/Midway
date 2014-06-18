@@ -247,6 +247,31 @@
             .airopbutton:active {
                 margin: 2px 5px 0 2px;
             }
+            .attackitem {
+                position: relative;
+                height: 89px;
+                line-height: 89px;
+                padding-left: 10px;
+                margin-top: 10px;
+            }
+            .attackitemdetail {
+                pointer-events: none;
+                position: absolute;
+                top: 26px;
+                left: 234px;
+                font-size: 12px;
+                font-weight: normal;
+                line-height: 18px;
+            }
+            .attackitem:hover {
+                background-color: #0a4173;
+            }
+            .attackimage {
+                pointer-events: none;
+                position: absolute;
+                top: 0;
+                left: 82px;
+            }
         </style>
     </head>
     <body>
@@ -281,6 +306,7 @@
             <div id="imagecache">
                 <img id="fleet" class="searchmarker" src="/content/images/search/usnfleet.png" />
                 <img id="sighting" class="searchmarker" src="/content/images/search/ijnsighting.png" />
+                <img id="enemyflag" class="searchmarker" src="/content/images/ijn-med.png" />
             </div>
             <img id="cloudLayer" style="display: none; z-index: 10;" src="/content/images/search/cloud-layer.png" /> 
         </div>

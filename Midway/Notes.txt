@@ -6,6 +6,8 @@
 FEATURES
 --------
 - air ops not possible on first turn for either side (no ready aircraft) so skip it!
+- notify when opponent readies/stands down aircraft
+
 
 
 

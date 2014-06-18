@@ -19,9 +19,14 @@ namespace Midway.Model.Data
         //.....................................................................
         public IList<DtoAirOp> GetAirOps(int playerId, int gameId)
         {
+            var turn = _context.PlayerGames
+                               .Where(p => p.PlayerId == playerId && p.GameId == gameId)
+                               .Select(p => p.Turn)
+                               .Single();
+
             var dbOps = _context.AirOps
                               .Include(a => a.AirOpAircraftSet)
-                              .Where(a => a.PlayerId == playerId && a.GameId == gameId)
+                              .Where(a => a.PlayerId == playerId && a.GameId == gameId && a.Turn == turn)
                               .ToList();
 
             var ops = new List<DtoAirOp>();
@@ -29,14 +34,24 @@ namespace Midway.Model.Data
             foreach (var dbOp in dbOps)
             {
                 int [ ] totals = { 0, 0, 0 };
-
+                int? capSquadrons = null;
+                if (dbOp.Mission == "Attack")
+                {
+                    capSquadrons = _context.AirOpAircraftSets
+                                           .Include(s => s.AirOp)
+                                           .Where(s => s.AirOp.PlayerId != playerId && s.AirOp.GameId == gameId
+                                                       && s.AirOp.Turn == turn && s.AirOp.Mission == "CAP"
+                                                       && s.AirOp.Zone == dbOp.Zone)
+                                           .Sum(s => s.FSquadrons);
+                }
                 var op = new DtoAirOp
                     {
                         AirOpId = dbOp.AirOpId,
                         Zone = dbOp.Zone,
                         Mission = dbOp.Mission,
                         AircraftTotals = "",
-                        AirOpSources = new List<DtoAirOpSource>()
+                        AirOpSources = new List<DtoAirOpSource>(),
+                        CapSquadrons = capSquadrons ?? 0
                     };
 
                 foreach (var dbSource in dbOp.AirOpAircraftSet)
@@ -49,6 +64,7 @@ namespace Midway.Model.Data
                         {
                             SourceId = dbSource.SourceId,
                             SourceType = dbSource.SourceType,
+                            SourceLocation = GetSourceLocation(playerId, gameId, dbSource.SourceId, dbSource.SourceType),
                             TSquadrons = dbSource.TSquadrons,
                             FSquadrons = dbSource.FSquadrons,
                             DSquadrons = dbSource.DSquadrons
@@ -94,6 +110,25 @@ namespace Midway.Model.Data
                 _context.AirOps.Add(dbOp);
             }
             _context.Save();
+        }
+
+        private string GetSourceLocation(int playerId, int gameId, int sourceId, string sourceType)
+        {
+            if (sourceType == "BAS")
+            {
+                return _context.PlayerGameAirbases
+                               .Include(a => a.Airbase)
+                               .Where(a => a.PlayerId == playerId && a.GameId == gameId && a.AirbaseId == sourceId)
+                               .Select(a => a.Airbase.Location)
+                               .Single();
+            }
+            else
+            {
+                return _context.PlayerGameShips
+                               .Where(s => s.PlayerId == playerId && s.GameId == gameId && s.ShipId == sourceId)
+                               .Select(s => s.Location)
+                               .Single();
+            }
         }
     }
 }

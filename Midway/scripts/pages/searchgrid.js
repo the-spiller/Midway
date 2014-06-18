@@ -49,7 +49,7 @@
                 col += zonesize * 2;
                 break;
             }
-            return { x: col, y: row };
+            return new Vector2D(col, row);
         },
         privGetZoneLetter = function(innerRow, innerCol) {
             var z = (innerRow * 10) + innerCol;
@@ -82,7 +82,7 @@
         privCoordsToTopLeftCoords = function(coords) {
             var zonesX = coords.x - mapmargin < 0 ? 0 : Math.floor((coords.x - mapmargin) / zonesize),
                 zonesY = coords.y - mapmargin < 0 ? 0 : Math.floor((coords.y - mapmargin) / zonesize);
-            return { x: (zonesX * zonesize) + mapmargin, y: (zonesY * zonesize) + mapmargin };
+            return new Vector2D((zonesX * zonesize) + mapmargin, (zonesY * zonesize) + mapmargin);
         },
         privGetMapColsIndex = function(colLetter) {
             for (var i = 0; i < mapCols.length; i++) {
@@ -144,6 +144,137 @@
             cloudsCtx.clearRect(0, 0, gridWidth, gridHeight);
             cloudsCtx.globalAlpha = opacity;
             cloudsCtx.drawImage(clouds, coords.x, coords.y);
+        },
+        privDrawArrow = function (startCoords, endCoords, headStyle, whichEnd, headAngle, headLen) {
+            var angle1, topx, topy, angle2, botx, boty,
+                drawHead = function(x0, y0, x1, y1, x2, y2) {
+                    var cp1X, cp1Y, cp2X, cp2Y, backdist;
+                    //var radius = 3;
+                    //var twoPI = 2 * Math.PI;
+
+                    // all cases do this.
+                    iconsCtx.save();
+                    iconsCtx.beginPath();
+                    iconsCtx.moveTo(x0, y0);
+                    iconsCtx.lineTo(x1, y1);
+                    iconsCtx.lineTo(x2, y2);
+                    switch (headStyle) {
+                        case 0:
+                            // curved filled, add the bottom as an arcTo curve and fill
+                            backdist = Math.sqrt(((x2 - x0) * (x2 - x0)) + ((y2 - y0) * (y2 - y0)));
+                            iconsCtx.arcTo(x1, y1, x0, y0, .55 * backdist);
+                            iconsCtx.fill();
+                            break;
+                        case 1:
+                            // straight filled, add the bottom as a line and fill.
+                            iconsCtx.beginPath();
+                            iconsCtx.moveTo(x0, y0);
+                            iconsCtx.lineTo(x1, y1);
+                            iconsCtx.lineTo(x2, y2);
+                            iconsCtx.lineTo(x0, y0);
+                            iconsCtx.fill();
+                            break;
+                        case 2:
+                            // unfilled head, just stroke.
+                            iconsCtx.stroke();
+                            break;
+                        case 3:
+                            //filled head, add the bottom as a quadraticCurveTo curve and fill
+                            var cpx = (x0 + x1 + x2) / 3,
+                                cpy = (y0 + y1 + y2) / 3;
+                            iconsCtx.quadraticCurveTo(cpx, cpy, x0, y0);
+                            iconsCtx.fill();
+                            break;
+                        case 4:
+                            //filled head, add the bottom as a bezierCurveTo curve and fill
+                            var shiftamt = 5;
+                            if (x2 == x0) {
+                                // Avoid a divide by zero if x2==x0
+                                backdist = y2 - y0;
+                                cp1X = (x1 + x0) / 2;
+                                cp2X = (x1 + x0) / 2;
+                                cp1Y = y1 + backdist / shiftamt;
+                                cp2Y = y1 - backdist / shiftamt;
+                            } else {
+                                backdist = Math.sqrt(((x2 - x0) * (x2 - x0)) + ((y2 - y0) * (y2 - y0)));
+                                var xback = (x0 + x2) / 2;
+                                var yback = (y0 + y2) / 2;
+                                var xmid = (xback + x1) / 2;
+                                var ymid = (yback + y1) / 2;
+
+                                var m = (y2 - y0) / (x2 - x0);
+                                var dx = (backdist / (2 * Math.sqrt(m * m + 1))) / shiftamt;
+                                var dy = m * dx;
+                                cp1X = xmid - dx;
+                                cp1Y = ymid - dy;
+                                cp2X = xmid + dx;
+                                cp2Y = ymid + dy;
+                            }
+
+                            iconsCtx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, x0, y0);
+                            iconsCtx.fill();
+                            break;
+                    }
+                    iconsCtx.restore();
+                };
+            
+            headStyle = typeof (headStyle) != 'undefined' ? headStyle : 3;
+            whichEnd = typeof (whichEnd) != 'undefined' ? whichEnd : 1; // end point gets arrow
+            headAngle = typeof (headAngle) != 'undefined' ? headAngle : Math.PI / 8;
+            headLen = typeof (headLen) != 'undefined' ? headLen : 10;
+            // default to using drawHead to draw the head, but if the style
+            // argument is a function, use it instead
+            var toDrawHead = typeof (headStyle) != 'function' ? drawHead : headStyle;
+
+            // For ends with arrow we actually want to stop before we get to the arrow
+            // so that wide lines won't put a flat end on the arrow.
+            var dist = Math.sqrt((endCoords.x - startCoords.x) * (endCoords.x - startCoords.x) + (endCoords.y - startCoords.y) * (endCoords.y - startCoords.y));
+            var ratio = (dist - headLen / 3) / dist;
+            var tox, toy, fromx, fromy;
+            if (whichEnd & 1) {
+                tox = Math.round(startCoords.x + (endCoords.x - startCoords.x) * ratio);
+                toy = Math.round(startCoords.y + (endCoords.y - startCoords.y) * ratio);
+            } else {
+                tox = endCoords.x;
+                toy = endCoords.y;
+            }
+            if (whichEnd & 2) {
+                fromx = startCoords.x + (endCoords.x - startCoords.x) * (1 - ratio);
+                fromy = startCoords.y + (endCoords.y - startCoords.y) * (1 - ratio);
+            } else {
+                fromx = startCoords.x;
+                fromy = startCoords.y;
+            }
+
+            // Draw the shaft of the arrow
+            iconsCtx.beginPath();
+            iconsCtx.moveTo(fromx, fromy);
+            iconsCtx.lineTo(tox, toy);
+            iconsCtx.stroke();
+
+            // calculate the angle of the line
+            var lineangle = Math.atan2(endCoords.y - startCoords.y, endCoords.x - startCoords.x);
+            // h is the line length of a side of the arrow head
+            var h = Math.abs(headLen / Math.cos(headAngle));
+
+            if (whichEnd & 1) {	// handle far end arrow head
+                angle1 = lineangle + Math.PI + headAngle;
+                topx = endCoords.x + Math.cos(angle1) * h;
+                topy = endCoords.y + Math.sin(angle1) * h;
+                angle2 = lineangle + Math.PI - headAngle;
+                botx = endCoords.x + Math.cos(angle2) * h;
+                boty = endCoords.y + Math.sin(angle2) * h;
+                toDrawHead(topx, topy, endCoords.x, endCoords.y, botx, boty, headStyle);
+            }
+            if (whichEnd & 2) { // handle near end arrow head
+                angle1 = lineangle + headAngle;
+                topx = startCoords.x + Math.cos(angle1) * h;
+                topy = startCoords.y + Math.sin(angle1) * h;
+                angle2 = lineangle - headAngle;
+                botx = startCoords.x + Math.cos(angle2) * h;
+                boty = startCoords.y + Math.sin(angle2) * h;
+                toDrawHead(topx, topy, startCoords.x, startCoords.y, botx, boty, headStyle);
+            }
         };
     return {
         // read-only public props
@@ -153,7 +284,7 @@
         /* Convert input canvas coordinates to the name of the search map    */
         /* zone that contains them.                                          */
         /*-------------------------------------------------------------------*/
-        coordsToZone: function (coords) {
+        coordsToZone: function(coords) {
             return privCoordsToZone(coords);
         },
         /*-------------------------------------------------------------------*/
@@ -166,7 +297,7 @@
         /* Convert input canvas coordinates to those of the top left of the  */
         /* zone that contains them.                                          */
         /*-------------------------------------------------------------------*/
-        coordsToTopLeftCoords: function (coords) {
+        coordsToTopLeftCoords: function(coords) {
             return privCoordsToTopLeftCoords(coords);
         },
         getRelativeZone: function(zone, vector) {
@@ -175,7 +306,7 @@
         /*-------------------------------------------------------------------*/
         /* Calculate and return the distance in zones between two zones.     */
         /*-------------------------------------------------------------------*/
-        zoneDistance: function (zone1, zone2) {
+        zoneDistance: function(zone1, zone2) {
             if (zone1 == zone2) return 0;
             var zone1Coords = privZoneToTopLeftCoords(zone1),
                 zone2Coords = privZoneToTopLeftCoords(zone2),
@@ -195,12 +326,12 @@
         /* Convert input canvas coordinates to those of the top left of the  */
         /* area that contains them.                                          */
         /*-------------------------------------------------------------------*/
-        coordsToAreaTopLeftCoords: function (coords) {
+        coordsToAreaTopLeftCoords: function(coords) {
             return privZoneToTopLeftCoords(privCoordsToZone(coords).substr(0, 2) + "A");
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        clearCanvas: function (canvasIdx) {
+        clearCanvas: function(canvasIdx) {
             var ctx = privGetContextByIndex(canvasIdx);
             ctx.clearRect(0, 0, mapCvs.width, mapCvs.height);
         },
@@ -209,10 +340,10 @@
         /* match its dimensions. Add the atolls Kure and Midway with no      */
         /* transparency.                                                     */
         /*-------------------------------------------------------------------*/
-        drawMap: function (callback) {
+        drawMap: function(callback) {
             var mapImg = new Image();
             mapImg.src = "/content/images/search/searchboard.png";
-            mapImg.onload = function () {
+            mapImg.onload = function() {
                 mapCvs.height = mapImg.height;
                 mapCvs.width = mapImg.width;
                 iconsCvs.height = mapImg.height;
@@ -225,10 +356,10 @@
         /* Grab preloaded sighting image and draw it at the input zone's     */
         /* canvas coordinates.                                               */
         /*-------------------------------------------------------------------*/
-        drawSightingMarker: function (zone, age) {
+        drawSightingMarker: function(zone, age) {
             var topLeft = privZoneToTopLeftCoords(zone),
                 sightingImg = document.getElementById("sighting");
-            
+
             iconsCtx.save();
             if (age > 0) {
                 iconsCtx.globalAlpha = 1 - (age * 0.2);
@@ -240,7 +371,7 @@
         /* Grab preloaded fleet image and draw it at the input zone top left */
         /* coordinates.                                                      */
         /*-------------------------------------------------------------------*/
-        drawShipsMarker: function (coords) {
+        drawShipsMarker: function(coords) {
             var fleetImg = document.getElementById("fleet");
             iconsCtx.drawImage(fleetImg, coords.x - zonesize, coords.y);
         },
@@ -248,38 +379,38 @@
         /* Draw yellow square selected zone marker at the input canvas       */
         /* top left coordinates.                                             */
         /*-------------------------------------------------------------------*/
-        drawSelector: function (topLeft, sizeInZones) {
-            var top = topLeft.y,
-                left = topLeft.x,
+        drawSelector: function(coords, sizeInZones) {
+            var top = coords.y,
+                left = coords.x,
                 sideLength = (sizeInZones * zonesize) + 5,
                 savedData = mapCtx.getImageData(left, top, sideLength + 3, sideLength + 3);
-            
+
             if (sizeInZones == 1)
                 selectedZoneRestoreData = savedData;
             else
                 selectedAreaRestoreData = savedData;
-            
+
             privDrawSelBox(left, top, sideLength);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        removeZoneSelector: function (left, top) {
+        removeZoneSelector: function(left, top) {
             mapCtx.putImageData(selectedZoneRestoreData, left, top);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        removeAreaSelector: function (left, top) {
+        removeAreaSelector: function(left, top) {
             mapCtx.putImageData(selectedAreaRestoreData, left, top);
         },
         /*-------------------------------------------------------------------*/
         /* Highlight a rectangular range of map zones and return a list of   */
         /* the included zones.                                               */
         /*-------------------------------------------------------------------*/
-        highlightZones: function (topLeftZone, zonesWidth, zonesHeight) {
+        highlightZones: function(topLeftZone, zonesWidth, zonesHeight) {
             var topLeftCoords = privZoneToTopLeftCoords(topLeftZone),
                 width = zonesWidth * zonesize,
                 height = zonesHeight * zonesize,
-                bottomRightCoords = addVectors(topLeftCoords, { x: width, y: height });
+                bottomRightCoords = { x: topLeftCoords.x + width, y: topLeftCoords.y + height };
 
             highlightRestoreData = {
                 data: iconsCtx.getImageData(topLeftCoords.x, topLeftCoords.y, width, height),
@@ -298,7 +429,7 @@
             iconsCtx.closePath();
             iconsCtx.fill();
             iconsCtx.restore();
-            
+
             // build up array of zones to return
             var zones = [], zone;
             for (var x = 0; x < zonesWidth; x++) {
@@ -311,12 +442,12 @@
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        removeHighlight: function () {
+        removeHighlight: function() {
             iconsCtx.putImageData(highlightRestoreData.data, highlightRestoreData.left, highlightRestoreData.top);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        grabImageData: function (canvasIdx, left, top, width, height) {
+        grabImageData: function(canvasIdx, left, top, width, height) {
             var ctx = privGetContextByIndex(canvasIdx);
             if (!left) {
                 left = 0;
@@ -328,7 +459,7 @@
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        restoreImageData: function (canvasIdx, data, left, top) {
+        restoreImageData: function(canvasIdx, data, left, top) {
             var ctx = privGetContextByIndex(canvasIdx);
             ctx.putImageData(data, left, top);
         },
@@ -343,7 +474,7 @@
             cloudsCvs.style.top = window.mapTop + "px";
             cloudsCvs.style.left = window.mapLeft + "px";
             cloudsCvs.style.zIndex = 20;
-           
+
             var div = document.getElementById("canvii");
             div.appendChild(cloudsCvs);
 
@@ -351,15 +482,60 @@
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        drawSearchClouds: function (opacity, coords) {
+        drawSearchClouds: function(opacity, coords) {
             privDrawSearchClouds(opacity, coords);
         },
         /*-------------------------------------------------------------------*/
         /*-------------------------------------------------------------------*/
-        drawOppSearchArea: function(area) {
-            var coords = addVectors(privZoneToTopLeftCoords(area + "A"), { x: -3, y: -3 }),
+        drawOppSearchArea: function (area) {
+            var vector = new privZoneToTopLeftCoords(area + "A"),
+                offset = new Vector2D(-3, -3),
                 sideLength = (zonesize * 3) + 5;
-            privDrawSelBox(coords.x, coords.y, sideLength);
+
+            vector.add(offset);
+            privDrawSelBox(vector.x, vector.y, sideLength);
+        },
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        showAttacksFrom: function (sourceLocations) {
+            if (sourceLocations.length) {
+                highlightRestoreData = iconsCtx.getImageData(0, 0, iconsCvs.width, iconsCvs.height);
+                for (var i = 0; i < sourceLocations.length; i++) {
+                    var sourceVector = privZoneToTopLeftCoords(sourceLocations[i]),
+                        targetVector = privZoneToTopLeftCoords(window.selectedZone),
+                        flagOffset = new Vector2D(3, 8),
+                        arrowStartOffset = new Vector2D(15, 8),
+                        arrowEndOffset = new Vector2D(18, 18),
+                        img = document.getElementById("enemyflag");
+
+                    sourceVector.add(flagOffset);
+                    iconsCtx.drawImage(img, sourceVector.x, sourceVector.y);
+                    
+                    //arrow
+                    sourceVector.add(arrowStartOffset);
+                    targetVector.add(arrowEndOffset);
+                    //var arrowStart = Vector2D.fromAngle(getAngle(sourceVector, targetVector), 44),
+                    //    arrowEnd = Vector2D.fromAngle(getAngle(targetVector, sourceVector), 44);
+                    
+                    iconsCtx.save();
+                    iconsCtx.globalAlpha = 0.7;
+                    iconsCtx.strokeStyle = iconsCtx.fillStyle = "red";
+                    iconsCtx.lineWidth = 3;
+                    privDrawArrow(sourceVector, targetVector, 3, 1, Math.PI / 8, 20);
+                    //aircraft
+                    
+                    //iconsCtx.beginPath();
+                    //iconsCtx.moveTo(sourceVector.x, sourceVector.y);
+                    //iconsCtx.lineTo(targetVector.x, targetVector.y);
+                    //iconsCtx.stroke();
+                    iconsCtx.restore();
+                }
+            }
+        },
+        /*-------------------------------------------------------------------*/
+        /*-------------------------------------------------------------------*/
+        hideAttacksFrom: function() {
+            iconsCtx.putImageData(highlightRestoreData, 0, 0);
         }
     };
 })();

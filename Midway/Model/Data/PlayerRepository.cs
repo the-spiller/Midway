@@ -418,8 +418,18 @@ namespace Midway.Model.Data
 						}
                         else if (dbPg.PhaseId == 4)		//Possible Air Defense
                         {
+                            // If it's the first turn, there can't be an air attack or surface combat
+                            if (dbPg.Turn == 1)
+                            {
+                                dbPg.Turn++;
+                                dtoPg.Turn = dbPg.Turn;
+                                dbPg.PhaseId = dtoPg.PhaseId = 1; // Search Board Move
+                                dtoPg.PhaseName = GetPhaseName(1);
+                                dtoPg.Waiting = "N";
+                                dbDirty = true;
+                            }
                             // If opponent posted AirOps, we can move off of phase 4
-                            if (dbOpp.Turn > dbPg.Turn || (dbOpp.Turn == dbPg.Turn && dbOpp.PhaseId > 3))
+                            else if (dbOpp.Turn > dbPg.Turn || (dbOpp.Turn == dbPg.Turn && dbOpp.PhaseId > 3))
                             {
                                 if (UnderAirAttack(dbPg))
                                 {

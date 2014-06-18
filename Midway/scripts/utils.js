@@ -238,26 +238,30 @@ function eraseCookie(name) {
 }
 // END Local Storage
 
-// Element location............................................................
-
-function findPos(el) {
-    var curleft = 0, curtop = 0;
-    
-    if (el.offsetParent) {
-        do {
-            curleft += el.offsetLeft;
-            curtop += el.offsetTop;
-        }
-        while (el = el.offsetParent);
-    }
-
-    return { left: curleft, top: curtop };
+// Vector2d....................................................................
+function Vector2D(x, y) {
+    this.x = x || 0;
+    this.y = y || 0;
 }
+//add a vector to another
+Vector2D.prototype.add = function(vector) {
+    this.x += vector.x;
+    this.y += vector.y;
+};
+//length of vector
+Vector2D.prototype.getMagnitude = function () {
+    return Math.sqrt((this.x * this.x) + (this.y * this.y));
+};
+//new vector from angle and magnitude
+Vector2D.fromAngle = function(angle, magnitude) {
+    return new Vector2D(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+};
 
-// Vector math.................................................................
 
-function addVectors(vector1, vector2) {
-    return { x: vector1.x + vector2.x, y: vector1.y + vector2.y };
+// Trig........................................................................
+
+function getAngle(origin, point) {
+    return Math.atan2(point.y - origin.y, point.x - origin.x);
 }
 
 // URL parameters..............................................................

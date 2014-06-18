@@ -77,14 +77,14 @@ function scrollClouds() {
         elapsed;
 
     if (side == "USN") {
-        cloudsTopLeft = { x: -964, y: 0 };
-        velocity = { x: 2, y: 0 };
+        cloudsTopLeft = new Vector2D(-964, 0);
+        velocity = new Vector2D(2, 0);
         reset = function () {
             if (cloudsTopLeft.x > -1) cloudsTopLeft.x = -964;
         };
     } else {
-        cloudsTopLeft = { x: 0, y: 0 };
-        velocity = { x: -2, y: 0 };
+        cloudsTopLeft = new Vector2D(0, 0);
+        velocity = new Vector2D(-2, 0);
         reset = function () {
             if (cloudsTopLeft.x < -964) cloudsTopLeft.x = 0;
         };
@@ -96,7 +96,7 @@ function scrollClouds() {
         elapsed = new Date().getTime() - lastTime;
 
         if (elapsed >= 34) {
-            cloudsTopLeft = addVectors(cloudsTopLeft, velocity);
+            cloudsTopLeft.add(velocity);
             reset();
 
             if (game.PhaseId == 2) {

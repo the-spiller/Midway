@@ -262,6 +262,11 @@
     <Content Include="Content\images\pointssample.png" />
     <Content Include="Content\images\search\bg-searchnight.jpg" />
     <Content Include="Content\images\search\ijnairman.png" />
+    <Content Include="Content\images\search\ijndef.png" />
+    <Content Include="Content\images\search\ijndefcap.png" />
+    <Content Include="Content\images\search\ijndefd.png" />
+    <Content Include="Content\images\search\ijndeff.png" />
+    <Content Include="Content\images\search\ijndeft.png" />
     <Content Include="Content\images\search\ijnopsd.png" />
     <Content Include="Content\images\search\ijnopsf.png" />
     <Content Include="Content\images\search\ijnopspic.jpg" />

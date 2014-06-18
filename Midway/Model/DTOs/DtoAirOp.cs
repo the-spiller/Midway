@@ -9,6 +9,7 @@ namespace Midway.Model.DTOs
         public string Zone { get; set; }
         public string Mission { get; set; }
         public string AircraftTotals { get; set; }
+        public int CapSquadrons { get; set; }
 
         public IList<DtoAirOpSource> AirOpSources { get; set; }
     }

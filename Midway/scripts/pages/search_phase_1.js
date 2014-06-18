@@ -261,9 +261,7 @@ function setAircraftState(airReadinessDiv) {
                 break;
             case 2:
                 var msg = "Your aircraft are ready for operations. Are you sure you want them to stand down?";
-                showAlert("Aircraft Ready", msg, DLG_YESCANCEL, "blue",
-                    function (button) {
-                        
+                showAlert("Aircraft Ready", msg, DLG_YESNO, "blue", function (button) {
                     if (button == "Yes") {
                         targetEntity.AircraftState = 0;
                         window.editsMade = true;

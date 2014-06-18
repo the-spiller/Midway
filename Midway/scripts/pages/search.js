@@ -32,9 +32,8 @@
 
 $("#return").on("click", function() {
     if (editsMade) {
-        showAlert("Return Home",
-            "Are you sure you want to return to the home page without posting? Changes you've made will be lost.",
-            DLG_YESCANCEL, "blue", function (choice) {
+        var msg = "Are you sure you want to return to the home page without posting? Changes you've made will be lost.";
+        showAlert("Return Home", msg, DLG_YESNO, "blue", function (choice) {
                 if (choice == "Yes") goHome();
             });
     } else {
@@ -129,12 +128,14 @@ function drawShips(excludedZones) {
 /* zone. If it contains ships, display them on the Zone tab.         */
 /*-------------------------------------------------------------------*/
 function selectZone(coords) {
-    var topLeft = addVectors(searchGrid.coordsToTopLeftCoords(coords), { x: -3, y: -3 });
+    var topLeft = searchGrid.coordsToTopLeftCoords(coords);
+    topLeft.x -= 3;
+    topLeft.y -= 3;
     if (selectedZone) {
-        var oldTopLeft = searchGrid.zoneToTopLeftCoords(selectedZone),
-            oldTop = oldTopLeft.y - 3,
-            oldLeft = oldTopLeft.x - 3;
-        searchGrid.removeZoneSelector(oldLeft, oldTop);
+        var oldTopLeft = searchGrid.zoneToTopLeftCoords(selectedZone);
+        oldTopLeft.x -= 3;
+        oldTopLeft.y -= 3;
+        searchGrid.removeZoneSelector(oldTopLeft.x, oldTopLeft.y);
     }
     searchGrid.drawSelector(topLeft, 1);
     selectedZone = searchGrid.coordsToZone(coords);
@@ -575,7 +576,6 @@ function loadAudio() {
     if (audioLoaded) return;
     
     window.audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
-    console.log("search page volume: " + audioVol);
     var vol = audioVol * 0.01;
     
     $("#volinput").slider({
@@ -591,7 +591,7 @@ function loadAudio() {
     $("#volvalue").text($("#volinput").slider("value"));
 
     bgMusic = new Howl({
-        urls: [AUDIO_DIR_MUSIC + "search.ogg", AUDIO_DIR_MUSIC + "search.mp3"],
+        urls: [AUDIO_DIR_MUSIC + "home.ogg", AUDIO_DIR_MUSIC + "home.mp3"],
         autoplay: true,
         loop: true,
         volume: vol * 0.75
@@ -628,10 +628,11 @@ function setTabs() {
         showFirst = " tabshown";
     
     for (var i = 0; i < phase.Actions.length; i++) {
-        var act = phase.Actions[i];
-        tabHtml += "<li id=\"" + act.ActionKey.toLowerCase() + "tab\" class=\"tablistitem" + showFirst + "\" title=\"" +
+        var act = phase.Actions[i],
+            actId = act.ActionKey.replace(" ", "").toLowerCase();
+        tabHtml += "<li id=\"" + actId + "tab\" class=\"tablistitem" + showFirst + "\" title=\"" +
             act.Description + "\">" + act.ActionKey + "</li>";
-        panelHtml += "<div id=\"" + act.ActionKey.toLowerCase() + "\" class=\"tabpanel" + showFirst + "\"></div>";
+        panelHtml += "<div id=\"" + actId + "\" class=\"tabpanel" + showFirst + "\"></div>";
         showFirst = "";
         
     }
@@ -663,7 +664,8 @@ function shipsLoaded() {
             drawSightings();
 
             if (selectedZone) {
-                var coords = addVectors(searchGrid.zoneToTopLeftCoords(selectedZone), { x: -3, y: -3 });
+                var coords = searchGrid.zoneToTopLeftCoords(selectedZone);
+                coords.add(new Vector2D(-3, -3));
                 searchGrid.drawSelector(coords, 1);
             }
             showShipsInZone(selectedZone);
@@ -679,7 +681,6 @@ function shipsLoaded() {
     });
 }
 /*****************************************************************************/
-/* Base page load function called at $(document).ready.                      */
 /*****************************************************************************/
 function loadPage(callback) {
     game = findGameById(getUrlParameter("gid"), window.player.Games);
@@ -692,6 +693,7 @@ function loadPage(callback) {
         side = game.SideShortName;
 
         if (side == "IJN") {
+            // set up colors, images and layout for Japanese player
             mapLeft = 418;
             divLeft = 5;
             flagImg = "/content/images/ijn-med.png";
@@ -699,7 +701,8 @@ function loadPage(callback) {
             captionColor = "ijnred";
             
             var html = "<img id=\"fleet\" class=\"searchmarker\" src=\"" + searchDir + "ijnfleet.png\" />" +
-                "<img id=\"sighting\" class=\"searchmarker\" src=\"" + searchDir + "usnsighting.png\" />";
+                "<img id=\"sighting\" class=\"searchmarker\" src=\"" + searchDir + "usnsighting.png\" />" +
+                "<img id=\"enemyflag\" class=\"searchmarker\" src=\"/content/images/usn-med.png\" />";
             $("#imagecache").html(html);
             $("#fleetcursor").css("background", "url(" + searchDir + "ijnfleet.png) no-repeat left top");
             $("#dlgairops").css("background-color", "#610000");
@@ -724,6 +727,9 @@ function loadPage(callback) {
     });
 }
 
+/*---------------------------------------------------------------------------*/
+/* Base page load function called at $(document).ready.                      */
+/*---------------------------------------------------------------------------*/
 function loadUp() {
     loadPlayerForPage(function () {
         loadPage(function () {
@@ -734,8 +740,8 @@ function loadUp() {
         });
     });
 }
-// Initialize..........................................................
 
+// Initialize..................................................................
 $(document).ready(function () {
     loadUp();
 });

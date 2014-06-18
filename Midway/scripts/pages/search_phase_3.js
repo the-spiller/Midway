@@ -85,7 +85,7 @@ function loadAirOpsPhase() {
 
                 var zones = "";
                 if (oppSearches[i].Markers.length) {
-                    zones = "<span style=\"color: #ffd651;\">Ships sighted at ";
+                    zones = "<span style=\"color: #ffd651; pointer-events: none;\">Ships sighted at ";
                     for (var j = 0; j < oppSearches[i].Markers.length; j++) {
                         zones += oppSearches[i].Markers[j].Zone + ", ";
                     }
@@ -648,7 +648,7 @@ function getNewOp() {
 /*---------------------------------------------------------------------------*/
 /* Show air op dialog and capture data for new (if editingOpIdx == -1) or    */
 /* existing op. Update and display this and any other ops in the table on    */
-/* the AirOps tab if the player clicks "OK".                                 */
+/* the Air Ops tab if the player clicks "OK".                                */
 /*---------------------------------------------------------------------------*/
 function addEditAirOperation() {
     // set up the dialog elements
@@ -675,7 +675,7 @@ function addEditAirOperation() {
 
 /*---------------------------------------------------------------------------*/
 /* Calculate aircraft totals for the edited op and display the result on the */
-/* AirOps tab.                                                               */
+/* Air Ops tab.                                                              */
 /*---------------------------------------------------------------------------*/
 function saveAirOperation() {
     var op = editingOpIdx == -1 ? newOp : airOps[editingOpIdx],
@@ -707,7 +707,7 @@ function saveAirOperation() {
 
 /*---------------------------------------------------------------------------*/
 /* Delete the air operation element in airOps[] indicated by editingOpIdx    */
-/* and redraw the air operations list on the AirOps tab.                     */
+/* and redraw the air operations list on the Air Ops tab.                    */
 /*---------------------------------------------------------------------------*/
 function deleteAirOperation() {
     showAlert("Delete Air Operation", "Are you sure you want to delete this mission?", DLG_YESNO, "blue", function (btnText) {
