@@ -4,20 +4,17 @@ var attacks = [],
     defenseSetups = [], //parallel array of flags indicating battle map air defense setup completed
     showingAttacks = false;
 
-$(document).on("mousedown", ".attackitem", function (e) {
+$(document).on("mouseover", ".attackitem", function (e) {
     showingAttacks = true;
     showAttackSources(e.target.id);
-}).on("mouseup mouseout", ".attackitem", function () {
+}).on("mouseout", ".attackitem", function () {
     if (showingAttacks) {
         showingAttacks = false;
         searchGrid.hideAttacksFrom();
     }
-}).on("mousedown mouseup", ".gobattle", function(e) {
-    e.stopPropagation();
 }).on("click", ".gobattle", function (e) {
     goToBattleMap($(e.target).text());
 });
-
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 function loadAirDefensePhase() {
@@ -26,12 +23,11 @@ function loadAirDefensePhase() {
         for (var i = 0; i < attacks.length; i++) {
             tabHtml += getAttackItemHtml(attacks[i]);
         }
-        tabHtml += "</ul><p style=\"margin-top: 10px; font-size: .85em;\">Press to see attack sources<br />" +
+        tabHtml += "</ul><p style=\"margin-top: 10px; font-size: .85em;\">Hover to see attack sources<br />" +
             "Click zone button to go to battle map</p></div>";
         $("#airdefense").html(tabHtml);
     });
 }
-
 /*---------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------*/
 function showAttackSources(elementId) {
@@ -58,7 +54,7 @@ function showAttackSources(elementId) {
 /*---------------------------------------------------------------------------*/
 function getAttackItemHtml(attack) {
     var atkHtml = "<div class=\"attackitem\" id=\"zone" + attack.Zone + "\">" +
-        "<a class=\"gobattle flatbutton graybtn\" id=\"attack-" + attack.AirOpId + "\">" + attack.Zone + "</a>" +
+        "<a class=\"gobattle flatbutton graybtn\" id=\"btn-" + attack.Zone + "\">" + attack.Zone + "</a>" +
         "<img class=\"attackimage\" src=\"" + searchDir + side + "def.png\" />",
         squads = [0, 0, 0],
         planeTypes = ["t", "f", "d"];

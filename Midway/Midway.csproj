@@ -248,6 +248,7 @@
     <Content Include="Content\audio\sfx\bosun-attn.mp3" />
     <Content Include="Content\audio\sfx\ship-underway.mp3" />
     <Content Include="Content\images\battle\battleboard.png" />
+    <Content Include="Content\images\battle\bg-battle.jpg" />
     <Content Include="Content\images\battle\ijnd.png" />
     <Content Include="Content\images\battle\ijntdn.png" />
     <Content Include="Content\images\battle\ijntup.png" />
