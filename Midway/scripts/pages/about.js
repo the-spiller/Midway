@@ -1,12 +1,6 @@
-﻿// Event Handlers......................................................
+﻿var bgMusic;
 
-$("#return").on("click", function () {
-    window.history.back();
-});
-
-$("#infolink").on("click", function () {
-    showPhotoblurb();
-});
+// Event Handlers......................................................
 
 $(".expander").on("click", function () {
     var subUl = $(this).parent().find("ul");

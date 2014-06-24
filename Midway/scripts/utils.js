@@ -7,8 +7,27 @@ function windowToCanvas(canvas, x, y) {
     };
 }
 
+function getElementTopLeft(elem) {
+    var box = elem.getBoundingClientRect(),
+        body = document.body,
+        docElem = document.documentElement,
+        scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop,
+        scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft,
+        clientTop = docElem.clientTop || body.clientTop || 0,
+        clientLeft = docElem.clientLeft || body.clientLeft || 0,
+        x = box.left + scrollLeft - clientLeft,
+        y = box.top + scrollTop - clientTop;
+
+    return { x: Math.round(x), y: Math.round(y) };
+}
+
 function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+function textAdd(text, valueToAdd) {
+    var num = Number(text);
+    return (num + valueToAdd).toString();
 }
 
 function teletype(id, text, delay) {
@@ -47,15 +66,6 @@ function hasText(textElementId) {
         return false;
     }
     return true;
-}
-
-function inArray(needle, haystack) {
-    for (var x = 0; x < haystack.length; x++) {
-        if (haystack[x] === needle) {
-            return true;
-        }
-    }
-    return false;
 }
 
 // DateTime stuff..............................................................
@@ -228,26 +238,30 @@ function eraseCookie(name) {
 }
 // END Local Storage
 
-// Element location............................................................
-
-function findPos(el) {
-    var curleft = 0, curtop = 0;
-    
-    if (el.offsetParent) {
-        do {
-            curleft += el.offsetLeft;
-            curtop += el.offsetTop;
-        }
-        while (el = el.offsetParent);
-    }
-
-    return { left: curleft, top: curtop };
+// Vector2d....................................................................
+function Vector2D(x, y) {
+    this.x = x || 0;
+    this.y = y || 0;
 }
+//add a vector to another
+Vector2D.prototype.add = function(vector) {
+    this.x += vector.x;
+    this.y += vector.y;
+};
+//length of vector
+Vector2D.prototype.getMagnitude = function () {
+    return Math.sqrt((this.x * this.x) + (this.y * this.y));
+};
+//new vector from angle and magnitude
+Vector2D.fromAngle = function(angle, magnitude) {
+    return new Vector2D(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+};
 
-// Vector math.................................................................
 
-function addVectors(vector1, vector2) {
-    return { x: vector1.x + vector2.x, y: vector1.y + vector2.y };
+// Trig........................................................................
+
+function getAngle(origin, point) {
+    return Math.atan2(point.y - origin.y, point.x - origin.x);
 }
 
 // URL parameters..............................................................

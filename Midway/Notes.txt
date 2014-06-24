@@ -1,0 +1,14 @@
+﻿BUGS
+----
+- volume setting does not persist across pages (set on search page, number is correct on home page, but volume doesn't match)
+- arrivals tab loaded twice (no ships; IJN turn 3)
+
+FEATURES
+--------
+- air ops not possible on first turn for either side (no ready aircraft) so skip it!
+- notify when opponent readies/stands down aircraft
+
+
+
+
+

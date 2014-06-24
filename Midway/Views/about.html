@@ -5,106 +5,118 @@
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
         <style>
-        #nav {
-	        position: absolute;
-	        left: 0;
-	        top: 277px;
-	        width: 197px;
-	        height: 549px;
-	        overflow: hidden;
-	        text-align: left;
-	        vertical-align: top;
-	        padding: 15px;
-	        background-color: #004a7f;
-	        opacity: 0.7;
-        }
-            #nav li {
-                padding: 5px;
+            #nav {
+	            position: absolute;
+	            left: 0;
+	            top: 277px;
+	            width: 197px;
+	            height: 544px;
+	            overflow: hidden;
+	            text-align: left;
+	            vertical-align: top;
+	            padding: 15px;
+	            background-color: #093a67;
+	            opacity: 0.7;
             }
-            #nav a {
-                color: #fff;
+                #nav li {
+                    padding: 5px;
+                }
+                #nav a {
+                    color: #fff;
+                }
+                #nav a:hover, a:active {
+                    text-decoration: underline;
+                }
+
+            .ui-icon {
+	            display: none;
+                background-image: url(/content/themes/images/ui-icons_ffffff_256x240.png) !important;
             }
-            #nav a:hover, a:active {
-                text-decoration: underline;
+
+            .expandable {
+                display: none;
             }
 
-        .ui-icon {
-	        display: none;
-            background-image: url(/content/themes/images/ui-icons_ffffff_256x240.png) !important;
-        }
-
-        .expandable {
-            display: none;
-        }
-        .navheading {
-            font: bold 1.4em Arial, sans-serif;
-        }
-
-        .navsubheading {
-            font: bold 1.2em Arial, sans-serif;
-            padding-left: 20px;
-        }
-
-        #return {
-            position: absolute;
-            top: 10px;
-            left: 1288px;
-        }
-
-        #pagediv {
-            background-image: url(/content/images/head-about.jpg);
-        }
-
-        #pagetitle {
-            top: 85px;
-        }
-
-        #welcome {
-            top: 195px;
-        }
-
-        #words {
-	        position: absolute;
-	        top: 277px;
-            left: 229px;
-	        height: 559px;
-	        width: 1108px;
-	        padding: 0 30px 20px 20px;
-	        text-justify: auto;
-	        text-align: justify;
-	        font: 1.1em Georgia, serif;
-	        background-color: #ffe7c4;
-	        color: #000;
-	        overflow: auto;
-        }
-            #words a {
-                color: #004a7f;
+            .navheading {
+                font: bold 1.5em Arial, sans-serif;
             }
-            #words a:hover, a:active {
-                color: #000;
-                text-decoration: underline;
+
+            .navsubheading {
+                font: bold 1.3em Arial, sans-serif;
+                padding-left: 20px;
+            }
+
+            p.heading {
+	            color: #093a67;
+	            font: bold 1.5em Arial, sans-serif;
+	            padding-top: 20px;
+            }
+
+            p.subheading {
+	            color: #093a67;
+	            font: bold 1.2em Arial, sans-serif;
+            }
+
+            #pagediv {
+                background-image: url(/content/images/head-about.jpg);
+            }
+
+            #pagetitle {
+                top: 85px;
+            }
+
+            #welcome {
+                top: 195px;
+            }
+
+            #words {
+	            position: absolute;
+	            top: 277px;
+                left: 229px;
+	            height: 554px;
+	            width: 1108px;
+	            padding: 0 30px 20px 20px;
+	            text-justify: auto;
+	            text-align: justify;
+	            font: 1.1em Georgia, serif;
+	            background-color: #f0f8ff;
+	            color: #000;
+	            overflow: auto;
+            }
+                #words a {
+                    color: #a01000;
+                }
+                #words a:hover, a:active {
+                    color: #000;
+                    text-decoration: underline;
+                }
+            
+            .ltextwrap {
+                float: left;
+                margin: .5em 1em .5em 0;
+            }
+
+            .rtextwrap {
+                float: right;
+                margin: .5em 0 .5em 1em;
             }
             
-        .ltextwrap {
-            float: left;
-            margin: .5em 1em .5em 0;
-        }
-
-        .rtextwrap {
-            float: right;
-            margin: .5em 0 .5em 1em;
-        }
+            .numberedhanging {
+                padding-left: 40px;
+                text-indent: -18px;
+            }
         </style>
     </head>
     <body>
         <div id="pagediv">
             <div id="headdiv">
+                <div id="linksdiv">
+                    <a id="infolink" title="Photo info"><img src="/content/images/camera.png" /></a>
+                    <a id="return" title="Back" onclick="history.back();"><img src="/content/images/return.png" /></a>
+                </div>
                 <div id="pagetitle"  class="orange">ABOUT MIDWAY</div>
-                <div id="welcome" class="orange">Our game and the history behind it.</div>
+                <div id="welcome" class="orange">Our game and the history it portrays.</div>
             </div>
-
-            <a id="return" href="#" title="Return to logon page"><img src="/content/images/return.png" /></a>
-            <div id="infolink" title="Photo info"><img id="photoInfo" src="/content/images/camera.png" /></div>
 
             <div id="nav">
                 <ul>
@@ -114,8 +126,10 @@
                         </a>
                         <a href="#game" class="navheading">The Game</a>
                         <ul class="expandable">
+                            <li><a href="#registering" class="navsubheading">Registration</a></li>
                             <li><a href="#starting" class="navsubheading">Starting a Game</a></li>
                             <li><a href="#play" class="navsubheading">Game Play</a></li>
+                            <li><a href="#victory" class="navsubheading">Victory</a></li>
                         </ul>
                     </li>
                     <li>
@@ -132,68 +146,163 @@
                             <li><a href="#aftermath" class="navsubheading">Aftermath</a></li>
                         </ul>
                     </li>
+                    <li><a href="#credits" class="navheading" style="margin-left: 1em;">Credits</a></li>
+                    <li><a href="#contact" class="navheading" style="margin-left: 1em;">Contact Us</a></li>
                 </ul>
             </div>
 
             <div id="words">
                 <p id="game" class="heading">
-                    The Game of Midway
+                    The Game
                 </p>
                 <p>
-                    Midway is is a two-player, turn-based, double-blind World War II historical simulation wargame. It 
-                    recreates a landmark historical battle that began on 3 June 1942 between forces of the United
-                    States Navy Pacific Fleet and the Imperial Japanese Navy Combined Fleet. It gives players an idea of the 
-                    challenges facing the commanders of the opposing fleets, 
-                    yet without so much detail that it is difficult to learn to play. This is something 
-                    of a balancing act, and as a result some historical elements are overlooked (e.g. destroyers and 
-                    submarines have been left out). The game system is not particularly original; it's been tweaked, but veteran 
-                    board wargamers will recognize it immediately. Any changes we&rsquo;ve made were in an effort to 
-                    take better advantage of this medium without losing too much of its old-time map-and-counters feel.
+                    Midway is is a two-player, turn-based, double-blind World War II historical simulation wargame. A simple one, as 
+                    these things go. It's based on a landmark battle that occurred in early June, 1942 
+                    between forces of the United States Navy (USN) Pacific Fleet and the Imperial Japanese Navy (IJN) Combined 
+                    Fleet. It will give players an idea of the challenges that faced the commanders of the opposing fleets 
+                    but without so much detail that it is difficult to learn to play. This is a balancing act that results in some 
+                    historical elements being overlooked&mdash;for example, destroyers and submarines have been left out of the game.
+                </p>
+                <p>
+                    The game system is not particularly original; it's been tweaked, but veteran board wargamers will recognize 
+                    it immediately.
                 </p>
                     <div class="ltextwrap">
-                    <img src="/content/images/midway_atoll.jpg" />
-                    <div class="photocredit">
-                        Midway Atoll in November 1941
+                        <img src="/content/images/midway_atoll.jpg" />
+                        <div class="photocredit">
+                            Midway Atoll in November 1941
+                        </div>
                     </div>
-                </div>
                 <p>
-                    Each player takes a side: Japan's forces commanded by Admiral Isoroku Yamamoto, or those of the United 
-                    States under the overall command of Admiral Chester Nimitz. Players direct the movement and combat of the 
-                    ships and aircraft 
-                    actually present for the battle. The historical object is control of Midway Atoll. It begins the game 
-                    in U.S. hands and pays big dividends to the Japanese player if he or she can successfully capture it.
-                </p>
-                <p>    
-                    The game begins at 0500 3 June 1942 and is played in turns representing two hours in daylight and five 
-                    hours at night. At 1700 on 6 June&mdash;34 turns later&mdash;time runs out. The game ends when the last 
-                    turn is 
-                    completed, when one player withdraws all of his or her ships from the map, or when a player chooses 
-                    to retire. The winner is determined by points given for control of Midway and the destruction of enemy 
-                    ships.
+                    Each player takes a side: Japan&rsquo;s forces commanded by Admiral Isoroku Yamamoto, or those of the United 
+                    States under the command of Admiral Chester Nimitz. Players direct the movement and combat of the 
+                    ships and aircraft actually present for the battle (except, of course, those destroyers and submarines mentioned 
+                    above).
                 </p>
                 <p>
-                    At first glance, the game might appear to be a more sophisticated version of Battleship, and that&rsquo;s not 
-                    far wrong. Most of the game is played on a map of the central Pacific around Midway Atoll where
-                    neither player can see the other's ships. The map has a grid of squares about 20 miles across that&rsquo;s 
-                    used to control movement and determine range. Players have a limited number of searches each turn that they 
-                    use by selecting grid locations. When enemy ships are located they may be attacked.
+                    At first glance, the game might appear to be a sophisticated version of Battleship, and that&rsquo;s not far 
+                    wrong. Most of the game is played on a map of the central Pacific around Midway Atoll on which each player 
+                    sees only their own ships and aircraft. The map has a square grid (about 20 miles to a side) that&rsquo;s 
+                    used to control movement and determine range. Players have a limited number of searches available each turn 
+                    that they use by selecting grid locations. When enemy ships are located, only their types&mdash;battleship, 
+                    aircraft carrier, light aircraft carrier, cruiser or light cruiser&mdash;are revealed. No infomation on the 
+                    number of each type present is given, nor anything about any specific ship.
                 </p>
                 <p>
-                    Combat occurs in two ways. Usually it&rsquo;s one player launching planes from carriers to attack his 
-                    or her opponent from the air. Should ships of both players wind up sharing one 
-                    square on the map grid, ship-to-ship surface combat may ensue, though this does not happen often.
+                    Beginning at 0500 on 3 June 1942, the game is played in turns representing two hours in daylight and five hours 
+                    at night. Time runs out 34 turns later at 1700 on 6 June. The game ends when this last turn is completed or 
+                    when either player chooses to retire. The winner is determined by points given for control of Midway Atoll and 
+                    the destruction of enemy ships.
+                </p>
+                <p>
+                    Each turn is divided into phases in which players move their ships, search for their opponent, and plan and 
+                    execute combat. Combat is of two types: air or surface. Usually it&rsquo;s air operations attack missions: sending 
+                    aircraft that are available and in range to attack a grid square containing enemy ships. Ship-to-ship surface 
+                    combat can occur when ships of both players wind up sharing one square on the map grid, but this is unusual 
+                    (and never happened during the actual battle).
+                </p>
+                <p id="registering" class="subheading">
+                    Registration
+                </p>
+                <p>
+                    To register for the game, select the &ldquo;I&rsquo;d like to register&rdquo; link on the login page.
+                </p>
+                <p> On the Midway Registration page, submit an email address and a nickname. We&rsquo;ll use your email address to 
+                    send you a nasty, computer-generated password so you can log in. Your nickname is how you will be known in the 
+                    game. Both your email address and nickname must be unique or they will be rejected.
+                </p>
+                <p>                   
+                    Rest assured that other players can&rsquo;t see your email address and that we&rsquo;ll never give it away 
+                    or spam you in any way. If you cancel your registration we&rsquo;ll remove your email 
+                    address from our records and forget that we ever had it.
+                </p>
+                <p>
+                    If you lose or forget your password at any time (even if you&rsquo;ve never used it), you can fill in your email 
+                    address and  click the &ldquo;I forgot my password&rdquo; link on the login page to have another nasty, 
+                    computer-generated password sent to your email address.
+                </p>
+                <p>
+                    When you log in using the password we send, you&rsquo;ll arrive at Midway Home page. Click the 
+                    Registration tab to edit your registration information (including changing your password to something you&rsquo;ll 
+                    be able to remember). Cancel your registration here by simply clicking on the &ldquo;Cancel my 
+                    registration&rdquo; link and confiming that that&rsquo;s what you want to do.
                 </p>
                 <p id="starting" class="subheading">
                     Starting a Game
                 </p>
                 <p>
-        
+                    On the Home page, players are presented with a list of the games that they are participating in. Select one 
+                    and press the Play button to pick it up where it was left off.
+                </p>
+                <p>
+                    To start a new 
+                    game, select the &ldquo;New Game&rdquo; entry for the side you&rsquo;d like to play. If there's a specific opponent 
+                    you&rsquo;r looking for, enter their nickname in the &ldquo;Optional opponent nickname&rdquo; text box. If you 
+                    don&rsquo;t enter a nickname, the first player seeking a new game on the other side will become your opponent. 
+                    Click on the Play button to create the game and begin play. Once a new game is created, it is added to the 
+                    list of available games and will appear there until completed.
+                </p>
+                <p>
+                    Press the Play button and you&rsquo;ll arrive on the Search Map.
                 </p>
                 <p id="play" class="subheading">
                     Game Play
                 </p>
                 <p>
-        
+                    Midway is played in turns, and each turn consists of a series of phases with specific actions taken by each 
+                    player. These phases are:
+                </p>
+                <p>
+                    <span style="font-weight: bold;">1. Movement</span><br />
+                    Both players bring ships that have arrived on this turn into the game. The USN player gets all the ships 
+                    he or she will ever have on the first turn; the IJN player receives reinforcing ships on 5 different turns 
+                    during the game. New arrivals are displayed on the Arrivals tab; click to select one or more, then drag and 
+                    drop them on the near map edge&mdash;west (left) for the IJN player and east (right) for the USN.
+                </p> 
+                <p>
+                    Each small square on the map grid is called a &ldquo;zone.&rdquo; The larger square formed of nine zones is 
+                    called an &ldquo;area.&rdquo; We refer to a specific zone by its area and zone letter, i.e. &ldquo;A1A&rdquo; 
+                    is area A1, zone A at the map&rsquo;s top left.
+                </p>
+                <p>
+                    There is no limit to the number of ships that may occupy one zone (and combat will make it evident that you 
+                    want to keep your aircraft carriers supported by other ships). Ships on the map, including new arrivals, can 
+                    be moved up to two zones (six for the USN player on the first turn). To move your ships, select the zone 
+                    they're in, select them on the Zone tab (if you double-click on the zone, all ships will be selected 
+                    automatically), then drag them to the new zone. Movement is optional, but new arrivals 
+                    <span class="i">must</span> be placed on the map.
+                </p>
+                <p>
+                    End the phase by clicking the check mark button on the page&ldquo;s upper right.
+                </p>
+                <p>
+                    <span style="font-weight: bold;">2. Search</span><br />
+                </p>
+                <p id="victory" class="subheading">
+                    Victory
+                </p>
+                <p>
+                    During the game points are awarded to the players as follows:
+                </p>
+                <p class="numberedhanging">
+                    1. Starting with the 19th turn (0500 5 June) the U.S. player gets one point for each turn in which Midway is not 
+                    taken by the Japanese player, for a possible total of 15.
+                </p>
+                <div class="rtextwrap">
+                    <img src="/content/images/pointssample.png" />
+                    <div class="photocredit">
+                        Sunk, Enterprise is worth 10 points to the IJN player
+                    </div>
+                </div>
+                <p class="numberedhanging">
+                    2. The Japanese player receives 15 points for taking Midway before the game ends.
+                </p>
+                <p class="numberedhanging">
+                    3. Ships are assigned point values, and players receive them when they sink an opponent&rsquo;s ship. These point 
+                    values are shown circled on ship images on the Search Map Arrivals and Zone tabs, and on the Battle Map.
+                </p>
+                <p>
+                    When the game ends, the player with the most points has won!
                 </p>
                 <p id="battle" class="heading">
                     The History
@@ -202,67 +311,70 @@
                     Background
                 </p>
                 <p>
-                    On the morning of 4 June 1942, Imperial Japan was winning its new war with the United States. By nightfall, they
-                    were losing, never again to hold the intiative.
+                    On the morning of 4 June 1942, Imperial Japan was winning its war with the United States. By lunchtime, 
+                    it wasn&rsquo;t.
                 </p>
                 <div class="rtextwrap">
                     <img src="/content/images/geacps.png" />
                     <div class="photocredit">
-                        Imperial Japan, 1942
+                        Imperial Japan, June 1942
                     </div>
                 </div>
                 <p>
-                    The war began six months before in December, 1941 with a Japanese surprise attack on the U.S. Navy base 
-                    at <a href="http://en.wikipedia.org/wiki/Attack_on_Pearl_Harbor" target="_blank">Pearl Harbor</a> on 
-                    Oahu in the Hawaiian Islands. The Imperial Japanese Navy&rsquo;s aircraft carrier striking force 
+                    The war began six months before on 7 December 1941 with a surprise Japanese attack on the U.S. Navy base 
+                    at <a href="http://en.wikipedia.org/wiki/Attack_on_Pearl_Harbor" target="_blank">Pearl Harbor</a> on  
+                    Oahu in the Hawaiian Islands. The Imperial Japanese Navy&rsquo;s First Air Fleet 
                     <a href="http://en.wikipedia.org/wiki/1st_Air_Fleet_(Imperial_Japanese_Navy)" target="_blank">
-                    <span class="i">Kido Butai</span></a> launched 
-                    about 350 warplanes that sank or crippled the battleships of the U.S. Navy&rsquo;s Pacific Fleet, 
-                    announcing with convincing violence that the naval air arm was capable of far more than just fleet 
-                    defense. In one of those ironies that 
-                    litter military history, the IJN&rsquo;s carrier-based attack came while the U.S. 
-                    fleet&rsquo;s carriers and escorts were safely away from Pearl.
+                    <span class="i">Kido Butai</span></a> put the U.S. Navy&rsquo;s Pacific Fleet battleline on the harbor bottom, 
+                    announcing with convincing violence that a modern naval air arm trumped the traditional big-gun battleships 
+                    of the world&rsquo;s navies. In one of those ironies that litter military history, this demonstration 
+                    of the effectiveness of naval air power came while the U.S. fleet&rsquo;s carriers were safely away from Pearl.
                 </p>
                 <p>
-                    While America scrambled to assemble men and mat&#233;riel to fight this war, Japan&rsquo;s 
-                    ground and naval forces rampaged across the western Pacific, seizing Burma, Thailand, French Indochina, 
-                    British Malaya and more. Bad news rained down upon Americans as their troops on Guam, Wake Island and 
-                    the Philippines surrendered to Japanese invaders. Imperial Japan now threatened India and 
-                    Australia, and had built up a strong protective screen for what they deemed their 
+                    While America scrambled to assemble men and mat&#233;riel to fight this war, Thailand, Malaya, Hong Kong, Guam, 
+                    Wake Island and the Philippines fell to Japanese invaders. Imperial Japan now threatened Australia and had built 
+                    up a strong protective screen for their 
                     <a href="http://en.wikipedia.org/wiki/Greater_East_Asia_Co-Prosperity_Sphere" target="_blank">
-                    &ldquo;Greater East Asia Co-Prosperity Sphere.&rdquo;</a>
-                    Men of the Japanese Army and Navy came to believe themselves invincible. Much like today&rsquo;s Islamic radicals,  
-                    they believed Americans were spoiled and weak and would surrender easily.
+                    Greater East Asia Co-Prosperity Sphere</a>. Should Hawaii fall, the Pacific Ocean might as well 
+                    be a Japanese lake.
+                </p>
+                <p>
+                    Japanese soldiers, sailors and airmen came to believe themselves invincible. Much like today&rsquo;s radical 
+                    <span class="i">mujahideen</span>, they believed that Americans were spoiled and weak and lacked the will to 
+                    effectively respond.
                 </p>
                 <p>        
-                    These were dark days for the United States and its allies, but in April, 1942 a bright spot emerged. A  
-                    Pacific Fleet task force&mdash;including an 
-                    aircraft carrier that the Pearl Harbor attack missed&mdash;snuck to within 650 nautical miles of the 
-                    Japanese home islands and launched sixteen Army B-25 &ldquo;Mitchell&rdquo; medium bombers against 
-                    Tokyo and other Japanese cities. History knows this as the 
-                    <a href="http://en.wikipedia.org/wiki/Doolittle_Raid" target="_blank">Doolittle Raid</a> 
-                    after the man who planned and led it, Lt. Colonel 
-                    <a href="http://en.wikipedia.org/wiki/Jimmy_Doolittle">Jimmy Doolittle</a>. Little real damage was done, but the 
-                    raid accomplished its primary goal of raising American morale at a time when it was at its lowest. More, 
-                    it embarassed and enraged Japanese military leaders&mdash;none more than Admiral 
-                    <a href="http://en.wikipedia.org/wiki/Isoroku_Yamamoto">Isoroku Yamamoto</a>, Commander 
-                    in Chief of Japan&rsquo;s Combined Fleet.
+                    In April, a bright spot emerged for the U.S. and her allies. A Pacific Fleet task force, including 
+                    one of the aircraft carriers that the Pearl Harbor attack missed, snuck close to the Japanese home islands 
+                    and launched sixteen Army B-25 &ldquo;Mitchell&rdquo; medium bombers against Tokyo and other Japanese 
+                    cities&mdash;the <a href="http://en.wikipedia.org/wiki/Doolittle_Raid" target="_blank">Doolittle Raid</a>. Little 
+                    real damage was done, but the raid accomplished its primary goal of raising American morale at a time when it was 
+                    at its lowest. More, it embarassed and enraged Japanese military leaders!
                 </p>
                 <p>
-                    Yamamoto knew he must finish the job begun at Pearl Harbor&mdash;he must finish off the U.S. Pacific Fleet  
-                    by sinking its aircraft carriers. Doolittle had given him just what he needed to sell an idea to the Naval  
-                    General Staff: Operation &ldquo;MI,&rdquo; a plan to sieze the U.S. Navy base at tiny Midway Atoll, part of 
-                    the Hawaiian Islands chain about 1100 nautical miles northwest of Oahu. This invasion would surely 
-                    draw the Pacific Fleet out into the open where it could be destroyed!
+                    Imperial Navy Combined Fleet  
+                    <a href="http://en.wikipedia.org/wiki/Isoroku_Yamamoto" target="_blank">Admiral Isoroku Yamamoto</a> 
+                    knew he must complete the job begun at Pearl Harbor&mdash;he must finish off the U.S. Pacific Fleet by sinking 
+                    its aircraft carriers. U.S. bombs falling in Tokyo, however ineffective,  gave him just what he needed to sell 
+                    a plan to the Naval General Staff in Tokyo: attack the U.S. Naval Air Facility on tiny 
+                    <a href="http://en.wikipedia.org/wiki/Midway_Atoll" target="_blank">Midway Atoll</a> 
+                    at the northwestern end of the Hawaiian Islands chain, about two-thirds of the way from Tokyo to Honolulu. Surely 
+                    this would force the Pacific Fleet&rsquo;s carriers at Pearl Harbor (about 1100 nautical miles from Midway) out 
+                    into the open where they could be destroyed!
                 </p>
                 <p>
-                    As the details for Yamamoto's plan were worked out, Pacific Fleet cryptographers at Pearl began 
-                    to decode Japanese radio traffic concerning an objective for early June called &ldquo;AF.&rdquo; Suspecting that 
-                    this might refer to Midway, Pacific Fleet Commander in Chief Admiral 
-                    <a href="http://en.wikipedia.org/wiki/Chester_W._Nimitz" >Chester Nimitz</a> instructed the commander there
-                    to send a message in the clear indicating that the base&rsquo;s water purifiers had failed. The 
-                    Japanese took the bait: they broadcast instructions to load additional desalination equipment for AF,
-                    and now Nimitz knew where and when the attack would come.
+                    As the Imperial Navy planners worked out the details of Yamamoto's plan, a group of  
+                    <a href="http://en.wikipedia.org/wiki/Station_HYPO" target="_blank">U.S. Navy codebreakers in Hawaii</a> began 
+                    to decode Japanese radio traffic concerning an objective for early June called &ldquo;AF.&rdquo; Suspecting 
+                    that this might refer to Midway, Pacific Fleet Commander in Chief  
+                    <a href="http://en.wikipedia.org/wiki/Chester_W._Nimitz" target="_blank">Admiral Chester Nimitz</a> instructed 
+                    the commander there to broadcast an uncoded message indicating that the base&rsquo;s water purifiers had failed. 
+                    The Japanese took the bait: they radioed instructions to load additional desalination equipment for &ldquo;AF.&rdquo; 
+                    Now Nimitz knew where and when the attack would come.
+                </p>
+                <p>
+                    On 27 May, about 75 ships of Yamamoto's Combined Fleet steamed from port in Japan bound for Midway, led by 
+                    <span class="i">Kido Butai</span>.
                 </p>
                 <p id="4june" class="subheading">
                     4 June
@@ -279,39 +391,58 @@
                 <p id="aftermath" class="subheading">
                     Aftermath
                 </p>
-                <p id="crap" class="heading">Steaming Pile of Crap</p>
-                <p>Perhaps a re-engineering of your current world view will re-energize your online nomenclature to enable a new holistic interactive enterprise internet communication solution. </p>
-            <p>Upscaling the resurgent networking exchange solutions, achieving a breakaway systemic electronic data interchange system synchronization, thereby exploiting technical environments for mission critical broad based capacity constrained systems. </p>
-            <p>Fundamentally transforming well designed actionable information whose semantic content is virtually null. </p>
-            <p>To more fully clarify the current exchange, a few aggregate issues will require addressing to facilitate this distributed communication venue. </p>
-            <p>In integrating non-aligned structures into existing legacy systems, a holistic gateway blueprint is a backward compatible packaging tangible of immeasurable strategic value in right-sizing conceptual frameworks when thinking outside the box. </p>
-            <p>This being said, the ownership issues inherent in dominant thematic implementations cannot be understated vis-a vis document distribution on a real operating system consisting primarily of elements regarded as outdated and therefore impelling as a integrated out sourcing avenue to facilitate multi-level name value pairing in static components. </p>
-            <p>In order to properly merge and articulate these core assets, an acquisition statement outlining the information architecture, leading to a racheting up of convergence across the organic platform is an opportunity without precedent in current applicability transactional modeling. </p>
-            <p>Implementing these goals requires a careful examination to encompass an increasing complex out sourcing disbursement to ensure the extant parameters are not exceeded while focusing on infrastructure cohesion. </p>
-            <p>Dynamic demand forecasting indicates that a mainstream approach may establish a basis for leading-edge information processing to insure the diversity of granularity in encompassing expansion of content provided within the multimedia framework under examination. </p>
-                <p>Empowerment in information design literacy demands the immediate and complete disregard of the entire contents of this cyberspace communication. </p>
-                    <p>Perhaps a re-engineering of your current world view will re-energize your online nomenclature to enable a new holistic interactive enterprise internet communication solution. </p>
-            <p>Upscaling the resurgent networking exchange solutions, achieving a breakaway systemic electronic data interchange system synchronization, thereby exploiting technical environments for mission critical broad based capacity constrained systems. </p>
-            <p>Fundamentally transforming well designed actionable information whose semantic content is virtually null. </p>
-            <p>To more fully clarify the current exchange, a few aggregate issues will require addressing to facilitate this distributed communication venue. </p>
-            <p>In integrating non-aligned structures into existing legacy systems, a holistic gateway blueprint is a backward compatible packaging tangible of immeasurable strategic value in right-sizing conceptual frameworks when thinking outside the box. </p>
-            <p>This being said, the ownership issues inherent in dominant thematic implementations cannot be understated vis-a vis document distribution on a real operating system consisting primarily of elements regarded as outdated and therefore impelling as a integrated out sourcing avenue to facilitate multi-level name value pairing in static components. </p>
-            <p>In order to properly merge and articulate these core assets, an acquisition statement outlining the information architecture, leading to a racheting up of convergence across the organic platform is an opportunity without precedent in current applicability transactional modeling. </p>
-            <p>Implementing these goals requires a careful examination to encompass an increasing complex out sourcing disbursement to ensure the extant parameters are not exceeded while focusing on infrastructure cohesion. </p>
-            <p>Dynamic demand forecasting indicates that a mainstream approach may establish a basis for leading-edge information processing to insure the diversity of granularity in encompassing expansion of content provided within the multimedia framework under examination. </p>
-            <p>Empowerment in information design literacy demands the immediate and complete disregard of the entire contents of this cyberspace communication. </p>
-					
-            </div>
-            <div class="photoblurb">
-                <div class="closex">&times;</div>
-                <p>
-                    An out-of-shape Douglas SBD &ldquo;Dauntless&rdquo; dive bomber comes in for a landing aboard the 
-                    aircraft carrier USS <span class="i">Hornet</span> (CV-8) during the Battle of Midway, 4 Jun 1942. Note 
-                    the LSO (landing signal officer) ducking away from the aircraft&rsquo;s landing gear.
+                <p id="credits"class="heading">
+                    Credits
                 </p>
                 <p>
-                    The destroyer in the background is in plane guard position, ready to pick up the crew of any plane that winds 
-                    up in the water.
+                    Many thanks to all in the world of open source and specifically to the following folks for allowing us to leverage 
+                    their work:
+                </p>
+                <ul style="list-style-type: circle; margin-left: 2em;">
+                    <li>
+                        The crowd at <a href="http://stackoverflow.com" target ="_blank">Stack Overflow</a> without whom any kind of 
+                        software development would be a lot harder.
+                    </li>
+                    <li>
+                        <a href="http://github.com" target="_blank">GitHub</a>, a free source code control solution that shouldn&rsquo;t be. 
+                        Free, I mean. Why, the source for this very game can be found 
+                        <a href="https://github.com/the-spiller/Midway" target="_blank">there</a>!
+                    </li>
+                    <li>
+                        The <a href="http://jquery.com" target="_blank">JQuery</a> and 
+                        <a href="https://jqueryui.com" target="_blank">JQuery UI</a> teams and their fabulously useful javascript libraries.
+                    </li>
+                    <li>
+                        James Simpson and <a href="http://goldfirestudios.com/" target="_blank">GoldFire Studios, Inc.</a> for their 
+                        simple and effective modern javascript audio library <a href="https://github.com/goldfire/howler.js/">howler.js</a>.
+                    </li>
+                    <li>
+                        music and sfx
+                        sounddogs (sfx)
+                        soundcloud 
+                        newgrounds (music)
+                        ccmixter.org (music)
+                    </li>
+                </ul><br />
+                <p>
+                    If you believe that we are in violation of any copyright, please let us know and we&rsquo;ll make it right.
+                </p>
+                <p id="contact"class="heading">
+                    Contact Us
+                </p>
+                <p>
+                    Questions, suggestions, any kind of feedback&mdash;send email to 
+                    <a href="mailto:jeff@jeffcahill.net">jeff@jeffcahill.net</a>. Thanks!
+                </p>
+            </div>
+            <div class="photoblurb">
+                <p>
+                    A Douglas SBD &ldquo;Dauntless&rdquo; dive bomber attempts a landing aboard the aircraft 
+                    carrier USS <span class="i">Hornet</span> (CV-8) on 4 June 1942 during the Battle of Midway. 
+                    Note the LSO (landing signal officer) ducking away from the aircraft&rsquo;s landing gear.
+                </p>
+                <p>
+                    The destroyer in near background is trailing <span class="i">Hornet</span> in plane guard position.
                 </p>
                 <p class="photocredit">
                     U.S. Navy

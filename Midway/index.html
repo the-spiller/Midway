@@ -38,18 +38,9 @@
             top: 380px;
             left: 700px;
 	        width: 400px;
+            box-shadow: 4px 4px 8px #000000;
             box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
         }
-        td.spacer5 {
-            height: 5px;
-        }
-        .logonlinks {
-            color: #fff;
-        }
-            .logonlinks:hover, .logonlinks:active {
-                color: #ff2b00;
-                background-color: transparent;
-            }
 
         ._1964  {
             text-shadow: 2px 2px 3px #fff, -2px -2px 3px #fff;   
@@ -57,11 +48,19 @@
 
         #pagediv {
             background-image: url(/content/images/bg-logon.jpg);
+            background-repeat: no-repeat;
         }
-
         #infolink {
-            top: 365px;
-            left: 42px;
+            position: absolute;
+            width: 60px;
+            top: 364px;
+            left: 30px;
+            text-align: left;
+        }
+        .photoblurb {
+            position: absolute;
+            top: 364px;
+            left: 30px;
         }
         </style>
         <link rel="stylesheet" href="content/themes/jquery-ui-1.10.3.css" />
@@ -69,9 +68,9 @@
     <body>
         <div id="pagediv">
             <div id="fronttitle" class="orange">MIDWAY</div>
-            <div id="fronttiny" class="orange">REMARKABLY SIMILAR TO <span class="_1964">AVALON HILL'S 1964 NAVAL AIR</span> BATTLE GAME</div>
+            <div id="fronttiny" class="orange">REMARKABLY SIMILAR TO A <span class="_1964">NAVAL AIR BATTLE GAME WE PLAYED</span> IN THE SIXTIES</div>
             <div id="frontdate" class="orange">4 JUNE 1942, 0745</div>
-            <div id="infolink" title="Photo info"><img id="photoInfo" src="/content/images/camera.png" /></div>
+            <a id="infolink" title="Photo info"><img src="/content/images/camera.png" /></a>
 
             <div id="logondiv" class="floatingdiv">
                 <div class="floathead"></div>
@@ -87,20 +86,23 @@
                         <td class="right">Password</td>
                         <td><input id="pwd" type="password" /><a id="btngo" class="flatbutton graybtn">Go</a></td>
                     </tr>
+                    <tr><td colspan="2" class="spacer5"></td></tr>
                     <tr>
-                        <td colspan="2"><a id="newpass" href="#" class="logonlinks">I've forgotten my password.</a></td>
+                        <td colspan="2"><a id="newpass" href="#" class="divlinks">I've forgotten my password.</a></td>
                     </tr>
                     <tr><td colspan="2" class="spacer5"></td></tr>
                     <tr>
-                        <td colspan="2"><a id="register" href="#" class="logonlinks"> &rarr; I'd like to register.</a></td>
+                        <td colspan="2"><a id="register" href="#" class="divlinks"> &rarr; I'd like to register.</a></td>
                     </tr>
                     <tr>
-                        <td colspan="2"><a id="wat" href="#" class="logonlinks"> &rarr; What is this?</a></td>
+                        <td colspan="2"><a id="wat" href="#" class="divlinks"> &rarr; What is this?</a></td>
                     </tr>
                 </table>
             </div>
+            <div style="position: absolute; top: 830px; left: 1290px;">
+                <a href="http://www.wtfpl.net/"><img src="http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-4.png" width="80" height="15" alt="WTFPL" /></a>
+            </div>
             <div class="photoblurb">
-                <div class="closex">&times;</div>
                 <p>
                     USS <span class="i">Yorktown</span> (CV-5), the flagship of Rear Admiral Frank Fletcher&rsquo;s Task Force 17, photographed 
                     under attack by planes from the Japanese aircraft carrier <span class="i">Hiryu&#772;</span> on the afternoon of 4 June 
@@ -120,6 +122,7 @@
         </div>
 
         <div id="dlgoverlay">
+            <div id="waitmsg"></div>
             <div id="dlgcontent">
                 <div id="dlghead"></div>
                 <div id="dlgbody"></div>

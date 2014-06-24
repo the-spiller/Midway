@@ -1,11 +1,8 @@
 ﻿var badPwdCount = 0,
-    badPwdTries = 4;
+    badPwdTries = 4,
+    bgMusic;
 
 // Event handlers......................................................
-
-$("#infolink").on("click", function() {
-    showPhotoblurb();
-});
 
 $("#btngo").on("click", function(e) {
     e.preventDefault();
@@ -13,25 +10,23 @@ $("#btngo").on("click", function(e) {
 });
 
 $("#logondiv").on("keyup", function(e) {
-    if (e.keyCode == 13) {
+    if (e.keyCode == 13 && $("#dlgoverlay").css("display") != "block") {
         $("#btngo").css("background-color", "#ff2b00")
             .animate({ backgroundColor: "#808080" }, 250)
             .trigger("click");
     }
 });
 
-$("#newpass").on("click", function() {
+$("#newpass").on("click", function () {
     newPassword();
 });
 
 $("#register").on("click", function () {
-    showWait("Loading", "Loading registration page, please wait ...", "blue");
-    document.location.href("views/register.html");
+    navigateTo(bgMusic, "/views/register.html");
 });
 
 $("#wat").on("click", function () {
-    showWait("Loading", "Loading about page, please wait ...", "blue");
-    document.location.href = "views/about.html";
+    navigateTo(bgMusic, "/views/about.html");
 });
 
 // Functions...........................................................
@@ -50,6 +45,7 @@ function validateLogon() {
             }
         );
     } else {
+        showWait("Logging on ...");
         ajaxGetPlayerByEmail(function() {
             if (window.player.Lockout > new Date().getTime()) {
                 showLockoutAlert();
@@ -61,6 +57,7 @@ function validateLogon() {
                         showLockoutAlert();
                     });
                 } else {
+                    hideWait();
                     showAlert(
                         "Bad Password",
                         "No way, pal. The password you've entered is a no-go.<br /><br />" +
@@ -74,8 +71,8 @@ function validateLogon() {
                 }
             } else {
                 createUpdateAuthCookie();
-                showWait("Loading", "Loading home page, please wait ...", "blue");
-                document.location.href = "/views/home.html";
+                hideWait();
+                navigateTo(bgMusic, "/views/home.html");
             }
         });
     }
@@ -94,6 +91,7 @@ function showBadEmailAlert() {
 }
 
 function showLockoutAlert() {
+    hideWait();
     showAlert(
         "Locked Out",
         "You've exceeded the maximum number of attempts to log on with an incorrect " +
@@ -107,13 +105,14 @@ function newPassword() {
     if (!hasText("email")) {
         showAlert(
             "Missing Email",
-            "We need your email address if we're going to send you a new password, don't you think?",
+            "We'll need your email address if we're going to send you a new password, don't you think?",
             DLG_OK,
             "blue"
         );
     } else if (!validEmail("email")) {
         showBadEmailAlert();
     } else {
+        showWait("Generating password and sending email ...");
         ajaxGetPlayerByEmail(function() {
             ajaxPutWithUrlArgs(0, function () {
                 window.player.Lockout = 0;  // Remove any lockout condition
@@ -137,7 +136,6 @@ function ajaxGetPlayerByEmail(successCallback) {
         data: { "emailAddress": $("#email").val() },
         success: function(data) {
             window.player = JSON.parse(data);
-            console.log(window.player.PlayerId);
             if (successCallback) successCallback();
         },
         error: function(xhr, status, errorThrown) {
@@ -145,8 +143,8 @@ function ajaxGetPlayerByEmail(successCallback) {
                 showAlert("Error", "Ajax call resulted in an unspecified error.", DLG_OK, "red");
             } else if (errorThrown.indexOf("Player") == 0) {
                 showAlert(errorThrown,
-                    "We looked <span class='i'>everywhere</span> for your email address and just " +
-                        "couldn't find it.<br /><br />I'd suggest that perhaps you mistyped it.",
+                    "We looked <span class='i'>everywhere</span> for your email address and just couldn't find it among those of " +
+                        "our registered players.<br /><br />Are you registered? If so, I'd suggest that perhaps you mistyped it.",
                     DLG_OK, "red", hilightEmail);
             } else {
                 showAlert(xhr.status + " " + errorThrown, xhr.responseText, DLG_OK, "red", hilightEmail);

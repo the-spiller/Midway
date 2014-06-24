@@ -5,147 +5,294 @@
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
         <style>
-        .noselect {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
+            table {
+                border-collapse: collapse;
+            }
+            #imagecache {
+                display: none;
+            }
+            #pagediv {
+                background-image: url(/content/images/search/bg-search.jpg);
+                background-repeat: no-repeat;
+            }
+            #phase {
+                cursor: pointer;
+            }
+            #searchdiv {
+                display: none;
+                top: 60px;
+                width: 400px;
+                height: 766px;
+                opacity: 1.0;
+            }
+            #searchdiv .tabpanel {
+                height: 697px;
+                background: none;
+                background-color: #093a67;
+            }
+            #searchdiv .floathead {
+                cursor: default;
+            }
+            #canvii {
+                visibility: hidden;
+            }
 
-        #phase {
-            cursor: pointer;
-        }
-
-        .shipitem {
-            position: relative;
-            cursor: pointer;
-	        padding: 4px;
-            margin-bottom: 4px;
-        }
+            #mapcanvas {
+                position: absolute;
+                top: 85px;
+                z-index: 1;
+            }
+            #iconscanvas {
+                position: absolute;
+                top: 85px;
+                z-index: 10;
+            }
+            #phasedescrip {
+                position: absolute;
+                top: 58px;
+                width: 954px;
+                padding: 5px;
+            }
+            #fleetcursor {
+                width: 108px;
+                height: 36px;
+                background: url(/content/images/search/usnfleet.png) no-repeat left top;
+            }
+            #searchcursor {
+                width: 86px;
+                height: 86px;
+            }
+            #dlgairops {
+                display: none;
+                border: 1px solid #000;
+                background-color: #093a67;
+                opacity: 1.0;
+                top: 150px;
+                left: 200px;
+                box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+            }
+                #dlgairops .floathead {
+                    background: linear-gradient(to right, #808080,  #808080,  #808080, #000);
+                }
+                #dlgairops table {
+                    margin: 10px;
+                }
+                #dlgairops select {
+                    width: 155px;
+                    font: bold 1em Arial, sans-serif;
+                    background-color: #808080;
+                }
+            #airopclose {
+                position: absolute;
+                top: 6px;
+                right: 10px;
+                color: #fff;
+                font: 700 1.5em Arial, sans-serif;
+                cursor: pointer;
+            }
+            #airopbuttons {
+                position: absolute;
+                margin-top: 15px;
+                left: 10px;
+                bottom: 15px;
+            }
+            .updown {
+                width: 30px;
+            }
+            .shipname {
+                text-align: right;
+                vertical-align: middle;
+            }
+            .missionplanes {
+                position: relative;
+                width: 44px;
+            }
+            .missionplanes div {
+                position: absolute;
+                top: 25px;
+                left: 36px; 
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;                   
+            }
+            .tablistitem.tabshown {
+                background-color: #093a67;
+            }
+            .shipitem {
+                position: relative;
+                padding: 4px;
+                margin-bottom: 4px;
+            }
             .shipitem:hover {
-                background-color: #253549;
+                background-color: #0a4173;
             }
             .shipitem.selected {
-                background-color: #1f2c3d;
-	            padding: 5px 3px 3px 5px;
-		        box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
-
+                background-color: #08345c;
+                padding: 5px 3px 3px 5px;
+                box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
             }
-
-        .numplanes {
-	        position: absolute;
-	        top: 29px;
-	        font-weight: 500;
-	        color: #fff;
-	        z-index: 5;
-            font-size: .85em;
-        }
-	        .numplanes.torpedo {
-		        left: 186px;
-	        }
-	        .numplanes.fighter {
-		        left: 237px;
-	        }
-	        .numplanes.divebomber {
-		        left: 292px;
-	        }
-
-        .shiphits {
-            position: absolute;
-            left: 4px;
-            top: 35px;
-        }
+            .availmove {
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                height: 10px;
+                width: 10px;
+                z-index: 2;
+            }
+            .availmove.some-usn {
+                background-image: url(/content/images/booblite-go-l.png);
+            }
+            .availmove.some-ijn {
+                background-image: url(/content/images/booblite-go-r.png);
+            }
+            .availmove.none {
+                background-image: url(/content/images/booblite-stop.png);
+            }
+            .numplanes {
+                position: absolute;
+                top: 29px;
+                font-weight: 500;
+                color: #fff;
+                z-index: 5;
+                font-size: .85em;
+            }
+            .numplanes.torpedo {
+                left: 186px;
+            }
+            .numplanes.fighter {
+                left: 237px;
+            }
+            .numplanes.divebomber {
+                left: 292px;
+            }
+            .airreadiness {
+                position: absolute;
+                top: 12px;
+                left: 318px;
+                z-index: 2;
+            }
+            .shiphits {
+                position: absolute;
+                left: 4px;
+                top: 35px;
+            }
             .shiphits.green {
                 z-index: 2;
             }
             .shiphits.red {
                 z-index: 3;
             }
-                
-        .listheader {
-	        margin: 5px;
-	        background-color: #516580;
-	        padding: 4px;
-        }
-        
-        .searchitem {
-            position: relative;
-            cursor: pointer;
-	        padding: 5px;
-            margin-bottom: 4px;
-        }
-            .searchitem:hover {
-                background-color: #253549;
+            .listheader {
+                margin: 10px 5px 5px 5px;
+                background-color: #516580;
+                padding: 4px;
+                font-weight: bold;
             }
-
-        .oppsearchitem {
-            cursor: pointer;
-	        min-height: 42px;
-        }
-	        .oppsearchitem td {
-		        overflow: hidden;
-	        }
+            .searchitem {
+                position: relative;
+                padding: 4px;
+                margin-bottom: 4px;
+            }
+            .searchitem:hover {
+                background-color: #0a4173;
+            }
+            .searchitem.selected {
+                background-color: #08345c;
+                padding: 5px 3px 3px 5px;
+                box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.6) inset;
+            }
+            .cursordiv {
+                position: absolute;
+                display: none;
+                top: 0;
+                left: 0;
+                z-index: 999;
+                pointer-events: none;
+            }
+            .oppsearchitem {
+                cursor: pointer;
+                min-height: 42px;
+            }
+            .oppsearchitem td {
+                overflow: hidden;
+            }
             .oppsearchitem img {
                 position: relative;
-                margin: 0 -90px;
+                margin: 0 -96px;
             }
             .oppsearchitem:hover {
-                background-color: #253549;
+                background-color: #0a4173;
             }
-
-        .searchmarker {
-            position: absolute;
-            z-index: 5;
-            display: none; 
-        }
-        
-        .cursorimg {
-            cursor: none;
-            position: absolute;
-            z-index: 10;
-            display: none;
-        }
-        
-        .sightedlabel {
-            vertical-align: middle;
-        }
-
-        .sightedship {
-            padding: 5px;
-            vertical-align: top;
-        }
-        
-        #searchdiv {
-            top: 60px;
-            width: 400px;
-            height: 737px;
-            opacity: 1.0;
-        }
-            #searchdiv .tabpanel {
-                height: 670px;
-                background: none;
-                background-color: #2b3d55;
+            .searchmarker {
+                position: absolute;
+                z-index: 5;
             }
-
-        #searchcanvas {
-	        position: absolute;
-	        top: 60px;
-        }
+            .cursorimg {
+                cursor: none;
+                position: absolute;
+                z-index: 10;
+            }
+            .sightedlabel {
+                font-size: .8em;
+                vertical-align: bottom;
+            }
+            .sightedship {
+                padding: 5px;
+            }
+            .airopbutton {
+                cursor: pointer;
+                position: relative;
+                margin: 1px 6px 1px 1px;
+            }
+            .airopbutton:active {
+                margin: 2px 5px 0 2px;
+            }
+            .attackitem {
+                position: relative;
+                height: 89px;
+                line-height: 89px;
+                padding-left: 10px;
+                margin-top: 10px;
+            }
+            .attackitemdetail {
+                pointer-events: none;
+                position: absolute;
+                top: 26px;
+                left: 234px;
+                font-size: 12px;
+                font-weight: normal;
+                line-height: 18px;
+            }
+            .attackitem:hover {
+                background-color: #0a4173;
+            }
+            .attackimage {
+                pointer-events: none;
+                position: absolute;
+                top: 0;
+                left: 82px;
+            }
         </style>
     </head>
     <body>
-        <div id="pagediv">
+        <div id="pagediv" class="noselect">
             <div id="gamedesc" class="pagecaption"></div>
-            <div id="buttons">
-                <a id="airreadiness" href="#" title="Toggle aircraft readiness">
-                    <img id="readinessimg" src="/content/images/search/usn-airnotready.png" />
-                </a>
+            <div id="linksdiv">
                 <a id="done" href="#" title="End phase and post"><img src="/content/images/done.png" /></a>
+                <a id="audiolink" title="Volume"><img src="/content/images/speaker.png" /></a>
+                <div id="volsliderdiv">
+                    <div id="volinput"></div>
+                    <p id="volvalue"></p>
+                </div>
                 <a id="return" href="#" title="Return to home page"><img src="/content/images/return.png" /></a>
             </div>
-
-            <canvas id="searchcanvas">
-                Canvas not supported!
-            </canvas>
+            <div id="phasedescrip"></div>
+            <div id="canvii">
+                <canvas id="mapcanvas">
+                    Canvas not supported!? Are you kidding? Get thee a new browser, for God's sake!
+                </canvas>
+                <canvas id="iconscanvas"></canvas>
+            </div>
 
             <div id="searchdiv" class="floatingdiv">
                 <div class="floathead"></div>
@@ -154,25 +301,42 @@
                 </div>
                 <div id="tabpanels"></div>
             </div>
-
+            <div id="fleetcursor" class="cursordiv"></div>
+            <div id ="searchcursor" class="cursordiv"></div>
             <div id="imagecache">
                 <img id="fleet" class="searchmarker" src="/content/images/search/usnfleet.png" />
-                <img id="sighting" class="searchmarker" src="/content/images/search/ijnsighting.png" /> 
-                <img id="airsearchcursor" class="cursorimg" src="/content/images/search/usn-airsearchcursor.png" /> 
-                <img id="seasearchcursor" class="cursorimg" src="/content/images/search/usn-seasearchcursor.png" />  
+                <img id="sighting" class="searchmarker" src="/content/images/search/ijnsighting.png" />
+                <img id="enemyflag" class="searchmarker" src="/content/images/ijn-med.png" />
             </div>
+            <img id="cloudLayer" style="display: none; z-index: 10;" src="/content/images/search/cloud-layer.png" /> 
         </div>
 
         <div id="dlgoverlay">
-            <div id="dlgcontent">
+            <div id="dlgcontent" style="z-index: 2;">
                 <div id="dlghead"></div>
                 <div id="dlgbody"></div>
                 <div id="dlgbuttons"></div>
             </div>
+            <div id="dlgairops" class="floatingdiv noselect">
+                <div class="floathead">Air Operation</div>
+                <div id="airopclose">&times;</div>
+                <div style="position: relative; float: left;">
+                    <table>
+                        <tr><td class="right">Target zone:</td><td id="airopzone"></td></tr>
+                        <tr><td class="right">Mission:</td><td><select id="airopmission"></select></td></tr>
+                    </table>
+                    <table id="airopplanes"></table>
+                </div>
+                <img id="opsimage" src="/content/images/search/usnopspic.jpg" />
+                <div id="airopbuttons">
+                    <a id="airopOK" class="flatbutton graybtn">OK</a>
+                    <a id="airopCancel" class="flatbutton graybtn">Cancel</a>
+                </div>
+            </div>
         </div>
-
         <script src="/scripts/vendor/jquery-1.9.1.js"></script>
         <script src="/scripts/vendor/jquery-ui-1.10.3.js"></script>
+        <script src="/scripts/vendor/howler.min.js"></script>
         <script src="/scripts/utils.js"></script>
         <script src="/scripts/midway.js"></script>
         <script src="/scripts/pages/searchgrid.js"></script>

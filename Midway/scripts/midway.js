@@ -6,42 +6,81 @@ var player = undefined,
     DLG_OK = 1,
     DLG_OKCANCEL = 2,
     DLG_YESCANCEL = 3,
+    DLG_YESNO = 4,
+    AUDIO_DIR_SFX = "/content/audio/sfx/",
+    AUDIO_DIR_MUSIC = "/content/audio/music/",
     showingInfo = false,
-    IMG_WIDTH = 1387,
-    IMG_HEIGHT = 857,
-    COOKIE_NAME = "mdyplayer";
+    showingVol = false,
+    BG_IMG_WIDTH = 1387,
+    BG_IMG_HEIGHT = 857,
+    COOKIE_NAME_AUTH = "mdyplayer",
+    COOKIE_NAME_AUDIO = "audiovol",
+    supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
 
 // Functions...................................................................
 
-function showPhotoblurb() {
-    showingInfo = !showingInfo;
-
-    if (showingInfo) {
-        if (currentPage == "logon") {
-            $(".photoblurb").css({ "display": "block", "top": "394px", "left": $("#infolink").css("left") });
-        } else {
-            $(".photoblurb").css({ "display": "block", "top": "40px", "left": getPhotoBlurbLeft() + "px" });
-        }
+function navigateTo(music, url) {
+    if (music && (music.volume() > 0)) {
+        music.fade(music.volume(), 0, 1000);
+        setTimeout(function() { document.location.href = url; }, 1000);
     } else {
-        $(".photoblurb").css("display", "none");
+        document.location.href = url;
     }
 }
-function getPhotoBlurbLeft() {
-    var infolink = document.getElementById("infolink");
-    return infolink.offsetLeft - 400;
+
+function showPhotoblurb() {
+    showingInfo = !showingInfo;
+    var coords = getPhotoBlurbPosition(),
+        displayVal = showingInfo ? "block" : "none";
+    
+    $(".photoblurb").css({ "top": coords.y + "px", "left": coords.x + "px", "display": displayVal });
 }
+
+function getPhotoBlurbPosition() {
+    var pos = getElementTopLeft(document.getElementById("infolink"));
+
+    if (currentPage != "logon") {
+        pos.x -= 410;
+        pos.y -= 6;
+    }
+    return pos;
+}
+
+function showVolSlider() {
+    showingVol = !showingVol;
+    var coords = getVolSliderPosition(),
+        displayVal = showingVol ? "block" : "none";
+    
+    $("#volsliderdiv").css({ "top": coords.y + "px", "left": coords.x + "px", "display": displayVal });
+}
+
+/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------*/
+function getVolSliderPosition() {
+    var pos = getElementTopLeft(document.getElementById("audiolink"));
+    pos.x -= 2;
+    pos.y += 30;
+    return pos;
+}
+
+/*-----------------------------------------------------------------------------*/
+/*-----------------------------------------------------------------------------*/
 function getAlertPosition() {
     var left = Math.floor(($(window).width() / 2) - (DLG_WIDTH / 2));
-    var top = Math.floor($(window).scrollTop() + $(window).height() / 2) - 150;
+    var top = Math.floor($(window).scrollTop() + $(window).height() / 2) - 150;  //150px above center
     return { x: left, y: top };
 }
+
+/*-----------------------------------------------------------------------------*/
+/* Display modal "message box"                                                 */
+/*-----------------------------------------------------------------------------*/
 function showAlert(title, message, buttons, color, callback) {
     var topLeft = getAlertPosition();
     
     function getAlertButtonHtml(text) {
-        return "<a id='dlgbtn" + text.toLowerCase() + "' class='flatbutton " + color + "btn'>" + text + "</a>";
+        return "<a id=\"dlgbtn" + text.toLowerCase() + "\" class=\"flatbutton " + color + "btn\">" + text + "</a>";
     }
-
+    
     $("#dlghead").removeClass()
         .addClass(color + "dlghead")
         .css("width", (DLG_WIDTH - 10) + "px")
@@ -59,43 +98,50 @@ function showAlert(title, message, buttons, color, callback) {
         case (DLG_YESCANCEL):
             $("#dlgbuttons").html(getAlertButtonHtml("Yes") + getAlertButtonHtml("Cancel"));
             break;
+        case (DLG_YESNO):
+            $("#dlgbuttons").html(getAlertButtonHtml("Yes") + getAlertButtonHtml("No"));
     }
 
     $("#dlgbuttons .flatbutton").on("click", function (e) {
-        $("#dlgoverlay").css("display", "none");
         e.stopPropagation();
+        $("#dlgcontent").css("display", "none");
+        $("#dlgoverlay").css("display", "none");
         if (callback) callback(e.target.innerHTML);
     });
     
     $("#dlgcontent").removeClass().addClass(color + "dlg").css({
-        "top": topLeft.y + "px",
-        "left": topLeft.x + "px",
-        "width": DLG_WIDTH + "px"
+        display: "block",
+        top: topLeft.y + "px",
+        left: topLeft.x + "px",
+        width: DLG_WIDTH + "px"
         }).draggable({
             handle: "#dlghead",
             containment: "#pagediv",
             scroll: false
         });
 
+    hideWait();
     $("#dlgoverlay").css("display", "block").focus();
 }
 
-function showWait(title, message, color) {
-    var topLeft = getAlertPosition();
-    
-    $("#dlghead").removeClass().addClass(color + "dlghead").html(title);
-    $("#dlgbody").html(message);
-    $("#dlgbuttons").css("display", "none");
-    $("#dlgcontent").removeClass().addClass(color + "dlg").css({
+function showWait(waitMsg, callback) {
+    var topLeft = getAlertPosition(),
+        waitHtml = "<img src=\"/content/images/blueloader.gif\" style=\"margin-right: 10px;\">" + waitMsg;
+
+    $("#waitmsg").removeClass().addClass("bluedlg").css({
         top: topLeft.y + "px",
         left: topLeft.x + "px",
-        width: DLG_WIDTH
-        }).draggable({
-            handle: "#dlghead",
-            containment: "#pagediv",
-            scroll: false
-        });
+        width: DLG_WIDTH + "px",
+        display: "block"
+    }).html(waitHtml);
+
     $("#dlgoverlay").css("display", "block");
+    if (callback) callback();
+}
+
+function hideWait() {
+    $("#waitmsg").css("display", "none");
+    $("#dlgoverlay").css("display", "none");
 }
 
 function showAjaxError(xhr, status, errorThrown) {
@@ -111,25 +157,27 @@ function showAjaxError(xhr, status, errorThrown) {
         showAlert(xhr.status + " " + errorThrown, errText, DLG_OK, "red");
     }
 }
-
 function loadPlayerForPage(callback) {
-    var cookie = readCookie(COOKIE_NAME);
+    var cookie = readCookie(COOKIE_NAME_AUTH);
     if (cookie) {
         var playerId = cookie.substr(0, cookie.indexOf(":"));
         ajaxGetPlayer(playerId, function() {
             if (callback) callback();
         });
+    } else {
+        document.location.href = "/index.html";
     }
 }
 function createUpdateAuthCookie() {
-    createCookie(COOKIE_NAME, window.player.PlayerId + ":" + player.AuthKey, 1);
+    createCookie(COOKIE_NAME_AUTH, window.player.PlayerId + ":" + window.player.AuthKey, 1);
 }
+
 function ajaxGetPlayer(playerId, successCallback) {
     $.ajax({
         url: "/api/player/" + playerId.toString(),
         accepts: "application/json",
         success: function (data) {
-            player = JSON.parse(data);
+            window.player = JSON.parse(data);
             createUpdateAuthCookie();
             if (successCallback) successCallback();
         },
@@ -143,11 +191,12 @@ function ajaxUpdatePlayer(shallowPlayer, successCallback) {
     $.ajax({
         url: "/api/player",
         type: "PUT",
+        contentType: "application/json",
         accepts: "application/json",
-        data: shallowPlayer,
+        data: JSON.stringify(shallowPlayer),
         success: function (data) {
-            player = JSON.parse(data);
-            createUpdateAuthCookie();
+            window.player = JSON.parse(data);
+            createUpdateAuthCookie(); 
             if (successCallback) successCallback();
         },
         error: function (xhr, status, errorThrown) {
@@ -165,7 +214,7 @@ function ajaxGetPlayers(successCallback) {
         accepts: "application/json",
         success: function(data) {
             playersList = JSON.parse(data);
-            createUpdateAuthCookie();
+            createUpdateAuthCookie(); 
             if (successCallback) successCallback(playersList);
         },
         error: function(xhr, status, errorThrown) {
@@ -175,24 +224,38 @@ function ajaxGetPlayers(successCallback) {
 }
 
 function ajaxLoadScript(script, successCallback) {
-    $.ajax({
-        url: script,
-        dataType: "script",
-        type: "GET",
-        success: function() {
-            if (successCallback) successCallback();
-        },
-        error: function(xhr, status, errorThrown) {
-            showAjaxError(xhr, status, errorThrown);
-        }
-    });
+    if (script) {
+        $.ajax({
+            url: script,
+            dataType: "script",
+            type: "GET",
+            success: function() {
+                if (successCallback) successCallback();
+            },
+            error: function(xhr, status, errorThrown) {
+                showAjaxError(xhr, status, errorThrown);
+            }
+        });
+    } else {
+        if (successCallback) successCallback();
+    }
 }
 
+/*---------------------------------------------------------------------------*/
+/* Respond to a cllick on a tab -- make the selected tab current and update  */
+/* its display.
+/*---------------------------------------------------------------------------*/
 function workTabs(e) {
-    $(".tablistitem, .tabpanel").removeClass("tabshown");
     var clickedId = e.target.id;
-    $("#" + clickedId).addClass("tabshown");
-    $("#" + clickedId.replace("tab", "")).addClass("tabshown");
+    if (!$("#" + clickedId).hasClass("tabshown")) {
+        $(".tablistitem, .tabpanel").removeClass("tabshown");
+        $("#" + clickedId).addClass("tabshown");
+        $("#" + clickedId.replace("tab", "")).addClass("tabshown");
+        
+        if (clickedId == "zonetab") {
+            showShipsInZone(selectedZone);
+        }
+    }
 }
 
 function gameTimeFromTurn(turn) {
@@ -248,7 +311,14 @@ function findGameById(id, games) {
 
 // Global event handlers.......................................................
 
-$("#dlgoverlay").on("keyup", function (e) {
+$(document).on("click", "#infolink", function() {
+    showPhotoblurb();
+}).on("click", ".photoblurb", function() {
+    $("#infolink").trigger("click");
+}).on("click", "#audiolink", function () {
+    showVolSlider();
+}).on("keyup", "#dlgoverlay", function (e) {
+    e.stopPropagation();
     if (e.keyCode == 13) {
         if ($("#dlgbtnok").length)
             $("#dlgbtnok").trigger("click");
@@ -260,8 +330,4 @@ $("#dlgoverlay").on("keyup", function (e) {
         else if ($("#dlgbtnno").length)
             $("#dlgbtnno").trigger("click");
     }
-});
-
-$(".closex").on("click", function () {
-    $("#infolink").trigger("click");
 });

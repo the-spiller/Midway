@@ -1,44 +1,33 @@
-﻿var oppCleared = false,
+﻿
+var oppCleared = false,
     oppMatched = false,
     gamesPrepend,
     recordAppend,
     selGameId = 0,
     abandonables = [],
     twoWeeks = 1000 * 60 * 60 * 24 * 14,
+    bgMusic,
+    audioVol,
     nicknames = FuzzySet();
         
 // Event handlers......................................................
 
-$("#infolink").on("click", function() {
-    showPhotoblurb();
+$("#volinput").change(function() {
+    $("#volvalue").text(this.value);
 });
-
 $("#logofflink").on("click", function () {
     if (unsavedRegChanges()) return;
-    eraseCookie(COOKIE_NAME);
-    location.replace("/index.html");
+    eraseCookie(COOKIE_NAME_AUTH);
+    navigateTo(bgMusic, "/index.html");
 });
-
 $(".tablistitem").on("click", function (e) {
     workTabs(e);
 });
-
 $(document).on("mousedown", ".listitem", function (e) {
-    $(".listitem").removeClass("down");
-    $(e.target).addClass("down");
-    $("#playgame").css("display", "inline-block");
-    selGameId = Number(e.target.id.replace("game", ""));
-    if (selGameId < 0) {
-        $("#optopponent").slideDown();
-        $("#quitgame").css("display", "none");
-        setOppselectPos();
-    } else {
-        $("#optopponent").slideUp();
-        $("#quitgame").css("display", "inline-block")
-            .text(abandonables[selGameId] ? "Abandon" : "Retire");
-    }
+    selectGame(e.target);
+}).on("mousedown", ".gameselimg", function(e) {
+    selectGame(e.target.parentNode);
 });
-        
 $("#quitgame").on("click", function() {
     var caption,
         msg = "Are you sure you want to abandon this game?",
@@ -55,7 +44,7 @@ $("#quitgame").on("click", function() {
         msg = msg.replace("abandon", "retire from") +
             " It will go into your record as a loss (and a win for your opponent).";
     }
-    showAlert(caption, msg, DLG_YESCANCEL, "blue", function(button) {
+    showAlert(caption, msg, DLG_YESNO, "blue", function(button) {
         if (button == "Yes") {
             var shallowPlayer = shallowCopyPlayer();
             shallowPlayer.Games.push(shallowCopyGame(selGame));
@@ -78,102 +67,141 @@ $("#quitgame").on("click", function() {
         }
     });
 });
-
 $("#playgame").on("click", function () {
     if (selGameId == 0) return;
     if (unsavedRegChanges()) return;
 
-    showWait("Loading", "Loading search page, please wait ...", "blue");
     createGame(function () {
-        location.replace("/views/search.html?gid=" + selGameId);
+        navigateTo(bgMusic, "/views/search.html?gid=" + selGameId);
     });
 });
-        
-$("#oppnickname").on("focus", function () {
-    if (!oppCleared) {
-        $(this).val("");
-        oppCleared = true;
-    }
-}).on("blur", function() {
-    if (!$(this).val()) {
-        $(this).val("First available");
-        oppCleared = false;
-    }
-}).on("keyup", function (e) {
-    var oppselect = document.getElementById("oppselect");
-    if ($(this).val()) {
-        if (oppselect.length && e.keyCode == 40) {
-            $(oppselect).focus();
-        } else {
-            var results = nicknames.get($(this).val());
-            if (results == null || results.length > 10) {
-                closeOppSelect();
-                oppMatched = false;
+$("#oppnickname")
+    .on("focus", function () {
+        if (!oppCleared) {
+            $(this).val("");
+            oppCleared = true;
+        }
+    })
+    .on("blur", function () {
+        if (!$(this).val()) {
+            $(this).val("First available");
+            oppCleared = false;
+        }
+    })
+    .on("keyup", function (e) {
+        if ($("#dlgoverlay").css("display") == "block") return;
+    
+        var oppselect = document.getElementById("oppselect");
+        if ($(this).val()) {
+            if (oppselect.length && e.keyCode == 40) {
+                $(oppselect).focus();
             } else {
-                var selHtml = "";
-                for (var i = 0; i < results.length; i++) {
-                    selHtml += "<option>" + results[i][1] + "</option>";
-                }
-                $(oppselect).attr("size", results.length).html(selHtml);
-                $("#oppselectdiv").css({ "display": "block" });
-            }
-            if (oppselect.length == 1 && !oppMatched) {
-                $(this).val($(oppselect).text());
-                setTimeout(function () {
+                var results = nicknames.get($(this).val());
+                if (results == null || results.length > 10) {
                     closeOppSelect();
-                    oppMatched = true;
-                }, 500);
+                    oppMatched = false;
+                } else {
+                    var selHtml = "";
+                    for (var i = 0; i < results.length; i++) {
+                        selHtml += "<option>" + results[i][1] + "</option>";
+                    }
+                    $(oppselect).attr("size", results.length).html(selHtml);
+                    $("#oppselectdiv").css({ "display": "block" });
+                }
+                if (oppselect.length == 1 && !oppMatched) {
+                    $(this).val($(oppselect).text());
+                    setTimeout(function () {
+                        closeOppSelect();
+                        oppMatched = true;
+                    }, 500);
+                }
+            }
+        } else {
+            closeOppSelect();
+            oppMatched = false;
+        }
+    })
+    .on("input", function () {
+        if (!$(this).val()) {
+            closeOppSelect();
+            oppMatched = false;
+        }
+    });
+$("#oppselect")
+    .on("keyup", function(e) {
+        if ($("#dlgoverlay").css("display") == "block") return;
+
+        if (e.keyCode == 38 && $(this).prop("selectedIndex") == 0) {
+            $("#oppnickname").focus();
+        } else {
+            var selText = $("#oppselect>option:selected").text();
+            if (e.keyCode == 13 && selText) {
+                $("#oppnickname").val(selText);
+                closeOppSelect();
+                oppMatched = true;
             }
         }
-    } else {
-        closeOppSelect();
-        oppMatched = false;
-    }
-}).on("input", function () {
-    if (!$(this).val()) {
-        closeOppSelect();
-        oppMatched = false;
-    }
-});
-
-$("#oppselect").on("keyup", function(e) {
-    if (e.keyCode == 38 && $(this).prop("selectedIndex") == 0) {
-        $("#oppnickname").focus();
-    } else {
-        var selText = $("#oppselect>option:selected").text();
-        if (e.keyCode == 13 && selText) {
-            $("#oppnickname").val(selText);
+    })
+    .on("click", function (e) {
+        if (e.target) {
+            $("#oppnickname").val($(e.target).val());
             closeOppSelect();
             oppMatched = true;
         }
-    }
-}).on("click", function(e) {
-    if (e.target) {
-        $("#oppnickname").val($(e.target).val());
-        closeOppSelect();
-        oppMatched = true;
-    }
-});
-
+    });
 $(".regdata").on("input", function () {
     if (anyRegDataChanged()) {
-        $("#cancelreg").css("display", "inline-block");
+        $("#canceledit").css("display", "inline-block");
     } else {
-        $("#cancelreg").css("display", "none");
+        $("#canceledit").css("display", "none");
     }
 });
-
-$("#cancelreg").on("click", function() {
+$("#canceledit").on("click", function() {
     loadRegFields();
     $(this).css("display", "none");
 });
-        
-$("#savereg").on("click", function () {
+$("#saveedit").on("click", function () {
     saveRegData();
 });
-        
+$("#cancelreg").on("click", function() {
+    var msg = "<p>If you cancel your Midway registration, all your unfinished games will be forefeited, your " +
+        "record will be lost, you will no longer be able to log on, and none of this can be undone.</p><p>Are you sure that " +
+        "this is what you want to do?";
+    
+    showAlert("Cancel Registration", msg, DLG_YESNO, "red", function (resp) {
+        if (resp == "Yes") {
+            cancelRegistration(function () {
+                eraseCookie(COOKIE_NAME_AUTH);
+                location.replace("/index.html");
+            });
+        }
+    });
+});
+$("#editreg").on("keyup", function(e) {
+    if (e.keyCode == 13 && $("#saveedit").css("display") == "inline-block")
+        $("#saveedit").trigger("click");
+    else if (e.keyCode == 27 && $("#canceledit").css("display") == "inline-block")
+        $("#canceledit").trigger("click");
+});
+
 // Functions...........................................................
         
+function selectGame(gameItem) {
+    $(".listitem").removeClass("down");
+    $(gameItem).addClass("down");
+    $("#playgame").css("display", "inline-block");
+    selGameId = Number(gameItem.id.replace("game", ""));
+    if (selGameId < 0) {
+        $("#optopponent").slideDown();
+        $("#quitgame").css("display", "none");
+        setOppselectPos();
+    } else {
+        $("#optopponent").slideUp();
+        $("#quitgame").css("display", "inline-block")
+            .text(abandonables[selGameId] ? "Abandon" : "Retire");
+    }
+}
+
 function shallowCopyPlayer() {
     return {
         playerId: window.player.PlayerId,
@@ -204,17 +232,18 @@ function shallowCopyGame(game) {
     };
 }
         
-// Return the game with the highest ID value -- it's the newest
-function getNewestGameId() {
-    var maxId = 0,
-        games = window.player.Games;
-    
+// Return the Id of the newly-added game.
+function getAddedGameId(gameIdsBefore) {
+    var retId = 0,
+        games = player.Games;
+
     for (var i = 0; i < games.length; i++) {
-        if (games[i].GameId > maxId) {
-            maxId = games[i].GameId;
+        if ($.inArray(games[i].GameId, gameIdsBefore) == -1) {
+            retId = games[i].GameId;
+            break;
         }
     }
-    return maxId;
+    return retId;
 }
         
 function createGame(callback) {
@@ -224,7 +253,13 @@ function createGame(callback) {
         if ($("#oppnickname").val() && $("#oppnickname").val() != "First available")
             nickname = $("#oppnickname").val();
 
-        var shallowPlayer = shallowCopyPlayer();
+        // build array of player's existing game Ids so we can find an added one.
+        var gameIds = [];
+        for (var i = 0; i < player.Games.length; i++) {
+            gameIds.push(player.Games[i].GameId);
+        }
+        
+       var shallowPlayer = shallowCopyPlayer();
 
         var game = {
             GameId: 0,
@@ -247,9 +282,8 @@ function createGame(callback) {
 
         // do a player update to create the new game
         ajaxUpdatePlayer(shallowPlayer, function() {
-            showWait("Loading", "Loading search page, please wait ...", "blue");
             // set the new game Id
-            selGameId = getNewestGameId(); //highest game Id is newest
+            selGameId = getAddedGameId(gameIds);
             if (callback) callback();
         });
     } else {
@@ -258,7 +292,7 @@ function createGame(callback) {
 }
         
 function unsavedRegChanges() {
-    if ($("#cancelreg").css("display") == "inline-block") {
+    if ($("#canceledit").css("display") == "inline-block") {
         showAlert("Unsaved Changes", "You've made changes to your registration info that haven't been " +
             "saved. Please save or cancel them.", DLG_OK, "blue");
         $(".tablistitem, .tabpanel").removeClass("tabshown");
@@ -280,7 +314,7 @@ function saveRegData() {
             msg = "You apparently don't care about your security, but we do. You must provide a password!";     
         } else if ($("#pwd").val() != window.player.Password && $("#pwd").val() != $("#pwd2").val()) {
             caption = "Passwords Don't Match";
-            msg = "The password you've entered does not match the password you've supposedly reentered.";
+            msg = "The password you've entered is not the same as the one you've ostensibly confirmed.";
         } else if ($("#nickname").val() != window.player.Nickname) {
             if ($("#nickname").val() == "") {
                 caption = "Missing Nickname";
@@ -288,7 +322,7 @@ function saveRegData() {
                     " won't know what to call you!";
             } else if ($("#nickname").val().toLowerCase() == "first available") {
                 caption = "Invalid Nickname";
-                msg = "You trying to be funny? That'll screw up the way the nickname search works.";
+                msg = "You trying to be funny? That'll thoroughly screw up the way the nickname search works.";
             }
         }
         if (msg) {
@@ -305,7 +339,7 @@ function saveRegData() {
             };
             ajaxUpdatePlayer(shallowPlayer, function() {
                 loadRegFields();
-                $("#cancelreg").css("display", "none");
+                $("#canceledit").css("display", "none");
                 $("#namespan").text(window.player.Nickname);
                 showAlert("Save", "Changes saved.", DLG_OK, "blue");
             });
@@ -330,6 +364,23 @@ function loadRegFields() {
     $("#pwd2").val(window.player.Password);
     $("#nickname").val(window.player.Nickname);
 }
+
+/*-------------------------------------------------------*/
+/* Delete this player and his/her games from the system. */
+/*-------------------------------------------------------*/
+function cancelRegistration(successCallback) {
+    $.ajax({
+        url: "/api/player/" + player.PlayerId,
+        type: "DELETE",
+        success: function () {
+            if (successCallback) successCallback();
+        },
+        error: function (xhr, status, errorThrown) {
+            showAjaxError(xhr, status, errorThrown);
+        }
+    });
+}
+
 /*-------------------------------------------------------*/
 /* Build up html for one game for the 'Your Games' list. */
 /*-------------------------------------------------------*/
@@ -338,13 +389,13 @@ function getGameListItem(game) {
         title, oppName, icon, waiting;
             
     if (game.Waiting == "Y") {
-        icon = "<img src=\"/content/images/booblite-red.png\" />";
+        icon = "<img src=\"/content/images/booblite-red.png\" class=\"gameselimage\" />";
         waiting = " (waiting for opponent to post)";
     } else if (game.OppWaiting == "Y") {
-        icon = "<img src=\"/content/images/booblite!-green.png\" />";
-        waiting = " (opponent waiting for you to post)";
+        icon = "<img src=\"/content/images/booblite!-green.png\" class=\"gameselimage\" />";
+        waiting = " (waiting for you to post)";
     } else {
-        icon = "<img src=\"/content/images/booblite-green.png\" />";
+        icon = "<img src=\"/content/images/booblite-green.png\" class=\"gameselimage\" />";
         waiting = "";
     }
     if (game.OpponentNickname == null || game.OpponentNickname == "") {
@@ -367,7 +418,7 @@ function getGameListItem(game) {
             abandonables[game.GameId] = true;
         }
     }
-    var html = itemStart + title + "\"><img src=\"" + game.TinyFlagUrl + "\" />" +
+    var html = itemStart + title + "\"><img src=\"" + game.TinyFlagUrl + "\" class=\"gameselimage\" />" +
         game.SideShortName + " vs. " + oppName + icon + "Turn " + game.Turn + " " + game.PhaseName + "</li>";
     return html;
 }
@@ -437,7 +488,7 @@ function buildRecord() {
     for (var i = 0; i < window.player.Games.length; i++) {
         var game = window.player.Games[i];
                 
-        if (game.OpponentNickname != null) {
+        if (game.CompletedDTime != "" && game.OpponentNickname) {
             recIndex = -1;
             for (var j = 0; j < record.length; j++) {
                 if (game.OpponentNickname == record[j][0]) {
@@ -448,7 +499,7 @@ function buildRecord() {
             if (recIndex == -1) {
                 recIndex = record.push([game.OpponentNickname, 0, 0, 0]) - 1;
             }
-            if (game.Draw == "Y") {     //incomplete, abandoned or retired from
+            if (game.Draw == "Y") {     //abandoned or retired from
                 record[recIndex][3]++;
             } else if (game.Points < game.OpponentPoints) {
                 record[recIndex][2]++;
@@ -470,25 +521,45 @@ function buildRecord() {
 // Init................................................................
 
 $(document).ready(function () {
+    audioVol = readCookie(COOKIE_NAME_AUDIO) || 50;
+    console.log("home page volume: " + audioVol);
+    $("#volinput").slider({
+        orientation: "vertical",
+        value: audioVol,
+        slide: function (e, ui) {
+            audioVol = ui.value;
+            $("#volvalue").text(audioVol);
+            if (bgMusic) bgMusic.volume(audioVol * 0.01);
+            createCookie(COOKIE_NAME_AUDIO, audioVol, 1000);
+        }
+    });
+    $("#volvalue").text($("#volinput").slider("value"));
+
+    bgMusic = new Howl({
+        urls: [AUDIO_DIR_MUSIC + "home.ogg", AUDIO_DIR_MUSIC + "home.mp3"],
+        loop: true,
+        autoplay: false
+    });
+    if (bgMusic) {
+        if (audioVol > 0) {
+            bgMusic.play().fade(0, audioVol * 0.01, 1000);
+        }
+    }
+    
     loadPlayerForPage(function() {
-        $("#pagediv").css("background-image", "url(\"/content/images/bg-home.jpg\")");
         $("#namespan").text(window.player.Nickname);
 
-        $("#logofflink").css("left", "1240px");
-    
-        var welcome = document.getElementById("welcome");
-        var top = welcome.offsetTop + welcome.offsetHeight + 20;
-
-        $("#homediv").css("top", top + "px").draggable({
+        $("#homediv").draggable({
             handle: ".floathead",
             containment: "#pagediv",
             scroll: false
         });
+        
         loadRegFields();
         buildRecord();
         buildGameList();
         getPlayers();
-
+       
         window.currentPage = "home";
     });
 });

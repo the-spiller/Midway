@@ -1,4 +1,5 @@
-﻿@font-face {
+﻿
+@font-face {
     font-family: Teletype_1945_1985;
     src: url("/content/fonts/teletype1945-1985-webfont.eot");
     src: url("/content/fonts/teletype1945-1985-webfont.eot?#iefix") format("embedded-opentype"),
@@ -18,10 +19,8 @@
     font-style: normal;
 }
 
-* {
-    margin: 0;
-    padding: 0; 
-}
+/* Remove default margins and padding from all elements. */
+* { margin: 0; padding: 0; }
 
 body, html { height: 100%; font: normal 14px Arial, sans-serif; }
 
@@ -32,29 +31,15 @@ a img { border: none; vertical-align: middle; }
 ul { list-style-type: none; }
 
 p {
-    line-height: normal;
+    line-height: 1.25em;
     padding-bottom: 1em;
 }
-	p.heading {
-		color: #004a7f;
-		font: bold 1.2em Arial, sans-serif;
-		padding-top: 20px;
-	}
-
-	p.subheading {
-		color: #004a7f;
-		font: bold 1em Arial, sans-serif;
-	}
 
 input[type="text"], input[type="password"] {
     display: inline;
     font: bold 1em Arial, sans-serif;
     padding: 2px;
     margin-right: 2px;
-    border-top: 1px solid #202020;
-    border-right: 1px solid #fff;
-    border-bottom: 1px solid #fff;
-	border-left: 1px solid #202020;
     background-color: rgba(128, 128, 128, 1.0);
     color: #000;
 }
@@ -69,19 +54,30 @@ td, th {
     td.right, th.right {
 	    text-align: right;
     }
+
+td.spacer5 {
+    height: 5px;
+}
+
 th {
     border-bottom: 1px solid #fff;
 }
 
 .floatingdiv {
-    text-align: left;
     position: absolute;
 	background-color: #000;
     opacity: 0.8;
     color: rgba(255, 255, 255, 1.0);
     padding: 5px;
-	font: 1em Arial, sans-serif;
 }
+
+.divlinks {
+    color: #fff;
+}
+    .divlinks:hover, .divlinks:active {
+        color: #ff2b00;
+        background-color: transparent;
+    }
 
 .floattable {
     width: 100%;
@@ -120,6 +116,7 @@ th {
     left: 10px;
     font-size: 2em;
     font-weight: 800;
+    text-wrap: none;
 }
     .pagecaption img {
         margin-right: 7px;
@@ -132,19 +129,25 @@ th {
 .ijnred {
     color: #a01000;
 }
-
 .usnblue {
-    color: #004a7f;
+    color: #093a67;
 }
 
 .i {
 	font-style: italic;
 }
 
+.helpicon:hover {
+    cursor: pointer;
+}
+
+.clickme {
+    cursor: pointer;
+}
+
 #pagediv {
 	width: 100%;
 	height: 100%;
-    text-align: center;
 	background-repeat: no-repeat;
 }
 
@@ -153,10 +156,10 @@ th {
 	top: 0;
 	left: 20px;
 	font: 800 6em Arial, sans-serif;
+    text-wrap: none;
 }
 
 #welcome {
-	text-align: left;
 	position: absolute;
 	top: 115px;
 	left: 22px;
@@ -164,44 +167,32 @@ th {
 	width: 715px;
 }
 
-#infolink {
-	position: absolute;
-	cursor: pointer;
-	display: inline;
-	top: 10px;
-	left: 1325px;
+#linksdiv {
+    width: 100%;
+    text-align: right;
+    padding-top: 10px;
+    padding-right: 20px;
 }
 
-#logofflink {
-	position: absolute;
-    display: inline;
-    top: 18px;
-	width: 75px;
-	font: bold 1.2em Stencil, sans-serif;
-    color: #004a7f;
+#infolink, #audiolink {
+    cursor: pointer;
+	margin-right: 5px;
 }
-    #logofflink:hover, #logofflink:active {
-        color: #000;
-        text-decoration: underline;
-    }
+
+#return {
+    cursor: pointer;
+    margin-right: 20px;
+}
 
 #done {
+    cursor: pointer;
     opacity: 1.0;
+    margin-right: 5px;
 }
     #done.disable {
         opacity: 0.5;
         cursor: default;
     }
-
-#airreadiness
-{
-	opacity: 1.0;
-    margin-right: 20px;
-}
-	#airreadiness.disable {
-		opacity: 0.5;
-	    cursor: default;
-	}
 
 #buttons {
     display: inline-block;
@@ -211,14 +202,62 @@ th {
     margin: 22px 15px 0 0;
 }
 
+/* Chat .....................................................................*/
+/*#chatdiv {
+    display: none;
+    position: absolute;
+    top: 200px;
+    left: 500px;
+    width: 360px;
+    padding: 10px;
+    background-color: #6c8dab;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+}
+    #chatdiv ul {
+        min-height: 200px;
+        width: 100%;
+        font: normal .85em Arial, sans-serif;
+        color: #000;
+        background-color: #6c8dab;
+    }
+    #chatdiv input {
+        color: #000;
+        background-color: #c6c6c6;
+        width: 77%;
+    }
+#chathead {
+    padding: 5px;
+    margin-bottom: 10px;
+	cursor: move;
+    font: bold 1em Arial, sans-serif;
+    background: linear-gradient(to right, #093a67, #093a67, #093a67, #6c8dab);
+    color: #c6c6c6;
+}
+#chatclose {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font: 700 1.5em Arial, sans-serif;
+    color: #093a67;
+    cursor: pointer;
+}
+#chatinput {
+    width: 100%;
+    display: inline;
+    margin: 10px 0 20px 0;
+}
+    #chatinput a {
+        margin: 0;
+    }*/
+
 /* Flat anchor button........................................................*/
 
 .flatbutton {
 	padding: 4px 10px 4px 10px;
-    margin-right: 5px;
+    margin-right: 10px;
 	font: 600 14px Arial, sans-serif;
 	display: inline-block;
-    min-width: 30px;
+    min-width: 40px;
 	text-align: center;
 	cursor: pointer;
 	color: #000;
@@ -234,6 +273,12 @@ th {
     border-right: none;
 }
 
+.noselect {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
 .graybtn {
 	background-color: #808080;
 }
@@ -241,11 +286,11 @@ th {
 		background-color: #a0a0a0;
 	}
 .bluebtn {
-	background-color: #2b3d55;
+	background-color: #093a67;
     color: #c6c6c6;
 }
 	.bluebtn:hover, .bluebtn:active {
-		background-color: #516580;
+		background-color: #225481;
 	}
 .redbtn {
     background-color: #CE391B;
@@ -264,41 +309,48 @@ th {
     top: 0;
     width: 100%;
     height: 100%;
+    z-index: 30;
     background-color: rgba(0, 0, 0, 0);
 }
+#waitmsg {
+    display: none;
+    position: absolute;
+    text-align: center;
+    padding: 30px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+    font-weight: bold; 
+}
 #dlgcontent {
-    display: block;
+    display: none;
     position: absolute;
     text-align: left;
 	padding: 10px;
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
 }
-    #dlgcontent.bluedlg {
-        background-color: #869cb7;
-        color: #202c38;
-    }
-    #dlgcontent.reddlg {
-        background-color: #f9836b;
-        color: #000;
-    }
+.bluedlg {
+    background-color: #6c8dab;
+    color: #202c38;
+}
+.reddlg {
+    background-color: #f9836b;
+    color: #000;
+}
 #dlghead {
     display: block;
     font-weight: bold;
 	padding: 5px;
     margin-bottom: 10px;
 	cursor: move;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
 }
     #dlghead.bluedlghead {
-        background: linear-gradient(to right, #2b3d55, #2b3d55, #2b3d55, #869cb7);
+        background: linear-gradient(to right, #093a67, #093a67, #093a67, #6c8dab);
         color: #c6c6c6;
     }
     #dlghead.reddlghead {
         background: linear-gradient(to right, #CE391B, #CE391B, #CE391B, #f9836b);
 	    color: #ebebeb;
     }
+
 #dlgbody {
     line-height: 1.2em;
     padding: 5px;
@@ -318,13 +370,12 @@ th {
 .photoblurb {
     display: none;
 	position: absolute;
-    line-height: normal;
     text-justify: auto;
     text-align: justify;
     width: 400px;
     padding: 30px 22px 5px 20px;
     font: 1em Georgia, serif;
-	background-color: rgba(255, 231, 196, 0.7);
+	background-color: rgba(240, 248, 255, 0.7);
     color: #000;
     border-radius: 15px;
 }
@@ -333,19 +384,6 @@ th {
     font-style: italic;
     font-size: .85em;
 }
-.closex {
-	position: absolute;
-	top: -3px;
-	right: 7px;
-	font: 800 1.8em Arial, sans-serif;
-	cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-	.closex:hover, .closex:active {
-		color: #ff2b00;
-	}
 
 /* Tabs......................................................................*/
 
@@ -357,13 +395,13 @@ th {
     padding: 5px 15px 8px 15px;
 }
     .tablistitem.tabshown {
-        background-color: #2b3d55;
+        background-color: #3d3d3d;
     }
 .tabpanel {
     color: #eaecee;
     padding: 5px;
     display: none;
-    background: linear-gradient(to right, #2b3d55, #2b3d55, #2b3d55, #000);
+    background: linear-gradient(to right, #3d3d3d, #3d3d3d, #3d3d3d, #000);
     min-height: 270px;
     overflow: auto;
 }
@@ -400,3 +438,45 @@ th {
     .listitem img {
         padding: 3px 6px 0 5px;
     }
+
+/* Volume control slider ....................................................*/
+
+#volsliderdiv {
+    position: absolute;
+    display: none;
+	width: 30px;
+    height: 155px;
+	color: #000;
+	background-color: #c0c0c0;
+    z-index: 50;
+    text-align: center;
+	box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+}
+#volinput {
+    width: 5px;
+    height: 120px;
+    background: none;
+    color: #000;
+    background-color: #000;
+    border: none;
+	margin-top: 10px;
+	margin-left: 13px;
+}
+    #volinput .ui-slider-handle {
+        cursor: pointer;
+        color: #000;
+	    background: none;
+        background-color: #000;
+        height: 5px;
+        width: 16px;
+	    margin-left: -2px;
+        margin-bottom: -3px;
+    }
+
+#volvalue {
+	color: #000;
+	margin: 5px 0 5px -2px;
+    font-weight: bold;
+}
+
+

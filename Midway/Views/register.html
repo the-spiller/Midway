@@ -5,26 +5,35 @@
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
         <style>
-        #registerdiv {
-            font-size: 1em;
-            top: 165px;
-            left: 660px;
-	        width: 400px;
-            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
-        }
+            #pagediv {
+                background-image: url(/content/images/bg-register.jpg);
+                background-repeat: no-repeat;
+            }
+
+            #welcome { width: 1125px; }
+
+            #registerdiv {
+                font-size: 1em;
+                top: 165px;
+                left: 675px;
+	            width: 400px;
+                box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+            }
         </style>
     </head>
     <body>
         <div id="pagediv">
-            <div id="pagetitle" class="orange">REGISTRATION</div>
+            <div id="linksdiv">
+                <a id="infolink" title="Photo info"><img src="/content/images/camera.png" /></a>
+                <a id="return" title="Return to logon page"><img src="/content/images/return.png" /></a>
+            </div>
+
+            <div id="pagetitle" class="orange">MIDWAY REGISTRATION</div>
 
             <div id="welcome" class="orange">
                 The Battle of Midway turned the tide in the Pacific during World War II. Join friends old and new in 
                 recreating this legendary naval air battle! 
             </div>
-
-            <a id="return" href="#" title="Return to logon page"><img src="/content/images/return.png" /></a>
-            <div id="infolink" title="Photo info"><img id="photoInfo" src="/content/images/camera.png" /></div>
 
             <div id="registerdiv" class="floatingdiv">
                 <div class="floathead"></div>
@@ -37,7 +46,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <p>Your nickname is how other players will see you.</p>
+                            <a href="/views/about.html#registering" class="divlinks"> &rarr; More info on registration</a>
                         </td>
                     </tr>
                     <tr>
@@ -52,12 +61,11 @@
             </div>
 
             <div class="photoblurb">
-                <div class="closex">&times;</div>
                 <p>
                     U.S. Navy Torpedo Squadron Six (VT-6) Douglas TBD &ldquo;Devastator&rdquo; torpedo bombers are prepared for 
-                    launching on USS <span class="i">Enterprise</span> (CV-6) at about 0730-0740 hrs, 4 June 1942. Eleven of the fourteen TBDs 
-                    launched from <span class="i">Enterprise</span> are visible. Three more TBDs and ten F4F fighters must still be pushed 
-                    into position before launching will begin.
+                    launching on USS <span class="i">Enterprise</span> (CV-6) at about 0730-0740 hours, 4 June 1942. Eleven of the 
+                    fourteen TBDs launched from <span class="i">Enterprise</span> are visible. Three more TBDs and ten Grumman F4F 
+                    &ldquo;Wildcat&rdquo; fighters must still be pushed into position before launching will begin.
                 </p>
                 <p>
                     The TBD in the left front is Number Two (Bureau # 1512), flown by Ensign Severin L. Rombach and 
@@ -65,8 +73,7 @@
                     crew were lost attacking Japanese aircraft carriers somewhat more than two hours later. 
                 </p>
                 <p>
-                    The wake of USS <span class="i">Pensacola</span> (CA-24) trails off to the right and a destroyer is in 
-                    plane guard position at left.
+                    The destroyer at left is trailing <span class="i">Enterprise</span> in plane guard position.
                 </p>
                 <p class="photocredit">
                     U.S. Navy

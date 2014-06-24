@@ -4,8 +4,8 @@ using System.Net;
 using System.Net.Http;
 using Newtonsoft.Json;
 using Midway.Helpers;
-using Midway.Models.DTOs;
-using Midway.Models.Data;
+using Midway.Model.DTOs;
+using Midway.Model.Data;
 
 namespace Midway.Controllers
 {
@@ -25,6 +25,7 @@ namespace Midway.Controllers
         }
         
         // GET api/player......................................................
+        // List all players
         [Authorize]
         public HttpResponseMessage GetPlayers()
         {
@@ -37,11 +38,12 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-				return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/player");
             }
         }
 
-        // GET api/player/5....................................................
+        // GET api/player/id...................................................
+        // Get one player by id
         [Authorize]
         public HttpResponseMessage GetPlayer(int id)
         {
@@ -57,11 +59,12 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-				return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/player/id");
             }
         }
 
-        // GET api/player?emailAddress=value
+        // GET api/player?emailAddress=value...................................
+        // Get one player by email address
         public HttpResponseMessage GetPlayer(string emailAddress)
         {
             try
@@ -80,11 +83,12 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/player?emailAddress");
             }
         }
 
         // POST api/player (INSERT)............................................
+        // Open call to add a new player
         public HttpResponseMessage PostPlayer(DtoPlayer player)
         {
             try
@@ -113,7 +117,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "POST /api/player");
             }
         }
 
@@ -138,12 +142,12 @@ namespace Midway.Controllers
                 if (ex.Message == "Player not found")
                     return NotFoundResponse(playerId);
 
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "PUT /api/player?playerId&lockout");
             }
         }
 
         // PUT api/player (UPDATE).............................................
-        // Authorized call for real player updates incl. new games
+        // Call for player updates incl. new games
         [Authorize]
         public HttpResponseMessage PutPlayer(DtoPlayer player)
         {
@@ -167,10 +171,27 @@ namespace Midway.Controllers
 							ReasonPhrase = "Opponent Not Found"
 			            };
 
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "PUT /api/player");
             }
         }
-        
+        // DELETE api/player/id................................................
+        [Authorize]
+        public HttpResponseMessage DeletePlayer(int id)
+        {
+            try
+            {
+                _repo.DeletePlayer(id);
+                return new HttpResponseMessage(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Player not found")
+                    return NotFoundResponse(id);
+
+                return ControllerHelper.GenericErrorResponse(ex, "DELETE /api/player/id");
+            }
+        }
+
         // Private methods.....................................................
 		private HttpResponseMessage NotFoundResponse(int playerId)
 		{

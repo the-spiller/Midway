@@ -5,48 +5,72 @@
         <link rel="stylesheet" href="/content/midway.css" />
         <link rel="stylesheet" href="/content/themes/jquery-ui-1.10.3.css" />
         <style>
-        #homediv {
-            font-size: 1em;
-            left: 43px;
-            width: 675px;
-            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
-        }
-        
-        #optopponent {
-	        margin: 10px 0 10px 0;
-	        display: none;
-            width: 98%;
-        }
-	        #optopponent input {
-		        font-weight: normal;
-	            margin: 5px 0 5px 5px;
-	            width: 250px;
-	            vertical-align: middle;
-	        }
-            #optopponent a {
-                vertical-align: middle;
-                width: 50px;
+            #pagediv {
+                background-image: url(/content/images/bg-home.jpg);
+                background-repeat: no-repeat;
             }
+
+            #homediv {
+                font-size: 1em;
+                top: 205px;
+                left: 70px;
+                width: 675px;
+                box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+            }
+
+            #audiolink {
+                margin-right: 5px;
+            }
+
+            #logofflink {
+                vertical-align: central;
+                margin-right: 25px;
+                color: #000;
+                font: 600 1.2em Arial, sans-serif;
+            }
+                #logofflink:hover, #logofflink:active {
+                    text-decoration: underline;
+                }
+                #logofflink:active {
+                    text-decoration: underline;
+                    text-decoration-color: #ff2b00;
+                    color: #ff2b00;
+                }
+
+            #optopponent {
+	            margin: 10px 0 10px 0;
+	            display: none;
+                width: 98%;
+            }
+	            #optopponent input {
+	                margin: 5px 0 5px 5px;
+	                width: 250px;
+	                vertical-align: middle;
+	            }
+                #optopponent a {
+                    vertical-align: middle;
+                    width: 50px;
+                }
             
-        #recordtable {
-            margin: 20px;
-            width: 90%;
-            border-collapse: collapse;
-        }
-            #recordtable td.name {
-                width: 33%;
+            #recordtable {
+                margin: 20px;
+                width: 90%;
+                border-collapse: collapse;
             }
-            #recordtable td.number {
-                width: 19%;
-                border-right: 1px solid #fff;
-                text-align: right;
-            }
+                #recordtable td.name {
+                    width: 33%;
+                }
+                #recordtable td.number {
+                    width: 19%;
+                    border-right: 1px solid #fff;
+                    text-align: right;
+                }
 
             #playgame, #quitgame, #btncancel {
                 display: none;
             }
 
-            #cancelreg {
+            #canceledit {
                 display: none;
             }
 
@@ -68,7 +92,9 @@
             #editreg input[type="text"], #editreg input[type="password"] {
                 width: 300px;
             }
-            
+            .gameselimage {
+                pointer-events: none;
+            }
             .longbutton {
                 width: 70px;
                 margin-top: 10px;
@@ -78,14 +104,21 @@
         </style>
     </head>
     <body>
-        <div id="pagediv">
-            <div id="pagetitle" class="orange">HOME</div>
+        <div id="pagediv" class="noselect">
+            <div id="linksdiv">
+                <a id="infolink" title="Photo info"><img src="/content/images/camera.png" /></a>
+                <a id="audiolink" title="Volume"><img src="/content/images/speaker.png" /></a>
+                <div id="volsliderdiv">
+                    <div id="volinput"></div>
+                    <div id="volvalue">50</div>
+                </div>
+                <a id="logofflink" href="#">Log Off</a>
+            </div>
 
-            <a id="logofflink" href="#">Log Off</a>
-            <div id="infolink" title="Photo info"><img id="photoInfo" src="/content/images/camera.png" /></div>
+            <div id="pagetitle" class="orange">MIDWAY HOME</div>
 
             <div id="welcome" class="orange">
-                Welcome back, <span id="namespan"></span>! Go to a game, edit your registration info or peruse your record.
+                Welcome aboard, <span id="namespan"></span>! Go to a game, edit your registration info or peruse your record.
             </div>
 
             <div id="homediv" class="floatingdiv">
@@ -100,12 +133,12 @@
                 <div id="gameselect" class="tabpanel tabshown">
                     <div id="gamelist">
                         <ul>
-                            <li id="game-1" class="listitem"><img src="/content/images/usn.gif" />USN New Game</li>
-                            <li id="game-2" class="listitem"><img src="/content/images/ijn.gif" />IJN New Game</li>
+                            <li id="game-1" class="listitem"><img src="/content/images/usn.gif" class="gameselimage" />USN New Game</li>
+                            <li id="game-2" class="listitem"><img src="/content/images/ijn.gif" class="gameselimage" />IJN New Game</li>
                         </ul>
                     </div>
                     <div id="optopponent">
-                        Opponent Nickname (optional):
+                        Opponent (optional):
                         <input id="oppnickname" type="text" value="First available" />
                         <div id="oppselectdiv">
                             <select id="oppselect"></select>
@@ -127,19 +160,23 @@
                             <td><input id="pwd" type="password" class="regdata" /></td>
                         </tr>
                         <tr>
-                            <td class="right">Reenter password</td>
+                            <td class="right">Confirm password</td>
                             <td><input id="pwd2" type="password" /></td>
                         </tr>
                         <tr>
                             <td class="right">Nickname</td>
-                            <td><input id="nickname" type="text" class="regdata" /></td>
+                            <td><input id="nickname" type="text" maxlength="45" class="regdata" /></td>
                         </tr>
                         <tr>
                             <td></td>
                             <td>
-                                <a id="savereg" class="longbutton flatbutton graybtn">Save</a>
-                                <a id="cancelreg" class="longbutton flatbutton graybtn">Cancel</a>
+                                <a id="saveedit" class="longbutton flatbutton graybtn">Save</a>
+                                <a id="canceledit" class="longbutton flatbutton graybtn">Cancel</a>
                             </td>
+                        </tr>
+                        <tr><td class="spacer5" colspan="2"></td></tr>
+                        <tr>
+                            <td colspan="2"><a id="cancelreg" class="divlinks" href="#">Cancel my registration</a></td>
                         </tr>
                     </table>
                 </div>
@@ -156,15 +193,14 @@
             </div>
 
             <div class="photoblurb">
-                <div class="closex">&times;</div>
                 <p>
                     Japanese aircraft carrier <span class="i">Akagi</span> photographed leaving Celebes Island on 
-                    26 March 1942 for attacks on British bases in Ceylon. Other carriers and battleships of the Combined 
-                    Fleet striking force <span class="i">Kido Butai</span> follow, from front to back: 
+                    26 March 1942 for attacks on British bases in Ceylon. Other carriers and battleships of the Imperial Navy&rsquo;s 
+                    First Air Fleet <span class="i">Kido Butai</span> follow, from front to back: 
                     <span class="i">Soryu</span>, <span class="i">Hiryu&#772;</span>, <span class="i">Hiei</span>, 
                     <span class="i">Kirishima</span>, <span class="i">Haruna</span>, <span class="i">Kongo&#772;</span>, 
                     <span class="i">Zuikaku</span> and <span class="i">Shokaku</span>. All but the last two would be 
-                    present at Midway some nine weeks later.
+                    en route to Midway some eight weeks later.
                 </p>
                 <p>
                     We see her island and aft flight deck with parked B5N &ldquo;Kate&rdquo; torpedo bombers. Rolled mattresses 
@@ -183,9 +219,22 @@
                 <div id="dlgbuttons"></div>
             </div>
         </div>
+        
+<!--        <div id="chatdiv">
+            <div id="chathead">
+                Chat
+            </div>
+            <div id="chatclose">&times;</div>
+            <ul id="chatstream"></ul>
+            <div id="chatinput">
+                <input type="text" id="chatout" />
+                <a class="flatbutton bluebtn">Send</a>
+            </div>
+        </div>-->
 
         <script src="/scripts/vendor/jquery-1.9.1.js"></script>
         <script src="/scripts/vendor/jquery-ui-1.10.3.js"></script>
+        <script src="/scripts/vendor/howler.min.js"></script>
         <script src="/scripts/vendor/fuzzyset.js"></script>
         <script src="/scripts/utils.js"></script>
         <script src="/scripts/midway.js"></script>

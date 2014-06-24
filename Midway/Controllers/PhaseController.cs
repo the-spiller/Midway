@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Web.Http;
 using Midway.Helpers;
 using Newtonsoft.Json;
-using Midway.Models.DTOs;
-using Midway.Models.Data;
+using Midway.Model.DTOs;
+using Midway.Model.Data;
 
 namespace Midway.Controllers
 {
@@ -33,7 +33,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/phase");
             }
         }
 
@@ -58,7 +58,7 @@ namespace Midway.Controllers
                             ReasonPhrase = "Phase Not Found"
                         };
                 }
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "GET /api/phase/id");
             }
         }
 
@@ -70,14 +70,13 @@ namespace Midway.Controllers
                 if (phaseData.Ships != null && phaseData.Ships.Count > 0)
                     new ShipRepository(_uow).UpdateShips(phaseData.GameId, phaseData.PlayerId, phaseData.Ships);
 
-                if (phaseData.Searches != null && phaseData.Searches.Count > 0)
-                    new SearchRepository(_uow).RemoveSearchMarkers(phaseData.Searches);
+                if (phaseData.AirOps != null && phaseData.AirOps.Count > 0)
+                    new AirOpRepository(_uow).SaveAirOps(phaseData.GameId, phaseData.PlayerId, phaseData.AirOps);
 
                 _phaseRepo.AdvancePhase(
                     phaseData.GameId, 
                     phaseData.PlayerId, 
                     phaseData.SelectedZone, 
-                    phaseData.AirReadiness,
                     phaseData.Points);
 
 	            var dtoPlayer = new PlayerRepository(_uow).GetPlayerWithCurrentGame(phaseData.PlayerId, phaseData.GameId);
@@ -90,7 +89,7 @@ namespace Midway.Controllers
             }
             catch (Exception ex)
             {
-                return ControllerHelper.GenericErrorResponse(ex);
+                return ControllerHelper.GenericErrorResponse(ex, "PUT /api/phase");
             }
         }
     }

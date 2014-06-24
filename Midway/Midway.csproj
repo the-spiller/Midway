@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Midway</RootNamespace>
     <AssemblyName>Midway</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
@@ -42,13 +42,71 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.0\lib\net40\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServerCompact">
+      <HintPath>..\packages\EntityFramework.SqlServerCompact.6.1.0\lib\net40\EntityFramework.SqlServerCompact.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.1.4\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Owin">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Owin.1.1.4\lib\net40\Microsoft.AspNet.SignalR.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.1.1.4\lib\net40\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin.Host.SystemWeb">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.1.0.1\lib\net40\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO">
+      <HintPath>..\packages\Microsoft.Bcl.1.1.7\lib\net40\System.IO.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.19\lib\net40\System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Extensions">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.19\lib\net40\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.19\lib\net40\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.19\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime">
+      <HintPath>..\packages\Microsoft.Bcl.1.1.7\lib\net40\System.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Threading.Tasks">
+      <HintPath>..\packages\Microsoft.Bcl.1.1.7\lib\net40\System.Threading.Tasks.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -56,12 +114,13 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Http.OData, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.OData.4.0.30506\lib\net40\System.Web.Http.OData.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -69,16 +128,6 @@
     <Reference Include="Microsoft.Web.Mvc.FixedDisplayModes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.0\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http">
-    </Reference>
-    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest">
     </Reference>
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
@@ -112,10 +161,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Tracing.4.0.0\lib\net40\System.Web.Http.Tracing.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Http.OData, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.OData.4.0.0\lib\net40\System.Web.Http.OData.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Data.Edm.5.2.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
@@ -132,9 +177,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Models\Services\AuthCacheEntry.cs" />
-    <Compile Include="Models\Services\AuthHandler.cs" />
+    <Compile Include="Controllers\AirOpController.cs" />
+    <Compile Include="Model\Data\AirOpRepository.cs" />
+    <Compile Include="Model\DTOs\DtoAirOp.cs" />
+    <Compile Include="Model\DTOs\DtoAirOpSource.cs" />
+    <Compile Include="Model\DTOs\DtoNotification.cs" />
+    <Compile Include="Model\Services\AuthCacheEntry.cs" />
+    <Compile Include="Model\Services\AuthHandler.cs" />
     <Compile Include="Controllers\PhaseController.cs" />
     <Compile Include="Controllers\PlayerController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -143,65 +194,116 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ControllerHelper.cs" />
-    <Compile Include="Models\Action.cs" />
-    <Compile Include="Models\Airbase.cs" />
-    <Compile Include="Models\AirOp.cs" />
-    <Compile Include="Models\AirOpAircraft.cs" />
-    <Compile Include="Models\Data\IUnitOfWork.cs" />
-    <Compile Include="Models\Data\Mappings\ActionMap.cs" />
-    <Compile Include="Models\Data\Mappings\AirbaseMap.cs" />
-    <Compile Include="Models\Data\Mappings\AirOpAircraftMap.cs" />
-    <Compile Include="Models\Data\Mappings\AirOpMap.cs" />
-    <Compile Include="Models\Data\Mappings\GameMap.cs" />
-    <Compile Include="Models\Data\Mappings\PhaseActionMap.cs" />
-    <Compile Include="Models\Data\Mappings\PhaseMap.cs" />
-    <Compile Include="Models\Data\Mappings\PlayerGameAirbaseMap.cs" />
-    <Compile Include="Models\Data\Mappings\PlayerGameMap.cs" />
-    <Compile Include="Models\Data\Mappings\PlayerGameSearchMap.cs" />
-    <Compile Include="Models\Data\Mappings\PlayerGameSearchMarkerMap.cs" />
-    <Compile Include="Models\Data\Mappings\PlayerGameShipMap.cs" />
-    <Compile Include="Models\Data\Mappings\PlayerMap.cs" />
-    <Compile Include="Models\Data\Mappings\ShipMap.cs" />
-    <Compile Include="Models\Data\Mappings\SideMap.cs" />
-    <Compile Include="Models\Data\MidwayContext.cs" />
-    <Compile Include="Models\Data\PhaseRepository.cs" />
-    <Compile Include="Models\Data\PlayerRepository.cs" />
-    <Compile Include="Models\Data\SearchRepository.cs" />
-    <Compile Include="Models\Data\ShipRepository.cs" />
-    <Compile Include="Models\DTOs\DtoAction.cs" />
-    <Compile Include="Models\DTOs\DtoPhase.cs" />
-    <Compile Include="Models\DTOs\DtoPhaseData.cs" />
-    <Compile Include="Models\DTOs\DtoPlayer.cs" />
-    <Compile Include="Models\DTOs\DtoPlayerGame.cs" />
-    <Compile Include="Models\DTOs\DtoSearch.cs" />
-    <Compile Include="Models\DTOs\DtoSearchMarker.cs" />
-    <Compile Include="Models\DTOs\DtoShip.cs" />
-    <Compile Include="Models\Game.cs" />
-    <Compile Include="Models\Phase.cs" />
-    <Compile Include="Models\PhaseAction.cs" />
-    <Compile Include="Models\Player.cs" />
-    <Compile Include="Models\PlayerGame.cs" />
-    <Compile Include="Models\PlayerGameAirbase.cs" />
-    <Compile Include="Models\PlayerGameSearch.cs" />
-    <Compile Include="Models\PlayerGameSearchMarker.cs" />
-    <Compile Include="Models\PlayerGameShip.cs" />
-    <Compile Include="Models\Services\Caesar.cs" />
-    <Compile Include="Models\Services\Mailer.cs" />
-    <Compile Include="Models\Ship.cs" />
-    <Compile Include="Models\Side.cs" />
+    <Compile Include="Model\Action.cs" />
+    <Compile Include="Model\Airbase.cs" />
+    <Compile Include="Model\AirOp.cs" />
+    <Compile Include="Model\AirOpAircraft.cs" />
+    <Compile Include="Model\Data\IUnitOfWork.cs" />
+    <Compile Include="Model\Data\Mappings\ActionMap.cs" />
+    <Compile Include="Model\Data\Mappings\AirbaseMap.cs" />
+    <Compile Include="Model\Data\Mappings\AirOpAircraftMap.cs" />
+    <Compile Include="Model\Data\Mappings\AirOpMap.cs" />
+    <Compile Include="Model\Data\Mappings\GameMap.cs" />
+    <Compile Include="Model\Data\Mappings\PhaseActionMap.cs" />
+    <Compile Include="Model\Data\Mappings\PhaseMap.cs" />
+    <Compile Include="Model\Data\Mappings\PlayerGameAirbaseMap.cs" />
+    <Compile Include="Model\Data\Mappings\PlayerGameMap.cs" />
+    <Compile Include="Model\Data\Mappings\PlayerGameSearchMap.cs" />
+    <Compile Include="Model\Data\Mappings\PlayerGameSearchMarkerMap.cs" />
+    <Compile Include="Model\Data\Mappings\PlayerGameShipMap.cs" />
+    <Compile Include="Model\Data\Mappings\PlayerMap.cs" />
+    <Compile Include="Model\Data\Mappings\ShipMap.cs" />
+    <Compile Include="Model\Data\Mappings\SideMap.cs" />
+    <Compile Include="Model\Data\MidwayContext.cs" />
+    <Compile Include="Model\Data\PhaseRepository.cs" />
+    <Compile Include="Model\Data\PlayerRepository.cs" />
+    <Compile Include="Model\Data\SearchRepository.cs" />
+    <Compile Include="Model\Data\ShipRepository.cs" />
+    <Compile Include="Model\DTOs\DtoAction.cs" />
+    <Compile Include="Model\DTOs\DtoPhase.cs" />
+    <Compile Include="Model\DTOs\DtoPhaseData.cs" />
+    <Compile Include="Model\DTOs\DtoPlayer.cs" />
+    <Compile Include="Model\DTOs\DtoPlayerGame.cs" />
+    <Compile Include="Model\DTOs\DtoSearch.cs" />
+    <Compile Include="Model\DTOs\DtoSearchMarker.cs" />
+    <Compile Include="Model\DTOs\DtoShip.cs" />
+    <Compile Include="Model\Game.cs" />
+    <Compile Include="Model\Phase.cs" />
+    <Compile Include="Model\PhaseAction.cs" />
+    <Compile Include="Model\Player.cs" />
+    <Compile Include="Model\PlayerGame.cs" />
+    <Compile Include="Model\PlayerGameAirbase.cs" />
+    <Compile Include="Model\PlayerGameSearch.cs" />
+    <Compile Include="Model\PlayerGameSearchMarker.cs" />
+    <Compile Include="Model\PlayerGameShip.cs" />
+    <Compile Include="Model\Services\Mailer.cs" />
+    <Compile Include="Model\Ship.cs" />
+    <Compile Include="Model\Side.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\images\search\air-notready.png" />
-    <Content Include="Content\images\search\air-ready.png" />
-    <Content Include="Content\images\search\air-readying.png" />
+    <Content Include="Content\audio\music\home.mp3" />
+    <Content Include="Content\audio\music\search.mp3" />
+    <Content Include="Content\audio\sfx\air-search.mp3" />
+    <Content Include="Content\audio\sfx\bosun-attn.mp3" />
+    <Content Include="Content\audio\sfx\ship-underway.mp3" />
+    <Content Include="Content\images\battle\battleboard.png" />
+    <Content Include="Content\images\battle\bg-battle.jpg" />
+    <Content Include="Content\images\battle\ijnd.png" />
+    <Content Include="Content\images\battle\ijntdn.png" />
+    <Content Include="Content\images\battle\ijntup.png" />
+    <Content Include="Content\images\battle\usnd.png" />
+    <Content Include="Content\images\battle\usntdn.png" />
+    <Content Include="Content\images\battle\usntup.png" />
+    <Content Include="Content\images\blueloader.gif" />
+    <Content Include="Content\images\booblite-go-l.png" />
+    <Content Include="Content\images\booblite-go-r.png" />
+    <Content Include="Content\images\booblite-stop.png" />
+    <Content Include="Content\images\helpicon.png" />
+    <Content Include="Content\images\pointssample.png" />
+    <Content Include="Content\images\search\bg-searchnight.jpg" />
+    <Content Include="Content\images\search\ijnairman.png" />
+    <Content Include="Content\images\search\ijndef.png" />
+    <Content Include="Content\images\search\ijndefcap.png" />
+    <Content Include="Content\images\search\ijndefd.png" />
+    <Content Include="Content\images\search\ijndeff.png" />
+    <Content Include="Content\images\search\ijndeft.png" />
+    <Content Include="Content\images\search\ijnopsd.png" />
+    <Content Include="Content\images\search\ijnopsf.png" />
+    <Content Include="Content\images\search\ijnopspic.jpg" />
+    <Content Include="Content\images\search\ijnopst.png" />
+    <Content Include="Content\images\search\ready-0.png" />
+    <Content Include="Content\images\search\ready-2.png" />
+    <Content Include="Content\images\search\ready-1.png" />
+    <Content Include="Content\images\search\cloud-layer.png" />
+    <Content Include="Content\images\search\ijn-sea-search.png" />
+    <Content Include="Content\images\Ships\ijnbb.png" />
+    <Content Include="Content\images\Ships\ijnca.png" />
+    <Content Include="Content\images\Ships\ijncl.png" />
+    <Content Include="Content\images\Ships\ijncv.png" />
+    <Content Include="Content\images\Ships\ijncvl.png" />
+    <Content Include="Content\images\Ships\usnca.png" />
+    <Content Include="Content\images\Ships\usncl.png" />
+    <Content Include="Content\images\Ships\usncv.png" />
+    <Content Include="Content\images\search\updown.png" />
+    <Content Include="Content\images\search\usn-sea-search.png" />
+    <Content Include="Content\images\search\usnairman.png" />
+    <Content Include="Content\images\search\usnopsd.png" />
+    <Content Include="Content\images\search\usnopsf.png" />
+    <Content Include="Content\images\search\usnopspic.jpg" />
+    <Content Include="Content\images\search\usnopst.png" />
+    <Content Include="Content\images\speaker.png" />
+    <Content Include="Notes.txt" />
+    <Content Include="Scripts\pages\battle.js" />
+    <Content Include="Scripts\vendor\jquery.signalR-2.0.3.js" />
+    <Content Include="Scripts\vendor\jquery.signalR-2.0.3.min.js" />
     <Content Include="Scripts\pages\search_phase_1.js" />
     <Content Include="Scripts\pages\search_phase_2.js" />
     <Content Include="Scripts\pages\search_phase_3.js" />
+    <Content Include="Scripts\pages\search_phase_5.js" />
+    <Content Include="Scripts\vendor\howler.min.js" />
     <Content Include="Views\about.html" />
     <Content Include="App_Data\cm.sdf" />
-    <Content Include="App_Data\del_games.sql" />
-    <Content Include="Content\audio\teletype.mp3" />
     <Content Include="Content\images\bg-home.jpg" />
     <Content Include="Content\images\bg-logon.jpg" />
     <Content Include="Content\images\bg-register.jpg" />
@@ -224,86 +326,78 @@
     <Content Include="Content\images\search\ijn-air-search.png" />
     <Content Include="Content\images\search\ijn-airsearchcursor.png" />
     <Content Include="Content\images\search\ijn-seasearchcursor.png" />
-    <Content Include="Content\images\search\ijnbb.png" />
-    <Content Include="Content\images\search\ijnca.png" />
-    <Content Include="Content\images\search\ijncl.png" />
-    <Content Include="Content\images\search\ijncv.png" />
-    <Content Include="Content\images\search\ijncvl.png" />
     <Content Include="Content\images\search\ijnfleet.png" />
     <Content Include="Content\images\search\ijnsighting.png" />
     <Content Include="Content\images\search\searchboard.png" />
-    <Content Include="Content\images\search\Ships\akagi.png" />
-    <Content Include="Content\images\search\Ships\astoria.png" />
-    <Content Include="Content\images\search\Ships\atago.png" />
-    <Content Include="Content\images\search\Ships\atlanta.png" />
-    <Content Include="Content\images\search\Ships\chikuma.png" />
-    <Content Include="Content\images\search\Ships\chokai.png" />
-    <Content Include="Content\images\search\Ships\enterprise.png" />
-    <Content Include="Content\images\search\Ships\haguro.png" />
-    <Content Include="Content\images\search\Ships\haruna.png" />
-    <Content Include="Content\images\search\Ships\hiei.png" />
-    <Content Include="Content\images\search\Ships\hiryu.png" />
-    <Content Include="Content\images\search\Ships\Hits\1-hitred.png" />
-    <Content Include="Content\images\search\Ships\Hits\10-hitsgreen.png" />
-    <Content Include="Content\images\search\Ships\Hits\10-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\11-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\12-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\13-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\14-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\15-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\16-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\17-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\18-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\19-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\2-hitsgreen.png" />
-    <Content Include="Content\images\search\Ships\Hits\2-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\20-hitsgreen.png" />
-    <Content Include="Content\images\search\Ships\Hits\20-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\3-hitsgreen.png" />
-    <Content Include="Content\images\search\Ships\Hits\3-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\4-hitsgreen.png" />
-    <Content Include="Content\images\search\Ships\Hits\4-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\5-hitsgreen.png" />
-    <Content Include="Content\images\search\Ships\Hits\5-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\6-hitsgreen.png" />
-    <Content Include="Content\images\search\Ships\Hits\6-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\7-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\8-hitsgreen.png" />
-    <Content Include="Content\images\search\Ships\Hits\8-hitsred.png" />
-    <Content Include="Content\images\search\Ships\Hits\9-hitsred.png" />
-    <Content Include="Content\images\search\Ships\hornet.png" />
-    <Content Include="Content\images\search\Ships\hosho.png" />
-    <Content Include="Content\images\search\Ships\kaga.png" />
-    <Content Include="Content\images\search\Ships\kirishima.png" />
-    <Content Include="Content\images\search\Ships\kongo.png" />
-    <Content Include="Content\images\search\Ships\kumano.png" />
-    <Content Include="Content\images\search\Ships\midway.png" />
-    <Content Include="Content\images\search\Ships\mikuma.png" />
-    <Content Include="Content\images\search\Ships\minneapolis.png" />
-    <Content Include="Content\images\search\Ships\mogami.png" />
-    <Content Include="Content\images\search\Ships\mutsu.png" />
-    <Content Include="Content\images\search\Ships\myoko.png" />
-    <Content Include="Content\images\search\Ships\nagara.png" />
-    <Content Include="Content\images\search\Ships\nagato.png" />
-    <Content Include="Content\images\search\Ships\neworleans.png" />
-    <Content Include="Content\images\search\Ships\northampton.png" />
-    <Content Include="Content\images\search\Ships\pensacola.png" />
-    <Content Include="Content\images\search\Ships\portland.png" />
-    <Content Include="Content\images\search\Ships\sendai.png" />
-    <Content Include="Content\images\search\Ships\soryu.png" />
-    <Content Include="Content\images\search\Ships\suzuya.png" />
-    <Content Include="Content\images\search\Ships\tone.png" />
-    <Content Include="Content\images\search\Ships\vincennes.png" />
-    <Content Include="Content\images\search\Ships\yamato.png" />
-    <Content Include="Content\images\search\Ships\yorktown.png" />
-    <Content Include="Content\images\search\Ships\yura.png" />
-    <Content Include="Content\images\search\Ships\zuiho.png" />
+    <Content Include="Content\images\Ships\akagi.png" />
+    <Content Include="Content\images\Ships\astoria.png" />
+    <Content Include="Content\images\Ships\atago.png" />
+    <Content Include="Content\images\Ships\atlanta.png" />
+    <Content Include="Content\images\Ships\chikuma.png" />
+    <Content Include="Content\images\Ships\chokai.png" />
+    <Content Include="Content\images\Ships\enterprise.png" />
+    <Content Include="Content\images\Ships\haguro.png" />
+    <Content Include="Content\images\Ships\haruna.png" />
+    <Content Include="Content\images\Ships\hiei.png" />
+    <Content Include="Content\images\Ships\hiryu.png" />
+    <Content Include="Content\images\Ships\Hits\1-hitred.png" />
+    <Content Include="Content\images\Ships\Hits\10-hitsgreen.png" />
+    <Content Include="Content\images\Ships\Hits\10-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\11-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\12-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\13-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\14-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\15-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\16-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\17-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\18-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\19-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\2-hitsgreen.png" />
+    <Content Include="Content\images\Ships\Hits\2-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\20-hitsgreen.png" />
+    <Content Include="Content\images\Ships\Hits\20-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\3-hitsgreen.png" />
+    <Content Include="Content\images\Ships\Hits\3-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\4-hitsgreen.png" />
+    <Content Include="Content\images\Ships\Hits\4-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\5-hitsgreen.png" />
+    <Content Include="Content\images\Ships\Hits\5-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\6-hitsgreen.png" />
+    <Content Include="Content\images\Ships\Hits\6-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\7-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\8-hitsgreen.png" />
+    <Content Include="Content\images\Ships\Hits\8-hitsred.png" />
+    <Content Include="Content\images\Ships\Hits\9-hitsred.png" />
+    <Content Include="Content\images\Ships\hornet.png" />
+    <Content Include="Content\images\Ships\hosho.png" />
+    <Content Include="Content\images\Ships\kaga.png" />
+    <Content Include="Content\images\Ships\kirishima.png" />
+    <Content Include="Content\images\Ships\kongo.png" />
+    <Content Include="Content\images\Ships\kumano.png" />
+    <Content Include="Content\images\Ships\midway.png" />
+    <Content Include="Content\images\Ships\mikuma.png" />
+    <Content Include="Content\images\Ships\minneapolis.png" />
+    <Content Include="Content\images\Ships\mogami.png" />
+    <Content Include="Content\images\Ships\mutsu.png" />
+    <Content Include="Content\images\Ships\myoko.png" />
+    <Content Include="Content\images\Ships\nagara.png" />
+    <Content Include="Content\images\Ships\nagato.png" />
+    <Content Include="Content\images\Ships\neworleans.png" />
+    <Content Include="Content\images\Ships\northampton.png" />
+    <Content Include="Content\images\Ships\pensacola.png" />
+    <Content Include="Content\images\Ships\portland.png" />
+    <Content Include="Content\images\Ships\sendai.png" />
+    <Content Include="Content\images\Ships\soryu.png" />
+    <Content Include="Content\images\Ships\suzuya.png" />
+    <Content Include="Content\images\Ships\tone.png" />
+    <Content Include="Content\images\Ships\vincennes.png" />
+    <Content Include="Content\images\Ships\yamato.png" />
+    <Content Include="Content\images\Ships\yorktown.png" />
+    <Content Include="Content\images\Ships\yura.png" />
+    <Content Include="Content\images\Ships\zuiho.png" />
     <Content Include="Content\images\search\usn-air-search.png" />
     <Content Include="Content\images\search\usn-airsearchcursor.png" />
     <Content Include="Content\images\search\usn-seasearchcursor.png" />
-    <Content Include="Content\images\search\usnca.png" />
-    <Content Include="Content\images\search\usncl.png" />
-    <Content Include="Content\images\search\usncv.png" />
     <Content Include="Content\images\search\usnfleet.png" />
     <Content Include="Content\images\search\usnsighting.png" />
     <Content Include="Content\images\usn-med.png" />
@@ -327,13 +421,13 @@
     <Content Include="Content\themes\jquery-ui-1.10.3.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="Content\audio\teletype.ogg" />
     <Content Include="Content\fonts\fette___-webfont.eot" />
     <Content Include="Content\fonts\fette___-webfont.ttf" />
     <Content Include="Content\fonts\fette___-webfont.woff" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.eot" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.ttf" />
     <Content Include="Content\fonts\teletype1945-1985-webfont.woff" />
+    <Content Include="Views\battle.html" />
     <Content Include="Views\home.html" />
     <Content Include="index.html" />
     <Content Include="Views\register.html" />
@@ -345,7 +439,6 @@
     <Content Include="Scripts\pages\register.js" />
     <Content Include="Scripts\pages\search.js" />
     <Content Include="Scripts\utils.js" />
-    <Content Include="Scripts\vendor\buzz.js" />
     <Content Include="Scripts\vendor\fuzzyset.js" />
     <Content Include="Scripts\vendor\jquery-1.9.1.js" />
     <Content Include="Scripts\vendor\jquery-ui-1.10.3.js" />
@@ -357,6 +450,22 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
+    <Content Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\msvcr90.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\README_ENU.txt" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlceca40.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlcecompact40.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlceer40EN.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlceme40.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlceqp40.dll" />
+    <Content Include="_bin_deployableAssemblies\amd64\sqlcese40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\msvcr90.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\README_ENU.txt" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlceca40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlcecompact40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlceer40EN.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlceme40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlceqp40.dll" />
+    <Content Include="_bin_deployableAssemblies\x86\sqlcese40.dll" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\fonts\kna__-webfont.eot" />
@@ -367,8 +476,29 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\audio\sfx\air-search.ogg" />
+    <Content Include="Content\audio\sfx\bosun-attn.ogg" />
+    <Content Include="Content\audio\sfx\ship-underway.ogg" />
+    <Content Include="Content\audio\music\home.ogg" />
+    <Content Include="Content\audio\music\search.ogg" />
     <None Include="Properties\PublishProfiles\Files.pubxml" />
+    <Content Include="_bin_deployableAssemblies\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+    <Content Include="_bin_deployableAssemblies\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+    <None Include="Properties\PublishProfiles\FTP to Server.pubxml" />
   </ItemGroup>
+  <ItemGroup>
+    <AvailableItemName Include="ThirdPartyAssemblies">
+      <Visible>false</Visible>
+    </AvailableItemName>
+  </ItemGroup>
+  <Target Name="AfterBuild">
+    <Message Text="Build | Copying third party assemblies to output folder ($(OutputPath))" Importance="high" />
+    <Copy DestinationFolder="$(OutputPath)" SourceFiles="@(ThirdPartyAssemblies)" SkipUnchangedFiles="true" />
+  </Target>
+  <Target Name="CopyBinFiles" AfterTargets="CopyAllFilesToSingleFolderForPackage" BeforeTargets="MSDeployPublish">
+    <Message Text="Deploy | Copying third party assemblies to output folder ($(_PackageTempDir)\bin\)" Importance="high" />
+    <Copy DestinationFolder="$(_PackageTempDir)\bin\" SourceFiles="@(ThirdPartyAssemblies)" SkipUnchangedFiles="true" />
+  </Target>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -397,6 +527,11 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

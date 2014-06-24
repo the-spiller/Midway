@@ -1,7 +1,11 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Web.Http;
 using System.Web.Mvc;
+using System.Web.Routing;
+using System.Web.Helpers;
+using System.Configuration;
 using Midway.App_Start;
-using Midway.Models.Services;
+using Midway.Model.Services;
 
 namespace Midway
 {
@@ -13,9 +17,19 @@ namespace Midway
         protected void Application_Start()
         {
             //AreaRegistration.RegisterAllAreas();
+
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
             GlobalConfiguration.Configuration.MessageHandlers.Add(new AuthHandler());
+
+            //WebMail settings
+            WebMail.SmtpServer = ConfigurationManager.AppSettings["SmtpServer"];
+            WebMail.SmtpPort = Convert.ToInt32(ConfigurationManager.AppSettings["SmtpPort"]);
+            WebMail.EnableSsl = false;
+            WebMail.UserName = ConfigurationManager.AppSettings["MailSender"];
+            WebMail.From = WebMail.UserName;
+            WebMail.Password = "bullrun1";
         }
     }
 }
