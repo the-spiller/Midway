@@ -19,6 +19,20 @@
 	            width: 400px;
                 box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
             }
+            #moreinfo {
+                display: none;
+	            position: absolute;
+                top: 200px;
+                left: 250px;
+                text-justify: auto;
+                text-align: justify;
+                width: 400px;
+                padding: 30px 22px 5px 20px;
+                border: 1px solid #000;
+                font: 1em Georgia, serif;
+	            background-color: #f0f8ff;
+                color: #000;
+            }
         </style>
     </head>
     <body>
@@ -46,7 +60,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <a href="/views/about.html#registering" class="divlinks"> &rarr; More info on registration</a>
+                            <a id="moreinfolink" href="#" class="divlinks"> &rarr; More info on registration</a>
                         </td>
                     </tr>
                     <tr>
@@ -59,7 +73,31 @@
                     </tr>
                 </table>    
             </div>
-
+            <div id="moreinfo">
+                <p> Submit an email address and a nickname and we&rsquo;ll send you a nasty, computer-generated password to log in
+                    with. Your nickname is how you will be known in the 
+                    game. Both your email address and nickname must be unique or they will be rejected.
+                </p>
+                <p>                   
+                    Rest assured that other players can&rsquo;t see your email address and that we&rsquo;ll never give it away 
+                    or spam you in any way. If you cancel your registration we&rsquo;ll remove your email 
+                    address from our records and forget that we ever had it.
+                </p>
+                <p>
+                    If you lose or forget your password at any time (even if you&rsquo;ve never used it), you can fill in your email 
+                    address and  click the &ldquo;I forgot my password&rdquo; link on the login page to have another nasty, 
+                    computer-generated password sent to your email address.
+                </p>
+                <p>
+                    When you log in using the password we send, you&rsquo;ll arrive at Midway Home page. Click the 
+                    Registration tab to edit your registration information (including changing your password to something you&rsquo;ll 
+                    be able to remember). If you wish to cancel your registration, click on the &ldquo;Cancel my 
+                    registration&rdquo; link and confim that that&rsquo;s what you want to do.
+                </p>
+                <p>
+                    Click to close.
+                </p>
+            </div>
             <div class="photoblurb">
                 <p>
                     U.S. Navy Torpedo Squadron Six (VT-6) Douglas TBD &ldquo;Devastator&rdquo; torpedo bombers are prepared for 

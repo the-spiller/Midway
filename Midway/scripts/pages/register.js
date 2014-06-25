@@ -6,6 +6,14 @@ $("#return").on("click", function () {
     location.replace("/index.html");
 });
 
+$("#moreinfolink").on("click", function() {
+    $("#moreinfo").css("display", "block");
+});
+
+$("#moreinfo").on("click", function() {
+    $("#moreinfo").css("display", "none");
+});
+
 $("#btngo").on("click", function () {
     if (!validEmail("email")) {
         showAlert(
