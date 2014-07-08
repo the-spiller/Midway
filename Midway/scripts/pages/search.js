@@ -1,4 +1,7 @@
-﻿var cvs = document.getElementById("mapcanvas"),
+﻿/*------------------------------------------------------------*/
+/* Shared variables, events and functions for search map page */
+/*------------------------------------------------------------*/
+var cvs = document.getElementById("mapcanvas"),
     mapLeft = 5,
     mapTop = 85,
     divLeft = 974,
@@ -199,7 +202,7 @@ function showShipsInZone() {
     if (!selectedZone) return;
     var zone = selectedZone == "H5G" ? "Midway" : selectedZone,
         shipsHtml = "<div style=\"margin: 5px; font-weight: bold;\">" + zone + "</div>",
-        dblclick = "<div style=\"margin: 5px; font-size: .85em;\">Double-click to select all</div>",
+        dblclick = "<div style=\"margin: 5px; font-size: .85em;\">Double-click on map to select all</div>",
         gotOwnShips = false,
         i;
     
@@ -634,7 +637,6 @@ function setTabs() {
             act.Description + "\">" + act.ActionKey + "</li>";
         panelHtml += "<div id=\"" + actId + "\" class=\"tabpanel" + showFirst + "\"></div>";
         showFirst = "";
-        
     }
     $("#tabs").html(tabHtml);
     $("#tabpanels").html(panelHtml);

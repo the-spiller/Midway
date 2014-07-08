@@ -203,52 +203,33 @@ th {
 }
 
 /* Chat .....................................................................*/
-/*#chatdiv {
-    display: none;
-    position: absolute;
-    top: 200px;
-    left: 500px;
-    width: 360px;
-    padding: 10px;
-    background-color: #6c8dab;
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+#chat {
+    font: bold 1.2em Arial, sans-serif;
+    background-color: #093a67;
+    color: #eaecee;
+    margin-top: 5px;
+    padding: 10px;  
 }
-    #chatdiv ul {
-        min-height: 200px;
+    #chat ul {
+        height: 100px;
         width: 100%;
-        font: normal .85em Arial, sans-serif;
-        color: #000;
-        background-color: #6c8dab;
-    }
-    #chatdiv input {
         color: #000;
         background-color: #c6c6c6;
-        width: 77%;
+        margin: 5px 0 5px 0;
+        font: normal .85em Arial, sans-serif;
     }
-#chathead {
-    padding: 5px;
-    margin-bottom: 10px;
-	cursor: move;
-    font: bold 1em Arial, sans-serif;
-    background: linear-gradient(to right, #093a67, #093a67, #093a67, #6c8dab);
-    color: #c6c6c6;
-}
-#chatclose {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font: 700 1.5em Arial, sans-serif;
-    color: #093a67;
-    cursor: pointer;
-}
-#chatinput {
-    width: 100%;
-    display: inline;
-    margin: 10px 0 20px 0;
-}
-    #chatinput a {
+    #chat input {
         margin: 0;
-    }*/
+        width: 312px;
+        font: normal .85em Arial, sans-serif;
+        color: #000;
+        background-color: #c6c6c6;
+    }
+    #chat a
+    {
+        margin: 0;
+        display: inline;
+    }
 
 /* Flat anchor button........................................................*/
 

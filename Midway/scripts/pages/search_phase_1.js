@@ -1,14 +1,17 @@
-﻿/*---------------------------------------------------------------------------*/
-/*--------- EVENTS/FUNCTIONS for phase 1 (Search Map Move) ------------------*/
-/*---------------------------------------------------------------------------*/
-
+﻿/*----------------------------------------------------*/
+/* Events and functions for phase 1 (Search Map Move) */
+/*----------------------------------------------------*/
 var overHighlight = false,
     zonesHighlighted = [];
 
-$(document).on("click", ".airreadiness", function (e) {
+$(document).on("click", ".airreadiness.clickme", function (e) {
     if (game.PhaseId != 1) return;
     e.stopPropagation();
     setAircraftState(this);
+}).on("mousedown", ".airreadiness.clickme", function() {
+    $(this).css("padding", "2px 0px 0px 2px");
+}).on("mouseup", ".airreadiness.clickme", function() {
+    $(this).css("padding", "1px");
 });
 
 $("#canvii").on("mousemove", function (e) {

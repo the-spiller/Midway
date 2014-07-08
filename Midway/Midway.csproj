@@ -180,6 +180,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AirOpController.cs" />
+    <Compile Include="Controllers\MessageController.cs" />
     <Compile Include="Model\Data\AirOpRepository.cs" />
     <Compile Include="Model\DTOs\DtoAirOp.cs" />
     <Compile Include="Model\DTOs\DtoAirOpSource.cs" />
@@ -237,6 +238,8 @@
     <Compile Include="Model\PlayerGameSearchMarker.cs" />
     <Compile Include="Model\PlayerGameShip.cs" />
     <Compile Include="Model\Services\Mailer.cs" />
+    <Compile Include="Model\Services\MsgCache.cs" />
+    <Compile Include="Model\Services\MsgCacheEntry.cs" />
     <Compile Include="Model\Ship.cs" />
     <Compile Include="Model\Side.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

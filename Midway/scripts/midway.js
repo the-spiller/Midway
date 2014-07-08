@@ -1,6 +1,6 @@
-﻿/*---------------------------------------------------------------------------*/
-/* Midway game: HTML5 and JQuery                                             */
-/*---------------------------------------------------------------------------*/
+﻿/*--------------------------------------------------*/
+/* Variables, events and functions shared game-wide */
+/*--------------------------------------------------*/
 var player = undefined,
     DLG_WIDTH = 460,
     DLG_OK = 1,
@@ -16,6 +16,29 @@ var player = undefined,
     COOKIE_NAME_AUTH = "mdyplayer",
     COOKIE_NAME_AUDIO = "audiovol",
     supportsTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
+
+// Event handlers.......................................................
+
+$(document).on("click", "#infolink", function () {
+    showPhotoblurb();
+}).on("click", ".photoblurb", function () {
+    $("#infolink").trigger("click");
+}).on("click", "#audiolink", function () {
+    showVolSlider();
+}).on("keyup", "#dlgoverlay", function (e) {
+    e.stopPropagation();
+    if (e.keyCode == 13) {
+        if ($("#dlgbtnok").length)
+            $("#dlgbtnok").trigger("click");
+        else if ($("#dlgbtnyes").length)
+            $("#dlgbtnyes").trigger("click");
+    } else if (e.keyCode == 27) {
+        if ($("#dlgbtncancel").length)
+            $("#dlgbtncancel").trigger("click");
+        else if ($("#dlgbtnno").length)
+            $("#dlgbtnno").trigger("click");
+    }
+});
 
 // Functions...................................................................
 
@@ -308,26 +331,3 @@ function findGameById(id, games) {
     }
     return game;
 }
-
-// Global event handlers.......................................................
-
-$(document).on("click", "#infolink", function() {
-    showPhotoblurb();
-}).on("click", ".photoblurb", function() {
-    $("#infolink").trigger("click");
-}).on("click", "#audiolink", function () {
-    showVolSlider();
-}).on("keyup", "#dlgoverlay", function (e) {
-    e.stopPropagation();
-    if (e.keyCode == 13) {
-        if ($("#dlgbtnok").length)
-            $("#dlgbtnok").trigger("click");
-        else if ($("#dlgbtnyes").length)
-            $("#dlgbtnyes").trigger("click");
-    } else if (e.keyCode == 27) {
-        if ($("#dlgbtncancel").length)
-            $("#dlgbtncancel").trigger("click");
-        else if ($("#dlgbtnno").length)
-            $("#dlgbtnno").trigger("click");
-    }
-});

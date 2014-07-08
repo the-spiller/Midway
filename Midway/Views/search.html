@@ -22,11 +22,11 @@
                 display: none;
                 top: 60px;
                 width: 400px;
-                height: 766px;
+                height: 764px;
                 opacity: 1.0;
             }
             #searchdiv .tabpanel {
-                height: 697px;
+                height: 518px;
                 background: none;
                 background-color: #093a67;
             }
@@ -169,6 +169,7 @@
                 position: absolute;
                 top: 12px;
                 left: 318px;
+                padding: 1px;
                 z-index: 2;
             }
             .shiphits {
@@ -254,23 +255,25 @@
                 padding-left: 10px;
                 margin-top: 10px;
             }
-            .attackitemdetail {
+                .attackitem:hover {
+                    background-color: #0a4173;
+                }
+            .detailtable {
                 pointer-events: none;
                 position: absolute;
-                top: 26px;
-                left: 234px;
-                font-size: 12px;
-                font-weight: normal;
-                line-height: 18px;
+                top: 5px;
+                left: 260px;
+                font-size: .75em;
             }
-            .attackitem:hover {
-                background-color: #0a4173;
-            }
+                .detailtable td {
+                    padding-left: 2px;
+                    line-height: .9em;
+                }
             .attackimage {
                 pointer-events: none;
                 position: absolute;
                 top: 0;
-                left: 82px;
+                left: 105px;
             }
         </style>
     </head>
@@ -300,6 +303,12 @@
                     <ul id="tabs"></ul>
                 </div>
                 <div id="tabpanels"></div>
+                <div id="chat">
+                    Comm
+                    <ul></ul>
+                    <input type="text" />
+                    <a id="chatsend" class="flatbutton graybtn">Send</a>
+                </div>
             </div>
             <div id="fleetcursor" class="cursordiv"></div>
             <div id ="searchcursor" class="cursordiv"></div>

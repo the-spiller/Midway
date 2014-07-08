@@ -1,5 +1,6 @@
-﻿
-// Events and functions for Phase 5 (Air Defense Setup)
+﻿/*----------------------------------------------------*/
+/* Events and functions for phase 5 Air Defense Setup */
+/*----------------------------------------------------*/
 var attacks = [],
     defenseSetups = [], //parallel array of flags indicating battle map air defense setup completed
     showingAttacks = false;
@@ -19,12 +20,12 @@ $(document).on("mouseover", ".attackitem", function (e) {
 /*---------------------------------------------------------------------------*/
 function loadAirDefensePhase() {
     ajaxGetOppAirAttacks(function() {
-        var tabHtml = "<div style=\"margin: 5px;\">Zones under attack:<ul>";
+        var tabHtml = "<div style=\"margin: 5px;\">Click each zone button to go to the Battle Map and prepare your defense.<ul>";
         for (var i = 0; i < attacks.length; i++) {
             tabHtml += getAttackItemHtml(attacks[i]);
         }
-        tabHtml += "</ul><p style=\"margin-top: 10px; font-size: .85em;\">Hover to see attack sources<br />" +
-            "Click zone button to go to battle map</p></div>";
+        tabHtml += "</ul><p style=\"margin-top: 10px; font-size: .85em;\">" +
+            "Hover to see attack source(s)</p></div>";
         $("#airdefense").html(tabHtml);
     });
 }
@@ -54,7 +55,7 @@ function showAttackSources(elementId) {
 /*---------------------------------------------------------------------------*/
 function getAttackItemHtml(attack) {
     var atkHtml = "<div class=\"attackitem\" id=\"zone" + attack.Zone + "\">" +
-        "<a class=\"gobattle flatbutton graybtn\" id=\"btn-" + attack.Zone + "\">" + attack.Zone + "</a>" +
+        "<a class=\"gobattle flatbutton graybtn\" id=\"btn-" + attack.Zone + "\">Zone " + attack.Zone + "</a>" +
         "<img class=\"attackimage\" src=\"" + searchDir + side + "def.png\" />",
         squads = [0, 0, 0],
         planeTypes = ["t", "f", "d"];
@@ -68,14 +69,16 @@ function getAttackItemHtml(attack) {
     if (attack.CapSquadrons > 0) {
         atkHtml += "<img class=\"attackimage\" src=\"" + searchDir + side + "defcap.png\" />";
     }
+    var detTbl = "<table class=\"detailtable\">";
     for (i = 0; i < 3; i++) {
+        detTbl += "<tr><td>" + planeTypes[i].toUpperCase() + "</td><td class=\"right\">" + squads[i] + "</td></tr>";
         if (squads[i] > 0) {
             var imgSrc = searchDir + side + "def" + planeTypes[i] + ".png";
             atkHtml += "<img class=\"attackimage\" src=\"" + imgSrc + "\" />";
         }
     }
-    atkHtml += "<div class=\"attackitemdetail\">" + attack.AircraftTotals + "<br />CAP" + attack.CapSquadrons  + "</div></div>";
-    //atkHtml += "</div>";
+    detTbl += "<tr><td>CAP</td><td class=\"right\">" + attack.CapSquadrons + "</td></tr></table>";
+    atkHtml += detTbl  + "</div>";
     return atkHtml;
 }
 /*---------------------------------------------------------------------------*/
