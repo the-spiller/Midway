@@ -76,7 +76,6 @@
 	            height: 554px;
 	            width: 1108px;
 	            padding: 0 30px 20px 20px;
-	            text-justify: auto;
 	            text-align: justify;
 	            font: 1em Georgia, serif;
 	            background-color: #f0f8ff;
@@ -105,6 +104,13 @@
                 padding-left: 40px;
                 text-indent: -18px;
             }
+            .bspan {
+                font-weight: bold;
+            }
+            .numlist {
+                margin-left: 3em;
+                padding-bottom: 1em;
+            }
         </style>
     </head>
     <body>
@@ -126,9 +132,7 @@
                         </a>
                         <a href="#game" class="navheading">The Game</a>
                         <ul class="expandable">
-                            <li><a href="#registering" class="navsubheading">Registration</a></li>
                             <li><a href="#starting" class="navsubheading">Starting a Game</a></li>
-                            <li><a href="#play" class="navsubheading">Game Play</a></li>
                             <li><a href="#victory" class="navsubheading">Victory</a></li>
                         </ul>
                     </li>
@@ -206,67 +210,37 @@
                 </p>
                 <p>
                     On the Home page, players are presented with a list of the games that they are participating in. Select one 
-                    and press the Play button to pick it up where it was left off.
+                    and press the Play button to pick it up where you left off.
                 </p>
                 <p>
                     To start a new game, select the &ldquo;New Game&rdquo; entry for the side you&rsquo;d like to play. If there's 
                     a specific opponent you&rsquo;r looking for, enter their nickname in the &ldquo;Optional opponent nickname&rdquo; 
-                    text box. If you don&rsquo;t enter a nickname, the first player seeking a new game on the other side will become 
-                    your opponent. Click on the Play button to create the game and begin play. Once a new game is created, it is 
-                    added to the list of available games and will appear there until completed.
-                </p>
-                <p>
-                    Press the Play button and you&rsquo;ll arrive on the Search Map.
-                </p>
-                <p id="play" class="subheading">
-                    Game Play
+                    text box. If you don&rsquo;t enter a nickname, the first player seeking a new game playing the other side will 
+                    become your opponent. Click on the Play button to create the game and begin play. Once a new game is created, it is 
+                    added to the list of available games and will appear there until completed, retired from or abandoned.
                 </p>
                 <p>
                     Midway is played in turns, and each turn consists of a series of phases with specific actions taken by each 
                     player. These phases are:
                 </p>
+                <ol class="numlist">
+                    <li><span class="bspan">Movement</span>&mdash;the IJN player places newly arrived ships on the search map (the USN player starts the game with all the ships he or 
+                        she will ever have); both players move any or all of their ships and ready (or de-ready) aircraft for operations.</li>
+                    <li><span class="bspan">Search</span>&mdash;execute air and sea searches.</li>
+                    <li><span class="bspan">Air Operations</span>&mdash;see your opponent's search locations and plan your own air missions.</li>
+                    <li><span class="bspan">Possible Air Defense</span>&mdash;waiting for opponent to post Air Operations.</li>
+                    <li><span class="bspan">Air Defense Setup</span>&mdash;prepare your Battle Map defense for each zone under air attack.</li>
+                    <li><span class="bspan">Air Attack Setup</span>&mdash;place aircraft on the Battle Map for each zone you're attacking, defining specific ship attacks.</li>
+                    <li><span class="bspan">Air Attack Resolution</span>Attacked players strip off any extra fighters if they so desire, allocate defensive fire, and resolve air combats.</li>
+                    <li><span class="bspan">Air Attack Recovery</span>&mdash;attackers see the results of air combat and recover their aircraft.</li>
+                    <li><span class="bspan">Surface Combat Setup</span>&mdash;both players arrange on the Battle Map any of their ships that share a single zone on the search map; one ship per rectangle.</li>
+                    <li><span class="bspan">Surface Combat Move</span>&mdash;both players move any or all of their ships on the Battle Map one rectangle.</li>
+                    <li><span class="bspan">Surface Combat Fire</span>&mdash;players fire at enemy ships in range (battleships: 4 rectangles; all others: 3) and cause hits.</li>
+                    <li><span class="bspan">Surface Combat Outcome</span>&mdash;players see hits on their own ships and choose whether or not to attempt to end surface combat by withdrawal.</li>
+                </ol>
                 <p>
-                    <span style="font-weight: bold;">1. Movement</span><br />
-                    In this phase there are three things to do: bring newly-arrived ships into the game, move ships, and make 
-                    aircraft ready for use. Do these in any order you choose.
-                </p>
-                <p>
-                    The USN player gets all the ships he or she will ever have on the first turn; the IJN player receives 
-                    reinforcing ships on 5 different turns during the game. New arrivals are displayed on the Arrivals tab. Click 
-                    to select one or more, then click on one of the highlighted squares (aka &ldquo;zones&rdquo;) on the 
-                    map edge&mdash;west (left) for the IJN player and east (right) for the USN&mdash;to place them there.
-                </p> 
-                <p>
-                    There is no limit to the number of ships that may occupy one zone. It is smart to keep your ships together in one 
-                    or more groups; combat will demonstrate that your valuable aircraft carriers won&rsquo;t last long 
-                    unless supported by other ships.
-                </p>
-                <p>
-                    Ships on the map, including new arrivals, can be moved up to two zones (six for the USN player on the first 
-                    turn). To move ships, select the zone they&rsquo;re in, select them on the Zone tab, then click on any highlighted 
-                    zone to move them there. If you double-click on a zone, all your ships in that zone will be automatically selected. 
-                </p>
-                <p>
-                    Movement is optional, but new arrivals <span class="i">must</span> be placed on the map.
-                </p>
-                <p>
-                    If you wish, you may move your ships off the map: USN player via the east (right) map edge; IJN player off of 
-                    the north (top), west (left) or south (bottom) edges. Ships moved off the map cannot return to the game.
-                </p>
-                <p>
-                    Make your aircraft ready for use by clicking on the zone containing your aircraft carrier(s) or airbase (Midway),
-                    then clicking on the ready state icon <img src="/content/images/search/ready-0.png" /> on the aircraft carrier or 
-                    airbase in the zone tab&rsquo;s list. Aircraft in a &ldquo;not ready&rdquo; state (below the flight deck, shown) 
-                    will become &ldquo;readying,&rdquo; and in the following turn will be ready for use. If you click on a ship&rsquo;s
-                    &ldquo;readying&rdquo; or &ldquo;ready&rdquo; icon, you will knock it back to &ldquo;not ready.&rdquo; Your
-                    opponent is informed in the next phase when you ready or de-ready aircraft. Ships with readying or ready aircraft 
-                    aboard are more easily sunk (more on that later).
-                </p>
-                <p>
-                    End the phase by clicking the check mark button on the page&rsquo;s upper right.
-                </p>
-                <p>
-                    <span style="font-weight: bold;">2. Search</span><br />
+                    Detailed explanations of the actions to be performed in a phase are available in the game: click on the 
+                    <img src="/content/images/helpicon.png"/> icon next to the phase name.
                 </p>
                 <p id="victory" class="subheading">
                     Victory
@@ -274,23 +248,19 @@
                 <p>
                     During the game points are awarded to the players as follows:
                 </p>
-                <p class="numberedhanging">
-                    1. Starting with the 19th turn (0500 5 June) the U.S. player gets one point for each turn in which Midway is not 
-                    taken by the Japanese player, for a possible total of 15.
-                </p>
-                <div class="rtextwrap" style="text-align: center;">
+                <div class="rtextwrap" style="width: 150px;">
                     <img src="/content/images/pointssample.png" />
                     <div class="photocredit">
-                        Sunk, Enterprise is worth 10 points to the IJN player
+                        Sunk, Yorktown is worth 10 points to the IJN player
                     </div>
                 </div>
-                <p class="numberedhanging">
-                    2. The Japanese player receives 15 points for taking Midway before the game ends.
-                </p>
-                <p class="numberedhanging">
-                    3. Ships are assigned point values, and players receive them when they sink an opponent&rsquo;s ship. These point 
-                    values are shown circled on ship images on the Search Map Arrivals and Zone tabs, and on the Battle Map.
-                </p>
+                <ol class="numlist">
+                    <li>Starting with the 19th turn (0500 5 June) the U.S. player gets one point for each turn in which Midway is not 
+                        taken by the Japanese player, for a possible total of 15.</li>
+                    <li>The Japanese player receives 15 points for taking Midway before the game ends.</li>
+                    <li>Ships are assigned point values, and players receive them when they sink an opponent&rsquo;s ship. These point 
+                        values are shown circled on ship images on the Search Map Arrivals and Zone tabs, and on the Battle Map.</li>
+                </ol>
                 <p>
                     When the game ends, the player with the most points has won!
                 </p>
@@ -311,10 +281,10 @@
                     </div>
                 </div>
                 <p>
-                    The war began six months before on 7 December 1941 with a surprise Japanese attack on the U.S. Navy base 
-                    at <a href="http://en.wikipedia.org/wiki/Attack_on_Pearl_Harbor" target="_blank">Pearl Harbor</a> on  
-                    Oahu in the Hawaiian Islands. The Imperial Japanese Navy&rsquo;s First Air Fleet 
-                    <a href="http://en.wikipedia.org/wiki/1st_Air_Fleet_(Imperial_Japanese_Navy)" target="_blank">
+                    The war began six months before with a
+                    <a href="http://en.wikipedia.org/wiki/Attack_on_Pearl_Harbor" target="_blank">surprise Japanese attack on the 
+                        U.S. Navy base at Pearl Harbor</a> on Oahu in the Hawaiian Islands. The Imperial Japanese Navy&rsquo;s First 
+                    Carrier Striking Force <a href="http://en.wikipedia.org/wiki/1st_Air_Fleet_(Imperial_Japanese_Navy)" target="_blank">
                     <span class="i">Kido Butai</span></a> put the U.S. Navy&rsquo;s Pacific Fleet battleline on the harbor bottom, 
                     announcing with convincing violence that a modern naval air arm trumped the traditional big-gun battleships 
                     of the world&rsquo;s navies. In one of those ironies that litter military history, this demonstration 
@@ -322,7 +292,7 @@
                 </p>
                 <p>
                     While America scrambled to assemble men and mat&#233;riel to fight this war, Thailand, Malaya, Hong Kong, Guam, 
-                    Wake Island and the Philippines fell to Japanese invaders. Imperial Japan now threatened Australia and had built 
+                    Wake Island and the Philippines fell to Japanese invaders. Imperial Japan now threatened Australia and built 
                     up a strong protective screen for their 
                     <a href="http://en.wikipedia.org/wiki/Greater_East_Asia_Co-Prosperity_Sphere" target="_blank">
                     Greater East Asia Co-Prosperity Sphere</a>. Should Hawaii fall, the Pacific Ocean might as well 
@@ -363,10 +333,16 @@
                     Now Nimitz knew where and when the attack would come.
                 </p>
                 <p>
-                    On 27 May, about 75 ships of Yamamoto&rsquo;s Combined Fleet steamed from port in Japan bound for Midway, led by
-                    <span class="i">Kido Butai</span> and its 229 warplanes on four large aircraft carriers, two battleships, three 
-                    cruisers and 12 destroyers. By 2 June, two Pacific Fleet task forces composed of 234 aircraft on three carriers, 
-                    8 cruisers and 17 destroyers lay in wait about 350 miles northwest of Midway.
+                    On 27 May, about 75 ships of Yamamoto&rsquo;s Combined Fleet steamed from port bound for Midway, led by the 
+                    First Carrier Striking Force <span class="i">Kido Butai</span> and its two battleships, three heavy cruisers, one 
+                    light cruiser, 12 destroyers, four fleet carriers and 228 warplanes. By 2 June, two Pacific Fleet task forces 
+                    composed of 8 cruisers, 17 destroyers, three carriers and 232 aircraft lay in wait about 350 miles northwest 
+                    of Midway. An additional 78 Navy and Marine warplanes were based on Midway, supported by 21 U.S. Army Air Corps 
+                    bombers.
+                </p>
+                <p>
+                    Elements of the approaching Japanese fleet are spotted by search aircraft from Midway on 3 June. Attacks by Army
+                    bombers and PBY search planes jury-rigged with torpedos have no effect.
                 </p>
                 <p id="4june" class="subheading">
                     4 June

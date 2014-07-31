@@ -34,7 +34,9 @@ p {
     line-height: 1.25em;
     padding-bottom: 1em;
 }
-
+li {
+	padding: 1px;
+}
 input[type="text"], input[type="password"] {
     display: inline;
     font: bold 1em Arial, sans-serif;
